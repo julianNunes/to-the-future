@@ -1,0 +1,76 @@
+Instalação
+=============================================================================
+    - Instalar Xammp
+        - setar o PHP como comando no windows 
+        - redirecionar a pasta htdocs para a pasta do projeto
+
+    - Instalar composer
+    - Instalar Node
+    - Instalar NPM
+
+    - Instalar Docker
+        - https://learn.microsoft.com/pt-br/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package
+
+
+
+=============================================================================
+    - Docker: aplicativo que gera uma maquina virtual
+
+    - Bancos de cache   
+        - Redis
+        - MemCached
+        - 
+
+    - DNS: Domane Name System
+        - IP: Internet Protocol
+            - IpV4
+            - IpV6
+
+    - Sites antigos
+        - HTML é uma linguagem de tags, e ela é um linguagem ESTATICA
+        - CSS: Estilizador 
+        - Navegador é um interpretador de HMTL/CSS
+            - Navegador pede para um endereço (IP) e é respondido com os dados que são o proprio site
+    
+    - Sites Modernos (porem nem tanto)
+        - Incluido o JAVASCRIPT
+            - Permitiu que o HTML pudesse ser MANIPULADO
+            - DOM: Document Object Model
+                - Eventos: click, clicar fora, clicar dentro, arrastar, passar o mouse por cima, mudança (change)
+        - JQuery
+            - Biblioteca javascript para o front-end
+            - Chamadas ASSINCRONAS
+                - Eu permaneço na mesma pagina e faço uma chamda nova para o servidor
+
+    - Sites Modernos
+        - SPA: Single Page App
+            - Dar uma pesquisada
+        - VueJs (Muito parecido com o React)
+            - Framework JAVASCRIPT de frontend
+            - Conceito de Template - Modelo
+            - Reatividade 
+            - Fluxo de construção 
+                - Ordem na construção da pagina
+
+            
+    - Monolito: aplicativo onde o cliente e servidor estão no mesmo projeto 
+        - Tudoa acontece no mesmo servidor, no mesmo IP
+
+    - Laravel 10
+        - Framework de frontend e backend 
+        - Frontend é feito com "Blade"
+
+    - Sites modernos separam o front-end do back-end
+
+
+    - SQL: 
+        - tabelas elas sempre sao no plural
+        - sempre minusculo
+        - formato do nome das tabelas: 
+            - minhaTabelas
+            - minha_tabelas
+        - Palavras reservadas sao em MAIUSCULO
+            SELECT minha_tabelas.id 
+                FROM minha tabelas
+                WHERE id = 1 
+        - TODA TABELA TEM ID

@@ -1,0 +1,123 @@
+===============================================================
+Telas (Rotas - route)
+===============================================================
+
+===============================================================
+Login 
+    - Email
+    - Senha
+
+===============================================================
+Recuperacao de Senha
+    - Email
+    - Campo validador (token ou o codigo de segurança)
+
+    - Ação
+        - Envio de email com token ou link de acesso para criar nova Senha
+        - OU envio de email com codigo de verificação
+
+
+===============================================================
+Visualizacao dos dados do Usuario
+    - Campos
+        - Nome
+        - Apelido
+        - Email (TALVEZ)
+        - Troca de Senha
+        - Foto 
+        - Data de nascimento
+
+    - Botão de "Salvar"
+
+
+
+===============================================================
+
+Cartao de Credito
+    - botão para criar um novo cartao
+    
+    - Tabela com todos os cartoes
+        - Coluna "Ações"
+            - Botão para editar
+            - Botao para excluir
+            - Botao para ver Faturas 
+                - Rota nova, vai lev]ar 
+
+    - Modal para criar/edicao
+        - Ultimos 4 digitos do cartao
+        - Nome completo
+        - Dia de vencimento
+        - Apelido
+        - Ativo (Checkbox)
+
+
+===============================================================
+Cartao de Credito/FATURAS - VISUALIZACAO das FATURAS
+    
+    - Select de Mes e ano
+        - Vir selecionado com o mes corrente
+    
+    - Botão "Novo Lançamento"
+        - Abre a modal 
+            - Descricao (Obrigatorio)
+            - Data de Compra (Obrigatorio)
+            - Valor  (Obrigatorio)
+            - Parcela Atual (NAO OBRIGATORIO)
+            - Numero de Parcelas (NAO OBRIGATORIO)
+            - Tipo de despesa (NAO OBRIGATORIO)
+            - Observacao
+            - Checkbox(default false) - Valor compartilhado
+                - Se "SIM"
+                    - Porcentagem - Default 50%
+                    - Valor  (Obrigatorio)
+                    - AUTOCOMPLETE para usuarios (Obrigatorio)
+            - Autocomplete (MULTIPLO) - TAGS    
+    
+    - Tabela com os lançamentos da fatura
+        - Coluna "Ações"
+            - Botão para editar
+            - Botão para excluir
+        - Dividir visualmente entre lançamentos parcelados e lançamentos a vista
+        - Dividir entre SEMANAS - os valores a vista
+        - Gerar totalizadores tanto do parcelado, quanto do avista e somanto tudo
+    
+
+
+===============================================================
+Orçamento
+    - Select de ano
+        - Ao fazer o change buscar todos os orçamentos do ano
+    - Tabela com a lista de orçamentos do ano
+        - Botão para editar/visualizar
+        - Botao para remover Orçamento
+    
+    - Botão de criação do Orçamento
+        - Abril Modal 
+            - Select de Mes (Obrigatorio)
+            - CheckBox (default false) - perguntar se quer criar para o meses subquetenes ate o final do ano
+            - Botao Salvar 
+            - Botao cancelar
+    
+
+===============================================================
+Orçamento (Show/Ver)
+    - Painel Despesas 
+        - Botao para nova Despesa
+            - Abre a modal 
+                - Descricao (Obrigatorio)
+                - Data de vencimento (Obrigatorio)
+                - Valor  (Obrigatorio)
+                - Tipo de despesa 
+                - SELECT para cartao de Credito
+                - Observacao
+                - Checkbox(default false) - Valor compartilhado
+                    - Se "SIM"
+                        - Porcentagem - Default 50%
+                        - Valor  (Obrigatorio)
+                        - AUTOCOMPLETE para usuarios (Obrigatorio)
+                - Autocomplete - TAGS
+
+        - Tabela com as Despesas
+            - Tabela precisa ter um footer que gera os totalizadores
+
+    

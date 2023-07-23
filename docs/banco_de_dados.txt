@@ -1,0 +1,101 @@
+=============================================================
+TABELAS
+=============================================================
+
+- users - usuarios  
+	- id 
+	- email
+	- password
+	- token
+	- name 
+	- nickname 
+	- birth
+	- photo (url para a imagem)
+
+- tags
+	- id
+	- name
+
+- credit_cards - Cartao de Credito 
+	- id
+	- name - Nome do dono do cartão
+	- nickname - Apelido
+	- digits - Ultimos 4 numeros
+	- due_date - Data de Vencimento
+	- is_active - (BOOLEAN)
+
+
+- credit_card_invoices - Fatura do cartao de credito
+	- id
+	- total (decimal) - Valor total da fatura
+	- due_date - Data de Vencimento
+	- year - ANO
+	- month - Mes
+	- obs - Observação
+	- credit_card_fk - Chave estrangeira do cartão de credito
+
+
+- credit_card_invoice_expenses - Lançamento na Fatura do cartao de credito
+	- id
+	- description - Descricao
+	- date - Data
+	- value - Valor
+	- portion - Parcela
+	- portion_total - Numero total de parcelas
+	- type - Tipo de despesa
+	- obs - Observacao
+	- share_percentage - Porcentagem - Default 50%
+	- share_value - Valor  (Obrigatorio)
+	- user_fk - Chave estrangeira para usuario dono do lançamento
+	- credit_card_invoice_expense_fk - Chave estrangeira da fatura
+
+
+- credit_card_invoice_expense_tags
+	- id
+	- credit_card_invoice_expense_fk
+	- tag_fk
+
+
+
+
+
+
+
+- Conta Bancaria
+		- Nome do Banco
+		- Agencia
+		- Conta corrente
+		- Saldo Inicial
+
+
+- Movimentacao Bancaria (1 - N)
+	- Data
+	- Valor
+	- Descricao
+	- Credito/Debito
+
+
+
+
+- Fatura (1 - N)
+	- Data de vencimento
+	- Data de Fechamento
+	- Mes referente
+	- Valor (Total)
+
+- Lancamentos Fatura
+	- Data
+	- Valor
+	- Descricao
+	- Credito/Debito
+	- Parcela (Null caso nao exista)
+	- Total de Parcelas
+
+
+- Orçamento
+
+- Lancamentos
+	- Despesa/Receita
+	- Valor
+	- Descricao
+	- Data
