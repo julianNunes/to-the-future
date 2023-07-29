@@ -1,0 +1,19 @@
+Orçamento (Show/Ver)
+    - Painel Despesas 
+        - Botao para nova Despesa
+            - Abre a modal 
+                - Descricao (Obrigatorio)
+                - Data de vencimento (Obrigatorio)
+                - Valor  (Obrigatorio)
+                - Tipo de despesa 
+                - SELECT para cartao de Credito
+                - Observacao
+                - Checkbox(default false) - Valor compartilhado
+                    - Se "SIM"
+                        - Porcentagem - Default 50%
+                        - Valor  (Obrigatorio)
+                        - AUTOCOMPLETE para usuarios (Obrigatorio)
+                - Autocomplete - TAGS
+
+        - Tabela com as Despesas
+            - Tabela precisa ter um footer que gera os totalizadores

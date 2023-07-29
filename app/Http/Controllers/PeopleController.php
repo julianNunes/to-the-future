@@ -24,7 +24,7 @@ class PeopleController extends Controller
         $data = $query->paginate($request->get('limit', 10));
 
         return Inertia::render('People/Index', [
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
@@ -52,7 +52,7 @@ class PeopleController extends Controller
     public function edit(People $person)
     {
         return Inertia::render('People/Edit', [
-            'person' => $person
+            'person' => $person,
         ]);
     }
 

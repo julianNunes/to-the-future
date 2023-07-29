@@ -1,0 +1,28 @@
+Cartao de Credito/FATURAS - VISUALIZACAO das FATURAS
+    
+    - Select de Mes e ano
+        - Vir selecionado com o mes corrente
+    
+    - Botão "Novo Lançamento"
+        - Abre a modal 
+            - Descricao (Obrigatorio)
+            - Data de Compra (Obrigatorio)
+            - Valor  (Obrigatorio)
+            - Parcela Atual (NAO OBRIGATORIO)
+            - Numero de Parcelas (NAO OBRIGATORIO)
+            - Tipo de despesa (NAO OBRIGATORIO)
+            - Observacao
+            - Checkbox(default false) - Valor compartilhado
+                - Se "SIM"
+                    - Porcentagem - Default 50%
+                    - Valor  (Obrigatorio)
+                    - AUTOCOMPLETE para usuarios (Obrigatorio)
+            - Autocomplete (MULTIPLO) - TAGS    
+    
+    - Tabela com os lançamentos da fatura
+        - Coluna "Ações"
+            - Botão para editar
+            - Botão para excluir
+        - Dividir visualmente entre lançamentos parcelados e lançamentos a vista
+        - Dividir entre SEMANAS - os valores a vista
+        - Gerar totalizadores tanto do parcelado, quanto do avista e somanto tudo

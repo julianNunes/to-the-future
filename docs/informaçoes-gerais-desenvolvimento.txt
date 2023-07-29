@@ -1,0 +1,91 @@
+informaçoes-gerais-desenvolvimento
+=================================================================
+
+    - Docker: aplicativo que gera uma maquina virtual
+
+    - Bancos de cache   
+        - Redis
+        - MemCached
+        - 
+
+    - DNS: Domane Name System
+        - IP: Internet Protocol
+            - IpV4
+            - IpV6
+
+    - Sites antigos
+        - HTML é uma linguagem de tags, e ela é um linguagem ESTATICA
+        - CSS: Estilizador 
+        - Navegador é um interpretador de HMTL/CSS
+            - Navegador pede para um endereço (IP) e é respondido com os dados que são o proprio site
+    
+    - Sites Modernos (porem nem tanto)
+        - Incluido o JAVASCRIPT
+            - Permitiu que o HTML pudesse ser MANIPULADO
+            - DOM: Document Object Model
+                - Eventos: click, clicar fora, clicar dentro, arrastar, passar o mouse por cima, mudança (change)
+        - JQuery
+            - Biblioteca javascript para o front-end
+            - Chamadas ASSINCRONAS
+                - Eu permaneço na mesma pagina e faço uma chamda nova para o servidor
+
+    - Sites Modernos
+        - SPA: Single Page App
+            - Dar uma pesquisada
+        - VueJs (Muito parecido com o React)
+            - Framework JAVASCRIPT de frontend
+            - Conceito de Template - Modelo
+            - Reatividade 
+            - Fluxo de construção 
+                - Ordem na construção da pagina
+
+            
+    - Monolito: aplicativo onde o cliente e servidor estão no mesmo projeto 
+        - Tudoa acontece no mesmo servidor, no mesmo IP
+
+    - Laravel 10
+        - Framework de frontend e backend 
+        - Frontend é feito com "Blade"
+
+    - Sites modernos separam o front-end do back-end
+
+
+    - SQL: 
+        - tabelas elas sempre sao no plural
+        - sempre minusculo
+        - formato do nome das tabelas: 
+            - minhaTabelas
+            - minha_tabelas
+        - Palavras reservadas sao em MAIUSCULO
+            SELECT minha_tabelas.id 
+                FROM minha tabelas
+                WHERE id = 1 
+        - TODA TABELA TEM ID
+
+=================================================================
+VueJs / Front-end
+=================================================================
+
+    - Vericar o funcionamento do sistema de GRID para construir os componentes em Template
+        - Sempre procure algum exemplo no site do Vuetify
+    - Os componentes do Vuetify sempre começam com a letra "v" no inicio
+    - No metodo "data" é sempre importante declarar todas as variaveis que serao utilizadas.
+        - Não declarar as variaveis faz com que nao seja possivel a reatividade dos dados
+    - Todo componente ou conjunto de componentes ficam dentro de um "v-row" 
+    - Utilizar das classes do Vuetify para construir de forma responsiva os componentes
+        - No Navegador na parte do console, existe uma opção para mudar a resolução da tela e simular outros aparelhos
+        
+
+
+=================================================================
+Laravel PHP / Backend
+================================================================= 
+    - A arquitetura utilizada vai ser uma das mais antigas e simplificadas, o modelo MVC:
+        - Model-View-Controller
+
+    - Controller: 
+        - tem como objetivo fazer chamadas de metodos, e normalmente nao temos nela regras de negocio
+        - Ela esta associada a uma tela ou a um modulo
+
+    - A logica de negocio vai ficar nos arquivos de "services"
+        - Eles serao responsaveis pela logica e pelo acesso ao banco de dados
