@@ -1,13 +1,14 @@
 Gerenciamento - Orçamento
     - Select de ano
         - Ao fazer o change buscar todos os orçamentos do ano
+
     - Tabela com a lista de orçamentos do ano
         - Botão para editar/visualizar
         - Botao para remover Orçamento
-    
+
     - Botão de criação do Orçamento
-        - Abril Modal 
+        - Abril Modal
             - Select de Mes (Obrigatorio)
             - CheckBox (default false) - perguntar se quer criar para o meses subquetenes ate o final do ano
-            - Botao Salvar 
+            - Botao Salvar
             - Botao cancelar

@@ -3,14 +3,13 @@ Gerenciamento Cartao de Credito
 index.vue
     Componentes/Ações:
         - botão para criar um novo cartao
-            - Limpar os dados 
+            - Limpar os dados
 
         - Tabela com todos os cartoes
             - Coluna "Ações"
-                - Botão para editar
                 - Botao para excluir
-                - Botao para ver Faturas 
-                    - Rota nova, vai lev]ar 
+                - Botao para ver/editas Faturas
+                    - Rota nova, vai levar para uma nova tela
 
         - Modal para criar/edicao
             - Ultimos 4 digitos do cartao

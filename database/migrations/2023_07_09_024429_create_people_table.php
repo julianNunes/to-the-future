@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('gender');
             $table->string('address')->nullable();
             $table->timestamps();
+            $table->engine = 'InnoDB';
         });
     }
 

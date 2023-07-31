@@ -1,10 +1,12 @@
 Cartao de Credito/FATURAS - VISUALIZACAO das FATURAS
-    
+     - Toda essa tela sera um "component" do VUEjs para poder ser reutilzada
+
     - Select de Mes e ano
         - Vir selecionado com o mes corrente
-    
+        - Ao selecionar os dois, é feito a busca no back-end dos dados
+
     - Botão "Novo Lançamento"
-        - Abre a modal 
+        - Abre a modal
             - Descricao (Obrigatorio)
             - Data de Compra (Obrigatorio)
             - Valor  (Obrigatorio)
@@ -17,12 +19,15 @@ Cartao de Credito/FATURAS - VISUALIZACAO das FATURAS
                     - Porcentagem - Default 50%
                     - Valor  (Obrigatorio)
                     - AUTOCOMPLETE para usuarios (Obrigatorio)
-            - Autocomplete (MULTIPLO) - TAGS    
-    
+            - Autocomplete (MULTIPLO) - TAGS
+
+    - Botão para importar Excel
+        - Sera importado um excel com colunas padronizadas para fazer varios lançamentos de uma vez so
+
     - Tabela com os lançamentos da fatura
         - Coluna "Ações"
             - Botão para editar
             - Botão para excluir
         - Dividir visualmente entre lançamentos parcelados e lançamentos a vista
         - Dividir entre SEMANAS - os valores a vista
-        - Gerar totalizadores tanto do parcelado, quanto do avista e somanto tudo
+        - Gerar totalizadores tanto do parcelado, quanto do a vista e somanto tudo

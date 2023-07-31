@@ -1,12 +1,26 @@
 Orçamento (Show/Ver)
-    - Painel Despesas 
+    - AO ABRIR a tela
+        - buscar todas as entradas referentes ao orçamento e ja separar entre despesas e receitas no back-end
+
+        - Para DESPESAS:
+            - buscar todas as faturas de todos os cartoes de credito ativos
+                - Precisa tambem colocar junto com as despesas um totalizador para cada cartão de credito
+                - Cada cartao de credito vai se tornar um painel novo na tela, replicando o que ja existe na tela de visualização das faturas
+            - Buscar valores que foram compartilhados com o usuario logado para incluir nas despesas
+
+        - Para RECEITAS:
+            - Buscar valores que o usuario logado compartilhou com alguem e incluir nas receitas
+
+    - COMPONENTE: Select de Mes e ano
+        - Vir selecionado com o mes e ano que foram escolhido na tela de gerenciamento de orçamentos
+        - Ao selecionar/trocar os dois, é feito a busca no back-end dos dados descritos acima
+
+    -  COMPONENTE: Painel Despesas
         - Botao para nova Despesa
-            - Abre a modal 
+            - Abre a modal
                 - Descricao (Obrigatorio)
                 - Data de vencimento (Obrigatorio)
                 - Valor  (Obrigatorio)
-                - Tipo de despesa 
-                - SELECT para cartao de Credito
                 - Observacao
                 - Checkbox(default false) - Valor compartilhado
                     - Se "SIM"
@@ -17,3 +31,31 @@ Orçamento (Show/Ver)
 
         - Tabela com as Despesas
             - Tabela precisa ter um footer que gera os totalizadores
+
+    - COMPONENTE: Painel de Receitas
+        - Botao para nova Receita
+            - Abre a modal
+                - Descricao (Obrigatorio)
+                - Data de vencimento (Obrigatorio)
+                - Valor  (Obrigatorio)
+                - Observacao
+                - Checkbox(default false) - Valor compartilhado
+                    - Se "SIM"
+                        - Porcentagem - Default 50%
+                        - Valor  (Obrigatorio)
+                        - AUTOCOMPLETE para usuarios (Obrigatorio)
+                - Autocomplete - TAGS
+
+        - Tabela com as Receitas
+            - Tabela precisa ter um footer que gera os totalizadores
+
+    - COMPONENTE: Painel Resumo
+        - Total de despesas, MENOS COM OS VALORES COMPARTILHADOS
+        - Total de despesas COMPARTILHADAS COM OUTRO USUARIO
+        - Total de Receitas
+        - Balanço do orçamento
+            - CASO O VALOR SEJA NEGATIVO PINTAR O COMPONENTE DE VERMELHO
+
+    - COMPONENTE: Painel do cartao de credito
+        - Aqui os paineis serao replicados utilizando o componente do cartao de credito
+        - Mesma funcionalidade da tela de fatura do cartao de credito

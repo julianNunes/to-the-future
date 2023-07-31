@@ -2,13 +2,13 @@
 TABELAS
 =============================================================
 
-- users - usuarios  
-	- id 
+- users - usuarios
+	- id
 	- email
 	- password
 	- token
-	- name 
-	- nickname 
+	- name
+	- nickname
 	- birth
 	- photo (url para a imagem)
 
@@ -16,7 +16,7 @@ TABELAS
 	- id
 	- name
 
-- credit_cards - Cartao de Credito 
+- credit_cards - Cartao de Credito
 	- id
 	- name - Nome do dono do cartão
 	- nickname - Apelido
@@ -31,8 +31,16 @@ TABELAS
 	- due_date - Data de Vencimento
 	- year - ANO
 	- month - Mes
-	- obs - Observação
-	- credit_card_fk - Chave estrangeira do cartão de credito
+    - closed - Marcador para dizer que a fatura esta fechada
+	- remarks - Observação
+	- credit_card_id - Chave estrangeira do cartão de credito
+
+
+- credit_card_invoice_files
+	- id
+	- name
+	- path
+	- credit_card_invoice_expense_id
 
 
 - credit_card_invoice_expenses - Lançamento na Fatura do cartao de credito
@@ -43,59 +51,52 @@ TABELAS
 	- portion - Parcela
 	- portion_total - Numero total de parcelas
 	- type - Tipo de despesa
-	- obs - Observacao
+	- remarks - Observacao
 	- share_percentage - Porcentagem - Default 50%
-	- share_value - Valor  (Obrigatorio)
-	- user_fk - Chave estrangeira para usuario dono do lançamento
-	- credit_card_invoice_expense_fk - Chave estrangeira da fatura
-
+	- share_value - Valor
+	- user_id - Chave estrangeira para usuario dono do lançamento
+	- credit_card_invoice_expense_id - Chave estrangeira da fatura
 
 - credit_card_invoice_expense_tags
 	- id
-	- credit_card_invoice_expense_fk
-	- tag_fk
+	- credit_card_invoice_expense_id
+	- tag_id
 
 
+- budgets
+    - id
+	- year - ANO
+	- month - Mes
+    - user_id
 
 
+- budget_entries
+	- id
+	- description - Descricao
+	- due_date - Data
+	- value - Valor
+	- portion - Parcela
+	- portion_total - Numero total de parcelas
+	- type - ENUM(Despesa/Receita)
+	- remarks - Observacao
+    - closed - Marcador para dizer que o orçamento esta fechado
+	- share_percentage - Porcentagem - Default 50%
+	- share_value - Valor
+	- user_id - Chave estrangeira para usuario dono do lançamento
+	- budget_id - Chave estrangeira do orçamento
 
 
-
-- Conta Bancaria
-		- Nome do Banco
-		- Agencia
-		- Conta corrente
-		- Saldo Inicial
-
-
-- Movimentacao Bancaria (1 - N)
-	- Data
-	- Valor
-	- Descricao
-	- Credito/Debito
+- bank_accounts
+    - Nome do Banco
+    - Agencia
+    - Conta corrente
+    - Saldo Inicial
 
 
+- bank_account_entries
+	- id
+	- date - Data
+	- value - Valor
+	- description - Descricao
+	- type - ENUM(Credito/Debito)
 
-
-- Fatura (1 - N)
-	- Data de vencimento
-	- Data de Fechamento
-	- Mes referente
-	- Valor (Total)
-
-- Lancamentos Fatura
-	- Data
-	- Valor
-	- Descricao
-	- Credito/Debito
-	- Parcela (Null caso nao exista)
-	- Total de Parcelas
-
-
-- Orçamento
-
-- Lancamentos
-	- Despesa/Receita
-	- Valor
-	- Descricao
-	- Data
