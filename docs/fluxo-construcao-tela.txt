@@ -5,3 +5,6 @@ fluxo-construcao-tela
 ==============================================================================
     - Ao clicar em uma rota, uma "CONTROLLER" vai ser chamada
         - Ela vai fazer o "render" da tela, vai gerar o HTML/CSS/Javascript e mandar para o navegador como resposta
+        - Alem disso, tambem esse éh o momento de buscar os dados necessarios para renderizar a tela
+
+    -
