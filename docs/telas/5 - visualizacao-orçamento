@@ -31,6 +31,9 @@ Orçamento (Show/Ver)
 
         - Tabela com as Despesas
             - Tabela precisa ter um footer que gera os totalizadores
+            - Botoes para:
+                - Remover
+                - Atualizar
 
     - COMPONENTE: Painel de Receitas
         - Botao para nova Receita
@@ -48,6 +51,10 @@ Orçamento (Show/Ver)
 
         - Tabela com as Receitas
             - Tabela precisa ter um footer que gera os totalizadores
+            - Botoes para:
+                - Remover
+                - Atualizar
+
 
     - COMPONENTE: Painel Resumo
         - Total de despesas, MENOS COM OS VALORES COMPARTILHADOS
@@ -56,6 +63,14 @@ Orçamento (Show/Ver)
         - Balanço do orçamento
             - CASO O VALOR SEJA NEGATIVO PINTAR O COMPONENTE DE VERMELHO
 
+
     - COMPONENTE: Painel do cartao de credito
-        - Aqui os paineis serao replicados utilizando o componente do cartao de credito
+        - os paineis serao replicados utilizando o componente do cartao de credito
         - Mesma funcionalidade da tela de fatura do cartao de credito
+
+
+    - COMPONENTE: Painel do cartao de credito - COMPARTILHADO
+        - MOSTRAR SOMENTE OS VALORES QUE FORAM COMPARTILHADOS NO CARTAO DE CREDITO
+        - os paineis serao replicados utilizando o componente do cartao de credito
+        - Sera possivel somente remover um lancamento compartilhado
+            - INSERIR E ALTERAR NAO SERA POSSIVEL

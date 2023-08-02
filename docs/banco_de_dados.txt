@@ -67,6 +67,7 @@ TABELAS
     - id
 	- year - ANO
 	- month - Mes
+    - closed - Marcador para dizer que o orçamento esta fechado
     - user_id
 
 
@@ -79,11 +80,18 @@ TABELAS
 	- portion_total - Numero total de parcelas
 	- type - ENUM(Despesa/Receita)
 	- remarks - Observacao
-    - closed - Marcador para dizer que o orçamento esta fechado
 	- share_percentage - Porcentagem - Default 50%
 	- share_value - Valor
 	- user_id - Chave estrangeira para usuario dono do lançamento
 	- budget_id - Chave estrangeira do orçamento
+
+
+- budget_entry_tags
+	- id
+	- credit_card_invoice_expense_id
+	- tag_id
+
+
 
 
 - bank_accounts

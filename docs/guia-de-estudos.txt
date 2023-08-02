@@ -1,0 +1,110 @@
+Gui de Estudos
+==============================================================================
+
+==============================================================================
+Git
+==============================================================================
+    - Conceito de branch
+
+    - Conceito do comando checkout
+
+    - Conceito do comando commit
+
+    - Conceito do comando merge
+
+    - Conceito do comando pull e push
+
+
+==============================================================================
+PHP
+==============================================================================
+    - Tipagem no PHP
+        - String
+        - Int
+        - Float
+        - Boolean
+        - Object
+        - Array
+
+    - Conceito do "extends"
+
+    - Conceito de Class
+
+
+==============================================================================
+Laravel
+==============================================================================
+    - Conceito de rotas:
+        https://laravel.com/docs/10.x/routing
+
+    - Conceito de Controller:
+        https://laravel.com/docs/10.x/controllers
+
+    - Conceito de Request:
+        - Eh a requisicao feita, normalmente o primeiro parametro do metodo da Controller
+        - https://laravel.com/docs/10.x/controllers
+
+    - Conceito de Response:
+        - eh a resposta da Controller
+        - https://laravel.com/docs/10.x/responses
+
+    - Conceito de Validation
+        - Utilizado para validas os dados da Request
+        - https://laravel.com/docs/10.x/validation
+
+    - Conceito de Eloquent ORM
+        - Model: representa a tabela do banco de dados
+        - A partir do Model vamos podemos fazer todas as acoes no banco de dados
+        - https://laravel.com/docs/10.x/eloquent
+
+    - Query Builder
+        - Para situacoes onde eh necessario fazer uma query pura do SQL
+        - https://laravel.com/docs/10.x/queries
+
+    - Collections
+        - Uma biblioteca para manipular dados do Laravel
+        - https://laravel.com/docs/10.x/collections
+
+==============================================================================
+VueJs
+==============================================================================
+    - https://vuejs.org/guide/introduction.html
+
+
+
+
+
+==============================================================================
+PROJETO
+==============================================================================
+
+    - PASTAS:
+        - Backend
+            - app/
+            - routes/
+                - api.php: aqui vai ficar a definicao das rotas das nossas paginas
+                    - Route::resource(/ALGUMA-COISA/id)
+                    - Ler na documentacao do laravel sobre ROUTES
+
+            - Model: ver na documentacao do laravel
+                - PHP extends: procurar sobre Polimofirsmo
+
+            - Ao clicar em uma rota, uma "CONTROLLER" vai ser chamada
+                - Ela vai fazer o "render" da tela, vai gerar o HTML/CSS/Javascript e mandar para o navegador como resposta
+                - Alem disso, tambem esse éh o momento de buscar os dados necessarios para renderizar a tela
+                - Inertia::render: vai buscar na pasta resources/js/Pages, o meu arquivo vue
+
+
+        - FRONT-END
+            - Resources/js/Pages
+                - Aqui ficam as paginas que voce deve construir
+                - todo arquivo "index" quer dizer que eh a pagina "inicial"
+
+            - Arquivo vue
+                - Divido em HTML + TAGS do vueJs
+                    - Todo arquivo VUE, comeca com tag <template>
+                    - Tudo que tem <v-...> eh um componente do Vuetify
+
+                - SEgunda Parte de DADOS/EVENTOS/etc..., aqui eh JAVASCRIPT
+                    - Comeca com a tag <script>
+                    - import: importar um arquivo para o arquivo seu local
