@@ -34,32 +34,42 @@ PHP
 ==============================================================================
 Laravel
 ==============================================================================
+    - Conceito de Migrations:
+        - https://vuejs.org/guide/introduction.html
+
     - Conceito de rotas:
-        https://laravel.com/docs/10.x/routing
+        - https://laravel.com/docs/10.x/routing
+
 
     - Conceito de Controller:
-        https://laravel.com/docs/10.x/controllers
+        - https://laravel.com/docs/10.x/controllers
+
 
     - Conceito de Request:
         - Eh a requisicao feita, normalmente o primeiro parametro do metodo da Controller
         - https://laravel.com/docs/10.x/controllers
 
+
     - Conceito de Response:
         - eh a resposta da Controller
         - https://laravel.com/docs/10.x/responses
 
+
     - Conceito de Validation
         - Utilizado para validas os dados da Request
         - https://laravel.com/docs/10.x/validation
+
 
     - Conceito de Eloquent ORM
         - Model: representa a tabela do banco de dados
         - A partir do Model vamos podemos fazer todas as acoes no banco de dados
         - https://laravel.com/docs/10.x/eloquent
 
+
     - Query Builder
         - Para situacoes onde eh necessario fazer uma query pura do SQL
         - https://laravel.com/docs/10.x/queries
+
 
     - Collections
         - Uma biblioteca para manipular dados do Laravel
@@ -70,8 +80,25 @@ VueJs
 ==============================================================================
     - https://vuejs.org/guide/introduction.html
 
+=================================================================
+Vuetify
+=================================================================
+    - https://vuetifyjs.com/en/getting-started/installation/
 
+    - Vericar o funcionamento do sistema de GRID para construir os componentes em Template
+        - Sempre procure algum exemplo no site do Vuetify
+        - https://vuetifyjs.com/en/components/grids/
 
+    - Os componentes do Vuetify sempre começam com a letra "v" no inicio
+
+    - No metodo "data" é sempre importante declarar todas as variaveis que serao utilizadas.
+        - Não declarar as variaveis faz com que nao seja possivel a reatividade dos dados
+
+    - Todo componente ou conjunto de componentes em tela ficam dentro de um "v-row"
+        - isso garante que tudo fique sempre alinhado
+
+    - Utilizar das classes do Vuetify para construir de forma responsiva os componentes
+        - No Navegador na parte do console, existe uma opção para mudar a resolução da tela e simular outros aparelhos
 
 
 ==============================================================================
