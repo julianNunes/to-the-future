@@ -11,9 +11,12 @@ Orçamento (Show/Ver)
         - Para RECEITAS:
             - Buscar valores que o usuario logado compartilhou com alguem e incluir nas receitas
 
-    - COMPONENTE: Select de Mes e ano
+    - Select de Mes e ano
         - Vir selecionado com o mes e ano que foram escolhido na tela de gerenciamento de orçamentos
         - Ao selecionar/trocar os dois, é feito a busca no back-end dos dados descritos acima
+
+    - Botao: Adicionar Provisionamento
+        - Ao clicar vai buscar no banco de dados os registros de provisonamento e adiciona ao orcamento
 
     -  COMPONENTE: Painel Despesas
         - Botao para nova Despesa

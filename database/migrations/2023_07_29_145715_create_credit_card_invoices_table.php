@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('credit_card_invoices', function (Blueprint $table) {
             $table->id();
             $table->date('due_date')->comment('Data de vencimento');
+            $table->date('closing_date')->comment('Data de fechamento');
             $table->char('year', 4)->comment('Ano da fatura');
             $table->char('month', 2)->comment('Mês de vencimento');
             $table->string('total')->default(0);

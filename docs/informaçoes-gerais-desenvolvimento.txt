@@ -77,3 +77,10 @@ Laravel PHP / Backend
     - Controller:
         - tem como objetivo fazer chamadas de metodos, e normalmente nao temos nela regras de negocio
         - Ela esta associada a uma tela ou a um modulo
+
+
+    - Create Model and Migration :
+        - php artisan make:model Image -m
+
+    - Create Model, Migration and Controller with resource :
+        - php artisan make:model Image -mcr

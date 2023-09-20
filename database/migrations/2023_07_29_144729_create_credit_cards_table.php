@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('nickename');
             $table->char('digits', 4);
-            $table->date('due_date');
+            $table->date('due_date')->comment('Data de Vencimento');
+            $table->date('closing_date')->comment('Data de fechamento');
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');

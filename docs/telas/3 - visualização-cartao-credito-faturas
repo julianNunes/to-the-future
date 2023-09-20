@@ -5,6 +5,9 @@ Cartao de Credito/FATURAS - VISUALIZACAO das FATURAS
         - Vir selecionado com o mes corrente
         - Ao selecionar os dois, é feito a busca no back-end dos dados
 
+    - Botao "Upload Fatura"
+        - Selecionar arquivo e salvar na fatura referente
+
     - Botão "Novo Lançamento"
         - Abre a modal
             - Descricao (Obrigatorio)
@@ -23,11 +26,27 @@ Cartao de Credito/FATURAS - VISUALIZACAO das FATURAS
 
     - Botão para importar Excel
         - Sera importado um excel com colunas padronizadas para fazer varios lançamentos de uma vez so
+            - Nos disponibilizaremos uma planilha padrao para fazer download e ser preenchida
+                - Campos da planilha:
+                    - Id do Cartão
+                    - Mes
+                    - Ano
+                    - Descricao
+                    - Valor
+                    - Parcela Atual
+                    - Parcela Total
+                    - Observações
+                    - Tags (Separado por virgula)
+
+            - A Controller vai receber uma lista de dados e ira salvar a mesma
+                - transformar o resultado em uma Collection
+                - Agrupar por mes/ano, pensando que seja possível preencher um excel referenet a mais de uma mes
 
     - Tabela com os lançamentos da fatura
         - Coluna "Ações"
             - Botão para editar
             - Botão para excluir
         - Dividir visualmente entre lançamentos parcelados e lançamentos a vista
-        - Dividir entre SEMANAS - os valores a vista
-        - Gerar totalizadores tanto do parcelado, quanto do a vista e somanto tudo
+        - Dividir entre SEMANAS os valores a vista a partir da data de vencimento
+        - Gerar totalizadores tanto do parcelado, quanto do a vista e somando tudo
+

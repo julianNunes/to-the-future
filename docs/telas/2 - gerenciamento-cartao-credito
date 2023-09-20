@@ -15,6 +15,7 @@ index.vue
             - Ultimos 4 digitos do cartao
             - Nome completo
             - Dia de vencimento
+            - Data de Fechamento
             - Apelido
             - Ativo (Checkbox)
 

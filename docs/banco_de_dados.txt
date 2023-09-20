@@ -22,6 +22,7 @@ TABELAS
 	- nickname - Apelido
 	- digits - Ultimos 4 numeros
 	- due_date - Data de Vencimento
+	- closing_date - Data de Fechamento
 	- is_active - (BOOLEAN)
 
 
@@ -29,6 +30,7 @@ TABELAS
 	- id
 	- total (decimal) - Valor total da fatura
 	- due_date - Data de Vencimento
+	- closing_date - Data de Fechamento
 	- year - ANO
 	- month - Mes
     - closed - Marcador para dizer que a fatura esta fechada
@@ -54,13 +56,25 @@ TABELAS
 	- remarks - Observacao
 	- share_percentage - Porcentagem - Default 50%
 	- share_value - Valor
+    - share_user_id - Chave estrangeira para o usuario que sera compartilhado o valor
 	- user_id - Chave estrangeira para usuario dono do lançamento
 	- credit_card_invoice_expense_id - Chave estrangeira da fatura
+
 
 - credit_card_invoice_expense_tags
 	- id
 	- credit_card_invoice_expense_id
 	- tag_id
+
+- provisions
+	- id
+	- description - Descricao
+	- value - Valor
+	- week - Referente a semana
+	- share_percentage - Porcentagem - Default 50%
+	- share_value - Valor
+	- remarks - Observacao
+	- user_id - Chave estrangeira para usuario dono do lançamento
 
 
 - budgets
@@ -88,10 +102,18 @@ TABELAS
 
 - budget_entry_tags
 	- id
-	- credit_card_invoice_expense_id
+	- budget_id - Chave estrangeira do orçamento
 	- tag_id
 
-
+- budget_provisions
+	- id
+	- description - Descricao
+	- value - Valor
+	- week - Referente a semana
+	- share_percentage - Porcentagem - Default 50%
+	- share_value - Valor
+	- remarks - Observacao
+	- user_id - Chave estrangeira para usuario dono do lançamento
 
 
 - bank_accounts
