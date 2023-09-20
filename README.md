@@ -8,15 +8,15 @@ You can access demo app in : <https://laravel-inertia-vuetify.fly.dev>
 
 ## Features
 
-- Laravel 10
-- Inertia.js
-- Vue 3
-- Vite
-- Vuetify + Material Design Icons
-- ESLint + Prettier
-- Authentication (Login, Register, Forgot Password)
-- Example CRUD with serverside pagination, searching, and sorting
-- SPA (Single Page Application)
+-   Laravel 10
+-   Inertia.js
+-   Vue 3
+-   Vite
+-   Vuetify + Material Design Icons
+-   ESLint + Prettier
+-   Authentication (Login, Register, Forgot Password)
+-   Example CRUD with serverside pagination, searching, and sorting
+-   SPA (Single Page Application)
 
 ## Installation
 
@@ -64,6 +64,7 @@ php artisan migrate
 ```
 
 Run application
+
 ```bash
 php artisan serve
 ```

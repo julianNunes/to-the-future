@@ -79,6 +79,10 @@ Laravel PHP / Backend
         - Ela esta associada a uma tela ou a um modulo
 
 
+
+    - Sobre Services/Repositories
+        - https://medium.com/levantelab/repository-pattern-contracts-e-service-layer-no-laravel-6-670aa9f50173
+
     - Create Model and Migration :
         - php artisan make:model Image -m
 

@@ -10,5 +10,10 @@ export default {
             icon: 'mdi-account-group',
             to: '/people',
         },
+        {
+            title: 'Provision',
+            icon: 'mdi-money',
+            to: '/provision',
+        },
     ],
 }
