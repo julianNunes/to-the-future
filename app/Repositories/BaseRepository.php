@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repositories;
 
 use App\Repositories\Contracts\EloquentRepositoryInterface;
@@ -10,7 +9,7 @@ class BaseRepository implements EloquentRepositoryInterface
     /**
      * @var Model
      */
-     protected $model;
+    protected $model;
 
     /**
      * BaseRepository constructor.
@@ -23,37 +22,37 @@ class BaseRepository implements EloquentRepositoryInterface
     }
 
     /**
-    * @param array $attributes
-    *
-    * @return Model
-    */
+     * @param array $attributes
+     *
+     * @return Model
+     */
     public function create(array $attributes): Model
     {
         return $this->model->create($attributes);
     }
 
     /**
-    * @param $id
-    * @return Model
-    */
+     * @param $id
+     * @return Model
+     */
     public function find($id): ?Model
     {
         return $this->model->find($id);
     }
 
     /**
-    * @param $id
-    * @return bool
-    */
+     * @param $id
+     * @return bool
+     */
     public function update(?Model $model, array $attributes): bool
     {
         return $model->update($attributes);
     }
 
     /**
-    * @param $model
-    * @return bool
-    */
+     * @param $model
+     * @return bool
+     */
     public function delete(?Model $model): bool
     {
         return $model->delete();

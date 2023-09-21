@@ -20,7 +20,7 @@ class ProvisionService
     /**
      * Retorna todos os provisonamentos
      * @return Collection
-    */
+     */
     public function all()
     {
         $provisions = $this->provisionRepository->all();
@@ -39,7 +39,7 @@ class ProvisionService
      * Cria um novo Provisionamento
      * @param array $data
      * @return Provision
-    */
+     */
     public function create(array $data): Provision
     {
         return $this->provisionRepository->create($data);
