@@ -6,6 +6,7 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import vuetify from './Plugins/vuetify'
 import toast from './Plugins/toast'
+import i18n from './Locales/i18n'
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel'
 
@@ -17,6 +18,7 @@ createInertiaApp({
             .use(plugin)
             .use(vuetify)
             .use(toast)
+            .use(i18n)
             .mount(el)
     },
     progress: {

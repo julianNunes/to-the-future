@@ -1,0 +1,5 @@
+LISTA DE TAREFAS PENDENTES
+==================================================
+
+    - Criar componente para mudar dinamicamente a linguagem do sistema
+        - https://lokalise.com/blog/vue-i18n/

@@ -1,0 +1,26 @@
+{
+    "default": {
+        "new": "Novo",
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "search": "Buscar",
+        "action": "Ações",
+        "no-data-text": "Não há registro disponivel",
+        "itens-per-page": "Items por página",
+        "page-text": "{0}-{1} of {2}",
+        "sort-by": "Ordenar por",
+        "confirm-delete-item": "Are you sure you want to delete this item?",
+
+
+        "description": "Descrição",
+        "value": "Valor",
+        "week": "Semana",
+        "share": "Compartilhado",
+        "share-value": "Valor Compartilhado",
+        "remarks": "Observações"
+    },
+    "menus": {
+        "dashboard": "Dashboard",
+        "provision": "Provisionamento"
+    }
+}

@@ -1,8 +1,3 @@
-<script setup>
-import { Link } from '@inertiajs/vue3'
-import navigation from '@/Configs/navigation'
-</script>
-
 <template>
     <v-list nav>
         <!-- List Menu -->
@@ -22,3 +17,18 @@ import navigation from '@/Configs/navigation'
         </Link>
     </v-list>
 </template>
+
+<script setup>
+import { Link } from '@inertiajs/vue3'
+import navigation from '@/Configs/navigation'
+</script>
+
+<script>
+export default {
+    async created() {
+        for (let item of navigation.items) {
+            item.title = this.$t(item.title)
+        }
+    },
+}
+</script>

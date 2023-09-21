@@ -12,7 +12,6 @@ class Provision extends Model
     protected $table = 'provisions';
 
     protected $fillable = [
-        'name',
         'description',
         'value',
         'week',

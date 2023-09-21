@@ -1,0 +1,38 @@
+{
+    "default": {
+        "new": "Novo",
+        "save": "Salvar",
+        "cancel": "Cancelar",
+        "close": "Fechar",
+        "search": "Buscar",
+        "action": "Ações",
+        "no-data-text": "Não há registro disponivel",
+        "itens-per-page": "Items por página",
+        "page-text": "{0}-{1} de {2}",
+        "sort-by": "Ordenar por",
+        "no": "Não",
+        "yes": "Sim",
+        "confirm-delete-item": "Voce tem certeza que deseja remover esse item?",
+
+        "description": "Descrição",
+        "value": "Valor",
+        "week": "Semana",
+        "week-1": "Semana 1",
+        "week-2": "Semana 2",
+        "week-3": "Semana 3",
+        "week-4": "Semana 4",
+        "share": "Compartilhar",
+        "share-percentage": "Porcentagem Compartilhada",
+        "share-value": "Valor Compartilhado",
+        "share-user": "Compartilhado com",
+        "remarks": "Observações"
+    },
+    "menus": {
+        "dashboard": "Dashboard",
+        "provision": "Provisionamento"
+    },
+    "provision": {
+        "new-item": "Novo Provisionamento",
+        "edit-item": "Editar Provisionamento"
+    }
+}

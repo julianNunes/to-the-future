@@ -1,39 +1,33 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import { Head } from '@inertiajs/vue3'
-</script>
-
 <template>
     <Head title="Provision" />
     <AuthenticatedLayout>
         <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">Provision</h5>
+            <h5 class="text-h5 font-weight-bold">{{ $t('menus.provision') }}</h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
         <v-card class="pa-4">
             <v-row>
                 <v-col md="12">
-                    <v-btn text color="primary">Novo</v-btn>
+                    <v-spacer />
+                    <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
                 </v-col>
                 <v-col md="12">
                     <v-data-table
                         :headers="headers"
-                        :items="data.data"
+                        :items="listProvisions"
                         :search="search"
-                        show-select
                         :items-per-page="-1"
                         item-key="id"
-                        :no-data-text="`NAO EXISTE NADA`"
-                        :no-results-text="'Nao existem registros'"
+                        :no-data-text="$t('default.no-data-text')"
+                        :no-results-text="$t('default.no-data-text')"
                         :footer-props="{
-                            'items-per-page-text': 'Itens por Pagina',
-                            'page-text': 'Page Text',
+                            'items-per-page-text': $t('default.itens-per-page'),
+                            'page-text': $t('default.page-text'),
                         }"
                         :header-props="{
-                            sortByText: 'Sort By',
+                            sortByText: $t('default.sort-by'),
                         }"
-                        class="dataTable elevation-3"
+                        class="elevation-3"
                         fixed-header
                     >
                         <template #[`item.action`]="{ item }">
@@ -43,7 +37,7 @@ import { Head } from '@inertiajs/vue3'
                                 color="error"
                                 icon="mdi-delete"
                                 size="small"
-                                @click="deleteItem(item)"
+                                @click="openDelete(item)"
                             />
                         </template>
                         <template #top>
@@ -52,7 +46,7 @@ import { Head } from '@inertiajs/vue3'
                                     <v-col cols="12" lg="12" md="12" sm="12">
                                         <v-text-field
                                             v-model="search"
-                                            label="Buscar"
+                                            :label="$t('default.search')"
                                             append-icon="mdi-magnify"
                                             single-line
                                             hide-details
@@ -77,54 +71,84 @@ import { Head } from '@inertiajs/vue3'
                 <v-card-text>
                     <v-container>
                         <v-row>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-text-field label="Description" required></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-text-field label="Value" hint="example of helper text only on focus"></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="12" md="12">
                                 <v-text-field
-                                    label="Legal last name*"
-                                    hint="example of persistent helper text"
-                                    persistent-hint
+                                    v-model="provision.description"
+                                    :label="$t('default.description')"
                                     required
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12">
-                                <v-text-field label="Email*" required></v-text-field>
+                            <v-col cols="12" sm="6" md="6">
+                                <v-text-field
+                                    v-model="provision.value"
+                                    :label="$t('default.value')"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    required
+                                ></v-text-field>
                             </v-col>
-                            <v-col cols="12">
-                                <v-text-field label="Password*" type="password" required></v-text-field>
+                            <v-col cols="12" sm="6" md="6">
+                                <v-select
+                                    v-model="provision.week"
+                                    :label="$t('default.week')"
+                                    :items="weekList"
+                                    item-title="name"
+                                    item-value="value"
+                                    clearable
+                                ></v-select>
                             </v-col>
-                            <v-col cols="12" sm="6">
-                                <v-select :items="['0-17', '18-29', '30-54', '54+']" label="Age*" required></v-select>
+                            <v-col cols="12" sm="6" md="6">
+                                <v-select
+                                    v-model="provision.share"
+                                    :label="$t('default.share')"
+                                    :items="shareOptions"
+                                    item-title="name"
+                                    item-value="value"
+                                    clearable
+                                ></v-select>
                             </v-col>
-                            <v-col cols="12" sm="6">
-                                <v-autocomplete
-                                    :items="[
-                                        'Skiing',
-                                        'Ice hockey',
-                                        'Soccer',
-                                        'Basketball',
-                                        'Hockey',
-                                        'Reading',
-                                        'Writing',
-                                        'Coding',
-                                        'Basejump',
-                                    ]"
-                                    label="Interests"
-                                    multiple
-                                ></v-autocomplete>
+                            <v-col v-if="provision.share" cols="12" sm="6" md="6">
+                                <v-text-field
+                                    v-model="provision.share_percentage"
+                                    :label="$t('default.share-percentage')"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col v-if="provision.share" cols="12" sm="6" md="6">
+                                <v-text-field
+                                    v-model="provision.share_value"
+                                    :label="$t('default.share-percentage')"
+                                    type="number"
+                                    min="0"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col v-if="provision.share" cols="12" sm="6" md="6">
+                                <v-select
+                                    v-model="provision.share_user_id"
+                                    :label="$t('default.share-user')"
+                                    :items="listUsersShare"
+                                    item-title="name"
+                                    item-value="id"
+                                    clearable
+                                ></v-select>
+                            </v-col>
+                            <v-col cols="12" md="12">
+                                <v-text-field v-model="provision.remarks" :label="$t('default.remarks')"></v-text-field>
                             </v-col>
                         </v-row>
                     </v-container>
-                    <small>*indicates required field</small>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue-darken-1" variant="text" @click="dialog = false"> Close </v-btn>
-                    <v-btn color="blue-darken-1" variant="text" @click="dialog = false"> Save </v-btn>
+                    <v-btn color="error" @click="editDialog = false">
+                        {{ $t('default.cancel') }}
+                    </v-btn>
+                    <v-btn color="primary" :disabled="validItem()" @click="submitDelete">
+                        {{ $t('default.save') }}
+                    </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -133,17 +157,23 @@ import { Head } from '@inertiajs/vue3'
         <v-row justify="center">
             <v-dialog v-model="deleteDialog" persistent width="auto">
                 <v-card>
-                    <v-card-text>Are you sure you want to delete this item?</v-card-text>
+                    <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
                     <v-card-actions>
                         <v-spacer />
-                        <v-btn color="error" text @click="deleteDialog = false">Cancel</v-btn>
-                        <v-btn color="primary" :loading="isLoading" text @click="submitDelete">Delete</v-btn>
+                        <v-btn color="error" text :loading="isLoading" @click="deleteDialog = false">Cancel</v-btn>
+                        <v-btn color="primary" :loading="isLoading" text @click="save">Delete</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
         </v-row>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import { Head } from '@inertiajs/vue3'
+</script>
 
 <script>
 export default {
@@ -152,27 +182,30 @@ export default {
         data: {
             type: Object,
         },
+        usersShare: {
+            type: Array,
+        },
     },
 
     data() {
         return {
             headers: [
-                { title: 'Description', key: 'description' },
-                { title: 'Value', key: 'value' },
-                { title: 'Week', key: 'week' },
-                { title: 'Share', key: 'share_percentage' },
-                { title: 'Share Value', key: 'share_value' },
-                { title: 'Remarks', key: 'remarks' },
-                { title: 'Action', key: 'action', sortable: false },
+                { title: this.$t('default.description'), key: 'description' },
+                { title: this.$t('default.value'), key: 'value' },
+                { title: this.$t('default.week'), key: 'week' },
+                { title: this.$t('default.share'), key: 'share_percentage' },
+                { title: this.$t('default.share-value'), key: 'share_value' },
+                { title: this.$t('default.remarks'), key: 'remarks' },
+                { title: this.$t('default.action'), key: 'action', sortable: false },
             ],
             breadcrumbs: [
                 {
-                    title: 'Dashboard',
+                    title: this.$t('menus.dashboard'),
                     disabled: false,
                     href: '/dashboard',
                 },
                 {
-                    title: 'Provision',
+                    title: this.$t('menus.provision'),
                     disabled: true,
                 },
             ],
@@ -181,35 +214,64 @@ export default {
             deleteDialog: false,
             isLoading: false,
             deleteId: null,
+            listProvisions: [],
+            listUsersShare: [],
             provision: {
                 id: null,
                 description: null,
                 value: 0,
                 week: null,
                 remarks: null,
-                share_percentage: false,
+                share: null,
+                share_percentage: 0,
                 share_value: 0,
                 share_user_id: null,
             },
             weekList: [
                 {
-                    name: 'Semana 1',
+                    name: this.$t('default.week-1'),
                     value: 'WEEK_1',
                 },
                 {
-                    name: 'Semana 2',
+                    name: this.$t('default.week-2'),
                     value: 'WEEK_2',
                 },
                 {
-                    name: 'Semana 3',
+                    name: this.$t('default.week-3'),
                     value: 'WEEK_3',
                 },
                 {
-                    name: 'Semana 4',
+                    name: this.$t('default.week-4'),
                     value: 'WEEK_4',
                 },
             ],
+            shareOptions: [
+                {
+                    name: this.$t('default.no'),
+                    value: 0,
+                },
+                {
+                    name: this.$t('default.yes'),
+                    value: 1,
+                },
+            ],
         }
+    },
+
+    watch: {
+        'provision.share': function () {
+            this.provision.share_percentage = 0
+            this.provision.share_value = 0
+            this.provision.share_user_id = null
+        },
+        'provision.share_percentage': function (value) {
+            if (value > 0) {
+                this.provision.share_value =
+                    (parseFloat(this.provision.value) * parseFloat(this.provision.share_percentage)) / 100
+            } else {
+                this.provision.share_value = 0
+            }
+        },
     },
 
     async created() {
@@ -224,24 +286,38 @@ export default {
 
     methods: {
         getAll() {
-            this.isLoadingTable = true
+            this.isLoading = true
 
             this.$inertia.get('/provision', null, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {
-                    this.isLoadingTable = false
+                    this.isLoading = false
                 },
             })
         },
 
         newItem() {
+            this.titleModal = this.$t('provision.new-item')
+            this.provision = {
+                id: null,
+                description: null,
+                value: 0,
+                week: null,
+                remarks: null,
+                share: null,
+                share_percentage: 0,
+                share_value: 0,
+                share_user_id: null,
+            }
             this.editDialog = true
         },
 
         closeItem() {
             this.editDialog = false
         },
+
+        validItem() {},
 
         save() {
             console.log('save')
@@ -251,7 +327,7 @@ export default {
             console.log('update', item)
         },
 
-        deleteItem(item) {
+        openDelete(item) {
             this.deleteId = item.value
             this.deleteDialog = true
         },

@@ -1,17 +1,17 @@
 export default {
     items: [
         {
-            title: 'Dashboard',
+            title: 'menus.dashboard',
             icon: 'mdi-view-dashboard',
             to: '/dashboard',
         },
+        // {
+        //     title: 'People',
+        //     icon: 'mdi-account-group',
+        //     to: '/people',
+        // },
         {
-            title: 'People',
-            icon: 'mdi-account-group',
-            to: '/people',
-        },
-        {
-            title: 'Provision',
+            title: 'menus.provision',
             icon: 'mdi-money',
             to: '/provision',
         },
