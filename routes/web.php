@@ -1,8 +1,12 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PeopleController;
-use App\Http\Controllers\ProvisionController;
+use App\Http\Controllers\{
+    DashboardController,
+    PeopleController,
+    ProvisionController,
+    TagController,
+};
+
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -29,6 +33,20 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('/people', PeopleController::class)->except(['show']);
-Route::resource('/provision', ProvisionController::class)->except(['show']);
 
-require __DIR__.'/auth.php';
+// Provisionamentos
+Route::controller(ProvisionController::class)->group(function () {
+    Route::get('/provision', 'index');
+    Route::post('/provision', 'store');
+    Route::put('/provision/{id}', 'update');
+    Route::delete('/provision/{id}', 'destroy');
+});
+
+//Tags
+Route::controller(TagController::class)->group(function () {
+    Route::get('/tag', 'index');
+    Route::post('/tag', 'store');
+    Route::put('/tag/{id}', 'update');
+    Route::delete('/tag/{id}', 'destroy');
+});
+require __DIR__ . '/auth.php';

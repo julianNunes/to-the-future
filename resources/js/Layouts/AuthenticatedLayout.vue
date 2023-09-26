@@ -15,10 +15,10 @@ import NavigationMenu from '@/Components/NavigationMenu.vue'
             <v-divider />
             <NavigationMenu />
         </v-navigation-drawer>
-        <v-app-bar color="primary">
+        <v-app-bar color="light-green">
             <v-app-bar-nav-icon v-if="$vuetify.display.mobile" @click.stop="drawer = !drawer" />
             <v-app-bar-nav-icon v-else @click.stop="rail = !rail" />
-            <v-toolbar-title text="Laravel" />
+            <v-toolbar-title text="To the Future" />
         </v-app-bar>
         <v-main>
             <v-container>
@@ -50,9 +50,9 @@ export default {
                 const toast = useToast()
                 const flash = this.$page.props.flash
                 if (flash.success) {
-                    toast.success(flash.success)
+                    toast.success(this.$t(flash.success))
                 } else if (flash.error) {
-                    toast.error(flash.error)
+                    toast.error(this.$t(flash.error))
                 }
             },
         },

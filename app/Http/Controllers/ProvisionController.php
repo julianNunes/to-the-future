@@ -18,49 +18,63 @@ class ProvisionController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Retorna os dados para o index de Provisionamento
      */
     public function index()
     {
-        $data = $this->provisionService->all();
-
-        return Inertia::render('Provision/Index', [
-            'data' => $data,
-        ]);
+        $data = $this->provisionService->index();
+        return Inertia::render('Provision/Index', $data);
     }
 
+
     /**
-     * Store a newly created resource in storage.
+     * Cria um novo Provisionamento
      */
     public function store(Request $request)
     {
         $this->validate($request, [
             'description' => ['required'],
             'value' => ['required'],
-            'week' => ['nullable'],
+            'week' => ['required'],
         ]);
 
-        $provision = $this->provisionService->create($request->all());
-        return $provision;
+        $this->provisionService->create(
+            $request->description,
+            floatval($request->value),
+            $request->week,
+            $request->remarks,
+            $request->share_value,
+            $request->share_user_id
+        );
+
+        return redirect()->back()->with('success', 'default.sucess-save');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualiza um Provisionamento
      */
     public function update(Request $request, string $id)
     {
         $this->validate($request, [
             'description' => ['required'],
             'value' => ['required'],
-            'week' => ['nullable'],
+            'week' => ['required'],
         ]);
 
-        $provision = $this->provisionService->update($id, $request->all());
+        $provision = $this->provisionService->update(
+            $id,
+            $request->description,
+            floatval($request->value),
+            $request->week,
+            $request->remarks,
+            $request->share_value,
+            $request->share_user_id
+        );
         return $provision;
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Deleta um Provisionamento
      */
     public function destroy(string $id)
     {

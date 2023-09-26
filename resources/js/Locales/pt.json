@@ -6,13 +6,15 @@
         "close": "Fechar",
         "search": "Buscar",
         "action": "Ações",
-        "no-data-text": "Não há registro disponivel",
+        "no-data-text": "Não há registros disponiveis",
         "itens-per-page": "Items por página",
         "page-text": "{0}-{1} de {2}",
         "sort-by": "Ordenar por",
         "no": "Não",
         "yes": "Sim",
         "confirm-delete-item": "Voce tem certeza que deseja remover esse item?",
+        "loading-text-table": "Carregando... Por favor espere",
+        "sucess-save": "Registro criado com sucesso",
 
         "description": "Descrição",
         "value": "Valor",
@@ -27,12 +29,25 @@
         "share-user": "Compartilhado com",
         "remarks": "Observações"
     },
+    "rules": {
+        "required-text-field": "E necessario preencher o campo",
+        "required-currency-field": "Valor não valido"
+    },
     "menus": {
         "dashboard": "Dashboard",
-        "provision": "Provisionamento"
+        "provision": "Provisionamentos",
+        "tags": "Tags"
     },
     "provision": {
+        "title": "Provisionamentos Padrão",
         "new-item": "Novo Provisionamento",
-        "edit-item": "Editar Provisionamento"
+        "edit-item": "Editar Provisionamento",
+        "not-found": "Provisionamento não encontrado"
+    },
+    "tag": {
+        "title": "Gerenciamento de Tags",
+        "new-item": "Nova Tag",
+        "edit-item": "Editar Tag",
+        "not-found": "Tag não encontrado"
     }
 }

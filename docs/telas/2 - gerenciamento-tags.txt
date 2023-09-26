@@ -1,0 +1,10 @@
+Tela de Tags -
+===========================================================================
+    - Botão "Novo Lançamento"
+        - Abre a modal
+            - Descricao (Obrigatorio)
+
+    - Tabela com os lançamentos da fatura
+        - Coluna "Ações"
+            - Botão para excluir
+

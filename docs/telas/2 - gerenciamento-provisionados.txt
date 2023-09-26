@@ -1,0 +1,69 @@
+Tela de provisonamento - Cartao de credito e Debito
+===========================================================================
+    - Botão "Novo Lançamento"
+        - Abre a modal
+            - Descricao (Obrigatorio)
+            - Valor  (Obrigatorio)
+            - Semana (1/2/3/4)
+            - Observacao
+            - Checkbox(default false) - Valor compartilhado
+                - Se "SIM"
+                    - Porcentagem - Default 50%
+                    - Valor  (Obrigatorio)
+                    - AUTOCOMPLETE para usuarios (Obrigatorio)
+            - Autocomplete (MULTIPLO) - TAGS
+
+    - Tabela com os lançamentos da fatura
+        - Coluna "Ações"
+            - Botão para editar
+            - Botão para excluir
+        - Dividir entre SEMANAS - os valores a vista
+        - Gerar totalizadores somando tudo
+
+
+==========================================================================
+TO-DO
+==========================================================================
+
+    - testar:
+        https://github.com/vuejs-tips/v-money
+
+    - Fazer o teste do CRUD todo
+
+    - Verificar como gerar um totalizador na tabela
+        https://www.codeply.com/p/kIlxX2jTZ1/vuetify-datatable-with-sum-footer
+        https://vuetifyjs.com/en/components/data-tables/slots/#group-header-slot
+
+    - Verificar como separar no grupo da semana a tabela
+
+
+
+                       <v-col cols="12" sm="6" md="3">
+                                <VCurrency v-model="provision.share_value" :options="config" />
+                            </v-col>
+
+                          <v-col cols="12" sm="6" md="3">
+                                <VCurrencyField
+                                    v-model="provision.share_value"
+                                    :label="$t('default.share-value')"
+                                    :rules="[
+                                        (value) => {
+                                            if (provision.share) {
+                                                if (!value) return $t('rules.required-text-field')
+                                                if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                    :options="{
+                                        locale: 'pt-PT',
+                                        currency: 'BRL',
+                                        currencyDisplay: 'narrowSymbol',
+                                        precision: 2,
+                                        hideCurrencySymbolOnFocus: false,
+                                        hideGroupingSeparatorOnFocus: false,
+                                        autoDecimalDigits: true,
+                                    }"
+                                />
+                            </v-col>

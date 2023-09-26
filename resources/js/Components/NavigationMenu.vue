@@ -20,10 +20,10 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3'
-import navigation from '@/Configs/navigation'
 </script>
 
 <script>
+import navigation from '@/Configs/navigation'
 export default {
     async created() {
         for (let item of navigation.items) {

@@ -6,21 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Provision extends Model
+class ShareUser extends Model
 {
     use HasFactory;
 
-    protected $table = 'provisions';
+    protected $table = 'share_users';
 
     protected $fillable = [
-        'description',
-        'value',
-        'week',
-        'remarks',
-        'share_percentage',
-        'share_value',
+        'user_id',
         'share_user_id',
-        'user_id'
     ];
 
     public function shareUser(): HasOne

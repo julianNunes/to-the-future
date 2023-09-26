@@ -8,38 +8,18 @@
             <v-row dense>
                 <v-col md="12">
                     <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-
-                    <v-col cols="12" sm="6" md="4">
-                        <VCurrencyField
-                            v-model="provision.value"
-                            :label="$t('default.value')"
-                            required
-                            :rules="rules.currencyFieldRules"
-                            :options="{
-                                locale: 'pt-PT',
-                                currency: 'BRL',
-                                currencyDisplay: 'narrowSymbol',
-                                precision: 2,
-                                hideCurrencySymbolOnFocus: true,
-                                hideGroupingSeparatorOnFocus: true,
-                                autoDecimalDigits: true,
-                            }"
-                            density="comfortable"
-                        />
-                    </v-col>
                 </v-col>
                 <v-col md="12">
                     <v-data-table
                         :group-by="[{ key: 'week', order: 'asc' }]"
                         :headers="headers"
-                        :items="provisions"
+                        :items="listProvisions"
                         :sort-by="[{ key: 'created_at', order: 'asc' }]"
                         :search="search"
                         :loading="isLoading"
                         :loading-text="$t('default.loading-text-table')"
                         class="elevation-3"
                         density="compact"
-                        :total-items="provisions.length"
                         :no-data-text="$t('default.no-data-text')"
                         :no-results-text="$t('default.no-data-text')"
                         :footer-props="{
@@ -51,28 +31,20 @@
                         }"
                         fixed-header
                     >
-                        <template #[`item.value`]="{ item }">{{ currencyField(item.columns.value) }}</template>
-                        <template #[`item.share_value`]="{ item }">{{
-                            currencyField(item.columns.share_value)
-                        }}</template>
-                        <template #[`item.week`]="{ item }">{{ convertWeek(item.columns.week) }}</template>
-                        <template #[`item.share_user_id`]="{ item }">{{
-                            item.raw.share_user ? item.raw.share_user.name : ''
-                        }}</template>
                         <template #[`item.action`]="{ item }">
                             <v-icon
                                 color="warning"
                                 icon="mdi-pencil"
                                 size="small"
                                 class="me-2"
-                                @click="editItem(item.raw)"
+                                @click="openEdit(item)"
                             />
                             <v-icon
                                 class="ml-2"
                                 color="error"
                                 icon="mdi-delete"
                                 size="small"
-                                @click="openDelete(item.raw)"
+                                @click="openDelete(item)"
                             />
                         </template>
 
@@ -85,25 +57,20 @@
                                         :icon="isGroupOpen(item) ? '$expand' : '$next'"
                                         @click="toggleGroup(item)"
                                     ></VBtn>
-                                    {{ convertWeek(item.value) }}
+                                    {{ item['week_show'] }}
                                 </th>
                                 <th class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">
-                                    {{ sumGroup(provisions, item.key, item.value, 'value') }}
-                                </th>
-                                <th class="title text-right">
-                                    {{ sumGroup(provisions, item.key, item.value, 'share_value') }}
-                                </th>
-                                <th :colspan="3"></th>
+                                <th class="title text-right">{{ sumGroup(item.week, 'value') }}</th>
+                                <th class="title text-right">{{ sumGroup(item.week, 'share_value') }}</th>
                             </tr>
                         </template>
 
-                        <template v-if="provisions.length" #tfoot>
+                        <template v-if="listProvisions.length" #tfoot>
                             <tr class="green--text">
                                 <th class="title"></th>
                                 <th class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">{{ sumField(provisions, 'value') }}</th>
-                                <th class="title text-right">{{ sumField(provisions, 'share_value') }}</th>
+                                <th class="title text-right">{{ sumField('value') }}</th>
+                                <th class="title text-right">{{ sumField('share_value') }}</th>
                             </tr>
                         </template>
 
@@ -159,8 +126,8 @@
                                         currency: 'BRL',
                                         currencyDisplay: 'narrowSymbol',
                                         precision: 2,
-                                        hideCurrencySymbolOnFocus: true,
-                                        hideGroupingSeparatorOnFocus: true,
+                                        hideCurrencySymbolOnFocus: false,
+                                        hideGroupingSeparatorOnFocus: false,
                                         autoDecimalDigits: true,
                                     }"
                                     density="comfortable"
@@ -179,12 +146,35 @@
                                 ></v-select>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
-                                <VCurrencyField
+                                <v-select
+                                    v-model="provision.share"
+                                    :label="$t('default.share')"
+                                    :items="shareOptions"
+                                    item-title="name"
+                                    item-value="value"
+                                    clearable
+                                    density="comfortable"
+                                ></v-select>
+                            </v-col>
+                            <v-col v-if="provision.share" cols="12" sm="6" md="3">
+                                <v-text-field
+                                    v-model="provision.share_percentage"
+                                    :label="$t('default.share-percentage')"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col v-if="provision.share" cols="12" sm="6" md="3">
+                                <v-text-field
                                     v-model="provision.share_value"
                                     :label="$t('default.share-value')"
+                                    type="number"
+                                    min="0"
                                     :rules="[
                                         (value) => {
-                                            if (provision.share_user_id) {
+                                            if (provision.share) {
                                                 if (!value) return $t('rules.required-text-field')
                                                 if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
                                             }
@@ -192,18 +182,9 @@
                                         },
                                     ]"
                                     density="comfortable"
-                                    :options="{
-                                        locale: 'pt-PT',
-                                        currency: 'BRL',
-                                        currencyDisplay: 'narrowSymbol',
-                                        precision: 2,
-                                        hideCurrencySymbolOnFocus: true,
-                                        hideGroupingSeparatorOnFocus: true,
-                                        autoDecimalDigits: true,
-                                    }"
-                                />
+                                ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="8">
+                            <v-col v-if="provision.share" cols="12" sm="6" md="6">
                                 <v-select
                                     v-model="provision.share_user_id"
                                     :label="$t('default.share-user')"
@@ -213,7 +194,8 @@
                                     clearable
                                     :rules="[
                                         (value) => {
-                                            if (provision.share_value && parseFloat(provision.share_value) > 0) {
+                                            if (provision.share) {
+                                                console.log('value provision.share_user_id', value)
                                                 if (!value) return $t('rules.required-text-field')
                                             }
                                             return true
@@ -252,7 +234,7 @@
                     <v-card-actions>
                         <v-spacer />
                         <v-btn color="error" text :loading="isLoading" @click="deleteDialog = false">Cancel</v-btn>
-                        <v-btn color="primary" :loading="isLoading" text @click="this.delete()">Delete</v-btn>
+                        <v-btn color="primary" :loading="isLoading" text @click="save">Delete</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -267,8 +249,7 @@ import VCurrencyField from '../../Components/VCurrencyField.vue'
 </script>
 
 <script>
-import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
-
+// import { toRaw } from 'vue'
 export default {
     name: 'PeopleIndex',
     props: {
@@ -285,9 +266,8 @@ export default {
             headers: [
                 // { title: this.$t('default.week'), align: 'start', key: 'week', groupable: false },
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
-                { title: this.$t('default.share-user'), key: 'share_user_id' },
+                { title: this.$t('default.value'), align: 'end', key: 'value_show' },
+                { title: this.$t('default.share-value'), align: 'end', key: 'share_value_show' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
                 { title: this.$t('default.action'), key: 'action', sortable: false },
             ],
@@ -306,10 +286,26 @@ export default {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
                     (value) => {
-                        console.log('currencyFieldRules', value)
-                        if (!value) return this.$t('rules.required-text-field')
-                        if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+                        // if (!value) return this.$t('rules.required-text-field')
+                        if (parseFloat(value) <= 0) return this.$t('rules.required-currency-field')
 
+                        return true
+                    },
+                ],
+                shareValueRules: [
+                    (value) => {
+                        if (this.provision.share) {
+                            if (!value) return this.$t('rules.required-text-field')
+                            if (parseFloat(value) <= 0) return this.$t('rules.required-currency-field')
+                        }
+                        return true
+                    },
+                ],
+                shareUserRules: [
+                    (value) => {
+                        if (this.provision.share) {
+                            if (!value) return this.$t('rules.required-text-field')
+                        }
                         return true
                     },
                 ],
@@ -326,6 +322,8 @@ export default {
                 value: 0,
                 week: null,
                 remarks: null,
+                share: 0,
+                share_percentage: 0,
                 share_value: 0,
                 share_user_id: null,
             },
@@ -360,52 +358,102 @@ export default {
         }
     },
 
-    async created() {},
+    watch: {
+        'provision.share': function () {
+            this.provision.share_percentage = 0
+            this.provision.share_value = 0
+            this.provision.share_user_id = null
+        },
+        'provision.share_percentage': function (value) {
+            if (value > 0) {
+                this.provision.share_value = (
+                    (parseFloat(this.provision.value) * parseFloat(this.provision.share_percentage)) /
+                    100
+                ).toFixed(2)
+            } else {
+                this.provision.share_value = 0
+            }
+        },
+    },
+
+    async created() {
+        if (this.provisions && this.provisions.length) {
+            this.listProvisions = this.provisions.map((item) => {
+                item.week_show = this.weekList.find((x) => x.value === item.week).name
+                item.value_show = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                    item.value
+                )
+                item.share_value_show = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                    item.share_value
+                )
+
+                return item
+            })
+
+            console.log(this.listProvisions)
+        }
+    },
 
     async mounted() {},
 
+    async beforeCreate() {},
+
     methods: {
-        convertWeek(group) {
-            return this.weekList.find((x) => x.value === group).name
+        sumField(key) {
+            // sum data in give key (property)
+            let total = this.listProvisions.reduce((a, b) => (parseFloat(a) + (parseFloat(b[key]) || 0)).toFixed(2), 0)
+
+            total = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)
+            return total
+        },
+        sumGroup(group, key) {
+            console.log('group', group)
+            // sum data in give key (property)
+            let total = this.listProvisions
+                .filter((x) => x.week === group)
+                .reduce((a, b) => (parseFloat(a) + (parseFloat(b[key]) || 0)).toFixed(2), 0)
+            console.log('total sumGroup', total)
+            total = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)
+            return total
         },
 
         newItem() {
-            this.provision.value = 44
-            // this.titleModal = this.$t('provision.new-item')
-            // this.editDialog = true
-            // this.provision = {
-            //     id: null,
-            //     description: null,
-            //     value: 0,
-            //     week: null,
-            //     remarks: null,
-            //     share_value: 0,
-            //     share_user_id: null,
-            // }
-            // setTimeout(() => {
-            //     this.$refs.txtDescription.focus()
-            // })
+            this.titleModal = this.$t('provision.new-item')
+            this.provision = {
+                id: null,
+                description: null,
+                value: 0,
+                week: null,
+                remarks: null,
+                share: 0,
+                share_percentage: 0,
+                share_value: 0,
+                share_user_id: null,
+            }
+            this.editDialog = true
+            setTimeout(() => {
+                this.$refs.txtDescription.focus()
+            })
         },
 
         editItem(item) {
-            // console.log('item', item)
             this.titleModal = this.$t('provision.edit-item')
+            this.provision = {
+                id: item.id,
+                description: item.description,
+                value: item.value,
+                week: item.week,
+                remarks: item.remarks,
+                share: item.share,
+                share_percentage: item.share
+                    ? parseFloat((parseFloat(item.value) * 100) / parseFloat(item.share_percentage))
+                    : 0,
+                share_value: item.share_value,
+                share_user_id: item.share_user_id,
+            }
             this.editDialog = true
-            // this.provision = {
-            //     id: item.id,
-            //     description: item.description,
-            //     value: Number(item.value),
-            //     week: item.week,
-            //     remarks: item.remarks,
-            //     // share_value: item.share_value ? Number(item.share_value) : 0,
-            //     share_user_id: item.share_user_id,
-            // }
-            console.log('this.provision', this.provision)
-            console.log('item', item)
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
-                this.provision.value = 44
-                this.$forceUpdate()
             })
         },
 
@@ -416,76 +464,48 @@ export default {
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                if (this.provision.id) {
-                    await this.update()
-                } else {
-                    await this.create()
-                }
+                console.log('provision', this.provision)
+                // this.isLoading = true
+                // this.$inertia.post(
+                //     '/provision',
+                //     {
+                //         description: this.provision.description,
+                //         value: this.provision.value,
+                //         week: this.provision.week,
+                //         remarks: this.provision.remarks,
+                //         share_value: this.provision.share_value,
+                //         share_user_id: this.provision.share_user_id,
+                //     },
+                //     {
+                //         onSuccess: () => {
+                //             this.editDialog = false
+                //             this.isLoading = false
+                //         },
+                //         onError: (errors) => {
+                //             console.log('errors', errors)
+                //             this.isLoading = false
+                //         },
+                //         onFinish: () => {
+                //             console.log('onFinish')
+                //             this.isLoading = false
+                //         },
+                //     }
+                // )
             }
         },
 
-        async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/provision',
-                {
-                    description: this.provision.description,
-                    value: this.provision.value,
-                    week: this.provision.week,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                        this.isLoading = false
-                    },
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
-        },
-
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/provision/' + this.provision.id,
-                {
-                    description: this.provision.description,
-                    value: this.provision.value,
-                    week: this.provision.week,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                        this.isLoading = false
-                    },
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
+        async update(item) {
+            console.log('update', item)
         },
 
         openDelete(item) {
-            this.deleteId = item.id
+            this.deleteId = item.value
             this.deleteDialog = true
         },
 
-        delete() {
+        submitDelete() {
             this.isLoading = true
-            this.$inertia.delete(`/provision/${this.deleteId}`, {
+            this.$inertia.delete(`/people/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {

@@ -7,8 +7,10 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import vuetify from './Plugins/vuetify'
 import toast from './Plugins/toast'
 import i18n from './Locales/i18n'
+import { useCurrencyInput as CurrencyInput } from 'vue-currency-input'
+import money from 'v-money3'
 
-const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel'
+const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'To the Future'
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -19,6 +21,8 @@ createInertiaApp({
             .use(vuetify)
             .use(toast)
             .use(i18n)
+            .use(CurrencyInput)
+            .use(money)
             .mount(el)
     },
     progress: {

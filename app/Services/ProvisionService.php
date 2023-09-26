@@ -3,79 +3,122 @@
 namespace App\Services;
 
 use App\Models\Provision;
-use App\Repositories\Contracts\ProvisionRepositoryInterface;
-use Illuminate\Support\Str;
+use App\Models\ShareUser;
 use Exception;
-use Illuminate\Support\Collection;
 
 class ProvisionService
 {
-    protected $provisionRepository;
-
-    public function __construct(ProvisionRepositoryInterface $provisionRepository)
+    public function __construct()
     {
-        $this->provisionRepository = $provisionRepository;
     }
 
     /**
-     * Retorna todos os provisonamentos
-     * @return Collection
+     * Retorna os dados para o index de Provisionamento
+     * @return Array
      */
-    public function all()
+    public function index(): array
     {
-        $provisions = $this->provisionRepository->all();
+        $provisions = Provision::where('user_id', auth()->user()->id)->with('shareUser')->get();
+        $shareUsers = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->get();
 
-        if ($provisions && $provisions->count()) {
-            $provisions = $provisions->sortBy([
-                ['week', 'asc'],
-                ['id', 'asc']
-            ]);
+        if ($shareUsers && $shareUsers->count()) {
+            $shareUsers = $shareUsers->map(function ($item) {
+                return [
+                    'share_user_id' => $item->share_user_id,
+                    'share_user_name' => $item->shareUser->name
+                ];
+            });
         }
 
-        return $provisions;
+        return [
+            'provisions' => $provisions,
+            'shareUsers' => $shareUsers
+        ];
     }
 
     /**
      * Cria um novo Provisionamento
-     * @param array $data
+     * @param string $description
+     * @param float $value
+     * @param string $week
+     * @param string $remarks
+     * @param integer $share_value
+     * @param integer|null $share_user_id
      * @return Provision
      */
-    public function create(array $data): Provision
-    {
-        return $this->provisionRepository->create($data);
+    public function create(
+        string $description,
+        float $value,
+        string $week,
+        string $remarks = null,
+        float $share_value = 0,
+        int $share_user_id = null
+    ): Provision {
+        $provision = new Provision([
+            'description' => $description,
+            'value' => $value,
+            'week' => $week,
+            'remarks' => $remarks,
+            'share_value' => $share_value,
+            'share_user_id' => $share_user_id,
+            'user_id' => auth()->user()->id
+        ]);
+
+        $provision->save();
+        return $provision;
     }
 
     /**
-     * Atualiza um Provisionamento através
+     * Atualiza um Provisionamento
      * @param int $id
-     * @param array $data
+     * @param string $description
+     * @param float $value
+     * @param string $week
+     * @param string $remarks
+     * @param integer $share_value
+     * @param integer|null $share_user_id
      * @return bool
      */
-    public function update(int $id, array $data): bool
-    {
-        $provision = $this->provisionRepository->find($id);
+    public function update(
+        int $id,
+        string $description,
+        float $value,
+        string $week,
+        string $remarks = null,
+        float $share_value = null,
+        int $share_user_id = null
+    ): bool {
+        $provision = Provision::find($id);
 
         if (!$provision) {
-            throw new Exception('Provision Not Found');
+            throw new Exception('provision.not-found');
         }
 
-        return $this->provisionRepository->update($provision, $data);
+        return $provision->update([
+            'description' => $description,
+            'value' => $value,
+            'week' => $week,
+            'remarks' => $remarks,
+            'share_value' => $share_value,
+            'share_user_id' => $share_user_id,
+            'user_id' => auth()->user()->id
+        ]);
     }
 
     /**
-     * Deletar um Provisionamento através
+     * Deleta um Provisionamento
      * @param int $id
-     * return json response
      */
-    public function delete(int $id)
+    public function delete(int $id): bool
     {
-        $provision = $this->provisionRepository->find($id);
+        $provision = Provision::find($id);
+
 
         if (!$provision) {
-            throw new Exception('Provision Not Found');
+            throw new Exception('provision.not-found');
         }
 
-        return $this->provisionRepository->delete($provision);
+        return $provision->delete();
     }
 
     // /**

@@ -1,5 +1,14 @@
 LISTA DE TAREFAS PENDENTES
 ==================================================
-
+- GERAL:
     - Criar componente para mudar dinamicamente a linguagem do sistema
         - https://lokalise.com/blog/vue-i18n/
+
+    - Mudar como os menu é montado e fazer ele agrupado
+
+
+    - Alterar o formato das datas do timestamp do Laravel
+
+
+    - Criar classe customizavel do Exception para poder devolver valores
+

@@ -11,6 +11,11 @@ export default {
         //     to: '/people',
         // },
         {
+            title: 'menus.tags',
+            icon: 'mdi-tag',
+            to: '/tags',
+        },
+        {
             title: 'menus.provision',
             icon: 'mdi-money',
             to: '/provision',
