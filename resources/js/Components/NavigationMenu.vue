@@ -1,7 +1,7 @@
 <template>
     <v-list nav>
         <!-- List Menu -->
-        <Link v-for="(item, key) in navigation.items" :key="key" :href="item.to" as="div">
+        <Link v-for="(item, key) in items" :key="key" :href="item.to" as="div">
             <v-list-item
                 :prepend-icon="item.icon"
                 :title="item.title"
@@ -23,11 +23,31 @@ import { Link } from '@inertiajs/vue3'
 </script>
 
 <script>
-import navigation from '@/Configs/navigation'
 export default {
-    async created() {
-        for (let item of navigation.items) {
-            item.title = this.$t(item.title)
+    data() {
+        return {
+            items: [
+                {
+                    title: this.$t('menus.dashboard'),
+                    icon: 'mdi-view-dashboard',
+                    to: '/dashboard',
+                },
+                {
+                    title: this.$t('menus.tags'),
+                    icon: 'mdi-tag',
+                    to: '/tag',
+                },
+                {
+                    title: this.$t('menus.provision'),
+                    icon: 'mdi-cash-lock',
+                    to: '/provision',
+                },
+                {
+                    title: this.$t('menus.credit-card'),
+                    icon: 'mdi-credit-card',
+                    to: '/credit-card',
+                },
+            ],
         }
     },
 }

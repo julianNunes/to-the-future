@@ -1,5 +1,5 @@
 <template>
-    <Head title="Provision" />
+    <Head title="Tag" />
     <AuthenticatedLayout>
         <div class="mb-5">
             <h5 class="text-h5 font-weight-bold">{{ $t('tag.title') }}</h5>
@@ -13,12 +13,13 @@
                     <v-data-table
                         :headers="headers"
                         :items="tags"
-                        :sort-by="[{ key: 'name', order: 'asc' }]"
+                        :sort-by="[{ key: 'created_at', order: 'asc' }]"
                         :search="search"
                         :loading="isLoading"
                         :loading-text="$t('default.loading-text-table')"
                         class="elevation-3"
                         density="compact"
+                        :total-items="tags.length"
                         :no-data-text="$t('default.no-data-text')"
                         :no-results-text="$t('default.no-data-text')"
                         :footer-props="{
@@ -31,22 +32,33 @@
                         fixed-header
                     >
                         <template #[`item.action`]="{ item }">
-                            <v-icon
-                                color="warning"
-                                icon="mdi-pencil"
-                                size="small"
-                                class="me-2"
-                                @click="editItem(item.raw)"
-                            />
-                            <v-icon
-                                class="ml-2"
-                                color="error"
-                                icon="mdi-delete"
-                                size="small"
-                                @click="openDelete(item.raw)"
-                            />
+                            <v-tooltip :text="$t('default.edit')" location="top">
+                                <template #activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        color="warning"
+                                        icon="mdi-pencil"
+                                        size="small"
+                                        class="me-2"
+                                        @click="editItem(item)"
+                                    >
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip :text="$t('default.delete')" location="top">
+                                <template #activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        class="ml-2"
+                                        color="error"
+                                        icon="mdi-delete"
+                                        size="small"
+                                        @click="openDelete(item)"
+                                    >
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
                         </template>
-
                         <template #top>
                             <v-toolbar density="comfortable">
                                 <v-row dense>
@@ -81,7 +93,7 @@
                             <v-col cols="12" sm="12" md="12">
                                 <v-text-field
                                     ref="txtName"
-                                    v-model="tag.name"
+                                    v-model="tagName"
                                     :label="$t('default.name')"
                                     :rules="rules.textFieldRules"
                                     required
@@ -93,10 +105,10 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="error" :loading="isLoading" @click="editDialog = false">
+                    <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
                         {{ $t('default.cancel') }}
                     </v-btn>
-                    <v-btn color="primary" :loading="isLoading" type="submit" @click="save">
+                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
                         {{ $t('default.save') }}
                     </v-btn>
                 </v-card-actions>
@@ -110,8 +122,12 @@
                     <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
                     <v-card-actions>
                         <v-spacer />
-                        <v-btn color="error" text :loading="isLoading" @click="deleteDialog = false">Cancel</v-btn>
-                        <v-btn color="primary" :loading="isLoading" text @click="this.delete()">Delete</v-btn>
+                        <v-btn color="error" elevated :loading="isLoading" @click="deleteDialog = false">
+                            {{ $t('default.cancel') }}</v-btn
+                        >
+                        <v-btn color="primary" elevated :loading="isLoading" text @click="this.delete()">
+                            {{ $t('default.delete') }}</v-btn
+                        >
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -125,8 +141,10 @@ import { Head } from '@inertiajs/vue3'
 </script>
 
 <script>
+import { upperCase } from '../../utils/utils.js'
+
 export default {
-    name: 'PeopleIndex',
+    name: 'TagIndex',
     props: {
         tags: {
             type: Array,
@@ -135,17 +153,10 @@ export default {
 
     data() {
         return {
-            headers: [{ title: this.$t('default.name'), align: 'start', key: 'name' }],
-            breadcrumbs: [
-                {
-                    title: this.$t('menus.dashboard'),
-                    disabled: false,
-                    href: '/dashboard',
-                },
-                {
-                    title: this.$t('menus.provision'),
-                    disabled: true,
-                },
+            headers: [
+                // { title: this.$t('default.week'), align: 'start', key: 'week', groupable: false },
+                { title: this.$t('default.name'), align: 'start', key: 'name', groupable: false },
+                { title: this.$t('default.action'), width: '100', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
@@ -155,12 +166,22 @@ export default {
             deleteDialog: false,
             isLoading: false,
             deleteId: null,
-            listProvisions: [],
             tag: {
                 id: null,
                 name: null,
             },
         }
+    },
+
+    computed: {
+        tagName: {
+            get() {
+                return this.tag.name
+            },
+            set(value) {
+                this.tag.name = upperCase(value)
+            },
+        },
     },
 
     async created() {},
@@ -170,36 +191,23 @@ export default {
     methods: {
         newItem() {
             this.titleModal = this.$t('tag.new-item')
-            this.provision = {
-                id: null,
-                description: null,
-                value: 0,
-                week: null,
-                remarks: null,
-                share: 0,
-                share_percentage: 0,
-                share_value: 0,
-                share_user_id: null,
-            }
             this.editDialog = true
+            this.tag = {
+                id: null,
+                name: null,
+            }
             setTimeout(() => {
                 this.$refs.txtName.focus()
             })
         },
 
         editItem(item) {
-            console.log('item', item)
-            this.titleModal = this.$t('provision.edit-item')
-            this.provision = {
-                id: item.id,
-                description: item.description,
-                value: parseFloat(item.value),
-                week: item.week,
-                remarks: item.remarks,
-                share_value: item.share_value ? parseFloat(item.share_value) : 0,
-                share_user_id: item.share_user_id,
-            }
+            this.titleModal = this.$t('tag.edit-item')
             this.editDialog = true
+            this.tag = {
+                id: item.id,
+                name: item.name,
+            }
             setTimeout(() => {
                 this.$refs.txtName.focus()
             })
@@ -212,61 +220,48 @@ export default {
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/provision',
-                    {
-                        description: this.provision.description,
-                        value: this.provision.value,
-                        week: this.provision.week,
-                        remarks: this.provision.remarks,
-                        share_value: this.provision.share_value,
-                        share_user_id: this.provision.share_user_id,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                            this.isLoading = false
-                        },
-                        onError: () => {
-                            this.isLoading = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
+                if (this.tag.id) {
+                    await this.update()
+                } else {
+                    await this.create()
+                }
             }
         },
 
-        async update() {
-            let validate = await this.$refs.form.validate()
-            if (validate.valid) {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/provision/' + this.provision.id,
-                    {
-                        description: this.provision.description,
-                        value: this.provision.value,
-                        week: this.provision.week,
-                        remarks: this.provision.remarks,
-                        share_value: this.provision.share_value,
-                        share_user_id: this.provision.share_user_id,
+        async create() {
+            this.isLoading = true
+            this.$inertia.post(
+                '/tag',
+                {
+                    name: this.tag.name,
+                },
+                {
+                    onSuccess: () => {
+                        this.editDialog = false
                     },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                            this.isLoading = false
-                        },
-                        onError: () => {
-                            this.isLoading = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            }
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
+        },
+
+        async update() {
+            this.isLoading = true
+            this.$inertia.put(
+                '/tag/' + this.tag.id,
+                {
+                    name: this.tag.name,
+                },
+                {
+                    onSuccess: () => {
+                        this.editDialog = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
         },
 
         openDelete(item) {
@@ -274,9 +269,9 @@ export default {
             this.deleteDialog = true
         },
 
-        submitDelete() {
+        delete() {
             this.isLoading = true
-            this.$inertia.delete(`/provision/${this.deleteId}`, {
+            this.$inertia.delete(`/tag/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {

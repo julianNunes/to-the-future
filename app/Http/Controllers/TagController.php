@@ -51,11 +51,11 @@ class TagController extends Controller
             'name' => ['required'],
         ]);
 
-        $tag = $this->tagService->update(
+        $this->tagService->update(
             $id,
             $request->name,
         );
-        return $tag;
+        return redirect()->back()->with('success', 'default.sucess-update');
     }
 
     /**
@@ -63,6 +63,7 @@ class TagController extends Controller
      */
     public function destroy(string $id)
     {
-        return $this->tagService->delete($id);
+        $this->tagService->delete($id);
+        return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

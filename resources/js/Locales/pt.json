@@ -3,6 +3,8 @@
         "new": "Novo",
         "save": "Salvar",
         "cancel": "Cancelar",
+        "delete": "Remover",
+        "edit": "Editar",
         "close": "Fechar",
         "search": "Buscar",
         "action": "Ações",
@@ -15,7 +17,10 @@
         "confirm-delete-item": "Voce tem certeza que deseja remover esse item?",
         "loading-text-table": "Carregando... Por favor espere",
         "sucess-save": "Registro criado com sucesso",
+        "sucess-update": "Registro atualizado com sucesso",
+        "sucess-delete": "Registro removido com sucesso",
 
+        "name": "Nome",
         "description": "Descrição",
         "value": "Valor",
         "week": "Semana",
@@ -36,7 +41,8 @@
     "menus": {
         "dashboard": "Dashboard",
         "provision": "Provisionamentos",
-        "tags": "Tags"
+        "tags": "Tags",
+        "credit-card": "Cartões de Crédito"
     },
     "provision": {
         "title": "Provisionamentos Padrão",
@@ -48,6 +54,7 @@
         "title": "Gerenciamento de Tags",
         "new-item": "Nova Tag",
         "edit-item": "Editar Tag",
-        "not-found": "Tag não encontrado"
+        "not-found": "Tag não encontrado",
+        "already-exists": "Tag já existe"
     }
 }

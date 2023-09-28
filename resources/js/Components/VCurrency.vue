@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <VTextField
         ref="inputRef"
         v-money3="options"
@@ -33,4 +33,4 @@ export default {
         }
     },
 }
-</script>
+</script> -->

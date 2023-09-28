@@ -53,6 +53,8 @@ export default {
                     toast.success(this.$t(flash.success))
                 } else if (flash.error) {
                     toast.error(this.$t(flash.error))
+                } else if (this.$page.props.errors) {
+                    toast.error(this.$t(this.$page.props.errors.error))
                 }
             },
         },

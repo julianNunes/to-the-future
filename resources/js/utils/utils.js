@@ -42,3 +42,7 @@ export function currencyField(value) {
         currency: 'BRL',
     }).format(value)
 }
+
+export function upperCase(value) {
+    return value ? value.toUpperCase() : ''
+}

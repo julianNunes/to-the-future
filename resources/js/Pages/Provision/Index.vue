@@ -8,25 +8,6 @@
             <v-row dense>
                 <v-col md="12">
                     <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-
-                    <v-col cols="12" sm="6" md="4">
-                        <VCurrencyField
-                            v-model="provision.value"
-                            :label="$t('default.value')"
-                            required
-                            :rules="rules.currencyFieldRules"
-                            :options="{
-                                locale: 'pt-PT',
-                                currency: 'BRL',
-                                currencyDisplay: 'narrowSymbol',
-                                precision: 2,
-                                hideCurrencySymbolOnFocus: true,
-                                hideGroupingSeparatorOnFocus: true,
-                                autoDecimalDigits: true,
-                            }"
-                            density="comfortable"
-                        />
-                    </v-col>
                 </v-col>
                 <v-col md="12">
                     <v-data-table
@@ -51,29 +32,39 @@
                         }"
                         fixed-header
                     >
-                        <template #[`item.value`]="{ item }">{{ currencyField(item.columns.value) }}</template>
-                        <template #[`item.share_value`]="{ item }">{{
-                            currencyField(item.columns.share_value)
-                        }}</template>
-                        <template #[`item.week`]="{ item }">{{ convertWeek(item.columns.week) }}</template>
+                        <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
+                        <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
+                        <template #[`item.week`]="{ item }">{{ convertWeek(item.week) }}</template>
                         <template #[`item.share_user_id`]="{ item }">{{
-                            item.raw.share_user ? item.raw.share_user.name : ''
+                            item.share_user ? item.share_user.name : ''
                         }}</template>
                         <template #[`item.action`]="{ item }">
-                            <v-icon
-                                color="warning"
-                                icon="mdi-pencil"
-                                size="small"
-                                class="me-2"
-                                @click="editItem(item.raw)"
-                            />
-                            <v-icon
-                                class="ml-2"
-                                color="error"
-                                icon="mdi-delete"
-                                size="small"
-                                @click="openDelete(item.raw)"
-                            />
+                            <v-tooltip :text="$t('default.edit')" location="top">
+                                <template #activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        color="warning"
+                                        icon="mdi-pencil"
+                                        size="small"
+                                        class="me-2"
+                                        @click="editItem(item)"
+                                    >
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip :text="$t('default.delete')" location="top">
+                                <template #activator="{ props }">
+                                    <v-icon
+                                        v-bind="props"
+                                        class="ml-2"
+                                        color="error"
+                                        icon="mdi-delete"
+                                        size="small"
+                                        @click="openDelete(item)"
+                                    >
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
                         </template>
 
                         <template #group-header="{ item, toggleGroup, isGroupOpen }">
@@ -149,22 +140,15 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
-                                <VCurrencyField
+                                <v-text-field
                                     v-model="provision.value"
+                                    type="number"
                                     :label="$t('default.value')"
+                                    min="0"
                                     required
                                     :rules="rules.currencyFieldRules"
-                                    :options="{
-                                        locale: 'pt-PT',
-                                        currency: 'BRL',
-                                        currencyDisplay: 'narrowSymbol',
-                                        precision: 2,
-                                        hideCurrencySymbolOnFocus: true,
-                                        hideGroupingSeparatorOnFocus: true,
-                                        autoDecimalDigits: true,
-                                    }"
                                     density="comfortable"
-                                />
+                                ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                                 <v-select
@@ -179,9 +163,11 @@
                                 ></v-select>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
-                                <VCurrencyField
+                                <v-text-field
                                     v-model="provision.share_value"
                                     :label="$t('default.share-value')"
+                                    type="number"
+                                    min="0"
                                     :rules="[
                                         (value) => {
                                             if (provision.share_user_id) {
@@ -192,15 +178,6 @@
                                         },
                                     ]"
                                     density="comfortable"
-                                    :options="{
-                                        locale: 'pt-PT',
-                                        currency: 'BRL',
-                                        currencyDisplay: 'narrowSymbol',
-                                        precision: 2,
-                                        hideCurrencySymbolOnFocus: true,
-                                        hideGroupingSeparatorOnFocus: true,
-                                        autoDecimalDigits: true,
-                                    }"
                                 />
                             </v-col>
                             <v-col cols="12" sm="6" md="8">
@@ -234,10 +211,10 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="error" :loading="isLoading" @click="editDialog = false">
+                    <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
                         {{ $t('default.cancel') }}
                     </v-btn>
-                    <v-btn color="primary" :loading="isLoading" type="submit" @click="save">
+                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
                         {{ $t('default.save') }}
                     </v-btn>
                 </v-card-actions>
@@ -251,8 +228,12 @@
                     <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
                     <v-card-actions>
                         <v-spacer />
-                        <v-btn color="error" text :loading="isLoading" @click="deleteDialog = false">Cancel</v-btn>
-                        <v-btn color="primary" :loading="isLoading" text @click="this.delete()">Delete</v-btn>
+                        <v-btn color="error" elevated :loading="isLoading" @click="deleteDialog = false">
+                            {{ $t('default.cancel') }}</v-btn
+                        >
+                        <v-btn color="primary" elevated :loading="isLoading" text @click="this.delete()">
+                            {{ $t('default.delete') }}</v-btn
+                        >
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -263,14 +244,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
-import VCurrencyField from '../../Components/VCurrencyField.vue'
 </script>
 
 <script>
 import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
 
 export default {
-    name: 'PeopleIndex',
+    name: 'ProvisionIndex',
     props: {
         provisions: {
             type: Array,
@@ -306,7 +286,6 @@ export default {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
                     (value) => {
-                        console.log('currencyFieldRules', value)
                         if (!value) return this.$t('rules.required-text-field')
                         if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
@@ -370,42 +349,36 @@ export default {
         },
 
         newItem() {
-            this.provision.value = 44
-            // this.titleModal = this.$t('provision.new-item')
-            // this.editDialog = true
-            // this.provision = {
-            //     id: null,
-            //     description: null,
-            //     value: 0,
-            //     week: null,
-            //     remarks: null,
-            //     share_value: 0,
-            //     share_user_id: null,
-            // }
-            // setTimeout(() => {
-            //     this.$refs.txtDescription.focus()
-            // })
+            this.titleModal = this.$t('provision.new-item')
+            this.editDialog = true
+            this.provision = {
+                id: null,
+                description: null,
+                value: 0,
+                week: null,
+                remarks: null,
+                share_value: 0,
+                share_user_id: null,
+            }
+            setTimeout(() => {
+                this.$refs.txtDescription.focus()
+            })
         },
 
         editItem(item) {
-            // console.log('item', item)
             this.titleModal = this.$t('provision.edit-item')
             this.editDialog = true
-            // this.provision = {
-            //     id: item.id,
-            //     description: item.description,
-            //     value: Number(item.value),
-            //     week: item.week,
-            //     remarks: item.remarks,
-            //     // share_value: item.share_value ? Number(item.share_value) : 0,
-            //     share_user_id: item.share_user_id,
-            // }
-            console.log('this.provision', this.provision)
-            console.log('item', item)
+            this.provision = {
+                id: item.id,
+                description: item.description,
+                value: Number(item.value),
+                week: item.week,
+                remarks: item.remarks,
+                share_value: item.share_value ? Number(item.share_value) : 0,
+                share_user_id: item.share_user_id,
+            }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
-                this.provision.value = 44
-                this.$forceUpdate()
             })
         },
 
@@ -439,10 +412,6 @@ export default {
                 {
                     onSuccess: () => {
                         this.editDialog = false
-                        this.isLoading = false
-                    },
-                    onError: () => {
-                        this.isLoading = false
                     },
                     onFinish: () => {
                         this.isLoading = false
@@ -466,10 +435,6 @@ export default {
                 {
                     onSuccess: () => {
                         this.editDialog = false
-                        this.isLoading = false
-                    },
-                    onError: () => {
-                        this.isLoading = false
                     },
                     onFinish: () => {
                         this.isLoading = false
@@ -489,8 +454,14 @@ export default {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {
-                    this.isLoading = false
                     this.deleteDialog = false
+                    this.editDialog = false
+                },
+                onError: () => {
+                    this.isLoading = false
+                },
+                onFinish: () => {
+                    this.isLoading = false
                 },
             })
         },

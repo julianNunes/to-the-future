@@ -17,7 +17,7 @@ class TagService
      */
     public function index(): array
     {
-        $tags = Tag::where('user_id', auth()->user()->id)->with('shareUser')->get();
+        $tags = Tag::where('user_id', auth()->user()->id)->get();
 
         return [
             'tags' => $tags,
@@ -32,6 +32,12 @@ class TagService
     public function create(
         string $name
     ): Tag {
+        $tag = Tag::where('name', $name)->first();
+
+        if ($tag) {
+            throw new Exception('tag.already-exists');
+        }
+
         $tag = new Tag([
             'name' => $name,
             'user_id' => auth()->user()->id
@@ -51,6 +57,12 @@ class TagService
         int $id,
         string $name
     ): bool {
+        $tag = Tag::where('name', $name)->first();
+
+        if ($tag) {
+            throw new Exception('tag.already-exists');
+        }
+
         $tag = Tag::find($id);
 
         if (!$tag) {

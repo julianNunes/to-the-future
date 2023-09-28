@@ -5,20 +5,20 @@ export default {
             icon: 'mdi-view-dashboard',
             to: '/dashboard',
         },
-        // {
-        //     title: 'People',
-        //     icon: 'mdi-account-group',
-        //     to: '/people',
-        // },
         {
             title: 'menus.tags',
             icon: 'mdi-tag',
-            to: '/tags',
+            to: '/tag',
         },
         {
             title: 'menus.provision',
-            icon: 'mdi-money',
+            icon: 'mdi-cash-lock',
             to: '/provision',
+        },
+        {
+            title: 'menus.credit-card',
+            icon: 'mdi-credit-card',
+            to: '/credit-card',
         },
     ],
 }

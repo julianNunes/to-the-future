@@ -1,5 +1,5 @@
-<template>
-    <VTextField ref="inputRef" type="text" />
+<!-- <template>
+    <v-text-field ref="inputRef" type="text" />
 </template>
 
 <script>
@@ -33,4 +33,4 @@ export default {
         return { inputRef }
     },
 }
-</script>
+</script> -->
