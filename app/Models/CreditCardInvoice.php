@@ -30,4 +30,14 @@ class CreditCardInvoice extends Model
     {
         return $this->belongsTo(CreditCard::class, 'id', 'credit_card_id');
     }
+
+    public function file(): HasOne
+    {
+        return $this->hasOne(CreditCardInvoiceFile::class, 'invoice_id', 'id');
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(CreditCardInvoiceExpense::class, 'invoice_id', 'id');
+    }
 }

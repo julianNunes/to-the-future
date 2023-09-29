@@ -19,7 +19,7 @@ class CreditCardInvoiceExpenseDivision extends Model
         'value',
         'remarks',
         'share_value',
-        'credit_card_invoice_expense_id',
+        'expense_id',
         'share_user_id',
     ];
 
@@ -30,7 +30,7 @@ class CreditCardInvoiceExpenseDivision extends Model
 
     public function expense(): BelongsTo
     {
-        return $this->belongsTo(CreditCardInvoiceExpense::class, 'id', 'credit_card_invoice_expense_id');
+        return $this->belongsTo(CreditCardInvoiceExpense::class, 'id', 'expense_id');
     }
 
     public function tags(): MorphToMany

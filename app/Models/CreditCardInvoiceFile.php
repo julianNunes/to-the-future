@@ -20,6 +20,6 @@ class CreditCardInvoiceFile extends Model
 
     public function invoice(): BelongsTo
     {
-        return $this->belongsTo(CreditCardInvoice::class, 'id', 'credit_card_invoice_id');
+        return $this->belongsTo(CreditCardInvoice::class, 'id', 'invoice_id');
     }
 }
