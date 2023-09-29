@@ -17,10 +17,22 @@ class UserSeeder extends Seeder
         if (User::count() > 0) {
             return;
         }
-        User::create([
-            'name' => 'John Doe',
-            'email' => 'johndoe@mail.com',
-            'password' => Hash::make('password')
-        ]);
+        User::create(
+            [
+                'name' => 'Julian Nunes',
+                'email' => 'eu_dinovu@hotmail.com',
+                'password' => Hash::make('password')
+            ],
+            [
+                'name' => 'Damares Alves dos Santos',
+                'email' => 'damaresa747@gmail.com',
+                'password' => Hash::make('password')
+            ],
+            [
+                'name' => 'Abayomi Alves Artur',
+                'email' => 'abayomi@mail.com',
+                'password' => Hash::make('password')
+            ]
+        );
     }
 }

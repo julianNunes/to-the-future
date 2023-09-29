@@ -5,11 +5,13 @@ import * as components from 'vuetify/components'
 import * as labsComponents from 'vuetify/labs/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import { VDatePicker } from 'vuetify/labs/VDatePicker'
 
 const vuetify = createVuetify({
     components: {
         ...components,
         ...labsComponents,
+        VDatePicker,
     },
     directives,
     icons: {

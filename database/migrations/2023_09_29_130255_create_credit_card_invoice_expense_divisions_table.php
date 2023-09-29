@@ -11,18 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('credit_card_invoice_expenses', function (Blueprint $table) {
+        Schema::create('credit_card_invoice_expense_divisions', function (Blueprint $table) {
             $table->id();
             $table->string('description')->comment('Descricao');
-            $table->date('date')->comment('Data da compra');
             $table->decimal('value');
-            $table->enum('week', ['WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4']);
-            $table->char('portion', 3)->nullable()->comment('Parcela atual');
-            $table->char('portion_total', 3)->nullable()->comment('Total de Parcelas');
             $table->string('remarks');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
-            $table->unsignedBigInteger('invoice_id');
-            $table->foreign('invoice_id')->references('id')->on('credit_card_invoices');
+            $table->unsignedBigInteger('expense_id');
+            $table->foreign('expense_id')->references('id')->on('credit_card_invoice_expenses');
             $table->unsignedBigInteger('share_user_id')->nullable()->comment('Id do usuario que sera compartilhado o gasto');
             $table->foreign('share_user_id')->references('id')->on('users');
             $table->timestamps();
@@ -35,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('credit_card_invoice_expenses');
+        Schema::dropIfExists('credit_card_invoice_expense_divisions');
     }
 };

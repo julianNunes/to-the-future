@@ -7,18 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class CreditCard extends Model
+class Budget extends Model
 {
     use HasFactory;
 
-    protected $table = 'credit_cards';
+    protected $table = 'budgets';
 
     protected $fillable = [
-        'name',
-        'digits',
-        'due_date',
-        'closing_date',
-        'is_active',
+        'year',
+        'month',
+        'total_expense',
+        'total_income',
+        'closed',
         'user_id',
     ];
 
@@ -27,8 +27,13 @@ class CreditCard extends Model
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    public function invoices(): HasMany
+    public function entries(): HasMany
     {
-        return $this->hasMany(CreditCardInvoice::class, 'credit_card_id', 'id');
+        return $this->hasMany(BudgetEntry::class, 'budget_id', 'id');
+    }
+
+    public function provisions(): HasMany
+    {
+        return $this->hasMany(BudgetProvision::class, 'budget_id', 'id');
     }
 }

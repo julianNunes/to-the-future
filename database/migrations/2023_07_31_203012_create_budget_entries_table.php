@@ -20,7 +20,6 @@ return new class extends Migration
             $table->char('portion_total', 3)->nullable()->comment('Total de Parcelas');
             $table->enum('type', ['EXPENSE', 'INCOME']);
             $table->string('remarks');
-            $table->decimal('share_percentage')->nullable()->comment('Porcentagem do valor a ser compartilhado');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
             $table->unsignedBigInteger('budget_id');
             $table->foreign('budget_id')->references('id')->on('budgets');

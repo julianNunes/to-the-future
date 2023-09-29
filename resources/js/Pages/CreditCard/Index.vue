@@ -1,5 +1,5 @@
 <template>
-    <Head title="Provision" />
+    <Head title="Credit Card" />
     <AuthenticatedLayout>
         <div class="mb-5">
             <h5 class="text-h5 font-weight-bold">{{ $t('provision.title') }}</h5>
@@ -13,14 +13,14 @@
                     <v-data-table
                         :group-by="[{ key: 'week', order: 'asc' }]"
                         :headers="headers"
-                        :items="provisions"
+                        :items="creditCards"
                         :sort-by="[{ key: 'created_at', order: 'asc' }]"
                         :search="search"
                         :loading="isLoading"
                         :loading-text="$t('default.loading-text-table')"
                         class="elevation-3"
                         density="compact"
-                        :total-items="provisions.length"
+                        :total-items="creditCards.length"
                         :no-data-text="$t('default.no-data-text')"
                         :no-results-text="$t('default.no-data-text')"
                         :footer-props="{
@@ -80,21 +80,21 @@
                                 </th>
                                 <th class="title font-weight-bold text-right">Total</th>
                                 <th class="title text-right">
-                                    {{ sumGroup(provisions, item.key, item.value, 'value') }}
+                                    {{ sumGroup(creditCards, item.key, item.value, 'value') }}
                                 </th>
                                 <th class="title text-right">
-                                    {{ sumGroup(provisions, item.key, item.value, 'share_value') }}
+                                    {{ sumGroup(creditCards, item.key, item.value, 'share_value') }}
                                 </th>
                                 <th :colspan="3"></th>
                             </tr>
                         </template>
 
-                        <template v-if="provisions.length" #tfoot>
+                        <template v-if="creditCards.length" #tfoot>
                             <tr class="green--text">
                                 <th class="title"></th>
                                 <th class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">{{ sumField(provisions, 'value') }}</th>
-                                <th class="title text-right">{{ sumField(provisions, 'share_value') }}</th>
+                                <th class="title text-right">{{ sumField(creditCards, 'value') }}</th>
+                                <th class="title text-right">{{ sumField(creditCards, 'share_value') }}</th>
                             </tr>
                         </template>
 
@@ -252,7 +252,7 @@ import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
 export default {
     name: 'ProvisionIndex',
     props: {
-        provisions: {
+        creditCards: {
             type: Array,
         },
         shareUsers: {
@@ -263,12 +263,24 @@ export default {
     data() {
         return {
             headers: [
+                // { title: this.$t('default.week'), align: 'start', key: 'week', groupable: false },
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
                 { title: this.$t('default.value'), align: 'end', key: 'value' },
                 { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
                 { title: this.$t('default.action'), key: 'action', sortable: false },
+            ],
+            breadcrumbs: [
+                {
+                    title: this.$t('menus.dashboard'),
+                    disabled: false,
+                    href: '/dashboard',
+                },
+                {
+                    title: this.$t('menus.provision'),
+                    disabled: true,
+                },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
@@ -286,7 +298,7 @@ export default {
             deleteDialog: false,
             isLoading: false,
             deleteId: null,
-            provision: {
+            creditCard: {
                 id: null,
                 description: null,
                 value: 0,

@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('credit_card_invoice_expense_tag', function (Blueprint $table) {
+        Schema::create('taggables', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('credit_card_invoice_expense_id');
-            $table->unsignedBigInteger('tag_id');
             $table->timestamps();
-            $table->engine = 'InnoDB';
         });
     }
 
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('credit_card_invoice_expense_tag');
+        Schema::dropIfExists('taggables');
     }
 };

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Tag extends Model
 {
@@ -15,4 +16,19 @@ class Tag extends Model
         'name',
         'user_id'
     ];
+
+    public function entries(): MorphToMany
+    {
+        return $this->morphedByMany(BudgetEntry::class, 'taggable');
+    }
+
+    public function expenses(): MorphToMany
+    {
+        return $this->morphedByMany(CreditCardInvoiceExpense::class, 'taggable');
+    }
+
+    public function expenseDivisions(): MorphToMany
+    {
+        return $this->morphedByMany(CreditCardInvoiceExpenseDivision::class, 'taggable');
+    }
 }

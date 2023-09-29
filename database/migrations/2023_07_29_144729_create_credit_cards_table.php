@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('credit_cards', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('nickename');
             $table->char('digits', 4);
-            $table->date('due_date')->comment('Data de Vencimento');
-            $table->date('closing_date')->comment('Data de fechamento');
+            $table->char('due_date', 2)->comment('Dia de Vencimento');
+            $table->char('closing_date', 2)->comment('Dia de fechamento');
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');

@@ -17,7 +17,8 @@ return new class extends Migration
             $table->date('closing_date')->comment('Data de fechamento');
             $table->char('year', 4)->comment('Ano da fatura');
             $table->char('month', 2)->comment('Mês de vencimento');
-            $table->string('total')->default(0);
+            $table->decimal('total')->default(0);
+            $table->decimal('total_paid')->nullable();
             $table->boolean('closed')->default(false)->comment('Fatura fechada');
             $table->string('remarks')->comment('Observações');
             $table->unsignedBigInteger('credit_card_id');

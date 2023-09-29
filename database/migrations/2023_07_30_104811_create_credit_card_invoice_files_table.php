@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('path');
-            $table->unsignedBigInteger('credit_card_invoice_id');
-            $table->foreign('credit_card_invoice_id')->references('id')->on('credit_card_invoices');
+            $table->unsignedBigInteger('invoice_id');
+            $table->foreign('invoice_id')->references('id')->on('credit_card_invoices');
             $table->timestamps();
             $table->engine = 'InnoDB';
         });

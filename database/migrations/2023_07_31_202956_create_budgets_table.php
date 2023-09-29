@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->char('year', 4)->comment('Ano da fatura');
             $table->char('month', 2)->comment('Mês de vencimento');
+            $table->decimal('total_expense')->default(0)->comment('Total de despesa');
+            $table->decimal('total_income')->default(0)->comment('Total da receita');
             $table->boolean('closed')->default(false)->comment('Marcador para finalizar o orçamento');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
