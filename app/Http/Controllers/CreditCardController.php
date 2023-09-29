@@ -3,27 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\ProvisionService;
+use App\Services\CreditCardService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ProvisionController extends Controller
+class CreditCardController extends Controller
 {
 
-    protected $provisionService;
+    protected $creditCardService;
 
-    public function __construct(ProvisionService $provisionService)
+    public function __construct(CreditCardService $creditCardService)
     {
-        $this->provisionService = $provisionService;
+        $this->creditCardService = $creditCardService;
     }
 
     /**
-     * Retorna os dados para o index de Provisionamento
+     * Retorna os dados para o index de Cartão de Credito
      */
     public function index()
     {
-        $data = $this->provisionService->index();
-        return Inertia::render('Provision/Index', $data);
+        $data = $this->creditCardService->index();
+        return Inertia::render('CreditCard/Index', $data);
     }
 
 
@@ -33,18 +33,19 @@ class ProvisionController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'description' => ['required'],
-            'value' => ['required'],
-            'week' => ['required'],
+            'name' => ['required'],
+            'digits' => ['required'],
+            'due_date' => ['required'],
+            'closing_date' => ['required'],
+            'is_active' => ['required'],
         ]);
 
-        $this->provisionService->create(
-            $request->description,
-            floatval($request->value),
-            $request->week,
-            $request->remarks,
-            $request->share_value,
-            $request->share_user_id
+        $this->creditCardService->create(
+            $request->name,
+            $request->digits,
+            $request->due_date,
+            $request->closing_date,
+            $request->is_active == '1'
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -56,19 +57,20 @@ class ProvisionController extends Controller
     public function update(Request $request, string $id)
     {
         $this->validate($request, [
-            'description' => ['required'],
-            'value' => ['required'],
-            'week' => ['required'],
+            'name' => ['required'],
+            'digits' => ['required'],
+            'due_date' => ['required'],
+            'closing_date' => ['required'],
+            'is_active' => ['required'],
         ]);
 
-        $this->provisionService->update(
+        $this->creditCardService->update(
             $id,
-            $request->description,
-            floatval($request->value),
-            $request->week,
-            $request->remarks,
-            $request->share_value,
-            $request->share_user_id
+            $request->name,
+            $request->digits,
+            $request->due_date,
+            $request->closing_date,
+            $request->is_active == '1'
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }
@@ -78,7 +80,7 @@ class ProvisionController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->provisionService->delete($id);
+        $this->creditCardService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

@@ -89,14 +89,4 @@ class TagService
 
         return $tag->delete();
     }
-
-    // /**
-    //  * Armazenamento da Imagem do Tagamento
-    //  * @param object $image
-    //  * @return string
-    //  */
-    // public function storeImageTag(object $image)
-    // {
-    //     return $image->store("/tags");
-    // }
 }

@@ -2,132 +2,146 @@
 
 namespace App\Services;
 
-use App\Models\Provision;
-use App\Models\ShareUser;
+use App\Models\CreditCard;
 use Exception;
 
-class ProvisionService
+class CreditCardService
 {
     public function __construct()
     {
     }
 
     /**
-     * Retorna os dados para o index de Provisionamento
+     * Retorna os dados para o Gerenciamento de Cartões de Credito
      * @return Array
      */
     public function index(): array
     {
-        $provisions = Provision::where('user_id', auth()->user()->id)->with('shareUser')->get();
-        $shareUsers = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->get();
-
-        if ($shareUsers && $shareUsers->count()) {
-            $shareUsers = $shareUsers->map(function ($item) {
-                return [
-                    'share_user_id' => $item->share_user_id,
-                    'share_user_name' => $item->shareUser->name
-                ];
-            });
-        }
+        $creditCards = CreditCard::where('user_id', auth()->user()->id)->get();
 
         return [
-            'provisions' => $provisions,
-            'shareUsers' => $shareUsers
+            'creditCards' => $creditCards,
         ];
     }
 
     /**
-     * Cria um novo Provisionamento
-     * @param string $description
-     * @param float $value
-     * @param string $week
-     * @param string $remarks
-     * @param integer $share_value
-     * @param integer|null $share_user_id
-     * @return Provision
+     * Cria um novo Cartão do Crédito
+     * @return CreditCard
      */
     public function create(
-        string $description,
-        float $value,
-        string $week,
-        string $remarks = null,
-        float $share_value = 0,
-        int $share_user_id = null
-    ): Provision {
-        $provision = new Provision([
-            'description' => $description,
-            'value' => $value,
-            'week' => $week,
-            'remarks' => $remarks,
-            'share_value' => $share_value,
-            'share_user_id' => $share_user_id,
+        string $name,
+        string $digits,
+        string $dueDate,
+        string $closingDate,
+        bool $isActive
+    ): CreditCard {
+        $credit_card = CreditCard::where('name', $name)->first();
+
+        if ($credit_card) {
+            throw new Exception('credit-card.already-exists');
+        }
+
+        $credit_card = new CreditCard([
+            'name' => $name,
+            'digits' => $digits,
+            'due_date' => $dueDate,
+            'closing_date' => $closingDate,
+            'is_active' => $isActive,
             'user_id' => auth()->user()->id
         ]);
 
-        $provision->save();
-        return $provision;
+        $credit_card->save();
+        return $credit_card;
     }
 
     /**
-     * Atualiza um Provisionamento
-     * @param int $id
-     * @param string $description
-     * @param float $value
-     * @param string $week
-     * @param string $remarks
-     * @param integer $share_value
-     * @param integer|null $share_user_id
-     * @return bool
+     * Atualiza um Cartão de Credito
+     * @param integer $id
+     * @param string $name
+     * @param string $digits
+     * @param string $due_date
+     * @param string $closing_date
+     * @param boolean $is_active
+     * @return boolean
      */
     public function update(
         int $id,
-        string $description,
-        float $value,
-        string $week,
-        string $remarks = null,
-        float $share_value = null,
-        int $share_user_id = null
+        string $name,
+        string $digits,
+        string $dueDate,
+        string $closingDate,
+        bool $isActive
     ): bool {
-        $provision = Provision::find($id);
+        $tag = CreditCard::where('name', $name)->where('id', '!=', $id)->first();
 
-        if (!$provision) {
-            throw new Exception('provision.not-found');
+        if ($tag) {
+            throw new Exception('credit-card.already-exists');
         }
 
-        return $provision->update([
-            'description' => $description,
-            'value' => $value,
-            'week' => $week,
-            'remarks' => $remarks,
-            'share_value' => $share_value,
-            'share_user_id' => $share_user_id,
+        $credit_card = CreditCard::find($id);
+
+        if (!$credit_card) {
+            throw new Exception('credit-card.not-found');
+        }
+
+        return $credit_card->update([
+            'name' => $name,
+            'digits' => $digits,
+            'due_date' => $dueDate,
+            'closing_date' => $closingDate,
+            'is_active' => $isActive,
             'user_id' => auth()->user()->id
         ]);
     }
 
     /**
-     * Deleta um Provisionamento
+     * Deleta um Cartão de Crédito
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $provision = Provision::find($id);
+        $credit_card = CreditCard::with([
+            'invoices' => [
+                'file',
+                'expenses' => [
+                    'divisions' => [
+                        'tags'
+                    ],
+                    'tags'
+                ]
+            ]
+        ])->find($id);
 
 
-        if (!$provision) {
-            throw new Exception('provision.not-found');
+        if (!$credit_card) {
+            throw new Exception('credit-card.not-found');
         }
 
-        return $provision->delete();
-    }
+        // Remove todos os vinculos
+        foreach ($credit_card->invoices as $key => $invoice) {
 
-    // /**
-    //  * Armazenamento da Imagem do Provisionamento
-    //  * @param object $image
-    //  * @return string
-    //  */
-    // public function storeImageProvision(object $image)
-    // {
-    //     return $image->store("/provisions");
-    // }
+            foreach ($invoice->expenses as $expense) {
+
+                foreach ($expense->divisions as $division) {
+                    foreach ($division->tags as $tag) {
+                        $tag->delete();
+                    }
+
+                    $division->delete();
+                }
+
+                foreach ($expense->tags as $tag) {
+                    $tag->delete();
+                }
+
+                $expense->delete();
+            }
+
+            if ($invoice->file) {
+                $invoice->file->delete();
+            }
+        }
+
+        return $credit_card->delete();
+    }
 }

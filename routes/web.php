@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\{
     DashboardController,
+    CreditCardController,
     PeopleController,
     ProvisionController,
     TagController,
@@ -42,11 +43,21 @@ Route::controller(ProvisionController::class)->group(function () {
     Route::delete('/provision/{id}', 'destroy');
 });
 
-//Tags
+// Tags
 Route::controller(TagController::class)->group(function () {
     Route::get('/tag', 'index');
     Route::post('/tag', 'store');
     Route::put('/tag/{id}', 'update');
     Route::delete('/tag/{id}', 'destroy');
 });
+
+// CreditCards
+Route::controller(CreditCardController::class)->group(function () {
+    Route::get('/credit-card', 'index');
+    Route::post('/credit-card', 'store');
+    Route::put('/credit-card/{id}', 'update');
+    Route::delete('/credit-card/{id}', 'destroy');
+});
+
+
 require __DIR__ . '/auth.php';
