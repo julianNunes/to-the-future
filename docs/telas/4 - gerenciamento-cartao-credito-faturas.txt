@@ -1,0 +1,40 @@
+                            <v-col cols="12" sm="6" md="6">
+                                <v-select
+                                    ref="selectMonth"
+                                    v-model="invoice.month"
+                                    :label="$t('default.month')"
+                                    :items="listMonths"
+                                    item-title="name"
+                                    item-value="value"
+                                    clearable
+                                    :rules="rules.textFieldRules"
+                                    density="comfortable"
+                                ></v-select>
+                            </v-col>
+                            <v-col cols="12" sm="12" md="6">
+                                <v-menu
+                                    v-model="modalYear"
+                                    :close-on-content-click="false"
+                                    :nudge-right="40"
+                                    transition="scale-transition"
+                                    offset-y
+                                    max-width="290px"
+                                    min-width="290px"
+                                >
+                                    <template #activator="{ on }">
+                                        <v-text-field
+                                            v-model="invoice.year"
+                                            label="From"
+                                            prepend-icon="event"
+                                            readonly
+                                            v-on="on"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                        v-model="invoice.year"
+                                        locale="en-in"
+                                        no-title
+                                        @input="modalYear = false"
+                                    ></v-date-picker>
+                                </v-menu>
+                            </v-col>

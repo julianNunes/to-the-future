@@ -1,3 +1,6 @@
+import i18n from '@/Locales/i18n'
+
+const { t } = i18n.global
 /**
  * Metodo utilizado para somar valores em tabelas
  * @param {Array} data
@@ -46,3 +49,54 @@ export function currencyField(value) {
 export function upperCase(value) {
     return value ? value.toUpperCase() : ''
 }
+
+export const MONTHS = [
+    {
+        name: t('default.month-01'),
+        value: '01',
+    },
+    {
+        name: t('default.month-02'),
+        value: '02',
+    },
+    {
+        name: t('default.month-03'),
+        value: '03',
+    },
+    {
+        name: t('default.month-04'),
+        value: '04',
+    },
+    {
+        name: t('default.month-05'),
+        value: '05',
+    },
+    {
+        name: t('default.month-06'),
+        value: '06',
+    },
+    {
+        name: t('default.month-07'),
+        value: '07',
+    },
+    {
+        name: t('default.month-08'),
+        value: '08',
+    },
+    {
+        name: t('default.month-09'),
+        value: '09',
+    },
+    {
+        name: t('default.month-10'),
+        value: '10',
+    },
+    {
+        name: t('default.month-11'),
+        value: '11',
+    },
+    {
+        name: t('default.month-12'),
+        value: '12',
+    },
+]

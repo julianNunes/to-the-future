@@ -313,16 +313,6 @@ export default {
                     value: 'WEEK_4',
                 },
             ],
-            shareOptions: [
-                {
-                    name: this.$t('default.no'),
-                    value: 0,
-                },
-                {
-                    name: this.$t('default.yes'),
-                    value: 1,
-                },
-            ],
         }
     },
 

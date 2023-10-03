@@ -4,6 +4,7 @@
         "save": "Salvar",
         "cancel": "Cancelar",
         "delete": "Remover",
+        "show": "Visualizar",
         "edit": "Editar",
         "close": "Fechar",
         "search": "Buscar",
@@ -20,9 +21,29 @@
         "sucess-update": "Registro atualizado com sucesso",
         "sucess-delete": "Registro removido com sucesso",
 
+
+        "month": "Mês",
+        "year": "Ano",
+        "month-01": "Janeiro",
+        "month-02": "Fevereiro",
+        "month-03": "Março",
+        "month-04": "Abril",
+        "month-05": "Maio",
+        "month-06": "Junho",
+        "month-07": "Julho",
+        "month-08": "Agosto",
+        "month-09": "Setembro",
+        "month-10": "Outubro",
+        "month-11": "Novembro",
+        "month-12": "Dezembro",
+
         "name": "Nome",
         "description": "Descrição",
+        "date": "Data",
         "value": "Valor",
+        "portion": "Parcela",
+        "total": "Total",
+        "portion-total": "Total Parcela",
         "week": "Semana",
         "week-1": "Semana 1",
         "week-2": "Semana 2",
@@ -33,7 +54,10 @@
         "share-value": "Valor Compartilhado",
         "share-user": "Compartilhado com",
         "remarks": "Observações",
-        "active": "Ativo"
+        "active": "Ativo",
+        "total-paid": "Total Pago",
+        "closed": "Fechada",
+        "credit-card": "Cartão de Crédito"
     },
     "rules": {
         "required-text-field": "E necessario preencher o campo",
@@ -68,6 +92,28 @@
         "digits": "Digitos",
         "4-digits": "4 ultimos digitos",
         "due-date": "Dia do vencimento da fatura",
-        "closing-date": "Dia do fechamento da fatura"
+        "closing-date": "Dia do fechamento da fatura",
+        "invoices": "Faturas"
+    },
+    "credit-card-invoice": {
+        "title-index": "Gerenciamento de Faturas",
+        "title-show": "Fatura do Cartão de Crédito",
+        "title-invoices": "Faturas",
+        "new-item": "Nova Fatura",
+        "credit-card-title": "Dados do Cartão",
+        "year-month": "Mês/Ano",
+        "closing-date": "Fechamento",
+        "due-date": "Vencimento",
+        "closed": "Fatura fechada",
+        "automatic-generate": "Deseja gerar as faturas para os proximos meses subsequentes do ano?",
+        "already-exists": "Fatura ja existe",
+        "data-invoice": "Dados da Fatura",
+        "import-excel": "Importar Excel",
+        "download-template": "Download Template"
+    },
+    "credit-card-invoice-expense": {
+        "new-item": "Nova Despesa",
+        "edit-item": "Editar Despesa",
+        "not-found": "Despesa não encontrada"
     }
 }

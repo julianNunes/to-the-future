@@ -12,3 +12,10 @@ LISTA DE TAREFAS PENDENTES
 
     - Criar classe customizavel do Exception para poder devolver valores
 
+
+- CArtao de credito
+
+    - TESTAR O DELETE
+        - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
+
+    - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto

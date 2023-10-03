@@ -30,7 +30,7 @@ class CreditCardInvoiceExpenseDivision extends Model
 
     public function expense(): BelongsTo
     {
-        return $this->belongsTo(CreditCardInvoiceExpense::class, 'id', 'expense_id');
+        return $this->belongsTo(CreditCardInvoiceExpense::class, 'expense_id', 'id');
     }
 
     public function tags(): MorphToMany

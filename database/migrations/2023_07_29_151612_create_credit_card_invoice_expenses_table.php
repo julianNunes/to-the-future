@@ -17,9 +17,9 @@ return new class extends Migration
             $table->date('date')->comment('Data da compra');
             $table->decimal('value');
             $table->enum('week', ['WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4']);
-            $table->char('portion', 3)->nullable()->comment('Parcela atual');
-            $table->char('portion_total', 3)->nullable()->comment('Total de Parcelas');
-            $table->string('remarks');
+            $table->integer('portion')->nullable()->comment('Parcela atual');
+            $table->integer('portion_total')->nullable()->comment('Total de Parcelas');
+            $table->string('remarks')->nullable();
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
             $table->unsignedBigInteger('invoice_id');
             $table->foreign('invoice_id')->references('id')->on('credit_card_invoices');

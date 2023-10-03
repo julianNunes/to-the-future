@@ -28,7 +28,7 @@ class CreditCardController extends Controller
 
 
     /**
-     * Cria um novo Provisionamento
+     * Cria um novo Cartão de Credito
      */
     public function store(Request $request)
     {
@@ -52,7 +52,7 @@ class CreditCardController extends Controller
     }
 
     /**
-     * Atualiza um Provisionamento
+     * Atualiza um Cartão de Credito
      */
     public function update(Request $request, string $id)
     {
@@ -76,7 +76,7 @@ class CreditCardController extends Controller
     }
 
     /**
-     * Deleta um Provisionamento
+     * Deleta um Cartão de Credito
      */
     public function destroy(string $id)
     {

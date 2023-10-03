@@ -50,3 +50,4 @@ Cartao de Credito/FATURAS - VISUALIZACAO das FATURAS
         - Dividir entre SEMANAS os valores a vista a partir da data de vencimento
         - Gerar totalizadores tanto do parcelado, quanto do a vista e somando tudo
 
+===============================================================================

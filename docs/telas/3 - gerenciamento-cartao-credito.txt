@@ -24,5 +24,4 @@ index.vue
 ===========================================================================
 TO-DO
 ===========================================================================
-    - TESTAR O DELETE
-        - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
+

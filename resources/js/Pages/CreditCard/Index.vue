@@ -35,6 +35,20 @@
                             item.is_active ? $t('default.yes') : $t('default.no')
                         }}</template>
                         <template #[`item.action`]="{ item }">
+                            <v-tooltip :text="$t('credit-card.invoices')" location="top">
+                                <template #activator="{ props }">
+                                    <Link :href="hrefInvoice(item)" class="v-breadcrumbs-item--link">
+                                        <v-icon
+                                            v-bind="props"
+                                            color="warning"
+                                            icon="mdi-checkbook"
+                                            size="small"
+                                            class="me-2"
+                                        >
+                                        </v-icon>
+                                    </Link>
+                                </template>
+                            </v-tooltip>
                             <v-tooltip :text="$t('default.edit')" location="top">
                                 <template #activator="{ props }">
                                     <v-icon
@@ -42,7 +56,7 @@
                                         color="warning"
                                         icon="mdi-pencil"
                                         size="small"
-                                        class="me-2"
+                                        class="me-2 ml-2"
                                         @click="editItem(item)"
                                     >
                                     </v-icon>
@@ -184,7 +198,7 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 </script>
 
 <script>
@@ -283,8 +297,8 @@ export default {
     async mounted() {},
 
     methods: {
-        convertWeek(group) {
-            return this.weekList.find((x) => x.value === group).name
+        hrefInvoice(item) {
+            return '/credit-card/' + item.id + '/invoice'
         },
 
         newItem() {

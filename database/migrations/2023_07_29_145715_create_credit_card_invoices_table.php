@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('total')->default(0);
             $table->decimal('total_paid')->nullable();
             $table->boolean('closed')->default(false)->comment('Fatura fechada');
-            $table->string('remarks')->comment('Observações');
+            $table->string('remarks')->nullable()->comment('Observações');
             $table->unsignedBigInteger('credit_card_id');
             $table->foreign('credit_card_id')->references('id')->on('credit_cards');
             $table->timestamps();
