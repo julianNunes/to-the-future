@@ -40,27 +40,27 @@ class ProvisionService
      * Cria um novo Provisionamento
      * @param string $description
      * @param float $value
-     * @param string $week
+     * @param string $group
      * @param string $remarks
-     * @param integer $share_value
-     * @param integer|null $share_user_id
+     * @param integer $shareValue
+     * @param integer|null $shareUserId
      * @return Provision
      */
     public function create(
         string $description,
         float $value,
-        string $week,
+        string $group,
         string $remarks = null,
-        float $share_value = 0,
-        int $share_user_id = null
+        float $shareValue = 0,
+        int $shareUserId = null
     ): Provision {
         $provision = new Provision([
             'description' => $description,
             'value' => $value,
-            'week' => $week,
+            'group' => $group,
             'remarks' => $remarks,
-            'share_value' => $share_value,
-            'share_user_id' => $share_user_id,
+            'share_value' => $shareValue,
+            'share_user_id' => $shareUserId,
             'user_id' => auth()->user()->id
         ]);
 
@@ -73,20 +73,20 @@ class ProvisionService
      * @param int $id
      * @param string $description
      * @param float $value
-     * @param string $week
+     * @param string $group
      * @param string $remarks
-     * @param integer $share_value
-     * @param integer|null $share_user_id
+     * @param integer $shareValue
+     * @param integer|null $shareUserId
      * @return bool
      */
     public function update(
         int $id,
         string $description,
         float $value,
-        string $week,
+        string $group,
         string $remarks = null,
-        float $share_value = null,
-        int $share_user_id = null
+        float $shareValue = null,
+        int $shareUserId = null
     ): bool {
         $provision = Provision::find($id);
 
@@ -97,10 +97,10 @@ class ProvisionService
         return $provision->update([
             'description' => $description,
             'value' => $value,
-            'week' => $week,
+            'group' => $group,
             'remarks' => $remarks,
-            'share_value' => $share_value,
-            'share_user_id' => $share_user_id,
+            'share_value' => $shareValue,
+            'share_user_id' => $shareUserId,
             'user_id' => auth()->user()->id
         ]);
     }

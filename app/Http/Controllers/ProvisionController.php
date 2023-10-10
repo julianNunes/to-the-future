@@ -35,15 +35,15 @@ class ProvisionController extends Controller
         $this->validate($request, [
             'description' => ['required'],
             'value' => ['required'],
-            'week' => ['required'],
+            'group' => ['required'],
         ]);
 
         $this->provisionService->create(
             $request->description,
             floatval($request->value),
-            $request->week,
+            $request->group,
             $request->remarks,
-            $request->share_value,
+            $request->share_value ? floatval($request->share_value) : null,
             $request->share_user_id
         );
 
@@ -58,14 +58,14 @@ class ProvisionController extends Controller
         $this->validate($request, [
             'description' => ['required'],
             'value' => ['required'],
-            'week' => ['required'],
+            'group' => ['required'],
         ]);
 
         $this->provisionService->update(
             $id,
             $request->description,
             floatval($request->value),
-            $request->week,
+            $request->group,
             $request->remarks,
             $request->share_value,
             $request->share_user_id

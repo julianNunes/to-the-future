@@ -118,20 +118,18 @@ class CreditCardService
         }
 
         // Remove todos os vinculos
-        foreach ($credit_card->invoices as $key => $invoice) {
-
+        foreach ($credit_card->invoices as $invoice) {
             foreach ($invoice->expenses as $expense) {
-
                 foreach ($expense->divisions as $division) {
-                    foreach ($division->tags as $tag) {
-                        $tag->delete();
+                    if ($division->tags && $division->tags->count()) {
+                        $division->tags()->detach();
                     }
 
                     $division->delete();
                 }
 
-                foreach ($expense->tags as $tag) {
-                    $tag->delete();
+                if ($expense->tags && $expense->tags->count()) {
+                    $expense->tags()->detach();
                 }
 
                 $expense->delete();

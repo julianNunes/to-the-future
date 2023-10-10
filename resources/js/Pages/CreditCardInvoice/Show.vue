@@ -6,7 +6,7 @@
         </div>
 
         <!-- Componente da Fatura -->
-        <InvoiceExpense :credit-card-invoice="creditCardInvoice" :share-users="shareUsers" />
+        <InvoiceExpense :invoice="invoice" :share-users="shareUsers" />
     </AuthenticatedLayout>
 </template>
 
@@ -20,7 +20,7 @@ import InvoiceExpense from '../../Components/CreditCardInvoice/InvoiceExpense.vu
 export default {
     name: 'CreditCardInvoiceShow',
     props: {
-        creditCardInvoice: {
+        invoice: {
             type: Object,
         },
         shareUsers: {
@@ -30,34 +30,8 @@ export default {
 
     data() {
         return {
-            headers: [
-                { title: this.$t('credit-card-invoice.closing-date'), key: 'closing_date' },
-                { title: this.$t('credit-card-invoice.due-date'), key: 'due_date' },
-                { title: 'Total', key: 'total' },
-                { title: this.$t('default.total-paid'), key: 'total_paid' },
-                { title: this.$t('credit-card-invoice.closed'), key: 'closed' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.action'), key: 'action', sortable: false },
-            ],
-            rules: {
-                textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-            },
-            modalYear: false,
-            automaticGenerate: false,
-            yearMonth: null,
-            search: null,
-            editDialog: false,
-            deleteDialog: false,
             isLoading: false,
-            deleteId: null,
-            invoice: this.creditCardInvoice,
         }
     },
-
-    async created() {},
-
-    async mounted() {},
-
-    methods: {},
 }
 </script>

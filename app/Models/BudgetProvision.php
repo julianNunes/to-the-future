@@ -16,7 +16,7 @@ class BudgetProvision extends Model
     protected $fillable = [
         'description',
         'value',
-        'week',
+        'group',
         'remarks',
         'share_value',
         'share_user_id',

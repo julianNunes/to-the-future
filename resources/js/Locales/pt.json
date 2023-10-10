@@ -44,6 +44,8 @@
         "portion": "Parcela",
         "total": "Total",
         "portion-total": "Total Parcela",
+        "tags": "Tags",
+        "group": "Grupo",
         "week": "Semana",
         "week-1": "Semana 1",
         "week-2": "Semana 2",
@@ -112,6 +114,7 @@
         "download-template": "Download Template"
     },
     "credit-card-invoice-expense": {
+        "title": "Despesas",
         "new-item": "Nova Despesa",
         "edit-item": "Editar Despesa",
         "not-found": "Despesa não encontrada"

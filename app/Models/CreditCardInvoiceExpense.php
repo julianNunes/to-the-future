@@ -19,6 +19,7 @@ class CreditCardInvoiceExpense extends Model
         'description',
         'date',
         'value',
+        'group',
         'portion',
         'portion_total',
         'remarks',

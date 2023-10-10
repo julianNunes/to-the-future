@@ -70,7 +70,7 @@ TABELAS
 	- id
 	- description - Descricao
 	- value - Valor
-	- week - Referente a semana
+	- group - Referente a semana
 	- share_percentage - Porcentagem - Default 50%
 	- share_value - Valor
 	- remarks - Observacao
@@ -109,7 +109,7 @@ TABELAS
 	- id
 	- description - Descricao
 	- value - Valor
-	- week - Referente a semana
+	- group - Referente a semana
 	- share_percentage - Porcentagem - Default 50%
 	- share_value - Valor
 	- remarks - Observacao

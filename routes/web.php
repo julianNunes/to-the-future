@@ -4,6 +4,7 @@ use App\Http\Controllers\{
     DashboardController,
     CreditCardController,
     CreditCardInvoiceController,
+    CreditCardInvoiceExpenseController,
     PeopleController,
     ProvisionController,
     TagController,
@@ -50,6 +51,7 @@ Route::controller(TagController::class)->group(function () {
     Route::post('/tag', 'store');
     Route::put('/tag/{id}', 'update');
     Route::delete('/tag/{id}', 'destroy');
+    Route::get('/tag/search/{name}', 'search');
 });
 
 // CreditCard
@@ -69,12 +71,12 @@ Route::controller(CreditCardInvoiceController::class)->group(function () {
 });
 
 // CreditCardInvoiceExpense
-// Route::controller(CreditCardInvoiceExpenseController::class)->group(function () {
-//     Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense', 'store');
-//     Route::put('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'update');
-//     Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'destroy');
-//     Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense-import-excel', 'importExcel');
-// });
+Route::controller(CreditCardInvoiceExpenseController::class)->group(function () {
+    Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense', 'store');
+    Route::put('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'update');
+    Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'destroy');
+    // Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense-import-excel', 'importExcel');
+});
 
 
 require __DIR__ . '/auth.php';

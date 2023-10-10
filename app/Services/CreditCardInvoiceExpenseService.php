@@ -4,8 +4,12 @@ namespace App\Services;
 
 use App\Models\CreditCard;
 use App\Models\CreditCardInvoice;
+use App\Models\CreditCardInvoiceExpense;
+use App\Models\Tag;
 use Exception;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class CreditCardInvoiceExpenseService
 {
@@ -14,155 +18,230 @@ class CreditCardInvoiceExpenseService
     }
 
     /**
-     * Retorna os dados para o Gerenciamento de Faturas de um Cartões de Credito
-     * @return Array
-     */
-    public function index(int $creditCardId): array
-    {
-        $creditCard = CreditCard::where('id', $creditCardId)->with('invoices')->first();
-
-        return [
-            'creditCard' => $creditCard,
-        ];
-    }
-
-
-    /**
      * Undocumented function
      *
-     * @param string $dueDate
-     * @param string $closingDate
-     * @param string $year
-     * @param string $month
      * @param integer $creditCardId
-     * @param boolean $automaticGenerate
-     * @return CreditCardInvoice
+     * @param integer $invoiceId
+     * @param string $description
+     * @param string $date
+     * @param float $value
+     * @param string $group
+     * @param integer|null $portion
+     * @param integer|null $portionTotal
+     * @param string|null $remarks
+     * @param float|null $shareValue
+     * @param integer|null $shareUserId
+     * @param Collection|null $tags
+     * @return CreditCardInvoiceExpense
      */
     public function create(
-        string $dueDate,
-        string $closingDate,
-        string $year,
-        string $month,
         int $creditCardId,
-        bool $automaticGenerate = false
-    ): CreditCardInvoice {
+        int $invoiceId,
+        string $description,
+        string $date,
+        float $value,
+        string $group,
+        int $portion = null,
+        int $portionTotal = null,
+        string $remarks = null,
+        float $shareValue = null,
+        int $shareUserId = null,
+        Collection $tags = null
+    ): CreditCardInvoiceExpense {
         $credit_card = CreditCard::find($creditCardId);
 
         if (!$credit_card) {
             throw new Exception('credit-card.not-found');
         }
 
-        $credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $month])->first();
-
-        if ($credit_card_invoice) {
-            throw new Exception('credit-card-invoice.already-exists');
-        }
-
-        $credit_card_invoice = new CreditCardInvoice([
-            'due_date' => $dueDate,
-            'closing_date' => $closingDate,
-            'year' => $year,
-            'month' => $month,
-            'credit_card_id' => $creditCardId,
-        ]);
-
-        $credit_card_invoice->save();
-
-        if ($automaticGenerate) {
-            $due_date = Carbon::parse($dueDate);
-            $closing_date = Carbon::parse($closingDate);
-
-            $new_due_date = $due_date->copy()->addMonth();
-            $new_closing_date = $closing_date->copy()->addMonth();
-
-            for ($i = $new_due_date->month(); $i <= 12; $i++) {
-                $new_credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $new_closing_date->month()])->first();
-
-                if (!$new_credit_card_invoice) {
-                    new CreditCardInvoice([
-                        'due_date' => $new_due_date->format('YYYY-MM-DD'),
-                        'closing_date' => $new_closing_date->format('YYYY-MM-DD'),
-                        'year' => $year,
-                        'month' => $new_closing_date->month(),
-                        'credit_card_id' => $creditCardId,
-                    ]);
-                }
-
-                $new_due_date->addMonth();
-                $new_closing_date->addMonth();
-            }
-        }
-
-
-        return $credit_card_invoice;
-    }
-
-    /**
-     * Deleta uma fatura do cartãp de credito
-     * @param int $id
-     */
-    public function delete(int $id): bool
-    {
-        $credit_card_invoice = CreditCardInvoice::with([
-            'file',
-            'expenses' => [
-                'divisions' => [
-                    'tags'
-                ],
-                'tags'
-            ]
-        ])->find($id);
-
+        $credit_card_invoice = CreditCardInvoice::find($invoiceId);
 
         if (!$credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
-        // Remove todos os vinculos
-        foreach ($credit_card_invoice->expenses as $expense) {
+        $credit_card_invoice_expense = new CreditCardInvoiceExpense([
+            'description' => $description,
+            'date' => Carbon::parse($date)->format('y-m-d'),
+            'value' => $value,
+            'group' => $group,
+            'portion' => $portion,
+            'portion_total' => $portionTotal,
+            'remarks' => $remarks,
+            'share_value' => $shareValue,
+            'share_user_id' => $shareUserId,
+            'invoice_id' => $invoiceId
+        ]);
 
-            foreach ($expense->divisions as $division) {
-                foreach ($division->tags as $tag) {
-                    $tag->delete();
+        $credit_card_invoice_expense->save();
+
+        // Atualiza Tags
+        if ($tags && $tags->count()) {
+            $tags_sync = collect();
+
+            // Busca as Tags no banco
+            foreach ($tags as $tag) {
+                $new_tag = Tag::where('name', $tag['name'])->first();
+
+                if (!$new_tag) {
+                    $new_tag = new Tag([
+                        'name' => $tag['name'],
+                        'user_id' => auth()->user()->id
+                    ]);
+                    $new_tag->save();
                 }
 
-                $division->delete();
+                $tags_sync->push($new_tag);
             }
 
-            foreach ($expense->tags as $tag) {
-                $tag->delete();
+            if ($tags_sync->count()) {
+                $credit_card_invoice_expense->tags()->sync($tags_sync->pluck('id')->toArray());
+            } else {
+                $credit_card_invoice_expense->tags()->detach();
             }
-
-            $expense->delete();
         }
 
-        if ($credit_card_invoice->file) {
-            $credit_card_invoice->file->delete();
+        $expenses = CreditCardInvoiceExpense::where('invoice_id', $invoiceId)->get();
+
+        // Atualiza o saldo total da fatura
+        if ($expenses && $expenses->count()) {
+            $credit_card_invoice->total = $expenses->sum('total');
+            $credit_card_invoice->save();
         }
 
-        return $credit_card_invoice->delete();
+        return $credit_card_invoice_expense;
     }
 
     /**
-     * Retorna os dados para visualização/edição da Fatura de um Cartões de Credito
-     * @return Array
+     * Undocumented function
+     *
+     * @param integer $id
+     * @param integer $creditCardId
+     * @param integer $invoiceId
+     * @param string $description
+     * @param string $date
+     * @param float $value
+     * @param string $group
+     * @param integer|null $portion
+     * @param integer|null $portionTotal
+     * @param string|null $remarks
+     * @param float|null $shareValue
+     * @param integer|null $shareUserId
+     * @param Collection|null $tags
+     * @return CreditCardInvoiceExpense
      */
-    public function show(int $creditCardId, int $id): array
-    {
+    public function update(
+        int $id,
+        int $creditCardId,
+        int $invoiceId,
+        string $description,
+        string $date,
+        float $value,
+        string $group,
+        int $portion = null,
+        int $portionTotal = null,
+        string $remarks = null,
+        float $shareValue = null,
+        int $shareUserId = null,
+        Collection $tags = null
+    ): CreditCardInvoiceExpense {
         $credit_card = CreditCard::find($creditCardId);
 
         if (!$credit_card) {
             throw new Exception('credit-card.not-found');
         }
 
-        $creditCardInvoice = CreditCardInvoice::where('id', $id)->with('creditCard')->first();
+        $credit_card_invoice = CreditCardInvoice::find($invoiceId);
 
-        if (!$creditCardInvoice) {
-            throw new Exception('credit-card-inovice.not-found');
+        if (!$credit_card_invoice) {
+            throw new Exception('credit-card-invoice.not-found');
         }
 
-        return [
-            'creditCardInvoice' => $creditCardInvoice,
-        ];
+        $credit_card_invoice_expense = CreditCardInvoiceExpense::find($id);
+
+        if (!$credit_card_invoice_expense) {
+            throw new Exception('credit-card-invoice-expense.not-found');
+        }
+
+        $credit_card_invoice_expense->update([
+            'description' => $description,
+            'date' => Carbon::parse($date)->format('y-m-d'),
+            'value' => $value,
+            'group' => $group,
+            'portion' => $portion,
+            'portion_total' => $portionTotal,
+            'remarks' => $remarks,
+            'share_value' => $shareValue,
+            'share_user_id' => $shareUserId,
+        ]);
+
+        // Atualiza Tags
+        if ($tags && $tags->count()) {
+            $tags_sync = collect();
+
+            // Busca as Tags no banco
+            foreach ($tags as $tag) {
+                $new_tag = Tag::where('name', $tag['name'])->first();
+
+                if (!$new_tag) {
+                    $new_tag = new Tag([
+                        'name' => $tag['name'],
+                        'user_id' => auth()->user()->id
+                    ]);
+                    $new_tag->save();
+                }
+
+                $tags_sync->push($new_tag);
+            }
+
+            if ($tags_sync->count()) {
+                $credit_card_invoice_expense->tags()->sync($tags_sync->pluck('id')->toArray());
+            } else {
+                $credit_card_invoice_expense->tags()->detach();
+            }
+        }
+
+        // Atualiza o saldo total da fatura
+        $expenses = CreditCardInvoiceExpense::where('invoice_id', $invoiceId)->get();
+
+        if ($expenses && $expenses->count()) {
+            $credit_card_invoice->total = $expenses->sum('total');
+            $credit_card_invoice->save();
+        }
+
+        return $credit_card_invoice_expense;
+    }
+
+    /**
+     * Deleta uma Despesa da Fatura do Cartão de credito
+     * @param int $id
+     */
+    public function delete(int $id): bool
+    {
+        $credit_card_invoice_expense = CreditCardInvoiceExpense::with([
+            'divisions' => [
+                'tags'
+            ],
+            'tags'
+        ])->find($id);
+
+        if (!$credit_card_invoice_expense) {
+            throw new Exception('credit-card-invoice-expense.not-found');
+        }
+
+        // Remove todos os vinculos
+        foreach ($credit_card_invoice_expense->divisions as $division) {
+            if ($division->tags && $division->tags->count()) {
+                $division->tags()->detach();
+            }
+
+            $division->delete();
+        }
+
+        if ($credit_card_invoice_expense->tags && $credit_card_invoice_expense->tags->count()) {
+            $credit_card_invoice_expense->tags()->detach();
+        }
+
+        return  $credit_card_invoice_expense->delete();
     }
 }

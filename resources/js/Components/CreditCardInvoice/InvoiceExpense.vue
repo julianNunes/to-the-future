@@ -5,10 +5,10 @@
         </v-card-title>
         <v-card-text class="pt-4">
             <v-row dense>
-                <v-col cols="12" sm="12" md="4">
+                <v-col cols="12" sm="12" md="2">
                     <v-text-field
                         ref="txtName"
-                        v-model="invoice.credit_card.name"
+                        v-model="creditCardname"
                         :label="$t('default.credit-card')"
                         :readonly="true"
                         density="comfortable"
@@ -16,7 +16,7 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="2">
                     <v-text-field
-                        v-model="invoice.due_date"
+                        v-model="invoiceDueDate"
                         :label="$t('credit-card.due-date')"
                         :readonly="true"
                         density="comfortable"
@@ -24,7 +24,7 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="2">
                     <v-text-field
-                        v-model="invoice.closing_date"
+                        v-model="invoiceClosindDate"
                         :label="$t('credit-card.closing-date')"
                         :readonly="true"
                         density="comfortable"
@@ -32,7 +32,7 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="2">
                     <v-text-field
-                        :text="currencyField(invoice.total)"
+                        v-model="invoiceTotal"
                         :label="$t('default.total')"
                         :readonly="true"
                         density="comfortable"
@@ -40,7 +40,7 @@
                 </v-col>
                 <v-col cols="12" sm="6" md="2">
                     <v-text-field
-                        :text="currencyField(invoice.total_paid)"
+                        v-model="invoiceTotalPaid"
                         :label="$t('default.total-paid')"
                         :readonly="true"
                         density="comfortable"
@@ -53,6 +53,12 @@
                         :readonly="true"
                         density="comfortable"
                     ></v-text-field>
+                </v-col>
+            </v-row>
+            <v-row dense>
+                <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
+                <v-col md="12">
+                    <span class="text-h6">{{ $t('credit-card-invoice-expense.title') }}</span>
                 </v-col>
             </v-row>
             <v-row dense>
@@ -69,7 +75,7 @@
             <v-row dense>
                 <v-col md="12">
                     <v-data-table
-                        :group-by="[{ key: 'week', order: 'asc' }]"
+                        :group-by="[{ key: 'group', order: 'asc' }]"
                         :headers="headers"
                         :items="invoice.expenses"
                         :sort-by="[{ key: 'created_at', order: 'asc' }]"
@@ -93,7 +99,10 @@
                         <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                         <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
                         <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
-                        <template #[`item.week`]="{ item }">{{ convertWeek(item.week) }}</template>
+                        <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
+                        <template #[`item.tags`]="{ item }">{{
+                            item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
+                        }}</template>
                         <template #[`item.potion`]="{ item }">{{
                             item.portion ? item.portion + '/' + item.portion_total : ''
                         }}</template>
@@ -131,14 +140,14 @@
 
                         <template #group-header="{ item, toggleGroup, isGroupOpen }">
                             <tr>
-                                <th class="title" width="150px">
+                                <th class="title" style="width: auto">
                                     <VBtn
                                         size="small"
                                         variant="text"
                                         :icon="isGroupOpen(item) ? '$expand' : '$next'"
                                         @click="toggleGroup(item)"
                                     ></VBtn>
-                                    {{ convertWeek(item.value) }}
+                                    {{ convertGroup(item.value) }}
                                 </th>
                                 <th :colspan="2" class="title font-weight-bold text-right">Total</th>
                                 <th class="title text-right">
@@ -202,7 +211,7 @@
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">
+                        <v-col cols="12" sm="6" md="3">
                             <v-text-field
                                 v-model="expense.date"
                                 type="date"
@@ -212,7 +221,17 @@
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">
+                        <v-col cols="12" sm="6" md="3">
+                            <v-text-field
+                                v-model="expense.value"
+                                :label="$t('default.value')"
+                                type="number"
+                                min="0"
+                                :rules="rules.currencyFieldRules"
+                                density="comfortable"
+                            />
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
                             <v-text-field
                                 v-model="expense.portion"
                                 type="number"
@@ -222,7 +241,7 @@
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">
+                        <v-col cols="12" sm="6" md="3">
                             <v-text-field
                                 v-model="expense.portion_total"
                                 type="number"
@@ -241,11 +260,11 @@
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">
+                        <v-col cols="12" sm="6" md="3">
                             <v-select
-                                v-model="expense.week"
-                                :label="$t('default.week')"
-                                :items="weekList"
+                                v-model="expense.group"
+                                :label="$t('default.group')"
+                                :items="groupList"
                                 item-title="name"
                                 item-value="value"
                                 clearable
@@ -253,7 +272,7 @@
                                 density="comfortable"
                             ></v-select>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">
+                        <v-col cols="12" sm="6" md="3">
                             <v-text-field
                                 v-model="expense.share_value"
                                 :label="$t('default.share-value')"
@@ -271,7 +290,7 @@
                                 density="comfortable"
                             />
                         </v-col>
-                        <v-col cols="12" sm="6" md="8">
+                        <v-col cols="12" sm="6" md="6">
                             <v-select
                                 v-model="expense.share_user_id"
                                 :label="$t('default.share-user')"
@@ -296,6 +315,27 @@
                                 :label="$t('default.remarks')"
                                 density="comfortable"
                             ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="12">
+                            <v-autocomplete
+                                v-model="expense.tags"
+                                v-model:search="search_tag"
+                                :label="$t('default.tags')"
+                                :items="itemsTags"
+                                :loading="loadingData"
+                                item-title="name"
+                                item-value="name"
+                                clearable
+                                multiple
+                                chips
+                                :closable-chips="true"
+                                return-object
+                                hide-no-data
+                                hide-selected
+                                placeholder="Start typing to Search"
+                                prepend-icon="mdi-database-search"
+                                @update:search="searchTags"
+                            ></v-autocomplete>
                         </v-col>
                     </v-row>
                 </v-form>
@@ -342,7 +382,7 @@ import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
 export default {
     name: 'InvoiceExpenses',
     props: {
-        creditCardInvoice: {
+        invoice: {
             type: Object,
         },
         shareUsers: {
@@ -364,7 +404,8 @@ export default {
                 { title: this.$t('default.portion'), key: 'portion' },
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.action'), key: 'action', sortable: false },
+                { title: this.$t('default.tags'), key: 'tags' },
+                { title: this.$t('default.action'), key: 'action', width: '100', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
@@ -377,25 +418,43 @@ export default {
                         return true
                     },
                 ],
+                currencyFieldRules: [
+                    (value) => {
+                        if (!value) return this.$t('rules.required-text-field')
+                        if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+
+                        return true
+                    },
+                ],
             },
             search: null,
+            timeOut: null,
+            search_tag: '',
             editDialog: false,
             deleteDialog: false,
             isLoading: false,
+            loadingData: false,
             deleteId: null,
-            invoice: this.creditCardInvoice,
+            listTags: [],
+            searchFieldsData: [],
             expense: {
                 description: null,
                 date: null,
                 value: null,
+                group: null,
                 portion: null,
                 portion_total: null,
                 remarks: null,
                 share_value: null,
                 share_user_id: null,
                 invoice_id: null,
+                tags: [],
             },
-            weekList: [
+            groupList: [
+                {
+                    name: this.$t('default.portion'),
+                    value: 'PORTION',
+                },
                 {
                     name: this.$t('default.week-1'),
                     value: 'WEEK_1',
@@ -420,6 +479,27 @@ export default {
         isClosed() {
             return this.invoice.closed ? this.$t('default.yes') : this.$t('default.no')
         },
+        itemsTags() {
+            return this.listTags
+        },
+        creditCardname() {
+            return this.invoice.credit_card.name
+        },
+        itemsExpenses() {
+            return this.invoice.expenses
+        },
+        invoiceDueDate() {
+            return moment(this.invoice.due_date).format('DD/MM/YYYY')
+        },
+        invoiceClosindDate() {
+            return moment(this.invoice.closing_date).format('DD/MM/YYYY')
+        },
+        invoiceTotal() {
+            return currencyField(this.invoice.total)
+        },
+        invoiceTotalPaid() {
+            return currencyField(this.invoice.total_paid)
+        },
     },
 
     async created() {},
@@ -427,22 +507,67 @@ export default {
     async mounted() {},
 
     methods: {
-        convertWeek(group) {
-            return this.weekList.find((x) => x.value === group).name
+        convertGroup(group) {
+            return this.groupList.find((x) => x.value === group).name
         },
+        showTags(tags) {
+            if (tags.length) {
+                return tags.map((x) => x.name).join('|')
+            }
+
+            return ''
+        },
+        async searchTags(val) {
+            if (this.loadingData) return
+
+            if (!val || val.length <= 1) {
+                this.listTags = []
+                clearTimeout(this.timeOut)
+                return
+            }
+
+            // if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.includes(val)) {
+            //     return
+            // }
+
+            clearTimeout(this.timeOut)
+            this.timeOut = setTimeout(async () => {
+                this.loadingData = true
+                let searchFieldsData = []
+                await window.axios
+                    .get('/tag/search/' + val)
+                    .then(function (response) {
+                        if (response.data && response.data.length > 0) {
+                            searchFieldsData = response.data
+                        }
+
+                        searchFieldsData.unshift({ name: val.toUpperCase() })
+                    })
+                    .catch(function (error) {
+                        console.log('error', error)
+                    })
+
+                this.listTags = searchFieldsData
+                this.loadingData = false
+            }, 300)
+        },
+
         newItem() {
             this.titleModal = this.$t('credit-card-invoice-expense.new-item')
             this.editDialog = true
             this.expense = {
+                id: null,
                 description: null,
                 date: null,
                 value: null,
+                group: null,
                 portion: null,
                 portion_total: null,
                 remarks: null,
                 share_value: null,
                 invoice_id: null,
                 share_user_id: null,
+                tags: [],
             }
             setTimeout(() => {
                 this.$refs.txtName.focus()
@@ -453,15 +578,18 @@ export default {
             this.titleModal = this.$t('credit-card-invoice-expense.edit-item')
             this.editDialog = true
             this.expense = {
+                id: item.id,
                 description: item.description,
                 date: item.date,
                 value: item.value,
+                group: item.group,
                 portion: item.portion,
                 portion_total: item.portion_total,
                 remarks: item.remarks,
                 share_value: item.share_value,
                 invoice_id: item.invoice_id,
                 share_user_id: item.share_user_id,
+                tags: item.tags,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -475,7 +603,7 @@ export default {
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                if (this.creditCard.id) {
+                if (this.expense.id) {
                     await this.update()
                 } else {
                     await this.create()
@@ -491,12 +619,14 @@ export default {
                     description: this.expense.description,
                     date: this.expense.date,
                     value: this.expense.value,
+                    group: this.expense.group,
                     portion: this.expense.portion,
                     portion_total: this.expense.portion_total,
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
                     invoice_id: this.invoice.id,
+                    tags: this.expense.tags,
                 },
                 {
                     onSuccess: () => {
@@ -522,12 +652,14 @@ export default {
                     description: this.expense.description,
                     date: this.expense.date,
                     value: this.expense.value,
+                    group: this.expense.group,
                     portion: this.expense.portion,
                     portion_total: this.expense.portion_total,
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
                     invoice_id: this.invoice.id,
+                    tags: this.expense.tags,
                 },
                 {
                     onSuccess: () => {
@@ -547,20 +679,28 @@ export default {
 
         delete() {
             this.isLoading = true
-            this.$inertia.delete(`/credit-card/${this.deleteId}`, {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {
-                    this.deleteDialog = false
-                    this.editDialog = false
-                },
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-            })
+            this.$inertia.delete(
+                '/credit-card/' +
+                    this.invoice.credit_card.id +
+                    '/invoice/' +
+                    this.invoice.id +
+                    '/expense/' +
+                    this.deleteId,
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.deleteDialog = false
+                        this.editDialog = false
+                    },
+                    onError: () => {
+                        this.isLoading = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
         },
 
         downloadTemplate() {},

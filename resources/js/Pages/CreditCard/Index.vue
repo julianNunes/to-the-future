@@ -213,7 +213,6 @@ export default {
     data() {
         return {
             headers: [
-                // { title: this.$t('default.week'), align: 'start', key: 'week', groupable: false },
                 { title: this.$t('default.name'), key: 'name', groupable: false },
                 { title: this.$t('credit-card.digits'), key: 'digits' },
                 { title: this.$t('credit-card.due-date'), key: 'due_date' },

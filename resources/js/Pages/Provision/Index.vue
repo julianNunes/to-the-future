@@ -11,7 +11,7 @@
                 </v-col>
                 <v-col md="12">
                     <v-data-table
-                        :group-by="[{ key: 'week', order: 'asc' }]"
+                        :group-by="[{ key: 'group', order: 'asc' }]"
                         :headers="headers"
                         :items="provisions"
                         :sort-by="[{ key: 'created_at', order: 'asc' }]"
@@ -34,7 +34,7 @@
                     >
                         <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                         <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                        <template #[`item.week`]="{ item }">{{ convertWeek(item.week) }}</template>
+                        <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
                         <template #[`item.share_user_id`]="{ item }">{{
                             item.share_user ? item.share_user.name : ''
                         }}</template>
@@ -76,7 +76,7 @@
                                         :icon="isGroupOpen(item) ? '$expand' : '$next'"
                                         @click="toggleGroup(item)"
                                     ></VBtn>
-                                    {{ convertWeek(item.value) }}
+                                    {{ convertGroup(item.value) }}
                                 </th>
                                 <th class="title font-weight-bold text-right">Total</th>
                                 <th class="title text-right">
@@ -152,9 +152,9 @@
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                                 <v-select
-                                    v-model="provision.week"
-                                    :label="$t('default.week')"
-                                    :items="weekList"
+                                    v-model="provision.group"
+                                    :label="$t('default.group')"
+                                    :items="groupList"
                                     item-title="name"
                                     item-value="value"
                                     clearable
@@ -290,12 +290,12 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
-                week: null,
+                group: null,
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
             },
-            weekList: [
+            groupList: [
                 {
                     name: this.$t('default.week-1'),
                     value: 'WEEK_1',
@@ -321,8 +321,8 @@ export default {
     async mounted() {},
 
     methods: {
-        convertWeek(group) {
-            return this.weekList.find((x) => x.value === group).name
+        convertGroup(group) {
+            return this.groupList.find((x) => x.value === group).name
         },
 
         newItem() {
@@ -332,7 +332,7 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
-                week: null,
+                group: null,
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
@@ -349,7 +349,7 @@ export default {
                 id: item.id,
                 description: item.description,
                 value: Number(item.value),
-                week: item.week,
+                group: item.group,
                 remarks: item.remarks,
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
@@ -381,7 +381,7 @@ export default {
                 {
                     description: this.provision.description,
                     value: this.provision.value,
-                    week: this.provision.week,
+                    group: this.provision.group,
                     remarks: this.provision.remarks,
                     share_value: this.provision.share_value,
                     share_user_id: this.provision.share_user_id,
@@ -404,7 +404,7 @@ export default {
                 {
                     description: this.provision.description,
                     value: this.provision.value,
-                    week: this.provision.week,
+                    group: this.provision.group,
                     remarks: this.provision.remarks,
                     share_value: this.provision.share_value,
                     share_user_id: this.provision.share_user_id,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Services\TagService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class TagController extends Controller
@@ -65,5 +66,14 @@ class TagController extends Controller
     {
         $this->tagService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
+    }
+
+    /**
+     * Busca por nome de tags
+     */
+    public function search(Request $request, string $name)
+    {
+        $data = $this->tagService->search($name);
+        return response()->json($data);
     }
 }

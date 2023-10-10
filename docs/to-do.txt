@@ -14,8 +14,13 @@ LISTA DE TAREFAS PENDENTES
 
 
 - CArtao de credito
-
     - TESTAR O DELETE
         - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
 
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
+
+
+- Fatura do cartão de credito
+    - Botão para fazer download do arquivo template
+    - Upload do pdf da fatura
+    - Botão para visualizar o arquivo pdf da fatura

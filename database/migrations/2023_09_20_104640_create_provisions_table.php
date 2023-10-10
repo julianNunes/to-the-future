@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('description')->comment('Descricao');
             $table->decimal('value');
-            $table->enum('week', ['WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4']);
+            $table->enum('group', ['PORTION', 'WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4']);
             $table->string('remarks')->nullable()->comment('Observacoes');
             $table->decimal('share_percentage')->nullable()->comment('Porcentagem do valor a ser compartilhado');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');

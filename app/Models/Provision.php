@@ -15,7 +15,7 @@ class Provision extends Model
     protected $fillable = [
         'description',
         'value',
-        'week',
+        'group',
         'remarks',
         'share_percentage',
         'share_value',

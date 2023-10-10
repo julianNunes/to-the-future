@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Services\CreditCardInvoiceExpenseService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CreditCardInvoiceExpenseController extends Controller
 {
@@ -17,52 +18,74 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
-     * Retorna os dados para o index de Faturas de um Cartão de Credito
+     * Cria uma Despesa para uma fatura
      */
-    public function index(int $creditCardId)
-    {
-        $data = $this->creditCardInvoiceExpenseService->index($creditCardId);
-        return Inertia::render('CreditCardInvoice/Index', $data);
-    }
-
-
-    /**
-     * Cria uma nova Fatura
-     */
-    public function store(Request $request, int $creditCardId)
+    public function store(Request $request, int $creditCardId, int $invoiceId)
     {
         $this->validate($request, [
-            'due_date' => ['required'],
-            'closing_date' => ['required'],
-            'year' => ['required'],
-            'month' => ['required'],
+            'description' => ['required'],
+            'date' => ['required'],
+            'value' => ['required'],
         ]);
 
+        DB::beginTransaction();
+
         $this->creditCardInvoiceExpenseService->create(
-            $request->due_date,
-            $request->closing_date,
-            $request->year,
-            $request->month,
             $creditCardId,
-            $request->automatic_generate,
+            $invoiceId,
+            $request->description,
+            $request->date,
+            floatval($request->value),
+            $request->group,
+            $request->portion,
+            $request->portion_total,
+            $request->remarks,
+            $request->share_value ? floatval($request->share_value) : null,
+            $request->share_user_id,
+            collect($request->tags)
+        );
+
+        DB::commit();
+
+        return redirect()->back()->with('success', 'default.sucess-save');
+    }
+
+    /**
+     * Atualiza uma Despesa para uma fatura
+     */
+    public function update(Request $request, int $creditCardId, int $invoiceId, int $id)
+    {
+        $this->validate($request, [
+            'description' => ['required'],
+            'date' => ['required'],
+            'value' => ['required'],
+        ]);
+
+        $this->creditCardInvoiceExpenseService->update(
+            $id,
+            $creditCardId,
+            $invoiceId,
+            $request->description,
+            $request->date,
+            floatval($request->value),
+            $request->group,
+            $request->portion,
+            $request->portion_total,
+            $request->remarks,
+            $request->share_value ? floatval($request->share_value) : null,
+            $request->share_user_id,
+            collect($request->tags)
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
     }
 
-
     /**
-     * Deleta um Provisionamento
+     * Deleta uma Desoesa de uma Fatura do cartão de credito
      */
-    public function destroy(string $id)
+    public function destroy(int $creditCardId, int $invoiceId, int $id)
     {
         $this->creditCardInvoiceExpenseService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
-    }
-
-    public function show(int $creditCardId, int $id)
-    {
-        $data = $this->creditCardInvoiceExpenseService->show($creditCardId, $id);
-        return Inertia::render('CreditCardInvoice/Show', $data);
     }
 }

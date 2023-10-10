@@ -154,7 +154,6 @@ export default {
     data() {
         return {
             headers: [
-                // { title: this.$t('default.week'), align: 'start', key: 'week', groupable: false },
                 { title: this.$t('default.name'), align: 'start', key: 'name', groupable: false },
                 { title: this.$t('default.action'), width: '100', key: 'action', sortable: false },
             ],

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Tag;
 use Exception;
+use Illuminate\Support\Collection;
 
 class TagService
 {
@@ -88,5 +89,15 @@ class TagService
         }
 
         return $tag->delete();
+    }
+
+
+    public function search(string $name): Collection
+    {
+        $name = strtoupper($name);
+        return Tag::select('name')
+            ->where('name', 'LIKE', "%{$name}%")
+            ->where('user_id', auth()->user()->id)
+            ->get();
     }
 }

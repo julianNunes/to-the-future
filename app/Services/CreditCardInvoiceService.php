@@ -29,7 +29,6 @@ class CreditCardInvoiceService
         ];
     }
 
-
     /**
      * Undocumented function
      *
@@ -125,17 +124,16 @@ class CreditCardInvoiceService
 
         // Remove todos os vinculos
         foreach ($credit_card_invoice->expenses as $expense) {
-
             foreach ($expense->divisions as $division) {
-                foreach ($division->tags as $tag) {
-                    $tag->delete();
+                if ($division->tags && $division->tags->count()) {
+                    $division->tags->detach();
                 }
 
                 $division->delete();
             }
 
-            foreach ($expense->tags as $tag) {
-                $tag->delete();
+            if ($expense->tags && $expense->tags->count()) {
+                $expense->tags()->detach();
             }
 
             $expense->delete();
@@ -160,7 +158,7 @@ class CreditCardInvoiceService
             throw new Exception('credit-card.not-found');
         }
 
-        $creditCardInvoice = CreditCardInvoice::where('id', $id)->with(['creditCard', 'expenses'])->first();
+        $creditCardInvoice = CreditCardInvoice::where('id', $id)->with(['creditCard', 'expenses.tags'])->first();
 
         if (!$creditCardInvoice) {
             throw new Exception('credit-card-inovice.not-found');
@@ -178,7 +176,7 @@ class CreditCardInvoiceService
         }
 
         return [
-            'creditCardInvoice' => $creditCardInvoice,
+            'invoice' => $creditCardInvoice,
             'shareUsers' => $shareUsers,
         ];
     }
