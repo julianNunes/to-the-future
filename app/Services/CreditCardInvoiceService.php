@@ -158,7 +158,15 @@ class CreditCardInvoiceService
             throw new Exception('credit-card.not-found');
         }
 
-        $creditCardInvoice = CreditCardInvoice::where('id', $id)->with(['creditCard', 'expenses.tags'])->first();
+        $creditCardInvoice = CreditCardInvoice::where('id', $id)
+            ->with([
+                'creditCard',
+                'expenses' => [
+                    'tags',
+                    'shareUser'
+                ]
+            ])
+            ->first();
 
         if (!$creditCardInvoice) {
             throw new Exception('credit-card-inovice.not-found');

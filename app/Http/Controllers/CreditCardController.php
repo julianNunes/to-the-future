@@ -78,7 +78,7 @@ class CreditCardController extends Controller
     /**
      * Deleta um Cartão de Credito
      */
-    public function destroy(string $id)
+    public function delete(string $id)
     {
         $this->creditCardService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');

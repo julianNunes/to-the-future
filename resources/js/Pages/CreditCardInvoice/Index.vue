@@ -3,6 +3,7 @@
     <AuthenticatedLayout>
         <div class="mb-5">
             <h5 class="text-h5 font-weight-bold">{{ $t('credit-card-invoice.title-index') }}</h5>
+            <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
         <!-- Dados do cartão de credito -->
         <v-card class="mb-4">
@@ -208,6 +209,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
+import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 </script>
 
 <script>
@@ -227,6 +229,22 @@ export default {
 
     data() {
         return {
+            breadcrumbs: [
+                {
+                    title: this.$t('menus.dashboard'),
+                    disabled: false,
+                    href: '/dashboard',
+                },
+                {
+                    title: this.$t('menus.credit-card'),
+                    disabled: false,
+                    href: '/credit-card',
+                },
+                {
+                    title: this.$t('credit-card-invoice.title-index'),
+                    disabled: true,
+                },
+            ],
             headers: [
                 { title: this.$t('credit-card-invoice.closing-date'), key: 'closing_date' },
                 { title: this.$t('credit-card-invoice.due-date'), key: 'due_date' },

@@ -6,12 +6,15 @@ LISTA DE TAREFAS PENDENTES
 
     - Mudar como os menu é montado e fazer ele agrupado
 
-
     - Alterar o formato das datas do timestamp do Laravel
-
 
     - Criar classe customizavel do Exception para poder devolver valores
 
+    - Aplicar breadcrumbs em todas as paginas
+
+
+- Tags
+    - Metodo para exportar todas as tags em Excel
 
 - CArtao de credito
     - TESTAR O DELETE

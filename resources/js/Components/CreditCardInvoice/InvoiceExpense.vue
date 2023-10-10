@@ -56,18 +56,19 @@
                 </v-col>
             </v-row>
             <v-row dense>
-                <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
                 <v-col md="12">
+                    <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
                     <span class="text-h6">{{ $t('credit-card-invoice-expense.title') }}</span>
+                    <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
                 </v-col>
             </v-row>
-            <v-row dense>
+            <v-row>
                 <v-col md="12">
                     <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-                    <v-btn color="info" class="ml-2" @click="downloadTemplate">{{
+                    <v-btn color="info" class="ml-1" @click="downloadTemplate">{{
                         $t('credit-card-invoice.download-template')
                     }}</v-btn>
-                    <v-btn color="info" class="ml-2" @click="importExcel">{{
+                    <v-btn color="info" class="ml-1" @click="importExcel">{{
                         $t('credit-card-invoice.import-excel')
                     }}</v-btn>
                 </v-col>
@@ -193,7 +194,7 @@
     </v-card>
 
     <!-- Dialog Criacao/Edicao -->
-    <v-dialog v-model="editDialog" persistent width="800">
+    <v-dialog v-model="editDialog" persistent :fullscreen="true" class="ma-4">
         <v-card>
             <v-card-title>
                 <span class="text-h5">{{ titleModal }}</span>
@@ -236,7 +237,9 @@
                                 v-model="expense.portion"
                                 type="number"
                                 :label="$t('default.portion')"
+                                :disabled="expense.id ? true : false"
                                 min="0"
+                                step="1"
                                 required
                                 density="comfortable"
                             ></v-text-field>
@@ -246,13 +249,16 @@
                                 v-model="expense.portion_total"
                                 type="number"
                                 :label="$t('default.portion-total')"
+                                :disabled="expense.id ? true : false"
                                 min="0"
+                                step="1"
                                 required
                                 :rules="[
                                     (value) => {
                                         if (expense.portion) {
                                             if (!value) return $t('rules.required-text-field')
                                             if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
+                                            if (parseFloat(value) === 1) return $t('rules.minimum-portion')
                                         }
                                         return true
                                     },
@@ -338,6 +344,131 @@
                             ></v-autocomplete>
                         </v-col>
                     </v-row>
+                    <v-row dense>
+                        <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
+                        <v-col md="12">
+                            <span class="text-h6">{{ $t('credit-card-invoice-expense.title-division') }}</span>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col md="12">
+                            <v-btn color="primary" @click="newItemDivision">{{ $t('default.new') }}</v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-row dense>
+                        <v-col md="12">
+                            <v-data-table
+                                :headers="headersDivision"
+                                :items="expense.divisions"
+                                :loading="isLoading"
+                                :loading-text="$t('default.loading-text-table')"
+                                class="elevation-3"
+                                density="compact"
+                                :total-items="expense.divisions"
+                                :no-data-text="$t('default.no-data-text')"
+                                :no-results-text="$t('default.no-data-text')"
+                                :footer-props="{
+                                    'items-per-page-text': $t('default.itens-per-page'),
+                                    'page-text': $t('default.page-text'),
+                                }"
+                                :header-props="{
+                                    sortByText: $t('default.sort-by'),
+                                }"
+                                fixed-header
+                            >
+                                <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
+                                <template #[`item.share_value`]="{ item }">{{
+                                    currencyField(item.share_value)
+                                }}</template>
+                                <template #[`item.tags`]="{ item }">{{
+                                    item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
+                                }}</template>
+
+                                <template #[`item.share_user_id`]="{ item }">{{
+                                    item.share_user ? item.share_user.name : ''
+                                }}</template>
+                                <template #[`item.action`]="{ item }">
+                                    <v-tooltip :text="$t('default.edit')" location="top">
+                                        <template #activator="{ props }">
+                                            <v-icon
+                                                v-bind="props"
+                                                color="warning"
+                                                icon="mdi-pencil"
+                                                size="small"
+                                                class="me-2"
+                                                @click="editDivisionItem(item)"
+                                            >
+                                            </v-icon>
+                                        </template>
+                                    </v-tooltip>
+                                    <v-tooltip :text="$t('default.delete')" location="top">
+                                        <template #activator="{ props }">
+                                            <v-icon
+                                                v-bind="props"
+                                                class="ml-2"
+                                                color="error"
+                                                icon="mdi-delete"
+                                                size="small"
+                                                @click="openDivisionDelete(item)"
+                                            >
+                                            </v-icon>
+                                        </template>
+                                    </v-tooltip>
+                                </template>
+
+                                <template #group-header="{ item, toggleGroup, isGroupOpen }">
+                                    <tr>
+                                        <th class="title" style="width: auto">
+                                            <VBtn
+                                                size="small"
+                                                variant="text"
+                                                :icon="isGroupOpen(item) ? '$expand' : '$next'"
+                                                @click="toggleGroup(item)"
+                                            ></VBtn>
+                                            {{ convertGroup(item.value) }}
+                                        </th>
+                                        <th :colspan="2" class="title font-weight-bold text-right">Total</th>
+                                        <th class="title text-right">
+                                            {{ sumGroup(expense.divisions, item.key, item.value, 'value') }}
+                                        </th>
+                                        <th class="title text-right">
+                                            {{ sumGroup(expense.divisions, item.key, item.value, 'share_value') }}
+                                        </th>
+                                        <th :colspan="6"></th>
+                                    </tr>
+                                </template>
+
+                                <template v-if="expense.divisions.length" #tfoot>
+                                    <tr class="green--text">
+                                        <th class="title"></th>
+                                        <th colspan="2" class="title font-weight-bold text-right">Total</th>
+                                        <th class="title text-right">{{ sumField(expense.divisions, 'value') }}</th>
+                                        <th class="title text-right">
+                                            {{ sumField(expense.divisions, 'share_value') }}
+                                        </th>
+                                    </tr>
+                                </template>
+
+                                <template #top>
+                                    <v-toolbar density="comfortable">
+                                        <v-row dense>
+                                            <v-col cols="12" lg="12" md="12" sm="12">
+                                                <v-text-field
+                                                    v-model="search"
+                                                    :label="$t('default.search')"
+                                                    append-icon="mdi-magnify"
+                                                    single-line
+                                                    hide-details
+                                                    clearable
+                                                    @click:clear="search = null"
+                                                ></v-text-field>
+                                            </v-col>
+                                        </v-row>
+                                    </v-toolbar>
+                                </template>
+                            </v-data-table>
+                        </v-col>
+                    </v-row>
                 </v-form>
             </v-card-text>
             <v-card-actions>
@@ -356,13 +487,160 @@
     <v-row justify="center">
         <v-dialog v-model="deleteDialog" persistent width="auto">
             <v-card>
-                <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
+                <v-card-text>
+                    <v-row>
+                        <v-col md="12">
+                            {{ $t('default.confirm-delete-item') }}
+                        </v-col>
+                        <v-col v-show="expense.portion_total > 0" md="12">
+                            <v-col cols="12" md="12">
+                                <v-checkbox
+                                    v-model="deleteAllPortions"
+                                    :label="$t('credit-card-invoice.automatic-generate')"
+                                ></v-checkbox>
+                            </v-col>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
                 <v-card-actions>
                     <v-spacer />
                     <v-btn color="error" elevated :loading="isLoading" @click="deleteDialog = false">
                         {{ $t('default.cancel') }}</v-btn
                     >
                     <v-btn color="primary" elevated :loading="isLoading" text @click="this.delete()">
+                        {{ $t('default.delete') }}</v-btn
+                    >
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </v-row>
+
+    <!-- Dialog Criacao/Edicao de Divisão -->
+    <v-dialog v-model="editDivisionDialog" persistent :fullscreen="true" class="ma-4">
+        <v-card>
+            <v-card-title>
+                <span class="text-h5">{{ titleDivisionModal }}</span>
+            </v-card-title>
+            <v-card-text>
+                <v-form ref="form" @submit.prevent>
+                    <v-row dense>
+                        <v-col cols="12" sm="12" md="12">
+                            <v-text-field
+                                ref="txtDescription"
+                                v-model="division.description"
+                                :label="$t('default.description')"
+                                :rules="rules.textFieldRules"
+                                required
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <v-text-field
+                                v-model="division.value"
+                                :label="$t('default.value')"
+                                type="number"
+                                min="0"
+                                :rules="rules.currencyFieldRules"
+                                density="comfortable"
+                            />
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <v-text-field
+                                v-model="division.share_value"
+                                :label="$t('default.share-value')"
+                                type="number"
+                                min="0"
+                                :rules="[
+                                    (value) => {
+                                        if (division.share_user_id) {
+                                            if (!value) return $t('rules.required-text-field')
+                                            if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
+                                        }
+                                        return true
+                                    },
+                                ]"
+                                density="comfortable"
+                            />
+                        </v-col>
+                        <v-col cols="12" sm="6" md="6">
+                            <v-select
+                                v-model="division.share_user_id"
+                                :label="$t('default.share-user')"
+                                :items="shareUsers"
+                                item-title="share_user_name"
+                                item-value="share_user_id"
+                                clearable
+                                :rules="[
+                                    (value) => {
+                                        if (division.share_value && parseFloat(division.share_value) > 0) {
+                                            if (!value) return $t('rules.required-text-field')
+                                        }
+                                        return true
+                                    },
+                                ]"
+                                density="comfortable"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" md="12">
+                            <v-text-field
+                                v-model="division.remarks"
+                                :label="$t('default.remarks')"
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="12">
+                            <v-autocomplete
+                                v-model="division.tags"
+                                v-model:search="search_tag"
+                                :label="$t('default.tags')"
+                                :items="itemsTags"
+                                :loading="loadingData"
+                                item-title="name"
+                                item-value="name"
+                                clearable
+                                multiple
+                                chips
+                                :closable-chips="true"
+                                return-object
+                                hide-no-data
+                                hide-selected
+                                placeholder="Start typing to Search"
+                                prepend-icon="mdi-database-search"
+                                @update:search="searchTags"
+                            ></v-autocomplete>
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="error" flat :loading="isLoading" @click="editDivisionDialog = false">
+                    {{ $t('default.cancel') }}
+                </v-btn>
+                <v-btn color="primary" flat :loading="isLoading" type="submit" @click="saveDivison">
+                    {{ $t('default.save') }}
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <!-- Dialog delete Division -->
+    <v-row justify="center">
+        <v-dialog v-model="deleteDivisionDialog" persistent width="auto">
+            <v-card>
+                <v-card-text>
+                    <v-row>
+                        <v-col md="12">
+                            {{ $t('default.confirm-delete-item') }}
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn color="error" elevated :loading="isLoading" @click="deleteDivisionDialog = false">
+                        {{ $t('default.cancel') }}</v-btn
+                    >
+                    <v-btn color="primary" elevated :loading="isLoading" text @click="deleteeDivision()">
                         {{ $t('default.delete') }}</v-btn
                     >
                 </v-card-actions>
@@ -407,6 +685,15 @@ export default {
                 { title: this.$t('default.tags'), key: 'tags' },
                 { title: this.$t('default.action'), key: 'action', width: '100', sortable: false },
             ],
+            headersDivision: [
+                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
+                { title: this.$t('default.value'), align: 'end', key: 'value' },
+                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
+                { title: this.$t('default.share-user'), key: 'share_user_id' },
+                { title: this.$t('default.remarks'), key: 'remarks' },
+                { title: this.$t('default.tags'), key: 'tags' },
+                { title: this.$t('default.action'), key: 'action', width: '100', sortable: false },
+            ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 booleanFieldRules: [(v) => v !== null || this.$t('rules.required-text-field')],
@@ -426,29 +713,6 @@ export default {
                         return true
                     },
                 ],
-            },
-            search: null,
-            timeOut: null,
-            search_tag: '',
-            editDialog: false,
-            deleteDialog: false,
-            isLoading: false,
-            loadingData: false,
-            deleteId: null,
-            listTags: [],
-            searchFieldsData: [],
-            expense: {
-                description: null,
-                date: null,
-                value: null,
-                group: null,
-                portion: null,
-                portion_total: null,
-                remarks: null,
-                share_value: null,
-                share_user_id: null,
-                invoice_id: null,
-                tags: [],
             },
             groupList: [
                 {
@@ -472,6 +736,45 @@ export default {
                     value: 'WEEK_4',
                 },
             ],
+            search: null,
+            timeOut: null,
+            search_tag: '',
+            editDialog: false,
+            editDivisionDialog: false,
+            deleteDialog: false,
+            deleteDivisionDialog: false,
+            isLoading: false,
+            loadingData: false,
+            deleteId: null,
+            editedIndex: -1,
+            listTags: [],
+            searchFieldsData: [],
+            deleteAllPortions: false,
+            expense: {
+                id: null,
+                description: null,
+                date: null,
+                value: null,
+                group: null,
+                portion: null,
+                portion_total: null,
+                remarks: null,
+                share_value: null,
+                share_user_id: null,
+                invoice_id: null,
+                tags: [],
+                divisions: [],
+            },
+            division: {
+                id: null,
+                description: null,
+                value: null,
+                remarks: null,
+                share_value: null,
+                share_user_id: null,
+                expense_id: null,
+                tags: [],
+            },
         }
     },
 
@@ -510,6 +813,7 @@ export default {
         convertGroup(group) {
             return this.groupList.find((x) => x.value === group).name
         },
+
         showTags(tags) {
             if (tags.length) {
                 return tags.map((x) => x.name).join('|')
@@ -517,6 +821,7 @@ export default {
 
             return ''
         },
+
         async searchTags(val) {
             if (this.loadingData) return
 
@@ -568,6 +873,7 @@ export default {
                 invoice_id: null,
                 share_user_id: null,
                 tags: [],
+                divisions: [],
             }
             setTimeout(() => {
                 this.$refs.txtName.focus()
@@ -590,14 +896,11 @@ export default {
                 invoice_id: item.invoice_id,
                 share_user_id: item.share_user_id,
                 tags: item.tags,
+                divisions: item.divisions,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
             })
-        },
-
-        closeItem() {
-            this.editDialog = false
         },
 
         async save() {
@@ -627,8 +930,10 @@ export default {
                     share_user_id: this.expense.share_user_id,
                     invoice_id: this.invoice.id,
                     tags: this.expense.tags,
+                    divisions: this.expense.divisions,
                 },
                 {
+                    only: ['invoice'],
                     onSuccess: () => {
                         this.editDialog = false
                     },
@@ -660,8 +965,10 @@ export default {
                     share_user_id: this.expense.share_user_id,
                     invoice_id: this.invoice.id,
                     tags: this.expense.tags,
+                    divisions: this.expense.divisions,
                 },
                 {
+                    only: ['invoice'],
                     onSuccess: () => {
                         this.editDialog = false
                     },
@@ -674,38 +981,115 @@ export default {
 
         openDelete(item) {
             this.deleteId = item.id
+            this.deleteAllPortions = false
+            this.expense = item
             this.deleteDialog = true
         },
 
         delete() {
             this.isLoading = true
-            this.$inertia.delete(
-                '/credit-card/' +
-                    this.invoice.credit_card.id +
-                    '/invoice/' +
-                    this.invoice.id +
-                    '/expense/' +
-                    this.deleteId,
-                {
-                    preserveState: true,
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        this.deleteDialog = false
-                        this.editDialog = false
-                    },
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
+
+            if (this.deleteAllPortions) {
+                this.$inertia.delete(
+                    '/credit-card/' +
+                        this.invoice.credit_card.id +
+                        '/invoice/' +
+                        this.invoice.id +
+                        '/expense/' +
+                        this.deleteId +
+                        '/delete-all-portions',
+                    {
+                        onSuccess: () => {
+                            this.deleteDialog = false
+                            this.editDialog = false
+                        },
+                        onError: () => {
+                            this.isLoading = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            } else {
+                this.$inertia.delete(
+                    '/credit-card/' +
+                        this.invoice.credit_card.id +
+                        '/invoice/' +
+                        this.invoice.id +
+                        '/expense/' +
+                        this.deleteId,
+                    {
+                        onSuccess: () => {
+                            this.deleteDialog = false
+                            this.editDialog = false
+                        },
+                        onError: () => {
+                            this.isLoading = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            }
         },
 
         downloadTemplate() {},
 
         importExcel() {},
+
+        // Metodos para a divisão da despesa
+        newItemDivision() {
+            this.titleDivisionModal = this.$t('credit-card-invoice-expense.new-item-division')
+            this.division = {
+                id: null,
+                description: null,
+                value: null,
+                remarks: null,
+                share_value: null,
+                share_user_id: null,
+                expense_id: null,
+                tags: [],
+            }
+            this.editedIndex = -1
+            this.editDivisionDialog = true
+        },
+
+        editDivisionItem(item) {
+            this.titleDivisionModal = this.$t('credit-card-invoice-expense.edit-item-division')
+            this.division = {
+                id: item.id,
+                description: item.description,
+                value: item.value,
+                remarks: item.remarks,
+                share_value: item.share_value,
+                share_user_id: item.share_user_id,
+                expense_id: item.expense_id,
+                tags: item.tags,
+            }
+            this.editedIndex = this.expense.divisions.indexOf(item)
+            this.editDivisionDialog = true
+        },
+
+        saveDivison() {
+            if (this.editedIndex > -1) {
+                Object.assign(this.expense.divisions[this.editedIndex], this.division)
+            } else {
+                this.expense.divisions.push(this.division)
+            }
+            this.editDivisionDialog = false
+        },
+
+        openDivisionDelete(item) {
+            this.editedIndex = this.expense.divisions.indexOf(item)
+            this.deleteDivisionDialog = true
+        },
+
+        deleteeDivision() {
+            this.expense.divisions.splice(this.editedIndex, 1)
+            this.deleteDivisionDialog = false
+        },
     },
 }
 </script>

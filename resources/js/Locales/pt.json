@@ -64,7 +64,8 @@
     "rules": {
         "required-text-field": "E necessario preencher o campo",
         "required-currency-field": "Valor não valido",
-        "only-numbers": "Insira somente números"
+        "only-numbers": "Insira somente números",
+        "minimum-portion": "Valor mínimo de parcela é 2"
     },
     "menus": {
         "dashboard": "Dashboard",
@@ -115,8 +116,11 @@
     },
     "credit-card-invoice-expense": {
         "title": "Despesas",
+        "title-division": "Divisão da Despesa",
         "new-item": "Nova Despesa",
+        "new-item-division": "Nova Divisão de Despesa",
         "edit-item": "Editar Despesa",
+        "edit-item-division": "Editar Divisão de Despesa",
         "not-found": "Despesa não encontrada"
     }
 }

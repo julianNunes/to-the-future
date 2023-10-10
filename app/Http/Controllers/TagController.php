@@ -62,7 +62,7 @@ class TagController extends Controller
     /**
      * Deleta uma Tag
      */
-    public function destroy(string $id)
+    public function delete(string $id)
     {
         $this->tagService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');

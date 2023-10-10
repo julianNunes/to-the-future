@@ -57,11 +57,11 @@ class CreditCardInvoiceController extends Controller
 
 
     /**
-     * Deleta um Provisionamento
+     * Deleta uma Fatura
      * @param string $id
      * @return void
      */
-    public function destroy(string $id)
+    public function delete(string $id)
     {
         $this->creditCardInvoiceService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');

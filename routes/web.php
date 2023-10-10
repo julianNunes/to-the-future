@@ -42,7 +42,7 @@ Route::controller(ProvisionController::class)->group(function () {
     Route::get('/provision', 'index');
     Route::post('/provision', 'store');
     Route::put('/provision/{id}', 'update');
-    Route::delete('/provision/{id}', 'destroy');
+    Route::delete('/provision/{id}', 'delete');
 });
 
 // Tags
@@ -50,7 +50,7 @@ Route::controller(TagController::class)->group(function () {
     Route::get('/tag', 'index');
     Route::post('/tag', 'store');
     Route::put('/tag/{id}', 'update');
-    Route::delete('/tag/{id}', 'destroy');
+    Route::delete('/tag/{id}', 'delete');
     Route::get('/tag/search/{name}', 'search');
 });
 
@@ -59,14 +59,14 @@ Route::controller(CreditCardController::class)->group(function () {
     Route::get('/credit-card', 'index');
     Route::post('/credit-card', 'store');
     Route::put('/credit-card/{id}', 'update');
-    Route::delete('/credit-card/{id}', 'destroy');
+    Route::delete('/credit-card/{id}', 'delete');
 });
 
 // CreditCardInvoice
 Route::controller(CreditCardInvoiceController::class)->group(function () {
     Route::get('/credit-card/{creditCardId}/invoice', 'index');
     Route::post('/credit-card/{creditCardId}/invoice', 'store');
-    Route::delete('/credit-card/{creditCardId}/invoice/{id}', 'destroy');
+    Route::delete('/credit-card/{creditCardId}/invoice/{id}', 'delete');
     Route::get('/credit-card/{creditCardId}/invoice/{id}', 'show');
 });
 
@@ -74,7 +74,8 @@ Route::controller(CreditCardInvoiceController::class)->group(function () {
 Route::controller(CreditCardInvoiceExpenseController::class)->group(function () {
     Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense', 'store');
     Route::put('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'update');
-    Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'destroy');
+    Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'delete');
+    Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}/delete-all-portions', 'deletePortions');
     // Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense-import-excel', 'importExcel');
 });
 

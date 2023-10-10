@@ -3,6 +3,7 @@
     <AuthenticatedLayout>
         <div class="mb-5">
             <h5 class="text-h5 font-weight-bold">{{ $t('provision.title') }}</h5>
+            <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
         <v-card class="pa-4">
             <v-row dense>
@@ -244,6 +245,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
+import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 </script>
 
 <script>
@@ -262,6 +264,17 @@ export default {
 
     data() {
         return {
+            breadcrumbs: [
+                {
+                    title: this.$t('menus.dashboard'),
+                    disabled: false,
+                    href: '/dashboard',
+                },
+                {
+                    title: this.$t('menus.provision'),
+                    disabled: true,
+                },
+            ],
             headers: [
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
                 { title: this.$t('default.value'), align: 'end', key: 'value' },
