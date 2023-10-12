@@ -121,6 +121,20 @@
         "new-item-division": "Nova Divisão de Despesa",
         "edit-item": "Editar Despesa",
         "edit-item-division": "Editar Divisão de Despesa",
-        "not-found": "Despesa não encontrada"
+        "not-found": "Despesa não encontrada",
+        "delete-all-portions": "Deseja remover as outras parcelas referentes ?",
+        "has-divisions": "A despesa é referente a multiplos itens?",
+        "error-total-division": "O valor total das divisões não é igual ao valor da despesa",
+        "error-total-share-division": "O valor total compartilhado das divisões não é igual ao valor compartilhado da despesa",
+        "excel": {
+            "description": "É necessário informar a Descrição. Linha {key}",
+            "value": "É necessário informar o Valor. Linha {key}",
+            "date": "É necessário informar a Data. Linha {key}",
+            "group": "É necessário informar o Grupo. Linha {key}",
+            "portion": "É necessário informar a Parcela com valor maior que zero quando existe Parcela Total. Linha {key}",
+            "portion-total": "É necessário informar a Parcela Total com valor maior que 1 quando existe Parcela. Linha {key}",
+            "share-value": "É necessário informar o Valor Compartilhado quando houver o nome de um usuario em Compartilhado com. Linha {key}",
+            "share-user": "É necessário informar o nome do usuário que será compartilhado o valor quando houver Valor Compartilhado. Linha {key}"
+        }
     }
 }

@@ -46,7 +46,7 @@ export default {
                 {
                     title: this.$t('credit-card-invoice.title-index'),
                     disabled: false,
-                    href: '/credit-card/' + this.invoice.credit_card_id + '/invoice/' + this.invoice.id,
+                    href: '/credit-card/' + this.invoice.credit_card_id + '/invoice',
                 },
                 {
                     title: this.$t('credit-card-invoice-expense.title'),

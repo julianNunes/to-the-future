@@ -221,7 +221,7 @@ export default {
                     href: '/dashboard',
                 },
                 {
-                    title: this.$t('credit-card'),
+                    title: this.$t('menus.credit-card'),
                     disabled: true,
                 },
             ],

@@ -163,7 +163,11 @@ class CreditCardInvoiceService
                 'creditCard',
                 'expenses' => [
                     'tags',
-                    'shareUser'
+                    'shareUser',
+                    'divisions' => [
+                        'tags',
+                        'shareUser'
+                    ]
                 ]
             ])
             ->first();

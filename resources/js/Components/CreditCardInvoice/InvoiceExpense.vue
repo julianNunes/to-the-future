@@ -68,9 +68,10 @@
                     <v-btn color="info" class="ml-1" @click="downloadTemplate">{{
                         $t('credit-card-invoice.download-template')
                     }}</v-btn>
-                    <v-btn color="info" class="ml-1" @click="importExcel">{{
+                    <v-btn color="info" class="ml-1" @click="clickImportFile">{{
                         $t('credit-card-invoice.import-excel')
                     }}</v-btn>
+                    <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
                 </v-col>
             </v-row>
             <v-row dense>
@@ -331,6 +332,7 @@
                                 :loading="loadingData"
                                 item-title="name"
                                 item-value="name"
+                                :disabled="hasDivisions"
                                 clearable
                                 multiple
                                 chips
@@ -344,132 +346,138 @@
                             ></v-autocomplete>
                         </v-col>
                     </v-row>
-                    <v-row dense>
-                        <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
-                        <v-col md="12">
-                            <span class="text-h6">{{ $t('credit-card-invoice-expense.title-division') }}</span>
-                        </v-col>
-                    </v-row>
-                    <v-row dense>
-                        <v-col md="12">
-                            <v-btn color="primary" @click="newItemDivision">{{ $t('default.new') }}</v-btn>
-                        </v-col>
-                    </v-row>
-                    <v-row dense>
-                        <v-col md="12">
-                            <v-data-table
-                                :headers="headersDivision"
-                                :items="expense.divisions"
-                                :loading="isLoading"
-                                :loading-text="$t('default.loading-text-table')"
-                                class="elevation-3"
-                                density="compact"
-                                :total-items="expense.divisions"
-                                :no-data-text="$t('default.no-data-text')"
-                                :no-results-text="$t('default.no-data-text')"
-                                :footer-props="{
-                                    'items-per-page-text': $t('default.itens-per-page'),
-                                    'page-text': $t('default.page-text'),
-                                }"
-                                :header-props="{
-                                    sortByText: $t('default.sort-by'),
-                                }"
-                                fixed-header
-                            >
-                                <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                                <template #[`item.share_value`]="{ item }">{{
-                                    currencyField(item.share_value)
-                                }}</template>
-                                <template #[`item.tags`]="{ item }">{{
-                                    item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
-                                }}</template>
-
-                                <template #[`item.share_user_id`]="{ item }">{{
-                                    item.share_user ? item.share_user.name : ''
-                                }}</template>
-                                <template #[`item.action`]="{ item }">
-                                    <v-tooltip :text="$t('default.edit')" location="top">
-                                        <template #activator="{ props }">
-                                            <v-icon
-                                                v-bind="props"
-                                                color="warning"
-                                                icon="mdi-pencil"
-                                                size="small"
-                                                class="me-2"
-                                                @click="editDivisionItem(item)"
-                                            >
-                                            </v-icon>
-                                        </template>
-                                    </v-tooltip>
-                                    <v-tooltip :text="$t('default.delete')" location="top">
-                                        <template #activator="{ props }">
-                                            <v-icon
-                                                v-bind="props"
-                                                class="ml-2"
-                                                color="error"
-                                                icon="mdi-delete"
-                                                size="small"
-                                                @click="openDivisionDelete(item)"
-                                            >
-                                            </v-icon>
-                                        </template>
-                                    </v-tooltip>
-                                </template>
-
-                                <template #group-header="{ item, toggleGroup, isGroupOpen }">
-                                    <tr>
-                                        <th class="title" style="width: auto">
-                                            <VBtn
-                                                size="small"
-                                                variant="text"
-                                                :icon="isGroupOpen(item) ? '$expand' : '$next'"
-                                                @click="toggleGroup(item)"
-                                            ></VBtn>
-                                            {{ convertGroup(item.value) }}
-                                        </th>
-                                        <th :colspan="2" class="title font-weight-bold text-right">Total</th>
-                                        <th class="title text-right">
-                                            {{ sumGroup(expense.divisions, item.key, item.value, 'value') }}
-                                        </th>
-                                        <th class="title text-right">
-                                            {{ sumGroup(expense.divisions, item.key, item.value, 'share_value') }}
-                                        </th>
-                                        <th :colspan="6"></th>
-                                    </tr>
-                                </template>
-
-                                <template v-if="expense.divisions.length" #tfoot>
-                                    <tr class="green--text">
-                                        <th class="title"></th>
-                                        <th colspan="2" class="title font-weight-bold text-right">Total</th>
-                                        <th class="title text-right">{{ sumField(expense.divisions, 'value') }}</th>
-                                        <th class="title text-right">
-                                            {{ sumField(expense.divisions, 'share_value') }}
-                                        </th>
-                                    </tr>
-                                </template>
-
-                                <template #top>
-                                    <v-toolbar density="comfortable">
-                                        <v-row dense>
-                                            <v-col cols="12" lg="12" md="12" sm="12">
-                                                <v-text-field
-                                                    v-model="search"
-                                                    :label="$t('default.search')"
-                                                    append-icon="mdi-magnify"
-                                                    single-line
-                                                    hide-details
-                                                    clearable
-                                                    @click:clear="search = null"
-                                                ></v-text-field>
-                                            </v-col>
-                                        </v-row>
-                                    </v-toolbar>
-                                </template>
-                            </v-data-table>
-                        </v-col>
-                    </v-row>
                 </v-form>
+                <!-- Divisão das Despesas -->
+                <v-row dense>
+                    <v-col md="12">
+                        <v-checkbox
+                            v-model="hasDivisions"
+                            :label="$t('credit-card-invoice-expense.has-divisions')"
+                        ></v-checkbox>
+                    </v-col>
+                </v-row>
+                <v-row v-show="hasDivisions" dense>
+                    <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
+                    <v-col md="12">
+                        <span class="text-h6">{{ $t('credit-card-invoice-expense.title-division') }}</span>
+                    </v-col>
+                    <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
+                </v-row>
+                <v-row v-show="hasDivisions">
+                    <v-col md="12">
+                        <v-btn color="primary" @click="newItemDivision">{{ $t('default.new') }}</v-btn>
+                    </v-col>
+                </v-row>
+                <v-row v-show="hasDivisions" dense>
+                    <v-col md="12">
+                        <v-data-table
+                            :headers="headersDivision"
+                            :items="expense.divisions"
+                            :loading-text="$t('default.loading-text-table')"
+                            class="elevation-3"
+                            density="compact"
+                            :total-items="expense.divisions"
+                            :no-data-text="$t('default.no-data-text')"
+                            :no-results-text="$t('default.no-data-text')"
+                            :footer-props="{
+                                'items-per-page-text': $t('default.itens-per-page'),
+                                'page-text': $t('default.page-text'),
+                            }"
+                            :header-props="{
+                                sortByText: $t('default.sort-by'),
+                            }"
+                            fixed-header
+                        >
+                            <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
+                            <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
+                            <template #[`item.tags`]="{ item }">{{
+                                item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
+                            }}</template>
+
+                            <template #[`item.share_user_id`]="{ item }">{{
+                                item.share_user ? item.share_user.name : ''
+                            }}</template>
+                            <template #[`item.action`]="{ item }">
+                                <v-tooltip :text="$t('default.edit')" location="top">
+                                    <template #activator="{ props }">
+                                        <v-icon
+                                            v-bind="props"
+                                            color="warning"
+                                            icon="mdi-pencil"
+                                            size="small"
+                                            class="me-2"
+                                            @click="editDivisionItem(item)"
+                                        >
+                                        </v-icon>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip :text="$t('default.delete')" location="top">
+                                    <template #activator="{ props }">
+                                        <v-icon
+                                            v-bind="props"
+                                            class="ml-2"
+                                            color="error"
+                                            icon="mdi-delete"
+                                            size="small"
+                                            @click="openDivisionDelete(item)"
+                                        >
+                                        </v-icon>
+                                    </template>
+                                </v-tooltip>
+                            </template>
+
+                            <template #group-header="{ item, toggleGroup, isGroupOpen }">
+                                <tr>
+                                    <th class="title" style="width: auto">
+                                        <VBtn
+                                            size="small"
+                                            variant="text"
+                                            :icon="isGroupOpen(item) ? '$expand' : '$next'"
+                                            @click="toggleGroup(item)"
+                                        ></VBtn>
+                                        {{ convertGroup(item.value) }}
+                                    </th>
+                                    <th :colspan="2" class="title font-weight-bold text-right">Total</th>
+                                    <th class="title text-right">
+                                        {{ sumGroup(expense.divisions, item.key, item.value, 'value') }}
+                                    </th>
+                                    <th class="title text-right">
+                                        {{ sumGroup(expense.divisions, item.key, item.value, 'share_value') }}
+                                    </th>
+                                    <th :colspan="6"></th>
+                                </tr>
+                            </template>
+
+                            <template v-if="expense.divisions.length" #tfoot>
+                                <tr class="green--text">
+                                    <th class="title font-weight-bold text-right">Total</th>
+                                    <th class="title text-right">{{ sumField(expense.divisions, 'value') }}</th>
+                                    <th class="title text-right">
+                                        {{ sumField(expense.divisions, 'share_value') }}
+                                    </th>
+                                </tr>
+                            </template>
+
+                            <template #top>
+                                <v-toolbar density="comfortable">
+                                    <v-row dense>
+                                        <v-col cols="12" lg="12" md="12" sm="12">
+                                            <v-text-field
+                                                v-model="search"
+                                                :label="$t('default.search')"
+                                                append-icon="mdi-magnify"
+                                                single-line
+                                                hide-details
+                                                clearable
+                                                @click:clear="search = null"
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-toolbar>
+                            </template>
+                        </v-data-table>
+                    </v-col>
+                </v-row>
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -485,20 +493,18 @@
 
     <!-- Dialog delete -->
     <v-row justify="center">
-        <v-dialog v-model="deleteDialog" persistent width="auto">
+        <v-dialog v-model="deleteDialog" persistent width="800">
             <v-card>
                 <v-card-text>
                     <v-row>
                         <v-col md="12">
-                            {{ $t('default.confirm-delete-item') }}
+                            <span class="text-h6">{{ $t('default.confirm-delete-item') }}</span>
                         </v-col>
                         <v-col v-show="expense.portion_total > 0" md="12">
-                            <v-col cols="12" md="12">
-                                <v-checkbox
-                                    v-model="deleteAllPortions"
-                                    :label="$t('credit-card-invoice.automatic-generate')"
-                                ></v-checkbox>
-                            </v-col>
+                            <v-checkbox
+                                v-model="deleteAllPortions"
+                                :label="$t('credit-card-invoice-expense.delete-all-portions')"
+                            ></v-checkbox>
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -522,11 +528,11 @@
                 <span class="text-h5">{{ titleDivisionModal }}</span>
             </v-card-title>
             <v-card-text>
-                <v-form ref="form" @submit.prevent>
+                <v-form ref="formDivision" @submit.prevent>
                     <v-row dense>
                         <v-col cols="12" sm="12" md="12">
                             <v-text-field
-                                ref="txtDescription"
+                                ref="txtDescriptionDivision"
                                 v-model="division.description"
                                 :label="$t('default.description')"
                                 :rules="rules.textFieldRules"
@@ -655,7 +661,9 @@
 
 <script>
 import moment from 'moment'
+import { useToast } from 'vue-toastification'
 import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
+import readXlsxFile from 'read-excel-file'
 
 export default {
     name: 'InvoiceExpenses',
@@ -666,10 +674,6 @@ export default {
         shareUsers: {
             type: Array,
         },
-    },
-
-    setup(props) {
-        return props
     },
 
     data() {
@@ -736,6 +740,7 @@ export default {
                     value: 'WEEK_4',
                 },
             ],
+            toast: null,
             search: null,
             timeOut: null,
             search_tag: '',
@@ -750,6 +755,7 @@ export default {
             listTags: [],
             searchFieldsData: [],
             deleteAllPortions: false,
+            hasDivisions: false,
             expense: {
                 id: null,
                 description: null,
@@ -805,9 +811,21 @@ export default {
         },
     },
 
+    watch: {
+        hasDivisions(value) {
+            if (value) {
+                this.expense.tags = []
+            } else {
+                this.expense.divisions = []
+            }
+        },
+    },
+
     async created() {},
 
-    async mounted() {},
+    async mounted() {
+        this.toast = useToast()
+    },
 
     methods: {
         convertGroup(group) {
@@ -875,8 +893,9 @@ export default {
                 tags: [],
                 divisions: [],
             }
+            this.hasDivisions = false
             setTimeout(() => {
-                this.$refs.txtName.focus()
+                this.$refs.txtDescription.focus()
             })
         },
 
@@ -898,6 +917,7 @@ export default {
                 tags: item.tags,
                 divisions: item.divisions,
             }
+            this.hasDivisions = this.expense.divisions ? true : false
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
             })
@@ -906,10 +926,12 @@ export default {
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                if (this.expense.id) {
-                    await this.update()
-                } else {
-                    await this.create()
+                if (this.validateDivisions()) {
+                    if (this.expense.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
                 }
             }
         },
@@ -933,7 +955,7 @@ export default {
                     divisions: this.expense.divisions,
                 },
                 {
-                    only: ['invoice'],
+                    // only: ['invoice'],
                     onSuccess: () => {
                         this.editDialog = false
                     },
@@ -968,7 +990,7 @@ export default {
                     divisions: this.expense.divisions,
                 },
                 {
-                    only: ['invoice'],
+                    // only: ['invoice'],
                     onSuccess: () => {
                         this.editDialog = false
                     },
@@ -1037,9 +1059,147 @@ export default {
 
         downloadTemplate() {},
 
-        importExcel() {},
+        clickImportFile() {
+            console.log('clickImportFile')
+            console.log(this.$refs.fileInput)
+            this.$refs.fileInput.click()
+        },
+
+        selectFile(event) {
+            const file = event.target.files[0]
+            if (file) {
+                let data_excel = []
+
+                readXlsxFile(file).then((rows) => {
+                    rows.forEach((element, key) => {
+                        if (key > 0) {
+                            data_excel.push({
+                                description: element[0],
+                                date: element[1],
+                                value: element[2],
+                                group: element[3],
+                                portion: element[4],
+                                portion_total: element[5],
+                                share_value: element[6],
+                                share_user_name: element[7],
+                                remarks: element[8],
+                                tags: element[9],
+                            })
+                        }
+                    })
+                })
+
+                if (this.validateImportExcel(data_excel)) {
+                    this.importExcel(data_excel)
+                }
+            }
+        },
+
+        validateImportExcel(data_excel) {
+            data_excel.forEach((element, key) => {
+                // Description
+                if (!element.description) {
+                    this.toast.error(this.$tc('credit-card-invoice-expense.excel.description', { key: key + 1 }))
+                    return false
+                }
+
+                // Date
+                if (!element.date) {
+                    this.toast.error(this.$tc('credit-card-invoice-expense.excel.date', { key: key + 1 }))
+                    return false
+                }
+
+                // Value
+                if (!element.value) {
+                    this.toast.error(this.$tc('credit-card-invoice-expense.excel.date', { key: key + 1 }))
+                    return false
+                }
+
+                // group
+                if (!element.group) {
+                    this.toast.error(this.$tc('credit-card-invoice-expense.excel.group', { key: key + 1 }))
+                    return false
+                }
+
+                // portion and portion_total
+                if (element.portion || element.portion_total) {
+                    if (!element.portion || element.portion <= 0) {
+                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.portion', { key: key + 1 }))
+                        return false
+                    }
+
+                    if (!element.portion_total || element.portion_total <= 1) {
+                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.portion-total', { key: key + 1 }))
+                        return false
+                    }
+                }
+
+                // share_value and share_user_name
+                if (element[6] || element[7]) {
+                    if (!element[6] || element[6] <= 0) {
+                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-value', { key: key + 1 }))
+                        return false
+                    }
+
+                    if (!element[7]) {
+                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-user', { key: key + 1 }))
+                        return false
+                    }
+                }
+            })
+
+            return true
+        },
+
+        async importExcel(data_excel) {
+            this.isLoading = true
+            this.$inertia.post(
+                '/credit-card/' + this.invoice.credit_card.id + '/invoice/' + this.invoice.id + '/expense-import-excel',
+                {
+                    data: data_excel,
+                },
+                {
+                    onSuccess: () => {
+                        this.editDialog = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
+        },
 
         // Metodos para a divisão da despesa
+        validateDivisions() {
+            if (this.expense.divisions && this.expense.divisions.length) {
+                let total = 0
+
+                this.expense.divisions.forEach((item) => {
+                    total += parseFloat(item.value)
+                })
+
+                if (this.expense.value != total) {
+                    this.toast.warning(this.$t('credit-card-invoice-expense.error-total-division'))
+                    return false
+                }
+
+                if (this.expense.share_total) {
+                    let share_total = 0
+
+                    this.expense.divisions.forEach((item) => {
+                        share_total += parseFloat(item.share_value)
+                    })
+
+                    if (this.expense.share_total != share_total) {
+                        this.toast.warning(this.$t('credit-card-invoice-expense.error-total-share-division'))
+                        return false
+                    }
+                }
+            }
+
+            return true
+        },
+
         newItemDivision() {
             this.titleDivisionModal = this.$t('credit-card-invoice-expense.new-item-division')
             this.division = {
@@ -1054,6 +1214,9 @@ export default {
             }
             this.editedIndex = -1
             this.editDivisionDialog = true
+            setTimeout(() => {
+                this.$refs.txtDescriptionDivision.focus()
+            })
         },
 
         editDivisionItem(item) {
@@ -1072,13 +1235,16 @@ export default {
             this.editDivisionDialog = true
         },
 
-        saveDivison() {
-            if (this.editedIndex > -1) {
-                Object.assign(this.expense.divisions[this.editedIndex], this.division)
-            } else {
-                this.expense.divisions.push(this.division)
+        async saveDivison() {
+            let validate = await this.$refs.formDivision.validate()
+            if (validate.valid) {
+                if (this.editedIndex > -1) {
+                    Object.assign(this.expense.divisions[this.editedIndex], this.division)
+                } else {
+                    this.expense.divisions.push(this.division)
+                }
+                this.editDivisionDialog = false
             }
-            this.editDivisionDialog = false
         },
 
         openDivisionDelete(item) {

@@ -76,6 +76,7 @@ Route::controller(CreditCardInvoiceExpenseController::class)->group(function () 
     Route::put('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'update');
     Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'delete');
     Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}/delete-all-portions', 'deletePortions');
+    Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense-import-excel', 'store');
     // Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense-import-excel', 'importExcel');
 });
 

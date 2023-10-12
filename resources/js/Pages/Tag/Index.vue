@@ -13,7 +13,7 @@
                     <v-data-table
                         :headers="headers"
                         :items="tags"
-                        :sort-by="[{ key: 'created_at', order: 'asc' }]"
+                        :sort-by="[{ key: 'name', order: 'asc' }]"
                         :search="search"
                         :loading="isLoading"
                         :loading-text="$t('default.loading-text-table')"

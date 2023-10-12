@@ -24,6 +24,8 @@ LISTA DE TAREFAS PENDENTES
 
 
 - Fatura do cartão de credito
+    - ERRO:
+        - Ao pedir para gerar todas as faturas do ano a partir de janeiro, gerou apenas ate agosto
     - Botão para fazer download do arquivo template
     - Upload do pdf da fatura
     - Botão para visualizar o arquivo pdf da fatura
