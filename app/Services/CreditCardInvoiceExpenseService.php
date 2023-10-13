@@ -126,7 +126,7 @@ class CreditCardInvoiceExpenseService
                         'due_date' => $new_due_date->format('y-m-d'),
                         'closing_date' => $new_closing_date->format('y-m-d'),
                         'year' => $new_due_date->year,
-                        'month' => $new_due_date->month,
+                        'month' => $new_due_date->format('m'),
                         'credit_card_id' => $creditCardId,
                     ]);
 

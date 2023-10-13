@@ -20,9 +20,11 @@ class CreditCardInvoiceExpenseController extends Controller
     /**
      * Cria uma Despesa para uma fatura
      */
-    public function store(Request $request, int $creditCardId, int $invoiceId)
+    public function store(Request $request)
     {
         $this->validate($request, [
+            'credit_card_id' => ['required'],
+            'invoice_id' => ['required'],
             'description' => ['required'],
             'date' => ['required'],
             'value' => ['required'],
@@ -31,8 +33,8 @@ class CreditCardInvoiceExpenseController extends Controller
         DB::beginTransaction();
 
         $this->creditCardInvoiceExpenseService->create(
-            $creditCardId,
-            $invoiceId,
+            $request->credit_card_id,
+            $request->invoice_id,
             $request->description,
             $request->date,
             floatval($request->value),
@@ -54,9 +56,11 @@ class CreditCardInvoiceExpenseController extends Controller
     /**
      * Atualiza uma Despesa para uma fatura
      */
-    public function update(Request $request, int $creditCardId, int $invoiceId, int $id)
+    public function update(Request $request, int $id)
     {
         $this->validate($request, [
+            'credit_card_id' => ['required'],
+            'invoice_id' => ['required'],
             'description' => ['required'],
             'date' => ['required'],
             'value' => ['required'],
@@ -66,8 +70,8 @@ class CreditCardInvoiceExpenseController extends Controller
 
         $this->creditCardInvoiceExpenseService->update(
             $id,
-            $creditCardId,
-            $invoiceId,
+            $request->credit_card_id,
+            $request->invoice_id,
             $request->description,
             $request->date,
             floatval($request->value),
@@ -89,18 +93,43 @@ class CreditCardInvoiceExpenseController extends Controller
     /**
      * Deleta uma Despesa de uma Fatura do cartão de credito
      */
-    public function delete(Request $request, int $creditCardId, int $invoiceId, int $id)
+    public function delete(int $id)
     {
-        $this->creditCardInvoiceExpenseService->delete($id, $request->deleteAllPortions);
+        $this->creditCardInvoiceExpenseService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 
     /**
      * Deleta uma Despesa de uma Fatura do cartão de credito
      */
-    public function deletePortions(Request $request, int $creditCardId, int $invoiceId, int $id)
+    public function deletePortions(int $id)
     {
         $this->creditCardInvoiceExpenseService->deletePortions($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function storeImportExcel(Request $request)
+    {
+        $this->validate($request, [
+            'invoice_id' => ['required'],
+            'data' => ['required'],
+        ]);
+
+        DB::beginTransaction();
+
+        // $this->creditCardInvoiceExpenseService->storeImportExcel(
+        //     $request->invoice_id,
+        //     $request->data
+        // );
+
+        DB::commit();
+
+        return redirect()->back()->with('success', 'default.sucess-save');
     }
 }

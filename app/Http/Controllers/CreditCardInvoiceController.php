@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Services\CreditCardInvoiceService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class CreditCardInvoiceController extends Controller
@@ -34,13 +35,14 @@ class CreditCardInvoiceController extends Controller
      * @param integer $creditCardId
      * @return void
      */
-    public function store(Request $request, int $creditCardId)
+    public function store(Request $request)
     {
         $this->validate($request, [
             'due_date' => ['required'],
             'closing_date' => ['required'],
             'year' => ['required'],
             'month' => ['required'],
+            'credit_card_id' => ['required'],
         ]);
 
         $this->creditCardInvoiceService->create(
@@ -48,20 +50,20 @@ class CreditCardInvoiceController extends Controller
             $request->closing_date,
             $request->year,
             $request->month,
-            $creditCardId,
+            $request->credit_card_id,
             $request->automatic_generate,
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
     }
 
-
     /**
      * Deleta uma Fatura
-     * @param string $id
+     * @param integer $creditCardId
+     * @param integer $id
      * @return void
      */
-    public function delete(string $id)
+    public function delete(int $id)
     {
         $this->creditCardInvoiceService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
@@ -77,5 +79,39 @@ class CreditCardInvoiceController extends Controller
     {
         $data = $this->creditCardInvoiceService->show($creditCardId, $id);
         return Inertia::render('CreditCardInvoice/Show', $data);
+    }
+
+    /**
+     *
+     * @param integer $creditCardId
+     * @param integer $id
+     * @return void
+     */
+    public function downloadTemplate()
+    {
+        Log::info('downloadtemplate');
+        return response()->download(public_path('storage/template/template-despesas.xlsx'), 'template-despesas.xlsx');
+    }
+
+    /**
+     * Salva o arquivo referente a fatura
+     * @param integer $fileId
+     * @return void
+     */
+    public function storeFile(Request $request)
+    {
+        // $this->creditCardInvoiceService->delete($id);
+        return redirect()->back()->with('success', 'default.sucess-delete');
+    }
+
+    /**
+     * Remove o arquivo referente a fatura
+     * @param integer $fileId
+     * @return void
+     */
+    public function deleteFile(int $fileId)
+    {
+        // $this->creditCardInvoiceService->delete($id);
+        return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

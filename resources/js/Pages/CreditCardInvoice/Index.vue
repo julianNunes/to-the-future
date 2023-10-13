@@ -316,12 +316,13 @@ export default {
             if (validate.valid) {
                 this.isLoading = true
                 this.$inertia.post(
-                    '/credit-card/' + this.credit_card.id + '/invoice',
+                    '/credit-card/invoice',
                     {
                         due_date: this.yearMonth + '-' + this.credit_card.due_date,
                         closing_date: this.yearMonth + '-' + this.credit_card.closing_date,
                         year: this.yearMonth.substring(0, 4),
                         month: this.yearMonth.substring(5, 7),
+                        credit_card_id: this.credit_card.id,
                         automatic_generate: this.automaticGenerate,
                     },
                     {
@@ -343,7 +344,7 @@ export default {
 
         delete() {
             this.isLoading = true
-            this.$inertia.delete(`/credit-card/${this.credit_card.id}/invoice/${this.deleteId}`, {
+            this.$inertia.delete(`/credit-card/invoice/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {

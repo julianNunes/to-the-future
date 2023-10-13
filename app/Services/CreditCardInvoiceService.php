@@ -77,15 +77,21 @@ class CreditCardInvoiceService
             $new_due_date = $due_date->copy()->addMonth();
             $new_closing_date = $closing_date->copy()->addMonth();
 
+            Log::info('$due_date ' . $due_date->format('y-m-d'));
+            Log::info('$closing_date ' . $closing_date->format('y-m-d'));
+            Log::info('$new_due_date ' . $new_due_date->format('y-m-d'));
+            Log::info('$new_closing_date ' . $new_closing_date->format('y-m-d'));
+
             for ($i = $new_due_date->month; $i <= 12; $i++) {
-                $new_credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $new_closing_date->month])->first();
+                Log::info('$i month ' . $i);
+                $new_credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $new_due_date->month])->first();
 
                 if (!$new_credit_card_invoice) {
                     $new_credit_card_invoice = new CreditCardInvoice([
                         'due_date' => $new_due_date->format('y-m-d'),
                         'closing_date' => $new_closing_date->format('y-m-d'),
                         'year' => $year,
-                        'month' => $new_closing_date->month,
+                        'month' => $new_closing_date->format('m'),
                         'credit_card_id' => $creditCardId,
                     ]);
 
@@ -102,7 +108,7 @@ class CreditCardInvoiceService
     }
 
     /**
-     * Deleta uma fatura do cartãp de credito
+     * Deleta uma fatura do cartão de credito
      * @param int $id
      */
     public function delete(int $id): bool
@@ -126,7 +132,7 @@ class CreditCardInvoiceService
         foreach ($credit_card_invoice->expenses as $expense) {
             foreach ($expense->divisions as $division) {
                 if ($division->tags && $division->tags->count()) {
-                    $division->tags->detach();
+                    $division->tags()->detach();
                 }
 
                 $division->delete();
@@ -161,6 +167,7 @@ class CreditCardInvoiceService
         $creditCardInvoice = CreditCardInvoice::where('id', $id)
             ->with([
                 'creditCard',
+                'file',
                 'expenses' => [
                     'tags',
                     'shareUser',

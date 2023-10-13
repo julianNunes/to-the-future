@@ -8,6 +8,7 @@
             <v-row dense>
                 <v-col md="12">
                     <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
+                    <v-btn color="info" class="ml-1" @click="exportExcel">{{ $t('default.export-excel') }}</v-btn>
                 </v-col>
                 <v-col md="12">
                     <v-data-table
@@ -142,6 +143,7 @@ import { Head } from '@inertiajs/vue3'
 
 <script>
 import { upperCase } from '../../utils/utils.js'
+import writeXlsxFile from 'write-excel-file'
 
 export default {
     name: 'TagIndex',
@@ -278,6 +280,22 @@ export default {
                     this.deleteDialog = false
                 },
             })
+        },
+
+        async exportExcel() {
+            if (this.tags && this.tags.length) {
+                let data = []
+                data.push([{ value: this.$t('default.name') }])
+
+                this.tags.forEach((item) => {
+                    data.push([{ type: String, value: item.name }])
+                })
+
+                await writeXlsxFile(data, {
+                    data, // (optional) column widths, etc.
+                    fileName: 'export-tags.xlsx',
+                })
+            }
         },
     },
 }

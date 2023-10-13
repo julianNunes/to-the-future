@@ -65,7 +65,8 @@
             <v-row>
                 <v-col md="12">
                     <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-                    <v-btn color="info" class="ml-1" @click="downloadTemplate">{{
+
+                    <v-btn color="info" class="ml-1" href="/storage/template/template-despesas.xlsx" download>{{
                         $t('credit-card-invoice.download-template')
                     }}</v-btn>
                     <v-btn color="info" class="ml-1" @click="clickImportFile">{{
@@ -720,7 +721,7 @@ export default {
             },
             groupList: [
                 {
-                    name: this.$t('default.portion'),
+                    name: this.$t('default.in-installments'),
                     value: 'PORTION',
                 },
                 {
@@ -939,8 +940,10 @@ export default {
         async create() {
             this.isLoading = true
             this.$inertia.post(
-                '/credit-card/' + this.invoice.credit_card.id + '/invoice/' + this.invoice.id + '/expense',
+                '/credit-card/invoice/expense',
                 {
+                    credit_card_id: this.invoice.credit_card.id,
+                    invoice_id: this.invoice.id,
                     description: this.expense.description,
                     date: this.expense.date,
                     value: this.expense.value,
@@ -950,7 +953,6 @@ export default {
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
-                    invoice_id: this.invoice.id,
                     tags: this.expense.tags,
                     divisions: this.expense.divisions,
                 },
@@ -969,13 +971,10 @@ export default {
         async update() {
             this.isLoading = true
             this.$inertia.put(
-                '/credit-card/' +
-                    this.invoice.credit_card.id +
-                    '/invoice/' +
-                    this.invoice.id +
-                    '/expense/' +
-                    this.expense.id,
+                '/credit-card/invoice/expense/' + this.expense.id,
                 {
+                    credit_card_id: this.invoice.credit_card.id,
+                    invoice_id: this.invoice.id,
                     description: this.expense.description,
                     date: this.expense.date,
                     value: this.expense.value,
@@ -985,7 +984,6 @@ export default {
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
-                    invoice_id: this.invoice.id,
                     tags: this.expense.tags,
                     divisions: this.expense.divisions,
                 },
@@ -1012,52 +1010,42 @@ export default {
             this.isLoading = true
 
             if (this.deleteAllPortions) {
-                this.$inertia.delete(
-                    '/credit-card/' +
-                        this.invoice.credit_card.id +
-                        '/invoice/' +
-                        this.invoice.id +
-                        '/expense/' +
-                        this.deleteId +
-                        '/delete-all-portions',
-                    {
-                        onSuccess: () => {
-                            this.deleteDialog = false
-                            this.editDialog = false
-                        },
-                        onError: () => {
-                            this.isLoading = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
+                this.$inertia.delete('/credit-card/invoice/expense/' + this.deleteId + '/delete-all-portions', {
+                    onSuccess: () => {
+                        this.deleteDialog = false
+                        this.editDialog = false
+                    },
+                    onError: () => {
+                        this.isLoading = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                })
             } else {
-                this.$inertia.delete(
-                    '/credit-card/' +
-                        this.invoice.credit_card.id +
-                        '/invoice/' +
-                        this.invoice.id +
-                        '/expense/' +
-                        this.deleteId,
-                    {
-                        onSuccess: () => {
-                            this.deleteDialog = false
-                            this.editDialog = false
-                        },
-                        onError: () => {
-                            this.isLoading = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
+                this.$inertia.delete('/credit-card/invoice/expense/' + this.deleteId, {
+                    onSuccess: () => {
+                        this.deleteDialog = false
+                        this.editDialog = false
+                    },
+                    onError: () => {
+                        this.isLoading = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                })
             }
         },
 
-        downloadTemplate() {},
+        downloadTemplate() {
+            fetch('/credit-card/invoice/download-template')
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const file = window.URL.createObjectURL(blob)
+                    window.location.assign(file)
+                })
+        },
 
         clickImportFile() {
             console.log('clickImportFile')
@@ -1065,34 +1053,47 @@ export default {
             this.$refs.fileInput.click()
         },
 
-        selectFile(event) {
+        async selectFile(event) {
             const file = event.target.files[0]
             if (file) {
                 let data_excel = []
 
-                readXlsxFile(file).then((rows) => {
+                await readXlsxFile(file).then(async (rows) => {
                     rows.forEach((element, key) => {
+                        console.log('element', element)
                         if (key > 0) {
                             data_excel.push({
                                 description: element[0],
                                 date: element[1],
                                 value: element[2],
-                                group: element[3],
+                                group: this.convertGroupToExcel(element[3]),
                                 portion: element[4],
                                 portion_total: element[5],
                                 share_value: element[6],
                                 share_user_name: element[7],
                                 remarks: element[8],
-                                tags: element[9],
+                                tags: element[9] ? element[9].split(',') : null,
                             })
                         }
                     })
                 })
 
                 if (this.validateImportExcel(data_excel)) {
+                    console.log('data_excel', data_excel)
                     this.importExcel(data_excel)
                 }
             }
+        },
+
+        convertGroupToExcel(group) {
+            if (group) {
+                if (group === 'PARCELADO') return 'PORTION'
+                else if (group === 'SEMANA 1') return 'WEEK_1'
+                else if (group === 'SEMANA 2') return 'WEEK_2'
+                else if (group === 'SEMANA 3') return 'WEEK_4'
+                else if (group === 'SEMANA 4') return 'WEEK_5'
+            }
+            return ''
         },
 
         validateImportExcel(data_excel) {
@@ -1135,13 +1136,13 @@ export default {
                 }
 
                 // share_value and share_user_name
-                if (element[6] || element[7]) {
-                    if (!element[6] || element[6] <= 0) {
+                if (element.share_value || element.share_user_name) {
+                    if (!element.share_value || element.share_value <= 0) {
                         this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-value', { key: key + 1 }))
                         return false
                     }
 
-                    if (!element[7]) {
+                    if (!element.share_user_name) {
                         this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-user', { key: key + 1 }))
                         return false
                     }
@@ -1152,21 +1153,23 @@ export default {
         },
 
         async importExcel(data_excel) {
-            this.isLoading = true
-            this.$inertia.post(
-                '/credit-card/' + this.invoice.credit_card.id + '/invoice/' + this.invoice.id + '/expense-import-excel',
-                {
-                    data: data_excel,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
+            console.log('data_excel', data_excel)
+            // this.isLoading = true
+            // this.$inertia.post(
+            //     '/credit-card/invoice/expense-import-excel',
+            //     {
+            //         data: data_excel,
+            //         invoice_id: this.invoice.id,
+            //     },
+            //     {
+            //         onSuccess: () => {
+            //             this.editDialog = false
+            //         },
+            //         onFinish: () => {
+            //             this.isLoading = false
+            //         },
+            //     }
+            // )
         },
 
         // Metodos para a divisão da despesa

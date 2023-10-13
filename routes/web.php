@@ -65,19 +65,22 @@ Route::controller(CreditCardController::class)->group(function () {
 // CreditCardInvoice
 Route::controller(CreditCardInvoiceController::class)->group(function () {
     Route::get('/credit-card/{creditCardId}/invoice', 'index');
-    Route::post('/credit-card/{creditCardId}/invoice', 'store');
-    Route::delete('/credit-card/{creditCardId}/invoice/{id}', 'delete');
+    Route::post('/credit-card/invoice', 'store');
+    Route::delete('/credit-card/invoice/{id}', 'delete');
     Route::get('/credit-card/{creditCardId}/invoice/{id}', 'show');
+    Route::delete('/credit-card/invoice/{id}', 'delete');
+    Route::post('/credit-card/invoice/download-template', 'downloadTemplate');
+    Route::post('/credit-card/invoice/file', 'storeFile');
+    Route::delete('/credit-card/invoice/file/{fileId}', 'deleteFile');
 });
 
 // CreditCardInvoiceExpense
 Route::controller(CreditCardInvoiceExpenseController::class)->group(function () {
-    Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense', 'store');
-    Route::put('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'update');
-    Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}', 'delete');
-    Route::delete('/credit-card/{creditCardId}/invoice/{invoiceId}/expense/{id}/delete-all-portions', 'deletePortions');
-    Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense-import-excel', 'store');
-    // Route::post('/credit-card/{creditCardId}/invoice/{invoiceId}/expense-import-excel', 'importExcel');
+    Route::post('/credit-card/invoice/expense', 'store');
+    Route::put('/credit-card/invoice/expense/{id}', 'update');
+    Route::delete('/credit-card/invoice/expense/{id}', 'delete');
+    Route::delete('/credit-card/invoice/expense/{id}/delete-all-portions', 'deletePortions');
+    Route::post('/credit-card/invoice/expense-import-excel', 'storeImportExcel');
 });
 
 

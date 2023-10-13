@@ -18,7 +18,7 @@ class TagService
      */
     public function index(): array
     {
-        $tags = Tag::where('user_id', auth()->user()->id)->get();
+        $tags = Tag::where('user_id', auth()->user()->id)->orderBy('name')->get();
 
         return [
             'tags' => $tags,

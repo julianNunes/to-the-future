@@ -1,3 +1,4 @@
+==================================================
 LISTA DE TAREFAS PENDENTES
 ==================================================
 - GERAL:
@@ -10,11 +11,25 @@ LISTA DE TAREFAS PENDENTES
 
     - Criar classe customizavel do Exception para poder devolver valores
 
-    - Aplicar breadcrumbs em todas as paginas
-
 
 - Tags
     - Metodo para exportar todas as tags em Excel
+    - Adicionas tags padrão
+        - CASA
+        - FESTA
+        - Farmacia e Saude
+        - Lazer
+        - Mercado
+        - Assinatura
+        - Transporte
+        - Uber
+        - Viagem
+        - Ifood
+        - Profissinal
+        - Estudos
+        - Roupas
+
+
 
 - CArtao de credito
     - TESTAR O DELETE
@@ -29,3 +44,10 @@ LISTA DE TAREFAS PENDENTES
     - Botão para fazer download do arquivo template
     - Upload do pdf da fatura
     - Botão para visualizar o arquivo pdf da fatura
+
+
+
+
+==================================================
+LISTA DE TAREFAS PENDENTES
+==================================================
