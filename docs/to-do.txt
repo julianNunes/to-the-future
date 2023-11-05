@@ -12,8 +12,7 @@ LISTA DE TAREFAS PENDENTES
     - Criar classe customizavel do Exception para poder devolver valores
 
 
-- Tags
-    - Metodo para exportar todas as tags em Excel
+- Tags - SEEDER
     - Adicionas tags padrão
         - CASA
         - FESTA
@@ -31,6 +30,12 @@ LISTA DE TAREFAS PENDENTES
 
 
 
+
+- Fatura do cartão de credito
+    - Upload do pdf da fatura
+    - Botão para visualizar o arquivo pdf da fatura
+
+
 - CArtao de credito
     - TESTAR O DELETE
         - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
@@ -38,16 +43,7 @@ LISTA DE TAREFAS PENDENTES
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
 
 
-- Fatura do cartão de credito
-    - ERRO:
-        - Ao pedir para gerar todas as faturas do ano a partir de janeiro, gerou apenas ate agosto
-    - Botão para fazer download do arquivo template
-    - Upload do pdf da fatura
-    - Botão para visualizar o arquivo pdf da fatura
-
-
-
 
 ==================================================
-LISTA DE TAREFAS PENDENTES
+ORDEM DAS TAREFAS
 ==================================================

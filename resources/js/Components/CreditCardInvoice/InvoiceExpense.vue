@@ -850,9 +850,9 @@ export default {
                 return
             }
 
-            // if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.includes(val)) {
-            //     return
-            // }
+            if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
+                return
+            }
 
             clearTimeout(this.timeOut)
             this.timeOut = setTimeout(async () => {
@@ -865,7 +865,13 @@ export default {
                             searchFieldsData = response.data
                         }
 
-                        searchFieldsData.unshift({ name: val.toUpperCase() })
+                        if (
+                            searchFieldsData &&
+                            searchFieldsData.length > 0 &&
+                            !searchFieldsData.find((x) => x.name == val.toUpperCase())
+                        ) {
+                            searchFieldsData.unshift({ name: val.toUpperCase() })
+                        }
                     })
                     .catch(function (error) {
                         console.log('error', error)

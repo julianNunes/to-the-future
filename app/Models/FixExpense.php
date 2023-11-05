@@ -13,7 +13,7 @@ class BudgetEntry extends Model
 {
     use HasFactory;
 
-    protected $table = 'budget_entries';
+    protected $table = 'fix_expenses';
 
     protected $fillable = [
         'description',
@@ -31,11 +31,6 @@ class BudgetEntry extends Model
     public function shareUser(): HasOne
     {
         return $this->hasOne(User::class, 'id', 'share_user_id');
-    }
-
-    public function budget(): BelongsTo
-    {
-        return $this->belongsTo(Budget::class, 'budget_id', 'id');
     }
 
     public function tags(): MorphToMany

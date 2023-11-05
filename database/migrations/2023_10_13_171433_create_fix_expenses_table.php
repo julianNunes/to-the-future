@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('fix_expenses', function (Blueprint $table) {
             $table->id();
             $table->string('description')->comment('Descrição');
-            $table->date('due_date')->comment('Data de vencimento');
+            $table->char('due_date', 2)->comment('Dia de Vencimento');
             $table->decimal('value');
-            $table->char('portion', 3)->nullable()->comment('Parcela atual');
-            $table->char('portion_total', 3)->nullable()->comment('Total de Parcelas');
             $table->string('remarks');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
             $table->unsignedBigInteger('share_user_id')->nullable()->comment('Id do usuario que sera compartilhado o gasto');

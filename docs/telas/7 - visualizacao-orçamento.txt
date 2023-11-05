@@ -15,6 +15,9 @@ Orçamento (Show/Ver)
         - Vir selecionado com o mes e ano que foram escolhido na tela de gerenciamento de orçamentos
         - Ao selecionar/trocar os dois, é feito a busca no back-end dos dados descritos acima
 
+    - NAV-BAR
+        - meu Painel e o painel de OUTRO USUARIO QUE COMPARTILHA COMIGO
+
     - Botao: Adicionar Provisionamento
         - Ao clicar vai buscar no banco de dados os registros de provisonamento e adiciona ao orcamento
 
