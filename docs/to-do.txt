@@ -1,5 +1,5 @@
 ==================================================
-LISTA DE TAREFAS PENDENTES
+LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
 - GERAL:
     - Criar componente para mudar dinamicamente a linguagem do sistema
@@ -11,12 +11,12 @@ LISTA DE TAREFAS PENDENTES
 
     - Criar classe customizavel do Exception para poder devolver valores
 
-
 - Tags - SEEDER
     - Adicionas tags padrão
-        - CASA
-        - FESTA
-        - Farmacia e Saude
+        - Casa
+        - Festa
+        - Farmacia
+        - Saúde
         - Lazer
         - Mercado
         - Assinatura
@@ -27,11 +27,15 @@ LISTA DE TAREFAS PENDENTES
         - Profissinal
         - Estudos
         - Roupas
+        - Alimentação
+        - Supermercado
 
-
-
+==================================================
+LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
+==================================================
 
 - Fatura do cartão de credito
+    - Importar excel de despesas
     - Upload do pdf da fatura
     - Botão para visualizar o arquivo pdf da fatura
 
@@ -39,11 +43,31 @@ LISTA DE TAREFAS PENDENTES
 - CArtao de credito
     - TESTAR O DELETE
         - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
-
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
 
 
+- CRUD para "Financiamento" (financings)
+    - Criar Financiamento
+    - Editar Financiamento
+        - description
+        - start_date
+        - total
+        - remarks
+        - valor das parcelas (alterar todas)
+    - Editar parcela
+        - date
+        - value
+        - paid_value
+        - paid
+    - Remover parcela
+        -
 
-==================================================
-ORDEM DAS TAREFAS
-==================================================
+- CRUD para "Despesas Fixas" (fix_expenses)
+- Orçamento
+    - Fazer o CRUD para "Metas" (buget_goals)
+        - Nome
+        - Valor maximo
+        - Group (Semana 1....)
+        - Lista de TAGS
+
+    - Carregamento

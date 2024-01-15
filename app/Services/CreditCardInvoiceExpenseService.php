@@ -10,7 +10,6 @@ use App\Models\Tag;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
 class CreditCardInvoiceExpenseService
 {

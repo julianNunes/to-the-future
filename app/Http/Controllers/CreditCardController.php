@@ -54,7 +54,7 @@ class CreditCardController extends Controller
     /**
      * Atualiza um Cartão de Credito
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
         $this->validate($request, [
             'name' => ['required'],
@@ -78,7 +78,7 @@ class CreditCardController extends Controller
     /**
      * Deleta um Cartão de Credito
      */
-    public function delete(string $id)
+    public function delete(int $id)
     {
         $this->creditCardService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');

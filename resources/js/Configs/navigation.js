@@ -16,6 +16,11 @@ export default {
             to: '/provision',
         },
         {
+            title: 'menus.fix-expense',
+            icon: 'mdi-cash-lock',
+            to: '/provision',
+        },
+        {
             title: 'menus.credit-card',
             icon: 'mdi-credit-card',
             to: '/credit-card',

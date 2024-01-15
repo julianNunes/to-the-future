@@ -73,7 +73,8 @@
         "dashboard": "Dashboard",
         "provision": "Provisionamentos",
         "tags": "Tags",
-        "credit-card": "Cartões de Crédito"
+        "credit-card": "Cartões de Crédito",
+        "fix-expense": "Despesas Fixas"
     },
     "provision": {
         "title": "Provisionamentos Padrão",

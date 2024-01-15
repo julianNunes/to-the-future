@@ -8,6 +8,7 @@ use App\Http\Controllers\{
     PeopleController,
     ProvisionController,
     TagController,
+    FinancingController,
 };
 
 use Illuminate\Foundation\Application;
@@ -81,6 +82,21 @@ Route::controller(CreditCardInvoiceExpenseController::class)->group(function () 
     Route::delete('/credit-card/invoice/expense/{id}', 'delete');
     Route::delete('/credit-card/invoice/expense/{id}/delete-all-portions', 'deletePortions');
     Route::post('/credit-card/invoice/expense-import-excel', 'storeImportExcel');
+});
+
+// Financing
+Route::controller(FinancingController::class)->group(function () {
+    Route::get('/financing', 'index');
+    Route::post('/financing', 'store');
+    Route::put('/financing/{id}', 'update');
+    Route::delete('/financing/{id}', 'delete');
+});
+
+// FinancingInstallment
+Route::controller(FinancingController::class)->group(function () {
+    Route::get('/financing/{id}/installment', 'index');
+    Route::put('/financing/installment/{id}', 'update');
+    Route::delete('/financing/installment/{id}', 'delete');
 });
 
 

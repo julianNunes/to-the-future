@@ -46,7 +46,7 @@ class TagController extends Controller
     /**
      * Atualiza uma Tag
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
         $this->validate($request, [
             'name' => ['required'],
@@ -62,7 +62,7 @@ class TagController extends Controller
     /**
      * Deleta uma Tag
      */
-    public function delete(string $id)
+    public function delete(int $id)
     {
         $this->tagService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');

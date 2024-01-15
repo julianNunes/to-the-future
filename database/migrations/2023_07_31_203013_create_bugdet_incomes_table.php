@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('budget_entries', function (Blueprint $table) {
+        Schema::create('bugdet_incomes', function (Blueprint $table) {
             $table->id();
             $table->string('description')->comment('Descrição');
             $table->date('due_date')->comment('Data de vencimento');
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('budget_entries');
+        Schema::dropIfExists('bugdet_incomes');
     }
 };

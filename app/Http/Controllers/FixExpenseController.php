@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\ProvisionService;
+use App\Services\FixExpenseService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ProvisionController extends Controller
+class FixExpenseController extends Controller
 {
 
     protected $provisionService;
 
-    public function __construct(ProvisionService $provisionService)
+    public function __construct(FixExpenseService $provisionService)
     {
         $this->provisionService = $provisionService;
     }
@@ -23,7 +23,7 @@ class ProvisionController extends Controller
     public function index()
     {
         $data = $this->provisionService->index();
-        return Inertia::render('Provision/Index', $data);
+        return Inertia::render('FixExpense/Index', $data);
     }
 
 

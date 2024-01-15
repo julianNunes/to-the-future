@@ -4,14 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class FixExpense extends Model
+class BudgetEntry extends Model
 {
     use HasFactory;
 
-    protected $table = 'fix_expenses';
+    protected $table = 'budget_entries';
 
     protected $fillable = [
         'description',
@@ -29,6 +31,11 @@ class FixExpense extends Model
     public function shareUser(): HasOne
     {
         return $this->hasOne(User::class, 'id', 'share_user_id');
+    }
+
+    public function budget(): BelongsTo
+    {
+        return $this->belongsTo(Budget::class, 'budget_id', 'id');
     }
 
     public function tags(): MorphToMany

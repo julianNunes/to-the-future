@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('budgets', function (Blueprint $table) {
+        Schema::create('financings', function (Blueprint $table) {
             $table->id();
-            $table->char('year', 4)->comment('Ano da fatura');
-            $table->char('month', 2)->comment('Mês de vencimento');
-            $table->decimal('total_expense')->default(0)->comment('Total de Despesas');
-            $table->decimal('total_income')->default(0)->comment('Total da Receita');
-            $table->boolean('closed')->default(false)->comment('Marcador para finalizar o Orçamento');
+            $table->string('description')->comment('Descrição');
+            $table->date('start_date')->comment('Data de contratação do financiamento');
+            $table->decimal('total')->comment('Valor total do emprestimo');
+            $table->decimal('fees_monthly')->nullable()->comment('Valor mensal de juros');
+            $table->char('portion_total', 3)->comment('Total de Parcelas');
+            $table->string('remarks');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('budgets');
+        Schema::dropIfExists('financings');
     }
 };
