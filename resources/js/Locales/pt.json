@@ -74,7 +74,8 @@
         "provision": "Provisionamentos",
         "tags": "Tags",
         "credit-card": "Cartões de Crédito",
-        "fix-expense": "Despesas Fixas"
+        "fix-expense": "Despesas Fixas",
+        "financing": "Financiamentos"
     },
     "provision": {
         "title": "Provisionamentos Padrão",
@@ -139,5 +140,28 @@
             "share-value": "É necessário informar o Valor Compartilhado quando houver o nome de um usuario em Compartilhado com. Linha {key}",
             "share-user": "É necessário informar o nome do usuário que será compartilhado o valor quando houver Valor Compartilhado. Linha {key}"
         }
+    },
+    "financing": {
+        "title": "Gerenciamento de Financiamentos",
+        "new-item": "Nova Financiamento",
+        "edit-item": "Editar Financiamento",
+        "not-found": "Financiamento não encontrado",
+        "installments-show": "Ver Parcelas",
+        "start-date": "Data de Início",
+        "fees-monthly": "Juros Mensal",
+        "portion-total": "Total de Parcelas",
+        "installment-value": "Valor da Parcela",
+        "installment-first-date": "Data da Primeira Parcela"
+    },
+    "financing-installment": {
+        "title": "Parcelas do Financiamento",
+        "edit-item": "Editar Parcela",
+        "data-financing": "Dados do Financiamento",
+        "portions": "Parcelas",
+        "portion": "Parcela",
+        "open": "Em aberto",
+        "paid": "Pago",
+        "payment-date": "Data de Pagamento",
+        "paid-value": "Valor Pago"
     }
 }

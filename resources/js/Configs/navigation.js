@@ -1,5 +1,5 @@
 export default {
-    items: [
+    listMenu: [
         {
             title: 'menus.dashboard',
             icon: 'mdi-view-dashboard',
@@ -18,7 +18,12 @@ export default {
         {
             title: 'menus.fix-expense',
             icon: 'mdi-cash-lock',
-            to: '/provision',
+            to: '/fix-expense',
+        },
+        {
+            title: 'menus.financing',
+            icon: 'mdi-cash-lock',
+            to: '/financing',
         },
         {
             title: 'menus.credit-card',

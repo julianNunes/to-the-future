@@ -27,8 +27,7 @@ class FinancingService
     }
 
     /**
-     * Undocumented function
-     *
+     * Cria um novo Financiamento
      * @param string $description
      * @param string $startDate
      * @param float $total
@@ -53,8 +52,8 @@ class FinancingService
             'description' => $description,
             'start_date' => Carbon::parse($startDate)->format('y-m-d'),
             'total' => $total,
-            'feesMonthly' => $feesMonthly,
-            'portionTotal' => $portionTotal,
+            'fees_monthly' => $feesMonthly,
+            'portion_total' => $portionTotal,
             'remarks' => $remarks,
             'user_id' => auth()->user()->id
         ]);
@@ -79,15 +78,15 @@ class FinancingService
     }
 
     /**
-     * Undocumented function
-     *
+     * Edita um Financiamento. Apenas alguns dados estao disponiveis
+     * A atualização das parcelas irá ocorrer apenas nas parcelas que estiverem em aberto
      * @param integer $id
      * @param string $description
      * @param string $startDate
      * @param float $total
      * @param float $feesMonthly
      * @param string $remarks
-     * @param float $valueInstallment
+     * @param float|null $valueInstallment
      * @return boolean
      */
     public function update(
@@ -97,7 +96,7 @@ class FinancingService
         float $total,
         float $feesMonthly,
         string $remarks,
-        float $valueInstallment
+        float $valueInstallment = null
     ): bool {
         $financing = Financing::with('installments')->find($id);
 

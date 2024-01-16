@@ -17,11 +17,15 @@ class Provision extends Model
         'value',
         'group',
         'remarks',
-        'share_percentage',
         'share_value',
         'share_user_id',
         'user_id'
     ];
+
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 
     public function shareUser(): HasOne
     {

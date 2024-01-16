@@ -1,8 +1,8 @@
 <template>
-    <Head title="Provision" />
+    <Head title="Financing" />
     <AuthenticatedLayout>
         <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('provision.title') }}</h5>
+            <h5 class="text-h5 font-weight-bold">{{ $t('financing.title') }}</h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
         <v-card class="pa-4">
@@ -12,16 +12,15 @@
                 </v-col>
                 <v-col md="12">
                     <v-data-table
-                        :group-by="[{ key: 'group', order: 'asc' }]"
                         :headers="headers"
-                        :items="provisions"
+                        :items="financings"
                         :sort-by="[{ key: 'created_at', order: 'asc' }]"
                         :search="search"
                         :loading="isLoading"
                         :loading-text="$t('default.loading-text-table')"
                         class="elevation-3"
                         density="compact"
-                        :total-items="provisions.length"
+                        :total-items="financings.length"
                         :no-data-text="$t('default.no-data-text')"
                         :no-results-text="$t('default.no-data-text')"
                         :footer-props="{
@@ -33,13 +32,20 @@
                         }"
                         fixed-header
                     >
-                        <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                        <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                        <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
-                        <template #[`item.share_user_id`]="{ item }">{{
-                            item.share_user ? item.share_user.name : ''
+                        <template #[`item.start_date`]="{ item }">{{
+                            moment(item.start_date).format('DD/MM/YYYY')
                         }}</template>
+                        <template #[`item.total`]="{ item }">{{ currencyField(item.total) }}</template>
+                        <template #[`item.fees_monthly`]="{ item }">{{ percentField(item.fees_monthly) }}</template>
                         <template #[`item.action`]="{ item }">
+                            <v-tooltip :text="$t('financing.installments-show')" location="top">
+                                <template #activator="{ props }">
+                                    <Link :href="hrefInstalmment(item)" class="v-breadcrumbs-item--link">
+                                        <v-icon v-bind="props" color="warning" icon="mdi-checkbook" size="small">
+                                        </v-icon>
+                                    </Link>
+                                </template>
+                            </v-tooltip>
                             <v-tooltip :text="$t('default.edit')" location="top">
                                 <template #activator="{ props }">
                                     <v-icon
@@ -47,7 +53,7 @@
                                         color="warning"
                                         icon="mdi-pencil"
                                         size="small"
-                                        class="me-2"
+                                        class="ml-2"
                                         @click="editItem(item)"
                                     >
                                     </v-icon>
@@ -66,37 +72,6 @@
                                     </v-icon>
                                 </template>
                             </v-tooltip>
-                        </template>
-
-                        <template #group-header="{ item, toggleGroup, isGroupOpen }">
-                            <tr>
-                                <th class="title">
-                                    <VBtn
-                                        size="small"
-                                        variant="text"
-                                        :icon="isGroupOpen(item) ? '$expand' : '$next'"
-                                        @click="toggleGroup(item)"
-                                    ></VBtn>
-                                    {{ convertGroup(item.value) }}
-                                </th>
-                                <th class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">
-                                    {{ sumGroup(provisions, item.key, item.value, 'value') }}
-                                </th>
-                                <th class="title text-right">
-                                    {{ sumGroup(provisions, item.key, item.value, 'share_value') }}
-                                </th>
-                                <th :colspan="3"></th>
-                            </tr>
-                        </template>
-
-                        <template v-if="provisions.length" #tfoot>
-                            <tr class="green--text">
-                                <th class="title"></th>
-                                <th class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">{{ sumField(provisions, 'value') }}</th>
-                                <th class="title text-right">{{ sumField(provisions, 'share_value') }}</th>
-                            </tr>
                         </template>
 
                         <template #top>
@@ -133,79 +108,83 @@
                             <v-col cols="12" sm="12" md="12">
                                 <v-text-field
                                     ref="txtDescription"
-                                    v-model="provision.description"
+                                    v-model="financing.description"
                                     :label="$t('default.description')"
                                     :rules="rules.textFieldRules"
                                     required
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="6" md="3">
                                 <v-text-field
-                                    v-model="provision.value"
+                                    v-model="financing.start_date"
+                                    :label="$t('financing.start-date')"
+                                    type="date"
+                                    required
+                                    :rules="rules.textFieldRules"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="3">
+                                <v-text-field
+                                    v-model="financing.total"
                                     type="number"
-                                    :label="$t('default.value')"
+                                    :label="$t('default.total')"
                                     min="0"
                                     required
                                     :rules="rules.currencyFieldRules"
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-select
-                                    v-model="provision.group"
-                                    :label="$t('default.group')"
-                                    :items="groupList"
-                                    item-title="name"
-                                    item-value="value"
-                                    clearable
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="6" md="3">
                                 <v-text-field
-                                    v-model="provision.share_value"
-                                    :label="$t('default.share-value')"
+                                    v-model="financing.fees_monthly"
                                     type="number"
+                                    :label="$t('financing.fees-monthly')"
                                     min="0"
-                                    :rules="[
-                                        (value) => {
-                                            if (provision.share_user_id) {
-                                                if (!value) return $t('rules.required-text-field')
-                                                if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
-                                            }
-                                            return true
-                                        },
-                                    ]"
-                                    density="comfortable"
-                                />
-                            </v-col>
-                            <v-col cols="12" sm="6" md="8">
-                                <v-select
-                                    v-model="provision.share_user_id"
-                                    :label="$t('default.share-user')"
-                                    :items="shareUsers"
-                                    item-title="share_user_name"
-                                    item-value="share_user_id"
-                                    clearable
-                                    :rules="[
-                                        (value) => {
-                                            if (provision.share_value && parseFloat(provision.share_value) > 0) {
-                                                if (!value) return $t('rules.required-text-field')
-                                            }
-                                            return true
-                                        },
-                                    ]"
-                                    density="comfortable"
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="12" md="12">
-                                <v-text-field
-                                    v-model="provision.remarks"
-                                    :label="$t('default.remarks')"
+                                    required
+                                    :rules="rules.currencyFieldRules"
                                     density="comfortable"
                                 ></v-text-field>
+                            </v-col>
+                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
+                                <v-text-field
+                                    v-model="financing.portion_total"
+                                    type="number"
+                                    :label="$t('financing.portion-total')"
+                                    min="2"
+                                    required
+                                    :rules="rules.currencyFieldRules"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
+                                <v-text-field
+                                    v-model="financing.start_date_installment"
+                                    :label="$t('financing.installment-first-date')"
+                                    type="date"
+                                    required
+                                    :rules="rules.textFieldRules"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
+                                <v-text-field
+                                    v-model="financing.value_installment"
+                                    type="number"
+                                    :label="$t('financing.installment-value')"
+                                    min="0"
+                                    required
+                                    :rules="rules.currencyFieldRules"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="12">
+                                <v-textarea
+                                    v-model="financing.remarks"
+                                    :label="$t('default.remarks')"
+                                    density="comfortable"
+                                ></v-textarea>
                             </v-col>
                         </v-row>
                     </v-form>
@@ -224,15 +203,15 @@
 
         <!-- Dialog delete -->
         <v-row justify="center">
-            <v-dialog v-model="deleteDialog" persistent width="auto">
+            <v-dialog v-model="removeDialog" persistent width="auto">
                 <v-card>
                     <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
                     <v-card-actions>
                         <v-spacer />
-                        <v-btn color="error" elevated :loading="isLoading" @click="deleteDialog = false">
+                        <v-btn color="error" elevated :loading="isLoading" @click="removeDialog = false">
                             {{ $t('default.cancel') }}</v-btn
                         >
-                        <v-btn color="primary" elevated :loading="isLoading" text @click="this.delete()">
+                        <v-btn color="primary" elevated :loading="isLoading" text @click="remove()">
                             {{ $t('default.delete') }}</v-btn
                         >
                     </v-card-actions>
@@ -244,20 +223,19 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import { Head } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
+import moment from 'moment'
 </script>
 
 <script>
-import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
+import { currencyField, percentField } from '../../utils/utils.js'
 
 export default {
-    name: 'ProvisionIndex',
+    name: 'FinancingIndex',
     props: {
-        provisions: {
-            type: Array,
-        },
-        shareUsers: {
+        financings: {
             type: Array,
         },
     },
@@ -271,17 +249,18 @@ export default {
                     href: '/dashboard',
                 },
                 {
-                    title: this.$t('menus.provision'),
+                    title: this.$t('menus.financing'),
                     disabled: true,
                 },
             ],
             headers: [
-                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
-                { title: this.$t('default.share-user'), key: 'share_user_id' },
+                { title: this.$t('default.description'), align: 'start', key: 'description' },
+                { title: this.$t('financing.start-date'), align: 'center', key: 'start_date' },
+                { title: this.$t('financing.fees-monthly'), align: 'end', key: 'fees_monthly' },
+                { title: this.$t('financing.portion-total'), align: 'end', key: 'portion_total' },
+                { title: this.$t('default.total'), align: 'end', key: 'total' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.action'), key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
@@ -289,43 +268,26 @@ export default {
                     (value) => {
                         if (!value) return this.$t('rules.required-text-field')
                         if (Number(value) <= 0) return this.$t('rules.required-currency-field')
-
                         return true
                     },
                 ],
             },
             search: null,
             editDialog: false,
-            deleteDialog: false,
+            removeDialog: false,
             isLoading: false,
             deleteId: null,
-            provision: {
+            financing: {
                 id: null,
                 description: null,
-                value: 0,
-                group: null,
+                start_date: null,
+                total: 0,
+                fees_monthly: 0,
+                portion_total: 0,
                 remarks: null,
-                share_value: 0,
-                share_user_id: null,
+                start_date_installment: null,
+                value_installment: 0,
             },
-            groupList: [
-                {
-                    name: this.$t('default.week-1'),
-                    value: 'WEEK_1',
-                },
-                {
-                    name: this.$t('default.week-2'),
-                    value: 'WEEK_2',
-                },
-                {
-                    name: this.$t('default.week-3'),
-                    value: 'WEEK_3',
-                },
-                {
-                    name: this.$t('default.week-4'),
-                    value: 'WEEK_4',
-                },
-            ],
         }
     },
 
@@ -334,21 +296,23 @@ export default {
     async mounted() {},
 
     methods: {
-        convertGroup(group) {
-            return this.groupList.find((x) => x.value === group).name
+        hrefInstalmment(item) {
+            return '/financing/' + item.id + '/installment'
         },
 
         newItem() {
-            this.titleModal = this.$t('provision.new-item')
+            this.titleModal = this.$t('financing.new-item')
             this.editDialog = true
-            this.provision = {
+            this.financing = {
                 id: null,
                 description: null,
-                value: 0,
-                group: null,
+                start_date: null,
+                total: 0,
+                fees_monthly: 0,
+                portion_total: 0,
                 remarks: null,
-                share_value: 0,
-                share_user_id: null,
+                start_date_installment: null,
+                value_installment: 0,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -356,16 +320,16 @@ export default {
         },
 
         editItem(item) {
-            this.titleModal = this.$t('provision.edit-item')
+            this.titleModal = this.$t('financing.edit-item')
             this.editDialog = true
-            this.provision = {
+            this.financing = {
                 id: item.id,
                 description: item.description,
-                value: Number(item.value),
-                group: item.group,
+                start_date: item.start_date,
+                total: Number(item.total),
+                fees_monthly: item.fees_monthly ? Number(item.fees_monthly) : 0,
+                portion_total: Number(item.portion_total),
                 remarks: item.remarks,
-                share_value: item.share_value ? Number(item.share_value) : 0,
-                share_user_id: item.share_user_id,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -379,7 +343,7 @@ export default {
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                if (this.provision.id) {
+                if (this.financing.id) {
                     await this.update()
                 } else {
                     await this.create()
@@ -390,14 +354,16 @@ export default {
         async create() {
             this.isLoading = true
             this.$inertia.post(
-                '/provision',
+                '/financing',
                 {
-                    description: this.provision.description,
-                    value: this.provision.value,
-                    group: this.provision.group,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
+                    description: this.financing.description,
+                    start_date: this.financing.start_date,
+                    total: this.financing.total,
+                    fees_monthly: this.financing.fees_monthly,
+                    portion_total: this.financing.portion_total,
+                    remarks: this.financing.remarks,
+                    start_date_installment: this.financing.start_date_installment,
+                    value_installment: this.financing.value_installment,
                 },
                 {
                     onSuccess: () => {
@@ -413,14 +379,13 @@ export default {
         async update() {
             this.isLoading = true
             this.$inertia.put(
-                '/provision/' + this.provision.id,
+                '/financing/' + this.financing.id,
                 {
-                    description: this.provision.description,
-                    value: this.provision.value,
-                    group: this.provision.group,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
+                    description: this.financing.description,
+                    start_date: this.financing.start_date,
+                    total: this.financing.total,
+                    fees_monthly: this.financing.fees_monthly,
+                    remarks: this.financing.remarks,
                 },
                 {
                     onSuccess: () => {
@@ -435,16 +400,16 @@ export default {
 
         openDelete(item) {
             this.deleteId = item.id
-            this.deleteDialog = true
+            this.removeDialog = true
         },
 
-        delete() {
+        remove() {
             this.isLoading = true
-            this.$inertia.delete(`/provision/${this.deleteId}`, {
+            this.$inertia.delete(`/financing/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {
-                    this.deleteDialog = false
+                    this.removeDialog = false
                     this.editDialog = false
                 },
                 onError: () => {

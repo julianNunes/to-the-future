@@ -12,3 +12,6 @@ Gerenciamento - Orçamento
             - CheckBox (default false) - perguntar se quer criar para o meses subquetenes ate o final do ano
             - Botao Salvar
             - Botao cancelar
+
+    - Botão para "Clonar" um mes para outro
+        - Check para: "Despesas Fixas", "Provisionamento" e "Metas"

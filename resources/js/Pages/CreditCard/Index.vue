@@ -179,15 +179,15 @@
 
         <!-- Dialog delete -->
         <v-row justify="center">
-            <v-dialog v-model="deleteDialog" persistent width="auto">
+            <v-dialog v-model="removeDialog" persistent width="auto">
                 <v-card>
                     <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
                     <v-card-actions>
                         <v-spacer />
-                        <v-btn color="error" elevated :loading="isLoading" @click="deleteDialog = false">
+                        <v-btn color="error" elevated :loading="isLoading" @click="removeDialog = false">
                             {{ $t('default.cancel') }}</v-btn
                         >
-                        <v-btn color="primary" elevated :loading="isLoading" text @click="this.delete()">
+                        <v-btn color="primary" elevated :loading="isLoading" text @click="remove()">
                             {{ $t('default.delete') }}</v-btn
                         >
                     </v-card-actions>
@@ -231,7 +231,7 @@ export default {
                 { title: this.$t('credit-card.due-date'), key: 'due_date' },
                 { title: this.$t('credit-card.closing-date'), key: 'closing_date' },
                 { title: this.$t('default.active'), key: 'is_active' },
-                { title: this.$t('default.action'), key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
@@ -247,7 +247,7 @@ export default {
             },
             search: null,
             editDialog: false,
-            deleteDialog: false,
+            removeDialog: false,
             isLoading: false,
             deleteId: null,
             creditCard: {
@@ -406,16 +406,16 @@ export default {
 
         openDelete(item) {
             this.deleteId = item.id
-            this.deleteDialog = true
+            this.removeDialog = true
         },
 
-        delete() {
+        remove() {
             this.isLoading = true
             this.$inertia.delete(`/credit-card/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {
-                    this.deleteDialog = false
+                    this.removeDialog = false
                     this.editDialog = false
                 },
                 onError: () => {

@@ -20,10 +20,10 @@ class FinancingInstallmentController extends Controller
     /**
      * Retorna os dados para o index de Financiamento
      */
-    public function index(int $id)
+    public function index(int $financingId)
     {
-        $data = $this->financingInstallmentService->index($id);
-        return Inertia::render('Financing/Index', $data);
+        $data = $this->financingInstallmentService->index($financingId);
+        return Inertia::render('Financing/Show', $data);
     }
 
     /**
@@ -34,26 +34,18 @@ class FinancingInstallmentController extends Controller
         $this->validate($request, [
             'date' => ['required'],
             'value' => ['required'],
-            // 'paid_value' => ['required'],
             'paid' => ['required'],
+            // 'paid_value' => ['required'],
         ]);
 
         $this->financingInstallmentService->update(
             $id,
             $request->date,
             floatval($request->value),
-            $request->paid_value ? floatval($request->paid_value) : null,
             $request->paid == 'true' ? true : false,
+            $request->payment_date,
+            $request->paid_value ? floatval($request->paid_value) : null,
         );
         return redirect()->back()->with('success', 'default.sucess-update');
-    }
-
-    /**
-     * Deleta uma Parcela do Financiamento
-     */
-    public function delete(int $id)
-    {
-        $this->financingInstallmentService->delete($id);
-        return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

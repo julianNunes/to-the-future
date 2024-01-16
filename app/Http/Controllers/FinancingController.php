@@ -46,9 +46,9 @@ class FinancingController extends Controller
             $request->start_date,
             floatval($request->total),
             $request->fees_monthly ? floatval($request->fees_monthly) : null,
-            $request->portion_total,
-            $request->start_date_installment,
+            intval($request->portion_total),
             $request->remarks,
+            $request->start_date_installment,
             floatval($request->value_installment),
         );
 
@@ -64,9 +64,7 @@ class FinancingController extends Controller
             'description' => ['required'],
             'start_date' => ['required'],
             'total' => ['required'],
-            // 'portion_total' => ['required'],
             'remarks' => ['required'],
-            // 'value_installment' => ['required'],
         ]);
 
         $this->financingService->update(

@@ -9,6 +9,8 @@ use App\Http\Controllers\{
     ProvisionController,
     TagController,
     FinancingController,
+    FinancingInstallmentController,
+    FixExpenseController,
 };
 
 use Illuminate\Foundation\Application;
@@ -37,14 +39,6 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('/people', PeopleController::class)->except(['show']);
-
-// Provisionamentos
-Route::controller(ProvisionController::class)->group(function () {
-    Route::get('/provision', 'index');
-    Route::post('/provision', 'store');
-    Route::put('/provision/{id}', 'update');
-    Route::delete('/provision/{id}', 'delete');
-});
 
 // Tags
 Route::controller(TagController::class)->group(function () {
@@ -93,11 +87,25 @@ Route::controller(FinancingController::class)->group(function () {
 });
 
 // FinancingInstallment
-Route::controller(FinancingController::class)->group(function () {
-    Route::get('/financing/{id}/installment', 'index');
+Route::controller(FinancingInstallmentController::class)->group(function () {
+    Route::get('/financing/{financingId}/installment', 'index');
     Route::put('/financing/installment/{id}', 'update');
-    Route::delete('/financing/installment/{id}', 'delete');
 });
 
+// Despesas Fixas
+Route::controller(FixExpenseController::class)->group(function () {
+    Route::get('/fix-expenses', 'index');
+    Route::post('/fix-expenses', 'store');
+    Route::put('/fix-expenses/{id}', 'update');
+    Route::delete('/fix-expenses/{id}', 'delete');
+});
+
+// Provisionamentos
+Route::controller(ProvisionController::class)->group(function () {
+    Route::get('/provision', 'index');
+    Route::post('/provision', 'store');
+    Route::put('/provision/{id}', 'update');
+    Route::delete('/provision/{id}', 'delete');
+});
 
 require __DIR__ . '/auth.php';

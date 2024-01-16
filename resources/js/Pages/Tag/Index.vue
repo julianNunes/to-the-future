@@ -118,15 +118,15 @@
 
         <!-- Dialog delete -->
         <v-row justify="center">
-            <v-dialog v-model="deleteDialog" persistent width="auto">
+            <v-dialog v-model="removeDialog" persistent width="auto">
                 <v-card>
                     <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
                     <v-card-actions>
                         <v-spacer />
-                        <v-btn color="error" elevated :loading="isLoading" @click="deleteDialog = false">
+                        <v-btn color="error" elevated :loading="isLoading" @click="removeDialog = false">
                             {{ $t('default.cancel') }}</v-btn
                         >
-                        <v-btn color="primary" elevated :loading="isLoading" text @click="this.delete()">
+                        <v-btn color="primary" elevated :loading="isLoading" text @click="remove()">
                             {{ $t('default.delete') }}</v-btn
                         >
                     </v-card-actions>
@@ -157,14 +157,14 @@ export default {
         return {
             headers: [
                 { title: this.$t('default.name'), align: 'start', key: 'name', groupable: false },
-                { title: this.$t('default.action'), width: '100', key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'end', width: '100', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
             },
             search: null,
             editDialog: false,
-            deleteDialog: false,
+            removeDialog: false,
             isLoading: false,
             deleteId: null,
             tag: {
@@ -267,17 +267,17 @@ export default {
 
         openDelete(item) {
             this.deleteId = item.id
-            this.deleteDialog = true
+            this.removeDialog = true
         },
 
-        delete() {
+        remove() {
             this.isLoading = true
             this.$inertia.delete(`/tag/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {
                     this.isLoading = false
-                    this.deleteDialog = false
+                    this.removeDialog = false
                 },
             })
         },

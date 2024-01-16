@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('share_value')->nullable()->comment('Valor Total compartilhado');
             $table->unsignedBigInteger('share_user_id')->nullable()->comment('Id do usuario que sera compartilhado o gasto');
             $table->foreign('share_user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
             $table->engine = 'InnoDB';
         });

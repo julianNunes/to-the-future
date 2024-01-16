@@ -19,24 +19,34 @@ class FinancingInstallmentService
      * Retorna os dados para o Gerenciamento das Parcelas do Financiamento
      * @return Array
      */
-    public function index(int $id): array
+    public function index(int $financingId): array
     {
-        $financing = Financing::with('installments')->find($id);
+        $financing = Financing::with('installments')->find($financingId);
 
         return [
             'financing' => $financing,
-            // 'installments' => $financing->installments,
+            'installments' => $financing->installments,
         ];
     }
 
-
+    /**
+     *
+     * @param integer $id
+     * @param string $date
+     * @param float $value
+     * @param boolean $paid
+     * @param string|null $paymentDate
+     * @param float|null $paidValue
+     * @return boolean
+     */
     public function update(
         int $id,
         string $date,
         float $value,
-        float $paidValue = null,
         bool $paid,
-    ): FinancingInstallment {
+        string $paymentDate = null,
+        float $paidValue = null,
+    ): bool {
         $installment = FinancingInstallment::find($id);
 
         if (!$installment) {
@@ -44,10 +54,11 @@ class FinancingInstallmentService
         }
 
         return $installment->update([
-            'start_date' => Carbon::parse($date)->format('y-m-d'),
+            'date' => Carbon::parse($date)->format('y-m-d'),
             'value' => $value,
-            'paidValue' => $paidValue,
             'paid' => $paid,
+            'payment_date' => $paymentDate ? Carbon::parse($paymentDate)->format('y-m-d') : null,
+            'paid_value' => $paidValue,
         ]);
     }
 

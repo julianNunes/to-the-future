@@ -17,14 +17,16 @@ class FixExpense extends Model
         'description',
         'due_date',
         'value',
-        'portion',
-        'portion_total',
-        'type',
         'remarks',
         'share_value',
-        'budget_id',
         'share_user_id',
+        'user_id',
     ];
+
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 
     public function shareUser(): HasOne
     {

@@ -63,11 +63,15 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
         -
 
 - CRUD para "Despesas Fixas" (fix_expenses)
-- Orçamento
-    - Fazer o CRUD para "Metas" (buget_goals)
-        - Nome
-        - Valor maximo
-        - Group (Semana 1....)
-        - Lista de TAGS
+    -
 
-    - Carregamento
+- CRUD para "Provisionamento" (provisions)
+    -
+
+
+- Orçamento
+    - OLHAR ARQUIVO "6 - Gerenciamento...."
+
+
+
+

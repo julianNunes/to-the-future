@@ -42,6 +42,17 @@ export default {
                     icon: 'mdi-cash-lock',
                     to: '/provision',
                 },
+
+                {
+                    title: this.$t('menus.fix-expense'),
+                    icon: 'mdi-cash-lock',
+                    to: '/fix-expense',
+                },
+                {
+                    title: this.$t('menus.financing'),
+                    icon: 'mdi-cash-multiple',
+                    to: '/financing',
+                },
                 {
                     title: this.$t('menus.credit-card'),
                     icon: 'mdi-credit-card',
