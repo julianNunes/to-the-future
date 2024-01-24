@@ -42,7 +42,7 @@ class FinancingInstallmentController extends Controller
             $id,
             $request->date,
             floatval($request->value),
-            $request->paid == 'true' ? true : false,
+            $request->paid == 1 ? true : false,
             $request->payment_date,
             $request->paid_value ? floatval($request->paid_value) : null,
         );

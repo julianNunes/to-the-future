@@ -174,6 +174,7 @@
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <v-text-field
+                                    ref="inputDate"
                                     v-model="installment.date"
                                     :label="$t('default.date')"
                                     type="date"
@@ -196,12 +197,19 @@
                             <v-col cols="12" sm="6" md="3">
                                 <v-select
                                     v-model="installment.paid"
-                                    :label="Status"
+                                    label="Status"
                                     :items="listStatus"
                                     item-title="name"
                                     item-value="value"
                                     clearable
-                                    :rules="rules.textFieldRules"
+                                    :rules="[
+                                        (value) => {
+                                            if (installment.paid == null) {
+                                                return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
                                     density="comfortable"
                                 ></v-select>
                             </v-col>
@@ -213,7 +221,7 @@
                                     required
                                     :rules="[
                                         (value) => {
-                                            if (installment.paid) {
+                                            if (installment.paid == 1) {
                                                 if (!value) return $t('rules.required-text-field')
                                             }
                                             return true
@@ -231,7 +239,7 @@
                                     required
                                     :rules="[
                                         (value) => {
-                                            if (installment.paid) {
+                                            if (installment.paid == 1) {
                                                 if (!value) return $t('rules.required-text-field')
                                                 if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
                                             }
@@ -331,11 +339,11 @@ export default {
             },
             listStatus: [
                 {
-                    value: false,
+                    value: 0,
                     name: this.$t('financing-installment.open'),
                 },
                 {
-                    value: true,
+                    value: 1,
                     name: this.$t('financing-installment.paid'),
                 },
             ],
@@ -368,19 +376,19 @@ export default {
 
     methods: {
         editItem(item) {
-            this.titleModal = this.$t('financing.installment.edit-item')
+            this.titleModal = this.$t('financing-installment.edit-item')
             this.editDialog = true
             this.installment = {
                 id: item.id,
                 portion: Number(item.portion),
                 date: item.date,
                 value: Number(item.value),
-                paid: item.paid,
+                paid: item.paid ? 1 : 0,
                 paid_value: item.paid_value ? Number(item.paid_value) : 0,
                 payment_date: item.payment_date,
             }
             setTimeout(() => {
-                this.$refs.txtDescription.focus()
+                this.$refs.inputDate.focus()
             })
         },
 
@@ -402,7 +410,7 @@ export default {
                 {
                     date: this.installment.date,
                     value: this.installment.value,
-                    paid: this.installment.paid,
+                    paid: this.installment.paid ? true : false,
                     payment_date: this.installment.payment_date,
                     paid_value: this.installment.paid_value,
                 },

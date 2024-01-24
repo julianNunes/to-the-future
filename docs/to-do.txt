@@ -46,7 +46,7 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
 
 
-- CRUD para "Financiamento" (financings)
+* CRUD para "Financiamento" (financings)
     - Criar Financiamento
     - Editar Financiamento
         - description
@@ -59,8 +59,6 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
         - value
         - paid_value
         - paid
-    - Remover parcela
-        -
 
 - CRUD para "Despesas Fixas" (fix_expenses)
     -
