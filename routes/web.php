@@ -94,10 +94,10 @@ Route::controller(FinancingInstallmentController::class)->group(function () {
 
 // Despesas Fixas
 Route::controller(FixExpenseController::class)->group(function () {
-    Route::get('/fix-expenses', 'index');
-    Route::post('/fix-expenses', 'store');
-    Route::put('/fix-expenses/{id}', 'update');
-    Route::delete('/fix-expenses/{id}', 'delete');
+    Route::get('/fix-expense', 'index');
+    Route::post('/fix-expense', 'store');
+    Route::put('/fix-expense/{id}', 'update');
+    Route::delete('/fix-expense/{id}', 'delete');
 });
 
 // Provisionamentos

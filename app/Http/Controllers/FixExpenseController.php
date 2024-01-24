@@ -10,38 +10,38 @@ use Inertia\Inertia;
 class FixExpenseController extends Controller
 {
 
-    protected $provisionService;
+    protected $fixExpenseService;
 
-    public function __construct(FixExpenseService $provisionService)
+    public function __construct(FixExpenseService $fixExpenseService)
     {
-        $this->provisionService = $provisionService;
+        $this->fixExpenseService = $fixExpenseService;
     }
 
     /**
-     * Retorna os dados para o index de Provisionamento
+     * Retorna os dados para o index de Despesa FIxa
      */
     public function index()
     {
-        $data = $this->provisionService->index();
+        $data = $this->fixExpenseService->index();
         return Inertia::render('FixExpense/Index', $data);
     }
 
 
     /**
-     * Cria um novo Provisionamento
+     * Cria um novo Despesa FIxa
      */
     public function store(Request $request)
     {
         $this->validate($request, [
             'description' => ['required'],
+            'due_date' => ['required'],
             'value' => ['required'],
-            'group' => ['required'],
         ]);
 
-        $this->provisionService->create(
+        $this->fixExpenseService->create(
             $request->description,
+            $request->due_date,
             floatval($request->value),
-            $request->group,
             $request->remarks,
             $request->share_value ? floatval($request->share_value) : null,
             $request->share_user_id
@@ -51,21 +51,21 @@ class FixExpenseController extends Controller
     }
 
     /**
-     * Atualiza um Provisionamento
+     * Atualiza um Despesa FIxa
      */
     public function update(Request $request, int $id)
     {
         $this->validate($request, [
             'description' => ['required'],
+            'due_date' => ['required'],
             'value' => ['required'],
-            'group' => ['required'],
         ]);
 
-        $this->provisionService->update(
+        $this->fixExpenseService->update(
             $id,
             $request->description,
+            $request->due_date,
             floatval($request->value),
-            $request->group,
             $request->remarks,
             $request->share_value,
             $request->share_user_id
@@ -74,11 +74,11 @@ class FixExpenseController extends Controller
     }
 
     /**
-     * Deleta um Provisionamento
+     * Deleta um Despesa FIxa
      */
     public function delete(int $id)
     {
-        $this->provisionService->delete($id);
+        $this->fixExpenseService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

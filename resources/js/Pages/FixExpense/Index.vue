@@ -2,7 +2,7 @@
     <Head title="Provision" />
     <AuthenticatedLayout>
         <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('provision.title') }}</h5>
+            <h5 class="text-h5 font-weight-bold">{{ $t('fix-expense.title') }}</h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
         <v-card class="pa-4">
@@ -12,16 +12,15 @@
                 </v-col>
                 <v-col md="12">
                     <v-data-table
-                        :group-by="[{ key: 'group', order: 'asc' }]"
                         :headers="headers"
-                        :items="provisions"
+                        :items="expenses"
                         :sort-by="[{ key: 'created_at', order: 'asc' }]"
                         :search="search"
                         :loading="isLoading"
                         :loading-text="$t('default.loading-text-table')"
                         class="elevation-3"
                         density="compact"
-                        :total-items="provisions.length"
+                        :total-items="expenses.length"
                         :no-data-text="$t('default.no-data-text')"
                         :no-results-text="$t('default.no-data-text')"
                         :footer-props="{
@@ -35,7 +34,6 @@
                     >
                         <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                         <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                        <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
                         <template #[`item.share_user_id`]="{ item }">{{
                             item.share_user ? item.share_user.name : ''
                         }}</template>
@@ -68,34 +66,12 @@
                             </v-tooltip>
                         </template>
 
-                        <template #group-header="{ item, toggleGroup, isGroupOpen }">
-                            <tr>
-                                <th class="title">
-                                    <VBtn
-                                        size="small"
-                                        variant="text"
-                                        :icon="isGroupOpen(item) ? '$expand' : '$next'"
-                                        @click="toggleGroup(item)"
-                                    ></VBtn>
-                                    {{ convertGroup(item.value) }}
-                                </th>
-                                <th class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">
-                                    {{ sumGroup(provisions, item.key, item.value, 'value') }}
-                                </th>
-                                <th class="title text-right">
-                                    {{ sumGroup(provisions, item.key, item.value, 'share_value') }}
-                                </th>
-                                <th :colspan="3"></th>
-                            </tr>
-                        </template>
-
-                        <template v-if="provisions.length" #tfoot>
+                        <template v-if="expenses.length" #tfoot>
                             <tr class="green--text">
                                 <th class="title"></th>
                                 <th class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">{{ sumField(provisions, 'value') }}</th>
-                                <th class="title text-right">{{ sumField(provisions, 'share_value') }}</th>
+                                <th class="title text-right">{{ sumField(expenses, 'value') }}</th>
+                                <th class="title text-right">{{ sumField(expenses, 'share_value') }}</th>
                             </tr>
                         </template>
 
@@ -133,7 +109,7 @@
                             <v-col cols="12" sm="12" md="12">
                                 <v-text-field
                                     ref="txtDescription"
-                                    v-model="provision.description"
+                                    v-model="expense.description"
                                     :label="$t('default.description')"
                                     :rules="rules.textFieldRules"
                                     required
@@ -142,7 +118,7 @@
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                                 <v-text-field
-                                    v-model="provision.value"
+                                    v-model="expense.value"
                                     type="number"
                                     :label="$t('default.value')"
                                     min="0"
@@ -153,11 +129,9 @@
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                                 <v-select
-                                    v-model="provision.group"
-                                    :label="$t('default.group')"
-                                    :items="groupList"
-                                    item-title="name"
-                                    item-value="value"
+                                    v-model="expense.due_date"
+                                    :label="$t('fix-expense.due-date')"
+                                    :items="dueDateList"
                                     clearable
                                     :rules="rules.textFieldRules"
                                     density="comfortable"
@@ -165,13 +139,13 @@
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                                 <v-text-field
-                                    v-model="provision.share_value"
+                                    v-model="expense.share_value"
                                     :label="$t('default.share-value')"
                                     type="number"
                                     min="0"
                                     :rules="[
                                         (value) => {
-                                            if (provision.share_user_id) {
+                                            if (expense.share_user_id) {
                                                 if (!value) return $t('rules.required-text-field')
                                                 if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
                                             }
@@ -183,7 +157,7 @@
                             </v-col>
                             <v-col cols="12" sm="6" md="8">
                                 <v-select
-                                    v-model="provision.share_user_id"
+                                    v-model="expense.share_user_id"
                                     :label="$t('default.share-user')"
                                     :items="shareUsers"
                                     item-title="share_user_name"
@@ -191,7 +165,7 @@
                                     clearable
                                     :rules="[
                                         (value) => {
-                                            if (provision.share_value && parseFloat(provision.share_value) > 0) {
+                                            if (expense.share_value && parseFloat(expense.share_value) > 0) {
                                                 if (!value) return $t('rules.required-text-field')
                                             }
                                             return true
@@ -202,7 +176,7 @@
                             </v-col>
                             <v-col cols="12" md="12">
                                 <v-text-field
-                                    v-model="provision.remarks"
+                                    v-model="expense.remarks"
                                     :label="$t('default.remarks')"
                                     density="comfortable"
                                 ></v-text-field>
@@ -249,12 +223,12 @@ import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 </script>
 
 <script>
-import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
+import { sumField, currencyField } from '../../utils/utils.js'
 
 export default {
     name: 'ProvisionIndex',
     props: {
-        provisions: {
+        expenses: {
             type: Array,
         },
         shareUsers: {
@@ -271,12 +245,13 @@ export default {
                     href: '/dashboard',
                 },
                 {
-                    title: this.$t('menus.provision'),
+                    title: this.$t('menus.fix-expense'),
                     disabled: true,
                 },
             ],
             headers: [
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
+                { title: this.$t('fix-expense.due-date'), align: 'center', key: 'due_date' },
                 { title: this.$t('default.value'), align: 'end', key: 'value' },
                 { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
@@ -299,32 +274,48 @@ export default {
             removeDialog: false,
             isLoading: false,
             deleteId: null,
-            provision: {
+            expense: {
                 id: null,
                 description: null,
                 value: 0,
-                group: null,
+                due_date: null,
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
             },
-            groupList: [
-                {
-                    name: this.$t('default.week-1'),
-                    value: 'WEEK_1',
-                },
-                {
-                    name: this.$t('default.week-2'),
-                    value: 'WEEK_2',
-                },
-                {
-                    name: this.$t('default.week-3'),
-                    value: 'WEEK_3',
-                },
-                {
-                    name: this.$t('default.week-4'),
-                    value: 'WEEK_4',
-                },
+            dueDateList: [
+                '01',
+                '02',
+                '03',
+                '04',
+                '05',
+                '06',
+                '06',
+                '07',
+                '08',
+                '09',
+                '10',
+                '11',
+                '12',
+                '13',
+                '14',
+                '15',
+                '16',
+                '17',
+                '18',
+                '19',
+                '20',
+                '21',
+                '22',
+                '23',
+                '24',
+                '25',
+                '26',
+                '27',
+                '28',
+                '29',
+                '30',
+                '31',
             ],
         }
     },
@@ -334,18 +325,14 @@ export default {
     async mounted() {},
 
     methods: {
-        convertGroup(group) {
-            return this.groupList.find((x) => x.value === group).name
-        },
-
         newItem() {
-            this.titleModal = this.$t('provision.new-item')
+            this.titleModal = this.$t('fix-expense.new-item')
             this.editDialog = true
-            this.provision = {
+            this.expense = {
                 id: null,
                 description: null,
                 value: 0,
-                group: null,
+                due_date: null,
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
@@ -356,13 +343,13 @@ export default {
         },
 
         editItem(item) {
-            this.titleModal = this.$t('provision.edit-item')
+            this.titleModal = this.$t('fix-expense.edit-item')
             this.editDialog = true
-            this.provision = {
+            this.expense = {
                 id: item.id,
                 description: item.description,
                 value: Number(item.value),
-                group: item.group,
+                due_date: item.due_date,
                 remarks: item.remarks,
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
@@ -379,7 +366,7 @@ export default {
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                if (this.provision.id) {
+                if (this.expense.id) {
                     await this.update()
                 } else {
                     await this.create()
@@ -390,14 +377,14 @@ export default {
         async create() {
             this.isLoading = true
             this.$inertia.post(
-                '/provision',
+                '/fix-expense',
                 {
-                    description: this.provision.description,
-                    value: this.provision.value,
-                    group: this.provision.group,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
+                    description: this.expense.description,
+                    value: this.expense.value,
+                    due_date: this.expense.due_date,
+                    remarks: this.expense.remarks,
+                    share_value: this.expense.share_value,
+                    share_user_id: this.expense.share_user_id,
                 },
                 {
                     onSuccess: () => {
@@ -413,14 +400,14 @@ export default {
         async update() {
             this.isLoading = true
             this.$inertia.put(
-                '/provision/' + this.provision.id,
+                '/fix-expense/' + this.expense.id,
                 {
-                    description: this.provision.description,
-                    value: this.provision.value,
-                    group: this.provision.group,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
+                    description: this.expense.description,
+                    value: this.expense.value,
+                    due_date: this.expense.due_date,
+                    remarks: this.expense.remarks,
+                    share_value: this.expense.share_value,
+                    share_user_id: this.expense.share_user_id,
                 },
                 {
                     onSuccess: () => {
@@ -440,7 +427,7 @@ export default {
 
         remove() {
             this.isLoading = true
-            this.$inertia.delete(`/provision/${this.deleteId}`, {
+            this.$inertia.delete(`/fix-expense/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {

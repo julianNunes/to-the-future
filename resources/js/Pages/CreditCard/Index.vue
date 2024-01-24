@@ -5,6 +5,7 @@
             <h5 class="text-h5 font-weight-bold">{{ $t('credit-card.title') }}</h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
+
         <v-card class="pa-4">
             <v-row dense>
                 <v-col md="12">

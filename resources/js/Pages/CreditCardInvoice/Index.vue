@@ -5,12 +5,13 @@
             <h5 class="text-h5 font-weight-bold">{{ $t('credit-card-invoice.title-index') }}</h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
+
         <!-- Dados do cartão de credito -->
-        <v-card class="mb-4">
+        <v-card class="mt-4">
             <v-card-title class="bg-primary">
                 <span class="text-h6">{{ $t('credit-card-invoice.credit-card-title') }}</span>
             </v-card-title>
-            <v-card-text class="pt-4">
+            <v-card-text class="pa-4">
                 <v-row dense>
                     <v-col cols="12" sm="12" md="4">
                         <v-text-field

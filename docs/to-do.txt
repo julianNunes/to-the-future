@@ -66,6 +66,9 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 - CRUD para "Provisionamento" (provisions)
     -
 
+- Front
+    - Colocar cabeçalho nos v-card das telas anteriores
+
 
 - Orçamento
     - OLHAR ARQUIVO "6 - Gerenciamento...."

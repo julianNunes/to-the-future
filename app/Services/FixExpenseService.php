@@ -13,12 +13,12 @@ class FixExpenseService
     }
 
     /**
-     * Retorna os dados para o index de Provisionamento
+     * Retorna os dados para o index de Gerenciamento de Despesas Fixas
      * @return Array
      */
     public function index(): array
     {
-        $provisions = FixExpense::where('user_id', auth()->user()->id)->with('shareUser')->get();
+        $expenses = FixExpense::where('user_id', auth()->user()->id)->with('shareUser')->get();
         $shareUsers = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->get();
 
         if ($shareUsers && $shareUsers->count()) {
@@ -31,73 +31,53 @@ class FixExpenseService
         }
 
         return [
-            'provisions' => $provisions,
+            'expenses' => $expenses,
             'shareUsers' => $shareUsers
         ];
     }
 
-    /**
-     * Cria um novo Provisionamento
-     * @param string $description
-     * @param float $value
-     * @param string $group
-     * @param string $remarks
-     * @param integer $shareValue
-     * @param integer|null $shareUserId
-     * @return FixExpense
-     */
+
     public function create(
         string $description,
+        string $dueDate,
         float $value,
-        string $group,
         string $remarks = null,
-        float $shareValue = 0,
+        float $shareValue = null,
         int $shareUserId = null
     ): FixExpense {
-        $provision = new FixExpense([
+        $expense = new FixExpense([
             'description' => $description,
+            'due_date' => $dueDate,
             'value' => $value,
-            'group' => $group,
             'remarks' => $remarks,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
             'user_id' => auth()->user()->id
         ]);
 
-        $provision->save();
-        return $provision;
+        $expense->save();
+        return $expense;
     }
 
-    /**
-     * Atualiza um Provisionamento
-     * @param int $id
-     * @param string $description
-     * @param float $value
-     * @param string $group
-     * @param string $remarks
-     * @param integer $shareValue
-     * @param integer|null $shareUserId
-     * @return bool
-     */
     public function update(
         int $id,
         string $description,
+        string $dueDate,
         float $value,
-        string $group,
         string $remarks = null,
         float $shareValue = null,
         int $shareUserId = null
     ): bool {
-        $provision = FixExpense::find($id);
+        $expense = FixExpense::find($id);
 
-        if (!$provision) {
+        if (!$expense) {
             throw new Exception('provision.not-found');
         }
 
-        return $provision->update([
+        return $expense->update([
             'description' => $description,
             'value' => $value,
-            'group' => $group,
+            'due_date' => $dueDate,
             'remarks' => $remarks,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
@@ -111,22 +91,12 @@ class FixExpenseService
      */
     public function delete(int $id): bool
     {
-        $provision = FixExpense::find($id);
+        $expense = FixExpense::find($id);
 
-        if (!$provision) {
-            throw new Exception('provision.not-found');
+        if (!$expense) {
+            throw new Exception('fix-expense.not-found');
         }
 
-        return $provision->delete();
+        return $expense->delete();
     }
-
-    // /**
-    //  * Armazenamento da Imagem do Provisionamento
-    //  * @param object $image
-    //  * @return string
-    //  */
-    // public function storeImageProvision(object $image)
-    // {
-    //     return $image->store("/provisions");
-    // }
 }

@@ -163,5 +163,12 @@
         "paid": "Pago",
         "payment-date": "Data de Pagamento",
         "paid-value": "Valor Pago"
+    },
+    "fix-expense": {
+        "title": "Gerenciamento de Despesas Fixas",
+        "new-item": "Nova Despesa Fixa",
+        "edit-item": "Editar Despesa Fixa",
+        "not-found": "Despesa Fixa não encontrada",
+        "due-date": "Dia de Vencimento"
     }
 }
