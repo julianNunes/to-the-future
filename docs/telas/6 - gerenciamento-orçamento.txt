@@ -6,12 +6,28 @@ Gerenciamento - Orçamento
         - Botão para editar/visualizar
         - Botao para remover Orçamento
 
+
     - Botão de criação do Orçamento
         - Abril Modal
             - Select de Mes (Obrigatorio)
             - CheckBox (default false) - perguntar se quer criar para o meses subquetenes ate o final do ano
+            - Check para(default false):
+                - "Incluir Despesas Fixas",
+                - "Incluir Provisionamento Padrão"
+            - Tabela para metas (não obrigatorio):
+
+
             - Botao Salvar
             - Botao cancelar
 
+
     - Botão para "Clonar" um mes para outro
-        - Check para: "Despesas Fixas", "Provisionamento" e "Metas"
+        - Select de Mes (Obrigatorio)
+        - Check para(default false):
+            - "Copiar Despesas Fixas",
+            - "Copiar Receitas"
+            - "Incluir Provisionamento Padrão"
+            - "Copiar Metas"
+
+
+    - Botão para remover

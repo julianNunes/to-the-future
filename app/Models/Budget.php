@@ -27,9 +27,14 @@ class Budget extends Model
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    public function entries(): HasMany
+    public function expenses(): HasMany
     {
-        return $this->hasMany(BudgetEntry::class, 'budget_id', 'id');
+        return $this->hasMany(BudgetExpense::class, 'budget_id', 'id');
+    }
+
+    public function incomes(): HasMany
+    {
+        return $this->hasMany(BudgetIncome::class, 'budget_id', 'id');
     }
 
     public function provisions(): HasMany

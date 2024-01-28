@@ -40,12 +40,8 @@
                             <v-tooltip :text="$t('credit-card.invoices')" location="top">
                                 <template #activator="{ props }">
                                     <Link :href="hrefInvoice(item)" class="v-breadcrumbs-item--link">
-                                        <v-icon
-                                            v-bind="props"
-                                            color="warning"
-                                            icon="mdi-checkbook"
-                                            size="small"
-                                        ></v-icon>
+                                        <v-icon v-bind="props" color="warning" icon="mdi-checkbook" size="small">
+                                        </v-icon>
                                     </Link>
                                 </template>
                             </v-tooltip>
@@ -71,8 +67,7 @@
                                         icon="mdi-delete"
                                         size="small"
                                         @click="openDelete(item)"
-                                    >
-                                    </v-icon>
+                                    ></v-icon>
                                 </template>
                             </v-tooltip>
                         </template>

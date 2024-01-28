@@ -17,9 +17,9 @@ class Tag extends Model
         'user_id'
     ];
 
-    public function entries(): MorphToMany
+    public function budgetExpenses(): MorphToMany
     {
-        return $this->morphedByMany(BudgetEntry::class, 'taggable');
+        return $this->morphedByMany(BudgetExpense::class, 'taggable');
     }
 
     public function expenses(): MorphToMany

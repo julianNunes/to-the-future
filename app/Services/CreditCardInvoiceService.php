@@ -77,13 +77,7 @@ class CreditCardInvoiceService
             $new_due_date = $due_date->copy()->addMonth();
             $new_closing_date = $closing_date->copy()->addMonth();
 
-            Log::info('$due_date ' . $due_date->format('y-m-d'));
-            Log::info('$closing_date ' . $closing_date->format('y-m-d'));
-            Log::info('$new_due_date ' . $new_due_date->format('y-m-d'));
-            Log::info('$new_closing_date ' . $new_closing_date->format('y-m-d'));
-
             for ($i = $new_due_date->month; $i <= 12; $i++) {
-                Log::info('$i month ' . $i);
                 $new_credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $new_due_date->month])->first();
 
                 if (!$new_credit_card_invoice) {
@@ -102,7 +96,6 @@ class CreditCardInvoiceService
                 $new_closing_date->addMonth();
             }
         }
-
 
         return $credit_card_invoice;
     }

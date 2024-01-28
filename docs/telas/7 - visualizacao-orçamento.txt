@@ -1,4 +1,87 @@
 Orçamento (Show/Ver)
+
+- Backend:
+    - Dados de retorno ao abrir o show:
+        budget: {
+
+        }
+
+
+- Front-end
+    - Cabeçalho da tela
+        - Mes/Ano: ao trocar, faz a busca novamente
+        - Botões:
+            - "Adicionar Provisionamentos"
+            - "Adicionar Despesas Fixas"
+
+
+    - NAV-BAR
+        - meu Painel e o painel de OUTRO USUARIO QUE COMPARTILHA COMIGO
+        - Componente:
+            - Painel com as metas (COLUNA 12)
+                - De um lado tabela com dados
+                - Do Outro grafico com o utilizado e a meta
+
+
+            - Painel de Despesas (COLUNA 12)
+                - Na tabela de despesas ter o botão "+" para expandir a linha quando a despesa for uma parcela do financiamento
+                - Lançamento de Despesa
+                    - Se existe "user_share_id" e valor a compartilhar:
+                        - Gero um registro virtual na minha receite
+                        - gero um registr virtual na despesa do compartilhado
+                        - Painel de Receitas (COLUNA 6)
+
+            - Painel de Receitas (Coluna 12)
+
+
+            - Painel de Resumo dos Cartões (COLUNA 6)
+                - Parcelados
+                - Provisionamento
+                - Semana 1, 2, 3, 4
+
+            - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
+                -
+
+            - Expanse-painel com o componente de Cartões
+                - Foreach com todos os dados
+                - AJUSTE DO TITULO com nome do cartão
+
+
+            - Expanse-painel com o componente para Provisionamento
+
+
+
+
+
+
+    - Lançamento de Receita
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===============================================================================================================
     - AO ABRIR a tela
         - buscar todas as entradas referentes ao orçamento e ja separar entre despesas e receitas no back-end
 
@@ -15,8 +98,7 @@ Orçamento (Show/Ver)
         - Vir selecionado com o mes e ano que foram escolhido na tela de gerenciamento de orçamentos
         - Ao selecionar/trocar os dois, é feito a busca no back-end dos dados descritos acima
 
-    - NAV-BAR
-        - meu Painel e o painel de OUTRO USUARIO QUE COMPARTILHA COMIGO
+
 
     - Botao: Adicionar Provisionamento
         - Ao clicar vai buscar no banco de dados os registros de provisonamento e adiciona ao orcamento

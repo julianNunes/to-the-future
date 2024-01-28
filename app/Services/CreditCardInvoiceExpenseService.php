@@ -78,7 +78,7 @@ class CreditCardInvoiceExpenseService
         $credit_card_invoice_expense->save();
 
         // Atualiza Tags
-        $this->saveTagsToExpense($tags, $credit_card_invoice_expense);
+        TagService::saveTagsToModel($tags, $credit_card_invoice_expense);
 
         // Tratativa para Divisão de despesas
         // Removo sempre todos os registros
@@ -98,7 +98,7 @@ class CreditCardInvoiceExpenseService
                 $new_division->save();
 
                 // Atualiza Tags
-                $this->saveTagsToExpenseDivision($division->tags, $new_division);
+                TagService::saveTagsToModel($division->tags, $new_division);
             }
         }
 
@@ -148,7 +148,7 @@ class CreditCardInvoiceExpenseService
                 $new_expense->save();
 
                 // Atualiza Tags
-                $this->saveTagsToExpense($tags, $new_expense);
+                TagService::saveTagsToModel($tags, $new_expense);
 
                 if ($divisions && $divisions->count()) {
                     foreach ($divisions as $division) {
@@ -164,7 +164,7 @@ class CreditCardInvoiceExpenseService
                         $new_division->save();
 
                         // Atualiza Tags
-                        $this->saveTagsToExpenseDivision($division->tags, $new_division);
+                        TagService::saveTagsToModel($division->tags, $new_division);
                     }
                 }
 
@@ -246,7 +246,7 @@ class CreditCardInvoiceExpenseService
         ]);
 
         // Atualiza Tags
-        $this->saveTagsToExpense($tags, $credit_card_invoice_expense);
+        TagService::saveTagsToModel($tags, $credit_card_invoice_expense);
 
         // Tratativa para Divisão de despesas
         // Removo sempre todos os registros
@@ -266,7 +266,7 @@ class CreditCardInvoiceExpenseService
                 $new_division->save();
 
                 // Atualiza Tags
-                $this->saveTagsToExpenseDivision($division->tags, $new_division);
+                TagService::saveTagsToModel($division->tags, $new_division);
             }
         }
 
@@ -382,82 +382,6 @@ class CreditCardInvoiceExpenseService
                 return floatval($item['value']);
             });
             $credit_card_invoice->save();
-        }
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param Collection $tags
-     * @param CreditCardInvoiceExpense $creditCardInvoiceExpense
-     * @return void
-     */
-    protected function saveTagsToExpense(Collection $tags, CreditCardInvoiceExpense $creditCardInvoiceExpense)
-    {
-        if ($tags && $tags->count()) {
-            $tags_sync = collect();
-
-            // Busca as Tags no banco
-            foreach ($tags as $tag) {
-                $new_tag = Tag::where('name', $tag['name'])->first();
-
-                if (!$new_tag) {
-                    $new_tag = new Tag([
-                        'name' => $tag['name'],
-                        'user_id' => auth()->user()->id
-                    ]);
-                    $new_tag->save();
-                }
-
-                $tags_sync->push($new_tag);
-            }
-
-            if ($tags_sync->count()) {
-                $creditCardInvoiceExpense->tags()->sync($tags_sync->pluck('id')->toArray());
-            } else {
-                $creditCardInvoiceExpense->tags()->detach();
-            }
-        } else {
-            $creditCardInvoiceExpense->tags()->detach();
-        }
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param Collection $tags
-     * @param CreditCardInvoiceExpenseDivision $creditCardInvoiceExpenseDivision
-     * @return void
-     */
-    protected function saveTagsToExpenseDivision(
-        Collection $tags,
-        CreditCardInvoiceExpenseDivision $creditCardInvoiceExpenseDivision
-    ) {
-        if ($tags && $tags->count()) {
-            $tags_sync = collect();
-
-            // Busca as Tags no banco
-            foreach ($tags as $tag) {
-                $new_tag = Tag::where('name', $tag['name'])->first();
-
-                if (!$new_tag) {
-                    $new_tag = new Tag([
-                        'name' => $tag['name'],
-                        'user_id' => auth()->user()->id
-                    ]);
-                    $new_tag->save();
-                }
-
-                $tags_sync->push($new_tag);
-            }
-
-            if ($tags_sync->count()) {
-                $creditCardInvoiceExpenseDivision->tags()->sync($tags_sync->pluck('id')->toArray());
-            } else {
-                $creditCardInvoiceExpenseDivision->tags()->detach();
-            }
-        } else {
-            $creditCardInvoiceExpenseDivision->tags()->detach();
         }
     }
 }

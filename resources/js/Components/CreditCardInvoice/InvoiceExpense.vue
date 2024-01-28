@@ -1,8 +1,10 @@
 <template>
-    <v-card class="">
+    <!-- Dados do cartão -->
+    <v-card>
         <v-card-title class="bg-primary">
             <span class="text-h6">{{ $t('credit-card-invoice.data-invoice') }}</span>
         </v-card-title>
+
         <v-card-text class="pt-4">
             <v-row dense>
                 <v-col cols="12" sm="12" md="2">
@@ -62,6 +64,17 @@
                     <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
                 </v-col>
             </v-row>
+        </v-card-text>
+    </v-card>
+
+    <!-- Dados  -->
+    <v-card>
+        <v-card-title class="bg-primary">
+            <span class="text-h6">
+                {{ $t('credit-card-invoice-expense.title') }} {{ titleCard ? ' - ' + creditCardname : '' }}
+            </span>
+        </v-card-title>
+        <v-card-text>
             <v-row>
                 <v-col md="12">
                     <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
@@ -741,6 +754,8 @@ export default {
                     value: 'WEEK_4',
                 },
             ],
+            viewOnly: false,
+            titleCard: false,
             toast: null,
             search: null,
             timeOut: null,
@@ -833,14 +848,6 @@ export default {
             return this.groupList.find((x) => x.value === group).name
         },
 
-        showTags(tags) {
-            if (tags.length) {
-                return tags.map((x) => x.name).join('|')
-            }
-
-            return ''
-        },
-
         async searchTags(val) {
             if (this.loadingData) return
 
@@ -868,7 +875,7 @@ export default {
                         if (
                             searchFieldsData &&
                             searchFieldsData.length > 0 &&
-                            !searchFieldsData.find((x) => x.name == val.toUpperCase())
+                            !searchFieldsData.find((x) => x.name.toUpperCase() == val.toUpperCase())
                         ) {
                             searchFieldsData.unshift({ name: val.toUpperCase() })
                         }
@@ -963,7 +970,6 @@ export default {
                     divisions: this.expense.divisions,
                 },
                 {
-                    // only: ['invoice'],
                     onSuccess: () => {
                         this.editDialog = false
                     },

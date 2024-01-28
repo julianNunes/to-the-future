@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\{
+    BudgetController,
     DashboardController,
     CreditCardController,
     CreditCardInvoiceController,
@@ -106,6 +107,14 @@ Route::controller(ProvisionController::class)->group(function () {
     Route::post('/provision', 'store');
     Route::put('/provision/{id}', 'update');
     Route::delete('/provision/{id}', 'delete');
+});
+
+// Orçamento
+Route::controller(BudgetController::class)->group(function () {
+    Route::get('/budget/{year}', 'index');
+    // Route::post('/provision', 'store');
+    // Route::put('/provision/{id}', 'update');
+    // Route::delete('/provision/{id}', 'delete');
 });
 
 require __DIR__ . '/auth.php';

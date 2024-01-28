@@ -36,8 +36,8 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 
 - Fatura do cartão de credito
     - Importar excel de despesas
-    - Upload do pdf da fatura
-    - Botão para visualizar o arquivo pdf da fatura
+    ? Upload do pdf da fatura
+    ? Botão para visualizar o arquivo pdf da fatura
 
 
 - CArtao de credito
@@ -45,34 +45,66 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
         - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
 
-
-* CRUD para "Financiamento" (financings)
-    - Criar Financiamento
-    - Editar Financiamento
-        - description
-        - start_date
-        - total
-        - remarks
-        - valor das parcelas (alterar todas)
-    - Editar parcela
-        - date
-        - value
-        - paid_value
-        - paid
-
 - CRUD para "Despesas Fixas" (fix_expenses)
-    -
+    - INSERIR TAGS
+
 
 - CRUD para "Provisionamento" (provisions)
-    -
+    - INSERIR TAGS
 
-- Front
-    - Colocar cabeçalho nos v-card das telas anteriores
+
+- InvoiceExpense
+    - Mudar os blocos dos dados do cartao para os dados das despesas
 
 
 - Orçamento
     - OLHAR ARQUIVO "6 - Gerenciamento...."
 
 
+In all my carrer i worked like a fullstack developer.
+I started work with Laravel 4.2 in 2016 for an education platform, focused on users' interaction in real time, which is the great differential.
+The next job worked developing ERP projects in a small company and the next job, Solistica a logistic company, i worked  with Laravel 5 Developing ERP project for internal use in the company and WMS also used by external customers.
+Now i working in one personal project with Inertia and Laravel 10 to update my skills with Laravel and new technologies.
 
+
+I had almost 1 year of experience managing the educational project alone and during that time I had to deal with AWS S3.
+I no longer had contact with him.
+
+
+Unfortunately in all companies how i worked i never used automated testing. I have start studing in my personal project about automated testing with PHPUnit
+
+
+I love working with PHP/Laravel and mainly because I'm a musician and I would love to work in the music industry.
+I had my first child and I'm looking for my first international job and I want to provide more comfort for my family.
+
+=============================================================================================================
+DATE PICKER
+                            <v-col md="4">
+                                <v-dialog persistent width="290px">
+                                    <template #activator="{ props }">
+                                        <v-text-field
+                                            v-model="expense.due_date"
+                                            :label="$t('fix-expense.due-date')"
+                                            prepend-icon="mdi-calendar"
+                                            readonly
+                                            v-bind="props"
+                                        ></v-text-field>
+                                    </template>
+                                    <template #default="{ isActive }">
+                                        <v-date-picker
+                                            v-model="expense.due_date"
+                                            color="primary"
+                                            show-week
+                                            no-title
+                                            scrollable
+                                        >
+                                        </v-date-picker>
+                                        <v-spacer></v-spacer>
+                                        <v-btn text small @click="isActive.value = false">Cancel</v-btn>
+                                        <v-btn text small @click="$refs.modalEntryDateStart.save(expense.due_date)"
+                                            >OK</v-btn
+                                        >
+                                    </template>
+                                </v-dialog>
+                            </v-col>
 

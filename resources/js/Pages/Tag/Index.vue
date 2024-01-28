@@ -40,7 +40,6 @@
                                         color="warning"
                                         icon="mdi-pencil"
                                         size="small"
-                                        class="me-2"
                                         @click="editItem(item)"
                                     >
                                     </v-icon>
@@ -50,7 +49,7 @@
                                 <template #activator="{ props }">
                                     <v-icon
                                         v-bind="props"
-                                        class="ml-2"
+                                        class="ml-1"
                                         color="error"
                                         icon="mdi-delete"
                                         size="small"

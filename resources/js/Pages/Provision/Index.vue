@@ -36,6 +36,9 @@
                         <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                         <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
                         <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
+                        <template #[`item.tags`]="{ item }">{{
+                            item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
+                        }}</template>
                         <template #[`item.share_user_id`]="{ item }">{{
                             item.share_user ? item.share_user.name : ''
                         }}</template>
@@ -47,7 +50,6 @@
                                         color="warning"
                                         icon="mdi-pencil"
                                         size="small"
-                                        class="me-2"
                                         @click="editItem(item)"
                                     >
                                     </v-icon>
@@ -57,7 +59,7 @@
                                 <template #activator="{ props }">
                                     <v-icon
                                         v-bind="props"
-                                        class="ml-2"
+                                        class="ml-1"
                                         color="error"
                                         icon="mdi-delete"
                                         size="small"
@@ -207,6 +209,28 @@
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
+                            <v-col cols="12" md="12">
+                                <v-autocomplete
+                                    v-model="provision.tags"
+                                    v-model:search="search_tag"
+                                    :label="$t('default.tags')"
+                                    :items="itemsTags"
+                                    :loading="loadingData"
+                                    item-title="name"
+                                    item-value="name"
+                                    clearable
+                                    multiple
+                                    chips
+                                    :closable-chips="true"
+                                    :clear-on-select="true"
+                                    return-object
+                                    hide-no-data
+                                    hide-selected
+                                    placeholder="Start typing to Search"
+                                    prepend-icon="mdi-database-search"
+                                    @update:search="searchTags"
+                                ></v-autocomplete>
+                            </v-col>
                         </v-row>
                     </v-form>
                 </v-card-text>
@@ -281,6 +305,7 @@ export default {
                 { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
+                { title: this.$t('default.tags'), key: 'tags' },
                 { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
             ],
             rules: {
@@ -307,6 +332,7 @@ export default {
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
+                tags: [],
             },
             groupList: [
                 {
@@ -326,7 +352,17 @@ export default {
                     value: 'WEEK_4',
                 },
             ],
+            listTags: [],
+            searchFieldsData: [],
+            search_tag: '',
+            loadingData: false,
         }
+    },
+
+    computed: {
+        itemsTags() {
+            return this.listTags
+        },
     },
 
     async created() {},
@@ -336,6 +372,47 @@ export default {
     methods: {
         convertGroup(group) {
             return this.groupList.find((x) => x.value === group).name
+        },
+
+        async searchTags(val) {
+            if (this.loadingData) return
+
+            if (!val || val.length <= 1) {
+                this.listTags = []
+                clearTimeout(this.timeOut)
+                return
+            }
+
+            if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
+                return
+            }
+
+            clearTimeout(this.timeOut)
+            this.timeOut = setTimeout(async () => {
+                this.loadingData = true
+                let searchFieldsData = []
+                await window.axios
+                    .get('/tag/search/' + val)
+                    .then(function (response) {
+                        if (response.data && response.data.length > 0) {
+                            searchFieldsData = response.data
+                        }
+
+                        if (
+                            searchFieldsData &&
+                            searchFieldsData.length > 0 &&
+                            !searchFieldsData.find((x) => x.name == val.toUpperCase())
+                        ) {
+                            searchFieldsData.unshift({ name: val.toUpperCase() })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log('error', error)
+                    })
+
+                this.listTags = searchFieldsData
+                this.loadingData = false
+            }, 300)
         },
 
         newItem() {
@@ -349,6 +426,7 @@ export default {
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
+                tags: [],
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -366,6 +444,7 @@ export default {
                 remarks: item.remarks,
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
+                tags: item.tags,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -398,6 +477,7 @@ export default {
                     remarks: this.provision.remarks,
                     share_value: this.provision.share_value,
                     share_user_id: this.provision.share_user_id,
+                    tags: this.provision.tags,
                 },
                 {
                     onSuccess: () => {
@@ -421,6 +501,7 @@ export default {
                     remarks: this.provision.remarks,
                     share_value: this.provision.share_value,
                     share_user_id: this.provision.share_user_id,
+                    tags: this.provision.tags,
                 },
                 {
                     onSuccess: () => {

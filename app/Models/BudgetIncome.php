@@ -9,33 +9,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class BudgetEntry extends Model
+class BudgetIncome extends Model
 {
     use HasFactory;
 
-    protected $table = 'budget_entries';
+    protected $table = 'bugdet_incomes';
 
     protected $fillable = [
         'description',
         'due_date',
         'value',
-        'portion',
-        'portion_total',
-        'type',
         'remarks',
         'share_value',
         'budget_id',
         'share_user_id',
     ];
 
-    public function shareUser(): HasOne
-    {
-        return $this->hasOne(User::class, 'id', 'share_user_id');
-    }
-
     public function budget(): BelongsTo
     {
         return $this->belongsTo(Budget::class, 'budget_id', 'id');
+    }
+
+    public function shareUser(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'share_user_id');
     }
 
     public function tags(): MorphToMany

@@ -4,7 +4,10 @@ namespace App\Services;
 
 use App\Models\FixExpense;
 use App\Models\ShareUser;
+use App\Services\TagService;
 use Exception;
+use Illuminate\Support\Collection;
+
 
 class FixExpenseService
 {
@@ -18,7 +21,7 @@ class FixExpenseService
      */
     public function index(): array
     {
-        $expenses = FixExpense::where('user_id', auth()->user()->id)->with('shareUser')->get();
+        $expenses = FixExpense::where('user_id', auth()->user()->id)->with(['shareUser', 'tags'])->get();
         $shareUsers = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->get();
 
         if ($shareUsers && $shareUsers->count()) {
@@ -43,7 +46,8 @@ class FixExpenseService
         float $value,
         string $remarks = null,
         float $shareValue = null,
-        int $shareUserId = null
+        int $shareUserId = null,
+        Collection $tags = null,
     ): FixExpense {
         $expense = new FixExpense([
             'description' => $description,
@@ -56,6 +60,10 @@ class FixExpenseService
         ]);
 
         $expense->save();
+
+        // Salva Tags
+        TagService::saveTagsToModel($tags, $expense);
+
         return $expense;
     }
 
@@ -66,13 +74,17 @@ class FixExpenseService
         float $value,
         string $remarks = null,
         float $shareValue = null,
-        int $shareUserId = null
+        int $shareUserId = null,
+        Collection $tags = null,
     ): bool {
-        $expense = FixExpense::find($id);
+        $expense = FixExpense::with(['tags'])->find($id);
 
         if (!$expense) {
             throw new Exception('provision.not-found');
         }
+
+        // Atualiza Tags
+        TagService::saveTagsToModel($tags, $expense);
 
         return $expense->update([
             'description' => $description,
@@ -91,10 +103,14 @@ class FixExpenseService
      */
     public function delete(int $id): bool
     {
-        $expense = FixExpense::find($id);
+        $expense = FixExpense::with(['tags'])->find($id);
 
         if (!$expense) {
             throw new Exception('fix-expense.not-found');
+        }
+
+        if ($expense->tags && $expense->tags->count()) {
+            $expense->tags()->detach();
         }
 
         return $expense->delete();

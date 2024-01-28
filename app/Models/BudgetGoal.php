@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class BudgetProvision extends Model
+class BudgetGoal extends Model
 {
     use HasFactory;
 
@@ -18,16 +18,9 @@ class BudgetProvision extends Model
         'description',
         'value',
         'group',
-        'remarks',
-        'share_value',
-        'share_user_id',
+        'count_only_share',
         'budget_id'
     ];
-
-    public function shareUser(): HasOne
-    {
-        return $this->hasOne(User::class, 'id', 'share_user_id');
-    }
 
     public function budget(): BelongsTo
     {

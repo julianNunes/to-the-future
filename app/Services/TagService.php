@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Tag;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class TagService
@@ -99,5 +100,41 @@ class TagService
             ->where('name', 'LIKE', "%{$name}%")
             ->where('user_id', auth()->user()->id)
             ->get();
+    }
+
+    /**
+     * @todo DOCUMENTAR
+     * @param Collection $tags
+     * @param Model $model
+     * @return void
+     */
+    public static function saveTagsToModel(Collection $tags, Model $model)
+    {
+        if ($tags && $tags->count()) {
+            $tags_sync = collect();
+
+            // Busca as Tags no banco
+            foreach ($tags as $tag) {
+                $new_tag = Tag::where('name', $tag['name'])->first();
+
+                if (!$new_tag) {
+                    $new_tag = new Tag([
+                        'name' => $tag['name'],
+                        'user_id' => auth()->user()->id
+                    ]);
+                    $new_tag->save();
+                }
+
+                $tags_sync->push($new_tag);
+            }
+
+            if ($tags_sync->count()) {
+                $model->tags()->sync($tags_sync->pluck('id')->toArray());
+            } else {
+                $model->tags()->detach();
+            }
+        } else {
+            $model->tags()->detach();
+        }
     }
 }

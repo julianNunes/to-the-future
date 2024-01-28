@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         if (User::count() > 0) {
             return;
         }
-        User::create(
+        $users = [
             [
                 'name' => 'Julian Nunes',
                 'email' => 'eu_dinovu@hotmail.com',
@@ -29,9 +29,13 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Abayomi Alves Artur',
-                'email' => 'abayomi@mail.com',
+                'email' => 'abayomi@gmail.com',
                 'password' => Hash::make('password')
             ]
-        );
+        ];
+
+        collect($users)->each(function ($user) {
+            User::create($user);
+        });
     }
 }

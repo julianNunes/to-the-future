@@ -44,7 +44,8 @@ class FixExpenseController extends Controller
             floatval($request->value),
             $request->remarks,
             $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id
+            $request->share_user_id,
+            collect($request->tags)
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -68,7 +69,8 @@ class FixExpenseController extends Controller
             floatval($request->value),
             $request->remarks,
             $request->share_value,
-            $request->share_user_id
+            $request->share_user_id,
+            collect($request->tags)
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }
