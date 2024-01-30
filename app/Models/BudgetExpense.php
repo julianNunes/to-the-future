@@ -21,8 +21,8 @@ class BudgetExpense extends Model
         'value',
         'remarks',
         'share_value',
-        'budget_id',
         'share_user_id',
+        'budget_id',
         'financing_installment_id',
     ];
 

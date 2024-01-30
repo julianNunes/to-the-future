@@ -18,7 +18,7 @@ class BudgetController extends Controller
     }
 
     /**
-     * Retorna os dados para o index de Cartão de Credito
+     * Retorna os dados para o index de Orçamento
      */
     public function index(Request $request, string $year)
     {
@@ -28,55 +28,68 @@ class BudgetController extends Controller
 
 
     /**
-     * Cria um novo Cartão de Credito
+     * Cria um novo Orçamento
      */
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => ['required'],
-            'digits' => ['required'],
-            'due_date' => ['required'],
-            'closing_date' => ['required'],
-            'is_active' => ['required'],
+            'year' => ['required'],
+            'month' => ['required'],
         ]);
 
         $this->budgetService->create(
-            $request->name,
-            $request->digits,
-            $request->due_date,
-            $request->closing_date,
-            $request->is_active == '1'
+            $request->year,
+            $request->month,
+            $request->automaticGenerateYear,
+            $request->includeFixExpense,
+            $request->includeProvision
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
     }
 
     /**
-     * Atualiza um Cartão de Credito
+     * Clona um Orçamento
+     */
+    public function clone(Request $request, int $id)
+    {
+        $this->validate($request, [
+            'id' => ['required'],
+            'year' => ['required'],
+            'month' => ['required'],
+        ]);
+
+        $this->budgetService->create(
+            $id,
+            $request->year,
+            $request->month,
+            $request->includeProvision,
+            $request->cloneBugdetExpense,
+            $request->cloneBugdetIncome,
+            $request->cloneBugdetGoals
+        );
+
+        return redirect()->back()->with('success', 'default.sucess-update');
+    }
+
+    /**
+     * Atualiza um Orçamento
      */
     public function update(Request $request, int $id)
     {
         $this->validate($request, [
-            'name' => ['required'],
-            'digits' => ['required'],
-            'due_date' => ['required'],
-            'closing_date' => ['required'],
-            'is_active' => ['required'],
+            'closed' => ['closed'],
         ]);
 
         $this->budgetService->update(
             $id,
-            $request->name,
-            $request->digits,
-            $request->due_date,
-            $request->closing_date,
-            $request->is_active == '1'
+            $request->closed
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }
 
     /**
-     * Deleta um Cartão de Credito
+     * Deleta um Orçamento
      */
     public function delete(int $id)
     {
