@@ -104,11 +104,11 @@ class TagService
 
     /**
      * @todo DOCUMENTAR
-     * @param Collection $tags
      * @param Model $model
+     * @param Collection|null $tags
      * @return void
      */
-    public static function saveTagsToModel(Collection $tags, Model $model)
+    public static function saveTagsToModel(Model $model, Collection $tags = null)
     {
         if ($tags && $tags->count()) {
             $tags_sync = collect();

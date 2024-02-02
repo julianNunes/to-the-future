@@ -25,6 +25,7 @@
 
         "month": "Mês",
         "year": "Ano",
+        "year-month": "Mês/Ano",
         "month-01": "Janeiro",
         "month-02": "Fevereiro",
         "month-03": "Março",
@@ -48,6 +49,7 @@
         "tags": "Tags",
         "group": "Grupo",
         "in-installments": "Parcelado",
+        "monthly": "Mensal",
         "week": "Semana",
         "week-1": "Semana 1",
         "week-2": "Semana 2",
@@ -75,7 +77,8 @@
         "tags": "Tags",
         "credit-card": "Cartões de Crédito",
         "fix-expense": "Despesas Fixas",
-        "financing": "Financiamentos"
+        "financing": "Financiamentos",
+        "budget": "Orçamentos"
     },
     "provision": {
         "title": "Provisionamentos Padrão",
@@ -170,5 +173,15 @@
         "edit-item": "Editar Despesa Fixa",
         "not-found": "Despesa Fixa não encontrada",
         "due-date": "Dia de Vencimento"
+    },
+    "budget": {
+        "title": "Gerenciamento de Orçamentos",
+        "new-item": "Novo Orçamento",
+        "edit-item": "Editar Orçamento",
+        "clone": "Clonar",
+        "automatic-generate": "Deseja gerar os Orçamentos para os proximos meses subsequentes do ano?",
+        "include-fix-expense": "Incluir Despesas Fixas?",
+        "include-provision": "Incluir Provisionamento?"
+
     }
 }

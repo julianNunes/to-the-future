@@ -112,9 +112,11 @@ Route::controller(ProvisionController::class)->group(function () {
 // Orçamento
 Route::controller(BudgetController::class)->group(function () {
     Route::get('/budget/{year}', 'index');
-    // Route::post('/provision', 'store');
-    // Route::put('/provision/{id}', 'update');
-    // Route::delete('/provision/{id}', 'delete');
+    Route::post('/budget', 'store');
+    Route::put('/budget/{id}/clone', 'clone');
+    Route::put('/budget/{id}', 'update');
+    Route::delete('/budget/{id}', 'delete');
+    Route::get('/budget/{id}', 'show');
 });
 
 require __DIR__ . '/auth.php';

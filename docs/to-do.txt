@@ -33,6 +33,7 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
 LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
+- verificar como deixar o created_at e o updated_at automaticos
 
 - Fatura do cartão de credito
     - Importar excel de despesas
@@ -59,6 +60,8 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 
 - Orçamento
     - OLHAR ARQUIVO "6 - Gerenciamento...."
+
+    - Decidir se vou ter o "closed" no Budget
 
 
 In all my carrer i worked like a fullstack developer.

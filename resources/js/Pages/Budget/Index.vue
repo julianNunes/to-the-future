@@ -1,27 +1,42 @@
 <template>
-    <Head title="Credit Card" />
+    <Head title="Budget" />
     <AuthenticatedLayout>
         <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('credit-card.title') }}</h5>
+            <h5 class="text-h5 font-weight-bold">{{ $t('budget.title') }}</h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
 
         <v-card class="pa-4">
             <v-row dense>
-                <v-col md="12">
+                <v-col cols="12" sm="12" md="2">
+                    <v-text-field
+                        ref="inputYear"
+                        v-model="year"
+                        :label="$t('default.year')"
+                        type="number"
+                        min="1970"
+                        max="1970"
+                        step="1"
+                        :rules="rules.textFieldRules"
+                        required
+                        density="comfortable"
+                        @change="changeYear"
+                    ></v-text-field>
+                </v-col>
+                <v-col md="10">
                     <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
                 </v-col>
                 <v-col md="12">
                     <v-data-table
                         :headers="headers"
-                        :items="creditCards"
+                        :items="budgets"
                         :sort-by="[{ key: 'created_at', order: 'asc' }]"
                         :search="search"
                         :loading="isLoading"
                         :loading-text="$t('default.loading-text-table')"
                         class="elevation-3"
                         density="compact"
-                        :total-items="creditCards.length"
+                        :total-items="budgets.length"
                         :no-data-text="$t('default.no-data-text')"
                         :no-results-text="$t('default.no-data-text')"
                         :footer-props="{
@@ -33,27 +48,29 @@
                         }"
                         fixed-header
                     >
-                        <template #[`item.is_active`]="{ item }">{{
-                            item.is_active ? $t('default.yes') : $t('default.no')
+                        <template #[`item.total_expense`]="{ item }">{{ currencyField(item.total_expense) }}</template>
+                        <template #[`item.total_income`]="{ item }">{{ currencyField(item.total_income) }}</template>
+                        <template #[`item.closed`]="{ item }">{{
+                            item.closed ? $t('default.yes') : $t('default.no')
                         }}</template>
                         <template #[`item.action`]="{ item }">
-                            <v-tooltip :text="$t('credit-card.invoices')" location="top">
+                            <v-tooltip :text="$t('default.show')" location="top">
                                 <template #activator="{ props }">
-                                    <Link :href="hrefInvoice(item)" class="v-breadcrumbs-item--link">
-                                        <v-icon v-bind="props" color="warning" icon="mdi-checkbook" size="small">
+                                    <Link :href="hrefBudgetShow(item)" class="v-breadcrumbs-item--link">
+                                        <v-icon v-bind="props" color="warning" icon="mdi-eye" size="small" class="me-2">
                                         </v-icon>
                                     </Link>
                                 </template>
                             </v-tooltip>
-                            <v-tooltip :text="$t('default.edit')" location="top">
+                            <v-tooltip :text="$t('budget.clone')" location="top">
                                 <template #activator="{ props }">
                                     <v-icon
                                         v-bind="props"
                                         color="warning"
-                                        icon="mdi-pencil"
+                                        icon="mdi-content-copy"
                                         size="small"
                                         class="ml-1"
-                                        @click="editItem(item)"
+                                        @click="cloneItem(item)"
                                     >
                                     </v-icon>
                                 </template>
@@ -94,74 +111,91 @@
             </v-row>
         </v-card>
 
-        <!-- Dialog Criacao/Edicao -->
-        <v-dialog v-model="editDialog" persistent width="800">
+        <!-- Dialog Criacao -->
+        <v-dialog v-model="createDialog" persistent width="800">
             <v-card>
                 <v-card-title>
                     <span class="text-h5">{{ titleModal }}</span>
                 </v-card-title>
                 <v-card-text>
-                    <v-form ref="form" @submit.prevent>
+                    <v-form ref="formCreate" @submit.prevent>
                         <v-row dense>
-                            <v-col cols="12" sm="12" md="6">
+                            <v-col cols="12" md="4">
                                 <v-text-field
-                                    ref="txtName"
-                                    v-model="creditCard.name"
-                                    :label="$t('default.name')"
+                                    ref="selectMonthYear"
+                                    v-model="createBudget.yearMonth"
+                                    type="month"
+                                    :label="$t('budget.year-month')"
+                                    clearable
                                     :rules="rules.textFieldRules"
-                                    required
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="6">
-                                <v-text-field
-                                    v-model="creditCard.digits"
-                                    :label="$t('credit-card.4-digits')"
-                                    :counter="4"
-                                    :maxlength="4"
-                                    required
-                                    :rules="rules.digitsFieldRules"
-                                    density="comfortable"
-                                ></v-text-field>
+                            <v-col cols="12" md="12">
+                                <v-checkbox
+                                    v-model="createBudget.automaticGenerate"
+                                    :label="$t('budget.automatic-generate')"
+                                ></v-checkbox>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-select
-                                    v-model="creditCard.due_date"
-                                    :label="$t('credit-card.due-date')"
-                                    :items="days"
-                                    clearable
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                ></v-select>
+                            <v-col cols="12" md="12">
+                                <v-checkbox
+                                    v-model="createBudget.includeFixExpense"
+                                    :label="$t('budget.include-fix-expense')"
+                                ></v-checkbox>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-select
-                                    v-model="creditCard.closing_date"
-                                    :label="$t('credit-card.closing-date')"
-                                    :items="days"
-                                    clearable
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-select
-                                    v-model="creditCard.is_active"
-                                    :label="$t('default.active')"
-                                    :items="isActiveOptions"
-                                    item-title="name"
-                                    item-value="value"
-                                    clearable
-                                    :rules="rules.booleanFieldRules"
-                                    density="comfortable"
-                                ></v-select>
+                            <v-col cols="12" md="12">
+                                <v-checkbox
+                                    v-model="createBudget.includeProvision"
+                                    :label="$t('budget.include-provision')"
+                                ></v-checkbox>
                             </v-col>
                         </v-row>
                     </v-form>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
+                    <v-btn color="error" flat :loading="isLoading" @click="createDialog = false">
+                        {{ $t('default.cancel') }}
+                    </v-btn>
+                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="create">
+                        {{ $t('default.save') }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Dialog Clone -->
+        <v-dialog v-model="cloneDialog" persistent width="800">
+            <v-card>
+                <v-card-title>
+                    <span class="text-h5">{{ titleModal }}</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-form ref="formClone" @submit.prevent>
+                        <v-row dense>
+                            <v-col cols="12" md="4">
+                                <v-text-field
+                                    ref="selectMonthYearClone"
+                                    v-model="createBudget.yearMonth"
+                                    type="month"
+                                    :label="$t('budget.year-month')"
+                                    clearable
+                                    :rules="rules.textFieldRules"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" md="12">
+                                <v-checkbox
+                                    v-model="createBudget.automaticGenerate"
+                                    :label="$t('budget.automatic-generate')"
+                                ></v-checkbox>
+                            </v-col>
+                        </v-row>
+                    </v-form>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="error" flat :loading="isLoading" @click="cloneDialog = false">
                         {{ $t('default.cancel') }}
                     </v-btn>
                     <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
@@ -199,9 +233,9 @@ import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 
 <script>
 export default {
-    name: 'ProvisionIndex',
+    name: 'BudgetIndex',
     props: {
-        creditCards: {
+        budgets: {
             type: Array,
         },
     },
@@ -215,86 +249,41 @@ export default {
                     href: '/dashboard',
                 },
                 {
-                    title: this.$t('menus.credit-card'),
+                    title: this.$t('menus.budget'),
                     disabled: true,
                 },
             ],
             headers: [
                 { title: this.$t('default.name'), key: 'name', groupable: false },
-                { title: this.$t('credit-card.digits'), key: 'digits' },
-                { title: this.$t('credit-card.due-date'), key: 'due_date' },
-                { title: this.$t('credit-card.closing-date'), key: 'closing_date' },
+                { title: this.$t('budget.digits'), key: 'digits' },
+                { title: this.$t('budget.due-date'), key: 'due_date' },
+                { title: this.$t('budget.closing-date'), key: 'closing_date' },
                 { title: this.$t('default.active'), key: 'is_active' },
                 { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                booleanFieldRules: [(v) => v !== null || this.$t('rules.required-text-field')],
-                digitsFieldRules: [
-                    (value) => {
-                        if (!value) return this.$t('rules.required-text-field')
-                        if (!/^\d+$/.test(value)) return this.$t('rules.only-numbers')
-
-                        return true
-                    },
-                ],
             },
             search: null,
-            editDialog: false,
+            createDialog: false,
+            cloneDialog: false,
             removeDialog: false,
             isLoading: false,
             deleteId: null,
-            creditCard: {
-                id: null,
-                name: null,
-                digits: null,
-                due_date: null,
-                closing_date: null,
-                is_active: null,
+            createBudget: {
+                yearMonth: null,
+                automaticGenerateYear: false,
+                includeFixExpense: false,
+                includeProvision: false,
             },
-            days: [
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                '10',
-                '11',
-                '12',
-                '13',
-                '14',
-                '15',
-                '16',
-                '17',
-                '18',
-                '19',
-                '20',
-                '21',
-                '22',
-                '23',
-                '24',
-                '25',
-                '26',
-                '27',
-                '28',
-                '29',
-                '30',
-                '31',
-            ],
-            isActiveOptions: [
-                {
-                    name: this.$t('default.no'),
-                    value: 0,
-                },
-                {
-                    name: this.$t('default.yes'),
-                    value: 1,
-                },
-            ],
+            cloneBudget: {
+                id: null,
+                yearMonth: null,
+                includeProvision: false,
+                cloneBugdetExpense: false,
+                cloneBugdetIncome: false,
+                cloneBugdetGoals: false,
+            },
         }
     },
 
@@ -303,99 +292,89 @@ export default {
     async mounted() {},
 
     methods: {
-        hrefInvoice(item) {
-            return '/credit-card/' + item.id + '/invoice'
+        hrefBudgetShow(item) {
+            return '/budget/' + item.id
         },
 
         newItem() {
-            this.titleModal = this.$t('credit-card.new-item')
+            this.titleModal = this.$t('budget.new-item')
             this.editDialog = true
-            this.creditCard = {
-                id: null,
-                name: null,
-                digits: null,
-                due_date: null,
-                closing_date: null,
-                is_active: null,
+            this.createBudget = {
+                yearMonth: null,
+                automaticGenerateYear: false,
+                includeFixExpense: false,
+                includeProvision: false,
             }
             setTimeout(() => {
-                this.$refs.txtName.focus()
+                this.$refs.selectMonthYear.focus()
             })
-        },
-
-        editItem(item) {
-            this.titleModal = this.$t('credit-card.edit-item')
-            this.editDialog = true
-            this.creditCard = {
-                id: item.id,
-                name: item.name,
-                digits: item.digits,
-                due_date: item.due_date,
-                closing_date: item.closing_date,
-                is_active: item.is_active,
-            }
-            setTimeout(() => {
-                this.$refs.txtName.focus()
-            })
-        },
-
-        closeItem() {
-            this.editDialog = false
-        },
-
-        async save() {
-            let validate = await this.$refs.form.validate()
-            if (validate.valid) {
-                if (this.creditCard.id) {
-                    await this.update()
-                } else {
-                    await this.create()
-                }
-            }
         },
 
         async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/credit-card',
-                {
-                    name: this.creditCard.name,
-                    digits: this.creditCard.digits,
-                    due_date: this.creditCard.due_date,
-                    closing_date: this.creditCard.closing_date,
-                    is_active: this.creditCard.is_active,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
+            let validate = await this.$refs.formCreate.validate()
+            if (validate.valid) {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/budget',
+                    {
+                        year: this.createBudget.yearMonth.substring(0, 4),
+                        month: this.createBudget.yearMonth.substring(5, 7),
+                        automaticGenerateYear: this.createBudget.automaticGenerateYear,
+                        includeFixExpense: this.createBudget.includeFixExpense,
+                        includeProvision: this.createBudget.includeProvision,
                     },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
+                    {
+                        onSuccess: () => {
+                            this.createDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            }
         },
 
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/credit-card/' + this.creditCard.id,
-                {
-                    name: this.creditCard.name,
-                    digits: this.creditCard.digits,
-                    due_date: this.creditCard.due_date,
-                    closing_date: this.creditCard.closing_date,
-                    is_active: this.creditCard.is_active,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
+        cloneItem(item) {
+            this.titleModal = this.$t('budget.clone-item')
+            this.cloneDialog = true
+            this.cloneBudget = {
+                id: item.id,
+                yearMonth: null,
+                includeProvision: false,
+                cloneBugdetExpense: false,
+                cloneBugdetIncome: false,
+                cloneBugdetGoals: false,
+            }
+            setTimeout(() => {
+                this.$refs.selectMonthYearClone.focus()
+            })
+        },
+
+        async clone() {
+            let validate = await this.$refs.formClone.validate()
+            if (validate.valid) {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/budget/' + this.budget.id + '/clone',
+                    {
+                        year: this.createBudget.yearMonth.substring(0, 4),
+                        month: this.createBudget.yearMonth.substring(5, 7),
+                        includeProvision: this.createBudget.includeProvision,
+                        cloneBugdetExpense: this.createBudget.cloneBugdetExpense,
+                        cloneBugdetIncome: this.createBudget.cloneBugdetIncome,
+                        cloneBugdetGoals: this.createBudget.cloneBugdetGoals,
                     },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
+                    {
+                        onSuccess: () => {
+                            this.cloneDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            }
         },
 
         openDelete(item) {
@@ -405,12 +384,12 @@ export default {
 
         remove() {
             this.isLoading = true
-            this.$inertia.delete(`/credit-card/${this.deleteId}`, {
+            this.$inertia.delete(`/budget/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {
                     this.removeDialog = false
-                    this.editDialog = false
+                    this.removeDialog = false
                 },
                 onError: () => {
                     this.isLoading = false

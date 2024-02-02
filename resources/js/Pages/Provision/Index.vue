@@ -336,6 +336,10 @@ export default {
             },
             groupList: [
                 {
+                    name: this.$t('default.monthly'),
+                    value: 'MONTHLY',
+                },
+                {
                     name: this.$t('default.week-1'),
                     value: 'WEEK_1',
                 },
@@ -383,7 +387,11 @@ export default {
                 return
             }
 
-            if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
+            if (
+                this.provision.tags &&
+                this.provision.tags.length > 0 &&
+                this.provision.tags.find((x) => x.name == val)
+            ) {
                 return
             }
 
@@ -399,9 +407,11 @@ export default {
                         }
 
                         if (
-                            searchFieldsData &&
-                            searchFieldsData.length > 0 &&
-                            !searchFieldsData.find((x) => x.name == val.toUpperCase())
+                            (searchFieldsData &&
+                                searchFieldsData.length > 0 &&
+                                !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                            !searchFieldsData ||
+                            searchFieldsData.length == 0
                         ) {
                             searchFieldsData.unshift({ name: val.toUpperCase() })
                         }

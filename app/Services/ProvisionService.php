@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Provision;
 use App\Models\ShareUser;
 use Exception;
+use Illuminate\Support\Collection;
 
 class ProvisionService
 {
@@ -18,7 +19,7 @@ class ProvisionService
      */
     public function index(): array
     {
-        $provisions = Provision::where('user_id', auth()->user()->id)->with('shareUser')->get();
+        $provisions = Provision::where('user_id', auth()->user()->id)->with('shareUser', 'tags')->get();
         $shareUsers = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->get();
 
         if ($shareUsers && $shareUsers->count()) {
@@ -44,6 +45,7 @@ class ProvisionService
      * @param string $remarks
      * @param integer $shareValue
      * @param integer|null $shareUserId
+     * @param Collection $tags
      * @return Provision
      */
     public function create(
@@ -52,7 +54,8 @@ class ProvisionService
         string $group,
         string $remarks = null,
         float $shareValue = 0,
-        int $shareUserId = null
+        int $shareUserId = null,
+        Collection $tags
     ): Provision {
         $provision = new Provision([
             'description' => $description,
@@ -65,6 +68,9 @@ class ProvisionService
         ]);
 
         $provision->save();
+
+        // Atualiza Tags
+        TagService::saveTagsToModel($provision, $tags);
         return $provision;
     }
 
@@ -77,6 +83,7 @@ class ProvisionService
      * @param string $remarks
      * @param integer $shareValue
      * @param integer|null $shareUserId
+     * @param Collection $tags
      * @return bool
      */
     public function update(
@@ -86,13 +93,17 @@ class ProvisionService
         string $group,
         string $remarks = null,
         float $shareValue = null,
-        int $shareUserId = null
+        int $shareUserId = null,
+        Collection $tags
     ): bool {
         $provision = Provision::find($id);
 
         if (!$provision) {
             throw new Exception('provision.not-found');
         }
+
+        // Atualiza Tags
+        TagService::saveTagsToModel($provision, $tags);
 
         return $provision->update([
             'description' => $description,
@@ -118,16 +129,9 @@ class ProvisionService
             throw new Exception('provision.not-found');
         }
 
+        // Remove Tags
+        TagService::saveTagsToModel($provision);
+
         return $provision->delete();
     }
-
-    // /**
-    //  * Armazenamento da Imagem do Provisionamento
-    //  * @param object $image
-    //  * @return string
-    //  */
-    // public function storeImageProvision(object $image)
-    // {
-    //     return $image->store("/provisions");
-    // }
 }

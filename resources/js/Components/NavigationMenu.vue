@@ -23,6 +23,8 @@ import { Link } from '@inertiajs/vue3'
 </script>
 
 <script>
+import moment from 'moment'
+
 export default {
     data() {
         return {
@@ -57,6 +59,11 @@ export default {
                     title: this.$t('menus.credit-card'),
                     icon: 'mdi-credit-card',
                     to: '/credit-card',
+                },
+                {
+                    title: this.$t('menus.budget'),
+                    icon: 'mdi-credit-card',
+                    to: '/budget/' + moment().format('YYYY'),
                 },
             ],
         }

@@ -160,7 +160,7 @@
                                     ref="selectMonthYear"
                                     v-model="yearMonth"
                                     type="month"
-                                    :label="$t('default.month')"
+                                    :label="$t('credit-card-invoice.year-month')"
                                     clearable
                                     :rules="rules.textFieldRules"
                                     density="comfortable"

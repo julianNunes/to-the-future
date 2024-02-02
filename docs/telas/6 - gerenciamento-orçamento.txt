@@ -14,8 +14,6 @@ Gerenciamento - Orçamento
             - Check para(default false):
                 - "Incluir Despesas Fixas",
                 - "Incluir Provisionamento Padrão"
-            - Tabela para metas (não obrigatorio):
-
 
             - Botao Salvar
             - Botao cancelar
@@ -24,10 +22,15 @@ Gerenciamento - Orçamento
     - Botão para "Clonar" um mes para outro
         - Select de Mes (Obrigatorio)
         - Check para(default false):
-            - "Copiar Despesas Fixas",
-            - "Copiar Receitas"
             - "Incluir Provisionamento Padrão"
+            - "Copiar Despesas",
+            - "Copiar Receitas"
             - "Copiar Metas"
 
+        - Botao Salvar
+        - Botao cancelar
 
     - Botão para remover
+
+
+

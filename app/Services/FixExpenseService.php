@@ -62,7 +62,7 @@ class FixExpenseService
         $expense->save();
 
         // Salva Tags
-        TagService::saveTagsToModel($tags, $expense);
+        TagService::saveTagsToModel($expense, $tags);
 
         return $expense;
     }
@@ -84,7 +84,7 @@ class FixExpenseService
         }
 
         // Atualiza Tags
-        TagService::saveTagsToModel($tags, $expense);
+        TagService::saveTagsToModel($expense, $tags);
 
         return $expense->update([
             'description' => $description,
@@ -103,15 +103,14 @@ class FixExpenseService
      */
     public function delete(int $id): bool
     {
-        $expense = FixExpense::with(['tags'])->find($id);
+        $expense = FixExpense::find($id);
 
         if (!$expense) {
             throw new Exception('fix-expense.not-found');
         }
 
-        if ($expense->tags && $expense->tags->count()) {
-            $expense->tags()->detach();
-        }
+        // Remove Tags
+        TagService::saveTagsToModel($expense);
 
         return $expense->delete();
     }

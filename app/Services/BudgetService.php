@@ -83,7 +83,7 @@ class BudgetService
                     ]);
 
                     if ($expense->tags && $expense->tags->count()) {
-                        TagService::saveTagsToModel($expense->tags, $new_expense);
+                        TagService::saveTagsToModel($new_expense, $expense->tags);
                     }
                 }
             }
@@ -105,7 +105,7 @@ class BudgetService
                     ]);
 
                     if ($provision->tags && $provision->tags->count()) {
-                        TagService::saveTagsToModel($provision->tags, $new_provision);
+                        TagService::saveTagsToModel($new_provision, $provision->tags);
                     }
                 }
             }
@@ -141,7 +141,7 @@ class BudgetService
                             ]);
 
                             if ($expense->tags && $expense->tags->count()) {
-                                TagService::saveTagsToModel($expense->tags, $new_expense);
+                                TagService::saveTagsToModel($new_expense, $expense->tags);
                             }
                         }
                     }
@@ -159,7 +159,7 @@ class BudgetService
                             ]);
 
                             if ($provision->tags && $provision->tags->count()) {
-                                TagService::saveTagsToModel($provision->tags, $new_provision);
+                                TagService::saveTagsToModel($new_provision, $provision->tags);
                             }
                         }
                     }
@@ -232,7 +232,7 @@ class BudgetService
                     ]);
 
                     if ($provision->tags && $provision->tags->count()) {
-                        TagService::saveTagsToModel($provision->tags, $new_provision);
+                        TagService::saveTagsToModel($new_provision, $provision->tags);
                     }
                 }
             }
@@ -251,7 +251,7 @@ class BudgetService
                 ]);
 
                 if ($expense->tags && $expense->tags->count()) {
-                    TagService::saveTagsToModel($expense->tags, $new_expense);
+                    TagService::saveTagsToModel($new_expense, $expense->tags);
                 }
             }
         }
@@ -269,7 +269,7 @@ class BudgetService
                 ]);
 
                 if ($income->tags && $income->tags->count()) {
-                    TagService::saveTagsToModel($income->tags, $new_income);
+                    TagService::saveTagsToModel($new_income, $income->tags);
                 }
             }
         }
@@ -287,7 +287,7 @@ class BudgetService
                 $tags = collect($goal->tags);
 
                 if ($tags && $tags->count()) {
-                    TagService::saveTagsToModel($tags, $new_goal);
+                    TagService::saveTagsToModel($new_goal, $tags);
                 }
             }
         }

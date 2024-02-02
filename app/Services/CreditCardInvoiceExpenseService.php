@@ -78,7 +78,7 @@ class CreditCardInvoiceExpenseService
         $credit_card_invoice_expense->save();
 
         // Atualiza Tags
-        TagService::saveTagsToModel($tags, $credit_card_invoice_expense);
+        TagService::saveTagsToModel($credit_card_invoice_expense, $tags);
 
         // Tratativa para Divisão de despesas
         // Removo sempre todos os registros
@@ -98,7 +98,7 @@ class CreditCardInvoiceExpenseService
                 $new_division->save();
 
                 // Atualiza Tags
-                TagService::saveTagsToModel($division->tags, $new_division);
+                TagService::saveTagsToModel($new_division, $division->tags);
             }
         }
 
@@ -148,7 +148,7 @@ class CreditCardInvoiceExpenseService
                 $new_expense->save();
 
                 // Atualiza Tags
-                TagService::saveTagsToModel($tags, $new_expense);
+                TagService::saveTagsToModel($new_expense, $tags);
 
                 if ($divisions && $divisions->count()) {
                     foreach ($divisions as $division) {
@@ -164,7 +164,7 @@ class CreditCardInvoiceExpenseService
                         $new_division->save();
 
                         // Atualiza Tags
-                        TagService::saveTagsToModel($division->tags, $new_division);
+                        TagService::saveTagsToModel($new_division, $division->tags);
                     }
                 }
 
@@ -246,7 +246,7 @@ class CreditCardInvoiceExpenseService
         ]);
 
         // Atualiza Tags
-        TagService::saveTagsToModel($tags, $credit_card_invoice_expense);
+        TagService::saveTagsToModel($credit_card_invoice_expense, $tags);
 
         // Tratativa para Divisão de despesas
         // Removo sempre todos os registros
@@ -266,7 +266,7 @@ class CreditCardInvoiceExpenseService
                 $new_division->save();
 
                 // Atualiza Tags
-                TagService::saveTagsToModel($division->tags, $new_division);
+                TagService::saveTagsToModel($new_division, $division->tags);
             }
         }
 

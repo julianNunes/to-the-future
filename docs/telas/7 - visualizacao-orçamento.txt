@@ -6,6 +6,9 @@ Orçamento (Show/Ver)
 
         }
 
+    - CRUD
+        - Metas
+
 
 - Front-end
     - Cabeçalho da tela
@@ -40,7 +43,8 @@ Orçamento (Show/Ver)
                 - Semana 1, 2, 3, 4
 
             - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
-                -
+                - Somar o valor que devo pagar para o "share_user_id"
+                - Somar o valor a receber do "share_user_id"
 
             - Expanse-painel com o componente de Cartões
                 - Foreach com todos os dados

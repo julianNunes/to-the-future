@@ -59,7 +59,7 @@ class BudgetController extends Controller
             'month' => ['required'],
         ]);
 
-        $this->budgetService->create(
+        $this->budgetService->clone(
             $id,
             $request->year,
             $request->month,
