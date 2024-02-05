@@ -14,12 +14,20 @@ use App\Models\ShareUser;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 
 class BudgetService
 {
+    protected $budgetExpenseService;
+    protected $budgetProvisionService;
+    protected $budgetIncomeService;
+    protected $budgetGoalService;
+
     public function __construct()
     {
+        $this->budgetExpenseService = new BudgetExpenseService();
+        $this->budgetProvisionService = new BudgetProvisionService();
+        $this->budgetIncomeService = new BudgetIncomeService();
+        $this->budgetGoalService = new BudgetGoalService();
     }
 
     /**
@@ -30,22 +38,33 @@ class BudgetService
      */
     public function index(string $year): array
     {
-        $budgets = Budget::where(['user_id', auth()->user()->id, 'year' => $year])->get();
-
+        $budgets = Budget::where(['user_id' => auth()->user()->id, 'year' => $year])->get();
         return [
             'budgets' => $budgets,
+            'year' => $year,
         ];
     }
 
-
+    /**
+     * Undocumented function
+     *
+     * @param integer $userId
+     * @param string $year
+     * @param string $month
+     * @param boolean $automaticGenerateYear
+     * @param boolean $includeFixExpense
+     * @param boolean $includeProvision
+     * @return Budget
+     */
     public function create(
+        int $userId,
         string $year,
         string $month,
         bool $automaticGenerateYear = false,
         bool $includeFixExpense = false,
         bool $includeProvision = false
     ): Budget {
-        $budget = Budget::where(['year', $year, 'month' => $month, 'user_id', auth()->user()->id])->first();
+        $budget = Budget::where(['year' => $year, 'month' => $month, 'user_id' => $userId])->first();
 
         if ($budget) {
             throw new Exception('budget.already-exists');
@@ -53,60 +72,68 @@ class BudgetService
 
         $fix_expenses = null;
         $provisions = null;
+        $has_share_fix_expense = false;
+        $has_share_provision = false;
         $date = Carbon::parse($year . '-' . $month . '-01');
+        $shareUser = ShareUser::where('user_id', $userId)->first();
 
         $budget = new Budget([
             'year' => $year,
             'month' => $month,
-            'user_id' => auth()->user()->id
+            'user_id' => $userId
         ]);
 
         $budget->save();
 
         if ($includeFixExpense) {
-            $fix_expenses = FixExpense::with(['tags'])->where('user_id', auth()->user()->id)->get();
+            $fix_expenses = FixExpense::with(['tags'])->where('user_id', $userId)->get();
 
             if ($fix_expenses && $fix_expenses->count()) {
                 $new_date = $date->copy();
 
                 foreach ($fix_expenses as $expense) {
-                    $new_date = $date->day($expense->due_date);
-
-                    $new_expense = BudgetExpense::create([
-                        'description' => $expense->description,
-                        'date' => $new_date->format('y-m-d'),
-                        'value' => $expense->value,
-                        'remarks' => $expense->remarks,
-                        'share_value' => $expense->share_value,
-                        'share_user_id' => $expense->share_user_id,
-                        'budget_id' => $budget->id
-                    ]);
-
-                    if ($expense->tags && $expense->tags->count()) {
-                        TagService::saveTagsToModel($new_expense, $expense->tags);
-                    }
+                    $this->budgetExpenseService->create(
+                        $expense->description,
+                        $new_date->day($expense->due_date)->format('y-m-d'),
+                        $expense->value,
+                        $expense->remarks,
+                        $budget->id,
+                        $expense->share_value,
+                        $expense->share_user_id,
+                        $expense->tags
+                    );
                 }
+
+                $has_share_fix_expense = $fix_expenses->whereNotNull('share_user_id')->count() > 0 ? true : false;
             }
         }
 
         if ($includeProvision) {
-            $provisions = Provision::with(['tags'])->where('user_id', auth()->user()->id)->get();
+            $provisions = Provision::with(['tags'])->where('user_id', $userId)->get();
 
             if ($provisions && $provisions->count()) {
                 foreach ($provisions as $provision) {
-                    $new_provision = BudgetProvision::create([
-                        'description' => $provision->description,
-                        'value' => $provision->value,
-                        'group' => $provision->group,
-                        'remarks' => $provision->remarks,
-                        'share_value' => $provision->share_value,
-                        'share_user_id' => $provision->share_user_id,
-                        'budget_id' => $budget->id
-                    ]);
+                    $this->budgetProvisionService->create(
+                        $provision->description,
+                        $provision->value,
+                        $provision->group,
+                        $provision->remarks,
+                        $budget->id,
+                        $provision->share_value,
+                        $provision->share_user_id,
+                        $provision->tags
+                    );
+                }
+            }
 
-                    if ($provision->tags && $provision->tags->count()) {
-                        TagService::saveTagsToModel($new_provision, $provision->tags);
-                    }
+            $has_share_provision = $provisions->whereNotNull('share_user_id')->count() > 0 ? true : false;
+        }
+
+        if ($has_share_fix_expense || $has_share_provision) {
+            if ($shareUser) {
+                try {
+                    $this->create($shareUser->share_user_id, $year, $month);
+                } catch (Exception $e) {
                 }
             }
         }
@@ -115,52 +142,57 @@ class BudgetService
             $new_date = $date->copy()->addMonth();
 
             for ($i = $new_date->month; $i <= 12; $i++) {
-                $new_budget = Budget::where(['year' => $year, 'month' => $new_date->month, 'user_id' => auth()->user()->id])->first();
+                $new_budget = Budget::where(['year' => $year, 'month' => $new_date->month, 'user_id' => $userId])->first();
 
                 if (!$new_budget) {
                     $new_budget = new Budget([
                         'year' => $year,
                         'month' => $new_date->format('m'),
-                        'user_id' => auth()->user()->id
+                        'user_id' => $userId
                     ]);
 
                     $new_budget->save();
 
                     if ($includeFixExpense && $fix_expenses && $fix_expenses->count()) {
                         foreach ($fix_expenses as $expense) {
-                            $new_date = $date->day($expense->due_date);
+                            $due_date = $new_date->copy()->day($expense->due_date)->format('y-m-d');
 
-                            $new_expense = BudgetExpense::create([
-                                'description' => $expense->description,
-                                'date' => $new_date->format('y-m-d'),
-                                'value' => $expense->value,
-                                'remarks' => $expense->remarks,
-                                'share_value' => $expense->share_value,
-                                'share_user_id' => $expense->share_user_id,
-                                'budget_id' => $new_budget->id
-                            ]);
-
-                            if ($expense->tags && $expense->tags->count()) {
-                                TagService::saveTagsToModel($new_expense, $expense->tags);
-                            }
+                            $this->budgetExpenseService->create(
+                                $expense->description,
+                                $due_date,
+                                $expense->value,
+                                $expense->remarks,
+                                $new_budget->id,
+                                $expense->share_value,
+                                $expense->share_user_id,
+                                $expense->tags
+                            );
                         }
                     }
 
                     if ($includeProvision && $provisions && $provisions->count()) {
                         foreach ($provisions as $provision) {
-                            $new_provision = BudgetProvision::create([
-                                'description' => $provision->description,
-                                'value' => $provision->value,
-                                'group' => $provision->group,
-                                'remarks' => $provision->remarks,
-                                'share_value' => $provision->share_value,
-                                'share_user_id' => $provision->share_user_id,
-                                'budget_id' => $new_budget->id
-                            ]);
+                            $this->budgetProvisionService->create(
+                                $provision->description,
+                                $provision->value,
+                                $provision->group,
+                                $provision->remarks,
+                                $new_budget->id,
+                                $provision->share_value,
+                                $provision->share_user_id,
+                                $provision->tags
+                            );
+                        }
+                    }
+                }
 
-                            if ($provision->tags && $provision->tags->count()) {
-                                TagService::saveTagsToModel($new_provision, $provision->tags);
-                            }
+                $this->recalculateBugdet($new_budget->id);
+
+                if ($has_share_fix_expense || $has_share_provision) {
+                    if ($shareUser) {
+                        try {
+                            $this->create($shareUser->share_user_id, $year, $new_date->month);
+                        } catch (Exception $e) {
                         }
                     }
                 }
@@ -169,10 +201,23 @@ class BudgetService
             }
         }
 
+        $this->recalculateBugdet($budget->id);
+
         return $budget;
     }
 
-
+    /**
+     * Undocumented function
+     *
+     * @param integer $id
+     * @param string $year
+     * @param string $month
+     * @param boolean $includeProvision
+     * @param boolean $cloneBugdetExpense
+     * @param boolean $cloneBugdetIncome
+     * @param boolean $cloneBugdetGoals
+     * @return Budget
+     */
     public function clone(
         int $id,
         string $year,
@@ -199,7 +244,7 @@ class BudgetService
                 $query->with(['incomes.tags']);
             })
             ->when($cloneBugdetGoals, function (Builder $query) {
-                $query->with(['goals']);
+                $query->with(['goals.tags']);
             })
             ->find($id);
 
@@ -221,81 +266,73 @@ class BudgetService
 
             if ($provisions && $provisions->count()) {
                 foreach ($provisions as $provision) {
-                    $new_provision = BudgetProvision::create([
-                        'description' => $provision->description,
-                        'value' => $provision->value,
-                        'group' => $provision->group,
-                        'remarks' => $provision->remarks,
-                        'share_value' => $provision->share_value,
-                        'share_user_id' => $provision->share_user_id,
-                        'budget_id' => $new_budget->id
-                    ]);
-
-                    if ($provision->tags && $provision->tags->count()) {
-                        TagService::saveTagsToModel($new_provision, $provision->tags);
-                    }
+                    $this->budgetProvisionService->create(
+                        $provision->description,
+                        $provision->value,
+                        $provision->group,
+                        $provision->remarks,
+                        $new_budget->id,
+                        $provision->share_value,
+                        $provision->share_user_id,
+                        $provision->tags
+                    );
                 }
             }
         }
 
         if ($cloneBugdetExpense && $budget->expenses && $budget->expenses->count()) {
             foreach ($budget->expenses as $expense) {
-                $new_expense = BudgetExpense::create([
-                    'description' => $expense->description,
-                    'date' => $expense->date,
-                    'value' => $expense->value,
-                    'remarks' => $expense->remarks,
-                    'share_value' => $expense->share_value,
-                    'share_user_id' => $expense->share_user_id,
-                    'budget_id' => $new_budget->id
-                ]);
-
-                if ($expense->tags && $expense->tags->count()) {
-                    TagService::saveTagsToModel($new_expense, $expense->tags);
-                }
+                $this->budgetExpenseService->create(
+                    $expense->description,
+                    $expense->date,
+                    $expense->value,
+                    $expense->remarks,
+                    $new_budget->id,
+                    $expense->share_value,
+                    $expense->share_user_id,
+                    $expense->tags
+                );
             }
         }
 
         if ($cloneBugdetIncome && $budget->incomes && $budget->incomes->count()) {
             foreach ($budget->incomes as $income) {
-                $new_income = BudgetIncome::create([
-                    'description' => $income->description,
-                    'date' => $income->date,
-                    'value' => $income->value,
-                    'remarks' => $income->remarks,
-                    'share_value' => $income->share_value,
-                    'share_user_id' => $income->share_user_id,
-                    'budget_id' => $new_budget->id
-                ]);
-
-                if ($income->tags && $income->tags->count()) {
-                    TagService::saveTagsToModel($new_income, $income->tags);
-                }
+                $this->budgetIncomeService->create(
+                    $income->description,
+                    $income->date,
+                    $income->value,
+                    $income->remarks,
+                    $new_budget->id,
+                    $income->share_value,
+                    $income->share_user_id,
+                    $income->tags
+                );
             }
         }
 
         if ($cloneBugdetGoals && $budget->goals && $budget->goals->count()) {
             foreach ($budget->goals as $goal) {
-                $new_goal = BudgetGoal::create([
-                    'description' => $goal->description,
-                    'value' => $goal->value,
-                    'group' => $goal->group,
-                    'count_only_share' => $goal->count_only_share,
-                    'budget_id' => $budget->id
-                ]);
-
-                $tags = collect($goal->tags);
-
-                if ($tags && $tags->count()) {
-                    TagService::saveTagsToModel($new_goal, $tags);
-                }
+                $this->budgetGoalService->create(
+                    $goal->description,
+                    $goal->value,
+                    $goal->group,
+                    $goal->count_only_share,
+                    $budget->id,
+                    $goal->tags
+                );
             }
         }
 
         return $budget;
     }
 
-
+    /**
+     * Undocumented function
+     *
+     * @param integer $id
+     * @param boolean $closed
+     * @return boolean
+     */
     public function update(
         int $id,
         bool $closed
@@ -323,9 +360,8 @@ class BudgetService
             'goals'
         ])->find($id);
 
-
         if (!$budget) {
-            throw new Exception('credit-card.not-found');
+            throw new Exception('budget.not-found');
         }
 
         // Despesas
@@ -354,7 +390,12 @@ class BudgetService
         return $budget->delete();
     }
 
-    private function recalculateBugdet(int $id)
+    /**
+     *
+     * @param integer $id
+     * @return void
+     */
+    public function recalculateBugdet(int $id)
     {
         // Busca o budget do id
         // com despesas, receitas e provisionamento
@@ -365,7 +406,7 @@ class BudgetService
         ])->find($id);
 
         if (!$budget) {
-            throw new Exception('credit-card.not-found');
+            throw new Exception('budget.not-found');
         }
 
         $total_expense = 0;
@@ -379,23 +420,19 @@ class BudgetService
         // Soma Despesas
         if ($budget->expenses && $budget->expenses->count()) {
             $total_expense += $budget->expenses->sum('value');
-            $total_income += $budget->expenses->sum(function (Collection $item) {
-                return $item->share_value ? $item->share_value : null;
-            });
+            $total_income += $budget->expenses->sum('share_value');
         }
 
         // Soma Provisionamento
         if ($budget->provisions && $budget->provisions->count()) {
             $total_expense += $budget->provisions->sum('value');
-            $total_income += $budget->provisions->sum(function (Collection $item) {
-                return $item->share_value ? $item->share_value : null;
-            });
+            $total_income += $budget->provisions->sum('share_value');
         }
 
         $credit_card_invoices = CreditCardInvoice::with(['expenses'])
             ->where(['year' => $budget->year, 'month' => $budget->month])
-            ->whereHas('creditCard', function (Builder $query) {
-                $query->where('user_id', auth()->user()->id);
+            ->whereHas('creditCard', function (Builder $query) use ($budget) {
+                $query->where('user_id', $budget->user_id);
             })
             ->get();
 
@@ -403,54 +440,58 @@ class BudgetService
             foreach ($credit_card_invoices as $invoice) {
                 if ($invoice->expenses && $invoice->expenses->count()) {
                     $total_expense += $invoice->expenses->sum('value');
-                    $total_income += $invoice->expenses->sum(function (Collection $item) {
-                        return $item->share_value ? $item->share_value : null;
-                    });
+                    $total_income += $invoice->expenses->sum('share_value');
                 }
             }
         }
 
         // busca share user
-        $share_user = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->first();
+        $share_user = ShareUser::where('user_id', $budget->user_id)->with('shareUser')->first();
 
         if ($share_user) {
             // Busca orçamento com usuario compartilhado
-            $budet_share = Budget::with([
-                'expenses' => function (Builder $query) {
-                    $query->where('share_user_id', auth()->user()->id);
+            $budget_share = Budget::with([
+                'expenses' => function ($query) use ($budget) {
+                    $query->where('share_user_id', $budget->user_id);
                 },
-                'provisions' => function (Builder $query) {
-                    $query->where('share_user_id', auth()->user()->id);
+                'provisions' => function ($query) use ($budget) {
+                    $query->where('share_user_id', $budget->user_id);
                 },
             ])
                 ->where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user->share_user_id])
-                ->where(function (Builder $query) {
-                    $query->whereHas('expenses.share_user_id', auth()->user()->id)
-                        ->orWhereHas('provisions.share_user_id', auth()->user()->id);
+                ->where(function (Builder $query) use ($budget) {
+                    $query->whereHas('expenses', function (Builder $query2) use ($budget) {
+                        $query2->where('share_user_id', $budget->user_id);
+                    })
+                        ->orWhereHas('provisions', function (Builder $query2) use ($budget) {
+                            $query2->where('share_user_id', $budget->user_id);
+                        });
                 })
                 ->first();
 
-            // Soma Despesas
-            if ($budet_share->expenses && $budet_share->expenses->count()) {
-                $total_expense += $budet_share->expenses->sum('share_value');
-            }
+            if ($budget_share) {
+                // Soma Despesas
+                if ($budget_share->expenses && $budget_share->expenses->count()) {
+                    $total_expense += $budget_share->expenses->sum('share_value');
+                }
 
-            // Soma Provisionamento
-            if ($budet_share->provisions && $budet_share->provisions->count()) {
-                $total_expense += $budet_share->provisions->sum('share_value');
+                // Soma Provisionamento
+                if ($budget_share->provisions && $budget_share->provisions->count()) {
+                    $total_expense += $budget_share->provisions->sum('share_value');
+                }
             }
 
             $credit_card_invoices = CreditCardInvoice::with([
-                'expenses' => function (Builder $query) {
-                    $query->where('share_user_id', auth()->user()->id);
+                'expenses' => function (Builder $query) use ($budget) {
+                    $query->where('share_user_id', $budget->user_id);
                 }
             ])
                 ->where(['year' => $budget->year, 'month' => $budget->month])
                 ->whereHas('creditCard', function (Builder $query) use ($share_user) {
                     $query->where('user_id', $share_user->share_user_id);
                 })
-                ->whereHas('expenses', function (Builder $query) {
-                    $query->where('share_user_id', auth()->user()->id);
+                ->whereHas('expenses', function (Builder $query) use ($budget) {
+                    $query->where('share_user_id', $budget->user_id);
                 })
                 ->get();
 
@@ -467,5 +508,31 @@ class BudgetService
             'total_expense' => $total_expense,
             'total_income' => $total_income
         ]);
+    }
+
+    public function show(int $id)
+    {
+        // Busca o budget do id
+        // com despesas, receitas e provisionamento
+        $budget = Budget::with([
+            'expenses.tags',
+            'incomes.tags',
+            'provisions.tags',
+        ])->find($id);
+
+        if (!$budget) {
+            throw new Exception('credit-card.not-found');
+        }
+
+        // Busca as faturas dos cartões
+        $credit_card_invoices = CreditCardInvoice::with(['expenses.tags'])
+            ->where(['year' => $budget->year, 'month' => $budget->month])
+            ->whereHas('creditCard', function (Builder $query) use ($budget) {
+                $query->where('user_id', $budget->user_id);
+            })
+            ->get();
+
+        // busca share user
+        $share_user = ShareUser::where('user_id', $budget->user_id)->with('shareUser')->first();
     }
 }

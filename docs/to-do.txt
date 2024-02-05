@@ -1,84 +1,45 @@
 ==================================================
 LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
-- GERAL:
-    - Criar componente para mudar dinamicamente a linguagem do sistema
-        - https://lokalise.com/blog/vue-i18n/
+- Criar componente para mudar dinamicamente a linguagem do sistema
+    - https://lokalise.com/blog/vue-i18n/
 
-    - Mudar como os menu é montado e fazer ele agrupado
+- Mudar como os menu é montado e fazer ele agrupado
 
-    - Alterar o formato das datas do timestamp do Laravel
+- Alterar o formato das datas do timestamp do Laravel
+    - verificar como deixar o created_at e o updated_at automaticos
 
-    - Criar classe customizavel do Exception para poder devolver valores
-
-- Tags - SEEDER
-    - Adicionas tags padrão
-        - Casa
-        - Festa
-        - Farmacia
-        - Saúde
-        - Lazer
-        - Mercado
-        - Assinatura
-        - Transporte
-        - Uber
-        - Viagem
-        - Ifood
-        - Profissinal
-        - Estudos
-        - Roupas
-        - Alimentação
-        - Supermercado
-
-==================================================
-LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
-==================================================
-- verificar como deixar o created_at e o updated_at automaticos
+- Criar classe customizavel do Exception para poder devolver valores
 
 - Fatura do cartão de credito
     - Importar excel de despesas
     ? Upload do pdf da fatura
     ? Botão para visualizar o arquivo pdf da fatura
 
-
 - CArtao de credito
     - TESTAR O DELETE
         - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
-    - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
-
-- CRUD para "Despesas Fixas" (fix_expenses)
-    - INSERIR TAGS
-
-
-- CRUD para "Provisionamento" (provisions)
-    - INSERIR TAGS
-
-
-- InvoiceExpense
-    - Mudar os blocos dos dados do cartao para os dados das despesas
-
 
 - Orçamento
-    - OLHAR ARQUIVO "6 - Gerenciamento...."
-
     - Decidir se vou ter o "closed" no Budget
 
 
-In all my carrer i worked like a fullstack developer.
-I started work with Laravel 4.2 in 2016 for an education platform, focused on users' interaction in real time, which is the great differential.
-The next job worked developing ERP projects in a small company and the next job, Solistica a logistic company, i worked  with Laravel 5 Developing ERP project for internal use in the company and WMS also used by external customers.
-Now i working in one personal project with Inertia and Laravel 10 to update my skills with Laravel and new technologies.
+==================================================
+TO-DO
+==================================================
+- InvoiceExpense
+    - Mudar os blocos dos dados do cartao para os dados das despesas
+
+- CArtao de credito
+    - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
+
+- Orçamento
+    - Testar o Clone
+
+- Orçamento-Show:
+    - Construção completa
 
 
-I had almost 1 year of experience managing the educational project alone and during that time I had to deal with AWS S3.
-I no longer had contact with him.
-
-
-Unfortunately in all companies how i worked i never used automated testing. I have start studing in my personal project about automated testing with PHPUnit
-
-
-I love working with PHP/Laravel and mainly because I'm a musician and I would love to work in the music industry.
-I had my first child and I'm looking for my first international job and I want to provide more comfort for my family.
 
 =============================================================================================================
 DATE PICKER
@@ -110,4 +71,21 @@ DATE PICKER
                                     </template>
                                 </v-dialog>
                             </v-col>
+=============================================================================================================
+
+In all my carrer i worked like a fullstack developer.
+I started work with Laravel 4.2 in 2016 for an education platform, focused on users' interaction in real time, which is the great differential.
+The next job worked developing ERP projects in a small company and the next job, Solistica a logistic company, i worked  with Laravel 5 Developing ERP project for internal use in the company and WMS also used by external customers.
+Now i working in one personal project with Inertia and Laravel 10 to update my skills with Laravel and new technologies.
+
+
+I had almost 1 year of experience managing the educational project alone and during that time I had to deal with AWS S3.
+I no longer had contact with him.
+
+
+Unfortunately in all companies how i worked i never used automated testing. I have start studing in my personal project about automated testing with PHPUnit
+
+
+I love working with PHP/Laravel and mainly because I'm a musician and I would love to work in the music industry.
+I had my first child and I'm looking for my first international job and I want to provide more comfort for my family.
 

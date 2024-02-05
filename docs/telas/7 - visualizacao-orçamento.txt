@@ -42,6 +42,7 @@ Orçamento (Show/Ver)
                 - Provisionamento
                 - Semana 1, 2, 3, 4
 
+
             - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
                 - Somar o valor que devo pagar para o "share_user_id"
                 - Somar o valor a receber do "share_user_id"

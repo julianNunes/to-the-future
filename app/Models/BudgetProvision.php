@@ -19,9 +19,9 @@ class BudgetProvision extends Model
         'value',
         'group',
         'remarks',
+        'budget_id',
         'share_value',
         'share_user_id',
-        'budget_id'
     ];
 
     public function shareUser(): HasOne

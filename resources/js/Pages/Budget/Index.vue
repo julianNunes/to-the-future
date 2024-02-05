@@ -11,11 +11,11 @@
                 <v-col cols="12" sm="12" md="2">
                     <v-text-field
                         ref="inputYear"
-                        v-model="year"
+                        :model-value="yearModel"
                         :label="$t('default.year')"
                         type="number"
                         min="1970"
-                        max="1970"
+                        max="2050"
                         step="1"
                         :rules="rules.textFieldRules"
                         required
@@ -37,6 +37,7 @@
                         class="elevation-3"
                         density="compact"
                         :total-items="budgets.length"
+                        :items-per-page="12"
                         :no-data-text="$t('default.no-data-text')"
                         :no-results-text="$t('default.no-data-text')"
                         :footer-props="{
@@ -57,7 +58,13 @@
                             <v-tooltip :text="$t('default.show')" location="top">
                                 <template #activator="{ props }">
                                     <Link :href="hrefBudgetShow(item)" class="v-breadcrumbs-item--link">
-                                        <v-icon v-bind="props" color="warning" icon="mdi-eye" size="small" class="me-2">
+                                        <v-icon
+                                            v-bind="props"
+                                            color="light-blue"
+                                            icon="mdi-eye"
+                                            size="small"
+                                            class="me-2"
+                                        >
                                         </v-icon>
                                     </Link>
                                 </template>
@@ -66,7 +73,7 @@
                                 <template #activator="{ props }">
                                     <v-icon
                                         v-bind="props"
-                                        color="warning"
+                                        color="green"
                                         icon="mdi-content-copy"
                                         size="small"
                                         class="ml-1"
@@ -125,7 +132,7 @@
                                     ref="selectMonthYear"
                                     v-model="createBudget.yearMonth"
                                     type="month"
-                                    :label="$t('budget.year-month')"
+                                    :label="$t('default.year-month')"
                                     clearable
                                     :rules="rules.textFieldRules"
                                     density="comfortable"
@@ -133,20 +140,23 @@
                             </v-col>
                             <v-col cols="12" md="12">
                                 <v-checkbox
-                                    v-model="createBudget.automaticGenerate"
+                                    v-model="createBudget.automaticGenerateYear"
                                     :label="$t('budget.automatic-generate')"
+                                    density="comfortable"
                                 ></v-checkbox>
                             </v-col>
                             <v-col cols="12" md="12">
                                 <v-checkbox
                                     v-model="createBudget.includeFixExpense"
                                     :label="$t('budget.include-fix-expense')"
+                                    density="comfortable"
                                 ></v-checkbox>
                             </v-col>
                             <v-col cols="12" md="12">
                                 <v-checkbox
                                     v-model="createBudget.includeProvision"
                                     :label="$t('budget.include-provision')"
+                                    density="comfortable"
                                 ></v-checkbox>
                             </v-col>
                         </v-row>
@@ -229,6 +239,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import { currencyField } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -237,6 +248,9 @@ export default {
     props: {
         budgets: {
             type: Array,
+        },
+        year: {
+            type: String,
         },
     },
 
@@ -254,11 +268,10 @@ export default {
                 },
             ],
             headers: [
-                { title: this.$t('default.name'), key: 'name', groupable: false },
-                { title: this.$t('budget.digits'), key: 'digits' },
-                { title: this.$t('budget.due-date'), key: 'due_date' },
-                { title: this.$t('budget.closing-date'), key: 'closing_date' },
-                { title: this.$t('default.active'), key: 'is_active' },
+                { title: this.$t('default.year-month'), key: 'year_month' },
+                { title: this.$t('budget.total-expense'), key: 'total_expense', align: 'end' },
+                { title: this.$t('budget.total-income'), key: 'total_income', align: 'end' },
+                { title: this.$t('default.closed'), key: 'closed' },
                 { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
             ],
             rules: {
@@ -270,6 +283,7 @@ export default {
             removeDialog: false,
             isLoading: false,
             deleteId: null,
+            // yearModel: null,
             createBudget: {
                 yearMonth: null,
                 automaticGenerateYear: false,
@@ -287,6 +301,12 @@ export default {
         }
     },
 
+    computed: {
+        yearModel() {
+            return this.year
+        },
+    },
+
     async created() {},
 
     async mounted() {},
@@ -296,9 +316,13 @@ export default {
             return '/budget/' + item.id
         },
 
+        changeYear(value) {
+            this.$inertia.get('/budget/' + value.target.value)
+        },
+
         newItem() {
             this.titleModal = this.$t('budget.new-item')
-            this.editDialog = true
+            this.createDialog = true
             this.createBudget = {
                 yearMonth: null,
                 automaticGenerateYear: false,

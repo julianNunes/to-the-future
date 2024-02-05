@@ -116,7 +116,7 @@ Route::controller(BudgetController::class)->group(function () {
     Route::put('/budget/{id}/clone', 'clone');
     Route::put('/budget/{id}', 'update');
     Route::delete('/budget/{id}', 'delete');
-    Route::get('/budget/{id}', 'show');
+    Route::get('/budget/show/{id}', 'show');
 });
 
 require __DIR__ . '/auth.php';

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('budget_expenses', function (Blueprint $table) {
             $table->id();
             $table->string('description')->comment('Descrição');
-            $table->date('due_date')->comment('Data de Vencimento');
+            $table->date('date')->comment('Data de Vencimento');
             $table->decimal('value');
             $table->string('remarks');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');

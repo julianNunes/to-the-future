@@ -181,7 +181,8 @@
         "clone": "Clonar",
         "automatic-generate": "Deseja gerar os Orçamentos para os proximos meses subsequentes do ano?",
         "include-fix-expense": "Incluir Despesas Fixas?",
-        "include-provision": "Incluir Provisionamento?"
-
+        "include-provision": "Incluir Provisionamento?",
+        "total-expense": "Total Despesas",
+        "total-income": "Total Receitas"
     }
 }

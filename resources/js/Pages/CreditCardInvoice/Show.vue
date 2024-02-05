@@ -7,7 +7,7 @@
         </div>
 
         <!-- Componente da Fatura -->
-        <InvoiceExpense :invoice="invoice" :share-users="shareUsers" />
+        <InvoiceExpense :invoice="invoice" :share-users="shareUsers" :title-card="true" />
     </AuthenticatedLayout>
 </template>
 

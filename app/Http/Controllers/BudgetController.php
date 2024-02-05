@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\BudgetService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class BudgetController extends Controller
 {
@@ -26,7 +27,6 @@ class BudgetController extends Controller
         return Inertia::render('Budget/Index', $data);
     }
 
-
     /**
      * Cria um novo Orçamento
      */
@@ -38,6 +38,7 @@ class BudgetController extends Controller
         ]);
 
         $this->budgetService->create(
+            auth()->user()->id,
             $request->year,
             $request->month,
             $request->automaticGenerateYear,
@@ -95,5 +96,16 @@ class BudgetController extends Controller
     {
         $this->budgetService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
+    }
+
+    /**
+     * Atualiza um Orçamento
+     */
+    public function show(int $id)
+    {
+        $this->budgetService->show(
+            $id
+        );
+        return redirect()->back()->with('success', 'default.sucess-update');
     }
 }

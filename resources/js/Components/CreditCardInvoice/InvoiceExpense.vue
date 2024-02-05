@@ -1,212 +1,219 @@
 <template>
     <!-- Dados do cartão -->
-    <v-card>
-        <v-card-title class="bg-primary">
-            <span class="text-h6">{{ $t('credit-card-invoice.data-invoice') }}</span>
-        </v-card-title>
+    <v-expansion-panels v-model="panel" :readonly="titleCard ? true : false">
+        <v-expansion-panel>
+            <v-expansion-panel-title class="bg-primary">
+                <template #default="{ expanded }">
+                    <v-row no-gutters>
+                        <span class="text-h6">
+                            {{ $t('credit-card-invoice.data-invoice') }}
+                            {{ !expanded && titleCard ? ' - ' + creditCardname : '' }}
+                        </span>
+                    </v-row>
+                </template>
+            </v-expansion-panel-title>
 
-        <v-card-text class="pt-4">
-            <v-row dense>
-                <v-col cols="12" sm="12" md="2">
-                    <v-text-field
-                        ref="txtName"
-                        v-model="creditCardname"
-                        :label="$t('default.credit-card')"
-                        :readonly="true"
-                        density="comfortable"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="2">
-                    <v-text-field
-                        v-model="invoiceDueDate"
-                        :label="$t('credit-card.due-date')"
-                        :readonly="true"
-                        density="comfortable"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="2">
-                    <v-text-field
-                        v-model="invoiceClosindDate"
-                        :label="$t('credit-card.closing-date')"
-                        :readonly="true"
-                        density="comfortable"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="2">
-                    <v-text-field
-                        v-model="invoiceTotal"
-                        :label="$t('default.total')"
-                        :readonly="true"
-                        density="comfortable"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="2">
-                    <v-text-field
-                        v-model="invoiceTotalPaid"
-                        :label="$t('default.total-paid')"
-                        :readonly="true"
-                        density="comfortable"
-                    ></v-text-field>
-                </v-col>
-                <v-col cols="12" sm="6" md="2">
-                    <v-text-field
-                        v-model="isClosed"
-                        :label="$t('default.closed')"
-                        :readonly="true"
-                        density="comfortable"
-                    ></v-text-field>
-                </v-col>
-            </v-row>
-            <v-row dense>
-                <v-col md="12">
-                    <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
-                    <span class="text-h6">{{ $t('credit-card-invoice-expense.title') }}</span>
-                    <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
-                </v-col>
-            </v-row>
-        </v-card-text>
-    </v-card>
+            <v-expansion-panel-text class="pt-4">
+                <v-row dense>
+                    <v-col cols="12" sm="12" md="2">
+                        <v-text-field
+                            ref="txtName"
+                            v-model="creditCardname"
+                            :label="$t('default.credit-card')"
+                            :readonly="true"
+                            density="comfortable"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="2">
+                        <v-text-field
+                            v-model="invoiceDueDate"
+                            :label="$t('credit-card.due-date')"
+                            :readonly="true"
+                            density="comfortable"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="2">
+                        <v-text-field
+                            v-model="invoiceClosindDate"
+                            :label="$t('credit-card.closing-date')"
+                            :readonly="true"
+                            density="comfortable"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="2">
+                        <v-text-field
+                            v-model="invoiceTotal"
+                            :label="$t('default.total')"
+                            :readonly="true"
+                            density="comfortable"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="2">
+                        <v-text-field
+                            v-model="invoiceTotalPaid"
+                            :label="$t('default.total-paid')"
+                            :readonly="true"
+                            density="comfortable"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="2">
+                        <v-text-field
+                            v-model="isClosed"
+                            :label="$t('default.closed')"
+                            :readonly="true"
+                            density="comfortable"
+                        ></v-text-field>
+                    </v-col>
+                </v-row>
+                <!-- <v-row dense>
+                    <v-col md="12">
+                        <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
+                        <span class="text-h6">{{ $t('credit-card-invoice-expense.title') }}</span>
+                        <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
+                    </v-col>
+                </v-row> -->
+                <v-row dense>
+                    <v-col md="12">
+                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
+                        <v-btn color="info" class="ml-1" href="/storage/template/template-despesas.xlsx" download>{{
+                            $t('credit-card-invoice.download-template')
+                        }}</v-btn>
+                        <v-btn color="info" class="ml-1" @click="clickImportFile">{{
+                            $t('credit-card-invoice.import-excel')
+                        }}</v-btn>
+                        <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
+                    </v-col>
+                </v-row>
+                <v-row dense>
+                    <v-col md="12">
+                        <v-data-table
+                            :group-by="[{ key: 'group', order: 'asc' }]"
+                            :headers="headers"
+                            :items="invoice.expenses"
+                            :sort-by="[{ key: 'created_at', order: 'asc' }]"
+                            :search="search"
+                            :loading="isLoading"
+                            :loading-text="$t('default.loading-text-table')"
+                            class="elevation-3"
+                            density="compact"
+                            :total-items="invoice.expenses"
+                            :no-data-text="$t('default.no-data-text')"
+                            :no-results-text="$t('default.no-data-text')"
+                            :footer-props="{
+                                'items-per-page-text': $t('default.itens-per-page'),
+                                'page-text': $t('default.page-text'),
+                            }"
+                            :header-props="{
+                                sortByText: $t('default.sort-by'),
+                            }"
+                            fixed-header
+                        >
+                            <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
+                            <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
+                            <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
+                            <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
+                            <template #[`item.tags`]="{ item }">{{
+                                item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
+                            }}</template>
+                            <template #[`item.potion`]="{ item }">{{
+                                item.portion ? item.portion + '/' + item.portion_total : ''
+                            }}</template>
+                            <template #[`item.share_user_id`]="{ item }">{{
+                                item.share_user ? item.share_user.name : ''
+                            }}</template>
+                            <template #[`item.action`]="{ item }">
+                                <v-tooltip :text="$t('default.edit')" location="top">
+                                    <template #activator="{ props }">
+                                        <v-icon
+                                            v-bind="props"
+                                            color="warning"
+                                            icon="mdi-pencil"
+                                            size="small"
+                                            class="me-2"
+                                            @click="editItem(item)"
+                                        >
+                                        </v-icon>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip :text="$t('default.delete')" location="top">
+                                    <template #activator="{ props }">
+                                        <v-icon
+                                            v-bind="props"
+                                            class="ml-2"
+                                            color="error"
+                                            icon="mdi-delete"
+                                            size="small"
+                                            @click="openDelete(item)"
+                                        >
+                                        </v-icon>
+                                    </template>
+                                </v-tooltip>
+                            </template>
+
+                            <template #group-header="{ item, toggleGroup, isGroupOpen }">
+                                <tr>
+                                    <th class="title" style="width: auto">
+                                        <VBtn
+                                            size="small"
+                                            variant="text"
+                                            :icon="isGroupOpen(item) ? '$expand' : '$next'"
+                                            @click="toggleGroup(item)"
+                                        ></VBtn>
+                                        {{ convertGroup(item.value) }}
+                                    </th>
+                                    <th :colspan="2" class="title font-weight-bold text-right">Total</th>
+                                    <th class="title text-right">
+                                        {{ sumGroup(invoice.expenses, item.key, item.value, 'value') }}
+                                    </th>
+                                    <th class="title text-right">
+                                        {{ sumGroup(invoice.expenses, item.key, item.value, 'share_value') }}
+                                    </th>
+                                    <th :colspan="6"></th>
+                                </tr>
+                            </template>
+
+                            <template v-if="invoice.expenses.length" #tfoot>
+                                <tr class="green--text">
+                                    <th class="title"></th>
+                                    <th colspan="2" class="title font-weight-bold text-right">Total</th>
+                                    <th class="title text-right">{{ sumField(invoice.expenses, 'value') }}</th>
+                                    <th class="title text-right">{{ sumField(invoice.expenses, 'share_value') }}</th>
+                                </tr>
+                            </template>
+
+                            <template #top>
+                                <v-toolbar density="comfortable">
+                                    <v-row dense>
+                                        <v-col cols="12" lg="12" md="12" sm="12">
+                                            <v-text-field
+                                                v-model="search"
+                                                :label="$t('default.search')"
+                                                append-icon="mdi-magnify"
+                                                single-line
+                                                hide-details
+                                                clearable
+                                                @click:clear="search = null"
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-toolbar>
+                            </template>
+                        </v-data-table>
+                    </v-col>
+                </v-row>
+            </v-expansion-panel-text>
+        </v-expansion-panel>
+    </v-expansion-panels>
 
     <!-- Dados  -->
-    <v-card>
+    <!-- <v-card>
         <v-card-title class="bg-primary">
             <span class="text-h6">
                 {{ $t('credit-card-invoice-expense.title') }} {{ titleCard ? ' - ' + creditCardname : '' }}
             </span>
         </v-card-title>
-        <v-card-text>
-            <v-row>
-                <v-col md="12">
-                    <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-
-                    <v-btn color="info" class="ml-1" href="/storage/template/template-despesas.xlsx" download>{{
-                        $t('credit-card-invoice.download-template')
-                    }}</v-btn>
-                    <v-btn color="info" class="ml-1" @click="clickImportFile">{{
-                        $t('credit-card-invoice.import-excel')
-                    }}</v-btn>
-                    <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
-                </v-col>
-            </v-row>
-            <v-row dense>
-                <v-col md="12">
-                    <v-data-table
-                        :group-by="[{ key: 'group', order: 'asc' }]"
-                        :headers="headers"
-                        :items="invoice.expenses"
-                        :sort-by="[{ key: 'created_at', order: 'asc' }]"
-                        :search="search"
-                        :loading="isLoading"
-                        :loading-text="$t('default.loading-text-table')"
-                        class="elevation-3"
-                        density="compact"
-                        :total-items="invoice.expenses"
-                        :no-data-text="$t('default.no-data-text')"
-                        :no-results-text="$t('default.no-data-text')"
-                        :footer-props="{
-                            'items-per-page-text': $t('default.itens-per-page'),
-                            'page-text': $t('default.page-text'),
-                        }"
-                        :header-props="{
-                            sortByText: $t('default.sort-by'),
-                        }"
-                        fixed-header
-                    >
-                        <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                        <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                        <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
-                        <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
-                        <template #[`item.tags`]="{ item }">{{
-                            item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
-                        }}</template>
-                        <template #[`item.potion`]="{ item }">{{
-                            item.portion ? item.portion + '/' + item.portion_total : ''
-                        }}</template>
-                        <template #[`item.share_user_id`]="{ item }">{{
-                            item.share_user ? item.share_user.name : ''
-                        }}</template>
-                        <template #[`item.action`]="{ item }">
-                            <v-tooltip :text="$t('default.edit')" location="top">
-                                <template #activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        color="warning"
-                                        icon="mdi-pencil"
-                                        size="small"
-                                        class="me-2"
-                                        @click="editItem(item)"
-                                    >
-                                    </v-icon>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip :text="$t('default.delete')" location="top">
-                                <template #activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        class="ml-2"
-                                        color="error"
-                                        icon="mdi-delete"
-                                        size="small"
-                                        @click="openDelete(item)"
-                                    >
-                                    </v-icon>
-                                </template>
-                            </v-tooltip>
-                        </template>
-
-                        <template #group-header="{ item, toggleGroup, isGroupOpen }">
-                            <tr>
-                                <th class="title" style="width: auto">
-                                    <VBtn
-                                        size="small"
-                                        variant="text"
-                                        :icon="isGroupOpen(item) ? '$expand' : '$next'"
-                                        @click="toggleGroup(item)"
-                                    ></VBtn>
-                                    {{ convertGroup(item.value) }}
-                                </th>
-                                <th :colspan="2" class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">
-                                    {{ sumGroup(invoice.expenses, item.key, item.value, 'value') }}
-                                </th>
-                                <th class="title text-right">
-                                    {{ sumGroup(invoice.expenses, item.key, item.value, 'share_value') }}
-                                </th>
-                                <th :colspan="6"></th>
-                            </tr>
-                        </template>
-
-                        <template v-if="invoice.expenses.length" #tfoot>
-                            <tr class="green--text">
-                                <th class="title"></th>
-                                <th colspan="2" class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">{{ sumField(invoice.expenses, 'value') }}</th>
-                                <th class="title text-right">{{ sumField(invoice.expenses, 'share_value') }}</th>
-                            </tr>
-                        </template>
-
-                        <template #top>
-                            <v-toolbar density="comfortable">
-                                <v-row dense>
-                                    <v-col cols="12" lg="12" md="12" sm="12">
-                                        <v-text-field
-                                            v-model="search"
-                                            :label="$t('default.search')"
-                                            append-icon="mdi-magnify"
-                                            single-line
-                                            hide-details
-                                            clearable
-                                            @click:clear="search = null"
-                                        ></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-toolbar>
-                        </template>
-                    </v-data-table>
-                </v-col>
-            </v-row>
-        </v-card-text>
-    </v-card>
+        <v-card-text> </v-card-text>
+    </v-card> -->
 
     <!-- Dialog Criacao/Edicao -->
     <v-dialog v-model="editDialog" persistent :fullscreen="true" class="ma-4">
@@ -340,7 +347,7 @@
                         <v-col cols="12" md="12">
                             <v-autocomplete
                                 v-model="expense.tags"
-                                v-model:search="search_tag"
+                                v-model:search="searchTag"
                                 :label="$t('default.tags')"
                                 :items="itemsTags"
                                 :loading="loadingData"
@@ -611,7 +618,7 @@
                         <v-col cols="12" md="12">
                             <v-autocomplete
                                 v-model="division.tags"
-                                v-model:search="search_tag"
+                                v-model:search="searchTag"
                                 :label="$t('default.tags')"
                                 :items="itemsTags"
                                 :loading="loadingData"
@@ -688,6 +695,9 @@ export default {
         shareUsers: {
             type: Array,
         },
+        titleCard: {
+            type: Boolean,
+        },
     },
 
     data() {
@@ -755,11 +765,11 @@ export default {
                 },
             ],
             viewOnly: false,
-            titleCard: false,
             toast: null,
+            panel: this.titleCard ? 0 : null,
             search: null,
             timeOut: null,
-            search_tag: '',
+            searchTag: '',
             editDialog: false,
             editDivisionDialog: false,
             deleteDialog: false,
