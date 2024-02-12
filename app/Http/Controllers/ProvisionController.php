@@ -26,7 +26,6 @@ class ProvisionController extends Controller
         return Inertia::render('Provision/Index', $data);
     }
 
-
     /**
      * Cria um novo Provisionamento
      */

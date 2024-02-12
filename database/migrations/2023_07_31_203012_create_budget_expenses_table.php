@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('description')->comment('Descrição');
             $table->date('date')->comment('Data de Vencimento');
             $table->decimal('value');
-            $table->string('remarks');
+            $table->string('remarks')->nullable()->comment('Observacoes');;
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
             $table->boolean('paid')->default(false);
             $table->unsignedBigInteger('budget_id');

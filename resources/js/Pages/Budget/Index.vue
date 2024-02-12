@@ -6,116 +6,122 @@
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
 
-        <v-card class="pa-4">
-            <v-row dense>
-                <v-col cols="12" sm="12" md="2">
-                    <v-text-field
-                        ref="inputYear"
-                        :model-value="yearModel"
-                        :label="$t('default.year')"
-                        type="number"
-                        min="1970"
-                        max="2050"
-                        step="1"
-                        :rules="rules.textFieldRules"
-                        required
-                        density="comfortable"
-                        @change="changeYear"
-                    ></v-text-field>
-                </v-col>
-                <v-col md="10">
-                    <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-                </v-col>
-                <v-col md="12">
-                    <v-data-table
-                        :headers="headers"
-                        :items="budgets"
-                        :sort-by="[{ key: 'created_at', order: 'asc' }]"
-                        :search="search"
-                        :loading="isLoading"
-                        :loading-text="$t('default.loading-text-table')"
-                        class="elevation-3"
-                        density="compact"
-                        :total-items="budgets.length"
-                        :items-per-page="12"
-                        :no-data-text="$t('default.no-data-text')"
-                        :no-results-text="$t('default.no-data-text')"
-                        :footer-props="{
-                            'items-per-page-text': $t('default.itens-per-page'),
-                            'page-text': $t('default.page-text'),
-                        }"
-                        :header-props="{
-                            sortByText: $t('default.sort-by'),
-                        }"
-                        fixed-header
-                    >
-                        <template #[`item.total_expense`]="{ item }">{{ currencyField(item.total_expense) }}</template>
-                        <template #[`item.total_income`]="{ item }">{{ currencyField(item.total_income) }}</template>
-                        <template #[`item.closed`]="{ item }">{{
-                            item.closed ? $t('default.yes') : $t('default.no')
-                        }}</template>
-                        <template #[`item.action`]="{ item }">
-                            <v-tooltip :text="$t('default.show')" location="top">
-                                <template #activator="{ props }">
-                                    <Link :href="hrefBudgetShow(item)" class="v-breadcrumbs-item--link">
+        <v-card>
+            <v-card-text>
+                <v-row dense>
+                    <v-col cols="12" sm="12" md="2">
+                        <v-text-field
+                            ref="inputYear"
+                            :model-value="yearModel"
+                            :label="$t('default.year')"
+                            type="number"
+                            min="1970"
+                            max="2050"
+                            step="1"
+                            :rules="rules.textFieldRules"
+                            required
+                            density="comfortable"
+                            @change="changeYear"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col md="10">
+                        <v-btn color="primary" class="mt-2" @click="newItem">{{ $t('default.new') }}</v-btn>
+                    </v-col>
+                    <v-col md="12">
+                        <v-data-table
+                            :headers="headers"
+                            :items="budgets"
+                            :sort-by="[{ key: 'created_at', order: 'asc' }]"
+                            :search="search"
+                            :loading="isLoading"
+                            :loading-text="$t('default.loading-text-table')"
+                            class="elevation-3"
+                            density="compact"
+                            :total-items="budgets.length"
+                            :items-per-page="12"
+                            :no-data-text="$t('default.no-data-text')"
+                            :no-results-text="$t('default.no-data-text')"
+                            :footer-props="{
+                                'items-per-page-text': $t('default.itens-per-page'),
+                                'page-text': $t('default.page-text'),
+                            }"
+                            :header-props="{
+                                sortByText: $t('default.sort-by'),
+                            }"
+                            fixed-header
+                        >
+                            <template #[`item.total_expense`]="{ item }">{{
+                                currencyField(item.total_expense)
+                            }}</template>
+                            <template #[`item.total_income`]="{ item }">{{
+                                currencyField(item.total_income)
+                            }}</template>
+                            <template #[`item.closed`]="{ item }">{{
+                                item.closed ? $t('default.yes') : $t('default.no')
+                            }}</template>
+                            <template #[`item.action`]="{ item }">
+                                <v-tooltip :text="$t('default.show')" location="top">
+                                    <template #activator="{ props }">
+                                        <Link :href="hrefBudgetShow(item)" class="v-breadcrumbs-item--link">
+                                            <v-icon
+                                                v-bind="props"
+                                                color="light-blue"
+                                                icon="mdi-eye"
+                                                size="small"
+                                                class="me-2"
+                                            >
+                                            </v-icon>
+                                        </Link>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip :text="$t('budget.clone')" location="top">
+                                    <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
-                                            color="light-blue"
-                                            icon="mdi-eye"
+                                            color="green"
+                                            icon="mdi-content-copy"
                                             size="small"
-                                            class="me-2"
+                                            class="ml-1"
+                                            @click="cloneItem(item)"
                                         >
                                         </v-icon>
-                                    </Link>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip :text="$t('budget.clone')" location="top">
-                                <template #activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        color="green"
-                                        icon="mdi-content-copy"
-                                        size="small"
-                                        class="ml-1"
-                                        @click="cloneItem(item)"
-                                    >
-                                    </v-icon>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip :text="$t('default.delete')" location="top">
-                                <template #activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        class="ml-1"
-                                        color="error"
-                                        icon="mdi-delete"
-                                        size="small"
-                                        @click="openDelete(item)"
-                                    ></v-icon>
-                                </template>
-                            </v-tooltip>
-                        </template>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip :text="$t('default.delete')" location="top">
+                                    <template #activator="{ props }">
+                                        <v-icon
+                                            v-bind="props"
+                                            class="ml-1"
+                                            color="error"
+                                            icon="mdi-delete"
+                                            size="small"
+                                            @click="openDelete(item)"
+                                        ></v-icon>
+                                    </template>
+                                </v-tooltip>
+                            </template>
 
-                        <template #top>
-                            <v-toolbar density="comfortable">
-                                <v-row dense>
-                                    <v-col cols="12" lg="12" md="12" sm="12">
-                                        <v-text-field
-                                            v-model="search"
-                                            :label="$t('default.search')"
-                                            append-icon="mdi-magnify"
-                                            single-line
-                                            hide-details
-                                            clearable
-                                            @click:clear="search = null"
-                                        ></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-toolbar>
-                        </template>
-                    </v-data-table>
-                </v-col>
-            </v-row>
+                            <template #top>
+                                <v-toolbar density="comfortable">
+                                    <v-row dense>
+                                        <v-col cols="12" lg="12" md="12" sm="12">
+                                            <v-text-field
+                                                v-model="search"
+                                                :label="$t('default.search')"
+                                                append-icon="mdi-magnify"
+                                                single-line
+                                                hide-details
+                                                clearable
+                                                @click:clear="search = null"
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-toolbar>
+                            </template>
+                        </v-data-table>
+                    </v-col>
+                </v-row>
+            </v-card-text>
         </v-card>
 
         <!-- Dialog Criacao -->
@@ -283,7 +289,6 @@ export default {
             removeDialog: false,
             isLoading: false,
             deleteId: null,
-            // yearModel: null,
             createBudget: {
                 yearMonth: null,
                 automaticGenerateYear: false,
@@ -313,7 +318,7 @@ export default {
 
     methods: {
         hrefBudgetShow(item) {
-            return '/budget/' + item.id
+            return '/budget/show/' + item.id
         },
 
         changeYear(value) {

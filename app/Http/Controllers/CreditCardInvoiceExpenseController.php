@@ -18,7 +18,7 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
-     * Cria uma Despesa para uma fatura
+     * Cria uma Despesa para uma Fatura do cartão de credito
      */
     public function store(Request $request)
     {
@@ -54,7 +54,7 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
-     * Atualiza uma Despesa para uma fatura
+     * Atualiza uma Despesa para uma Fatura do cartão de credito
      */
     public function update(Request $request, int $id)
     {
@@ -106,30 +106,5 @@ class CreditCardInvoiceExpenseController extends Controller
     {
         $this->creditCardInvoiceExpenseService->deletePortions($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @param Request $request
-     * @return void
-     */
-    public function storeImportExcel(Request $request)
-    {
-        $this->validate($request, [
-            'invoice_id' => ['required'],
-            'data' => ['required'],
-        ]);
-
-        DB::beginTransaction();
-
-        // $this->creditCardInvoiceExpenseService->storeImportExcel(
-        //     $request->invoice_id,
-        //     $request->data
-        // );
-
-        DB::commit();
-
-        return redirect()->back()->with('success', 'default.sucess-save');
     }
 }

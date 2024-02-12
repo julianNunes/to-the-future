@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('group', ['PORTION', 'WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4']);
             $table->integer('portion')->nullable()->comment('Parcela atual');
             $table->integer('portion_total')->nullable()->comment('Total de Parcelas');
-            $table->string('remarks')->nullable();
+            $table->string('remarks')->nullable()->comment('Observacoes');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
             $table->unsignedBigInteger('invoice_id');
             $table->foreign('invoice_id')->references('id')->on('credit_card_invoices');

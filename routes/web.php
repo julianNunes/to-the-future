@@ -63,7 +63,7 @@ Route::controller(CreditCardInvoiceController::class)->group(function () {
     Route::get('/credit-card/{creditCardId}/invoice', 'index');
     Route::post('/credit-card/invoice', 'store');
     Route::delete('/credit-card/invoice/{id}', 'delete');
-    Route::get('/credit-card/{creditCardId}/invoice/{id}', 'show');
+    Route::get('/credit-card/invoice/{id}', 'show');
     Route::delete('/credit-card/invoice/{id}', 'delete');
     Route::post('/credit-card/invoice/download-template', 'downloadTemplate');
     Route::post('/credit-card/invoice/file', 'storeFile');
@@ -116,7 +116,8 @@ Route::controller(BudgetController::class)->group(function () {
     Route::put('/budget/{id}/clone', 'clone');
     Route::put('/budget/{id}', 'update');
     Route::delete('/budget/{id}', 'delete');
-    Route::get('/budget/show/{id}', 'show');
+    Route::get('/budget/find/{year}/{month}', 'findByYearMonth');
+    Route::get('/budget/show/{id}', 'show')->name('budget.show');
 });
 
 require __DIR__ . '/auth.php';

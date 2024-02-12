@@ -7,7 +7,7 @@
         </div>
 
         <!-- Dados do cartão de credito -->
-        <v-card class="mt-4">
+        <v-card>
             <v-card-title class="bg-primary">
                 <span class="text-h6">{{ $t('credit-card-invoice.credit-card-title') }}</span>
             </v-card-title>
@@ -62,88 +62,96 @@
             <v-card-title class="bg-primary">
                 <span class="text-h6">{{ $t('credit-card-invoice.title-invoices') }}</span>
             </v-card-title>
-            <v-row dense class="pa-4">
-                <v-col md="12">
-                    <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-                </v-col>
-                <v-col md="12">
-                    <v-data-table
-                        :headers="headers"
-                        :items="invoices"
-                        :sort-by="[{ key: 'due_date', order: 'desc' }]"
-                        :search="search"
-                        :loading="isLoading"
-                        :loading-text="$t('default.loading-text-table')"
-                        class="elevation-3"
-                        density="compact"
-                        :total-items="invoices.length"
-                        :no-data-text="$t('default.no-data-text')"
-                        :no-results-text="$t('default.no-data-text')"
-                        :footer-props="{
-                            'items-per-page-text': $t('default.itens-per-page'),
-                            'page-text': $t('default.page-text'),
-                        }"
-                        :header-props="{
-                            sortByText: $t('default.sort-by'),
-                        }"
-                        fixed-header
-                    >
-                        <template #[`item.closing_date`]="{ item }">{{
-                            moment(item.closing_date).format('DD/MM/YYYY')
-                        }}</template>
-                        <template #[`item.due_date`]="{ item }">{{
-                            moment(item.due_date).format('DD/MM/YYYY')
-                        }}</template>
-                        <template #[`item.total`]="{ item }">{{ currencyField(item.total) }}</template>
-                        <template #[`item.total_paid`]="{ item }">{{ currencyField(item.total_paid) }}</template>
-                        <template #[`item.closed`]="{ item }">{{
-                            item.closed ? $t('default.yes') : $t('default.no')
-                        }}</template>
+            <v-card-text class="pa-4">
+                <v-row dense>
+                    <v-col md="12">
+                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
+                    </v-col>
+                    <v-col md="12">
+                        <v-data-table
+                            :headers="headers"
+                            :items="invoices"
+                            :sort-by="[{ key: 'due_date', order: 'desc' }]"
+                            :search="search"
+                            :loading="isLoading"
+                            :loading-text="$t('default.loading-text-table')"
+                            class="elevation-3"
+                            density="compact"
+                            :total-items="invoices.length"
+                            :no-data-text="$t('default.no-data-text')"
+                            :no-results-text="$t('default.no-data-text')"
+                            :footer-props="{
+                                'items-per-page-text': $t('default.itens-per-page'),
+                                'page-text': $t('default.page-text'),
+                            }"
+                            :header-props="{
+                                sortByText: $t('default.sort-by'),
+                            }"
+                            fixed-header
+                        >
+                            <template #[`item.closing_date`]="{ item }">{{
+                                moment(item.closing_date).format('DD/MM/YYYY')
+                            }}</template>
+                            <template #[`item.due_date`]="{ item }">{{
+                                moment(item.due_date).format('DD/MM/YYYY')
+                            }}</template>
+                            <template #[`item.total`]="{ item }">{{ currencyField(item.total) }}</template>
+                            <template #[`item.total_paid`]="{ item }">{{ currencyField(item.total_paid) }}</template>
+                            <template #[`item.closed`]="{ item }">{{
+                                item.closed ? $t('default.yes') : $t('default.no')
+                            }}</template>
 
-                        <template #[`item.action`]="{ item }">
-                            <v-tooltip :text="$t('default.show')" location="top">
-                                <template #activator="{ props }">
-                                    <Link :href="hrefInvoiceShow(item)" class="v-breadcrumbs-item--link">
-                                        <v-icon v-bind="props" color="warning" icon="mdi-eye" size="small" class="me-2">
+                            <template #[`item.action`]="{ item }">
+                                <v-tooltip :text="$t('default.show')" location="top">
+                                    <template #activator="{ props }">
+                                        <Link :href="hrefInvoiceShow(item)" class="v-breadcrumbs-item--link">
+                                            <v-icon
+                                                v-bind="props"
+                                                color="warning"
+                                                icon="mdi-eye"
+                                                size="small"
+                                                class="me-2"
+                                            >
+                                            </v-icon>
+                                        </Link>
+                                    </template>
+                                </v-tooltip>
+                                <v-tooltip :text="$t('default.delete')" location="top">
+                                    <template #activator="{ props }">
+                                        <v-icon
+                                            v-bind="props"
+                                            class="ml-1"
+                                            color="error"
+                                            icon="mdi-delete"
+                                            size="small"
+                                            @click="openDelete(item)"
+                                        >
                                         </v-icon>
-                                    </Link>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip :text="$t('default.delete')" location="top">
-                                <template #activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        class="ml-1"
-                                        color="error"
-                                        icon="mdi-delete"
-                                        size="small"
-                                        @click="openDelete(item)"
-                                    >
-                                    </v-icon>
-                                </template>
-                            </v-tooltip>
-                        </template>
+                                    </template>
+                                </v-tooltip>
+                            </template>
 
-                        <template #top>
-                            <v-toolbar density="comfortable">
-                                <v-row dense>
-                                    <v-col cols="12" lg="12" md="12" sm="12">
-                                        <v-text-field
-                                            v-model="search"
-                                            :label="$t('default.search')"
-                                            append-icon="mdi-magnify"
-                                            single-line
-                                            hide-details
-                                            clearable
-                                            @click:clear="search = null"
-                                        ></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-toolbar>
-                        </template>
-                    </v-data-table>
-                </v-col>
-            </v-row>
+                            <template #top>
+                                <v-toolbar density="comfortable">
+                                    <v-row dense>
+                                        <v-col cols="12" lg="12" md="12" sm="12">
+                                            <v-text-field
+                                                v-model="search"
+                                                :label="$t('default.search')"
+                                                append-icon="mdi-magnify"
+                                                single-line
+                                                hide-details
+                                                clearable
+                                                @click:clear="search = null"
+                                            ></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-toolbar>
+                            </template>
+                        </v-data-table>
+                    </v-col>
+                </v-row>
+            </v-card-text>
         </v-card>
 
         <!-- Dialog Criacao/Edicao -->
@@ -218,7 +226,7 @@ import moment from 'moment'
 import { currencyField, MONTHS } from '../../utils/utils.js'
 
 export default {
-    name: 'ProvisionIndex',
+    name: 'CreditCardInvoiceIndex',
     props: {
         creditCard: {
             type: Object,
@@ -295,7 +303,7 @@ export default {
 
     methods: {
         hrefInvoiceShow(item) {
-            return '/credit-card/' + item.credit_card_id + '/invoice/' + item.id
+            return '/credit-card/invoice/' + item.id
         },
 
         newItem() {

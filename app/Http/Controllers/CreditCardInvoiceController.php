@@ -28,11 +28,9 @@ class CreditCardInvoiceController extends Controller
         return Inertia::render('CreditCardInvoice/Index', $data);
     }
 
-
     /**
      * Cria uma nova Fatura
      * @param Request $request
-     * @param integer $creditCardId
      * @return void
      */
     public function store(Request $request)
@@ -59,7 +57,6 @@ class CreditCardInvoiceController extends Controller
 
     /**
      * Deleta uma Fatura
-     * @param integer $creditCardId
      * @param integer $id
      * @return void
      */
@@ -70,7 +67,7 @@ class CreditCardInvoiceController extends Controller
     }
 
     /**
-     *
+     * Mostrar os dados de uma fatura
      * @param integer $creditCardId
      * @param integer $id
      * @return void

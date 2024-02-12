@@ -184,5 +184,14 @@
         "include-provision": "Incluir Provisionamento?",
         "total-expense": "Total Despesas",
         "total-income": "Total Receitas"
+    },
+    "budget-show" : {
+        "title": "Visualização Orçamento",
+        "my-budget": "Meu Orçamento",
+        "include-fix-expense": "Incluir Despesas Fixas",
+        "include-provision": "Incluir Provisionamento"
+    },
+    "budget-expense": {
+        "title": "Despesas"
     }
 }

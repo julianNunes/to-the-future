@@ -1,17 +1,14 @@
 <template>
-    <Head title="Provision" />
-    <AuthenticatedLayout>
-        <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('fix-expense.title') }}</h5>
-            <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
-        </div>
-
-        <!-- Tabela com dados -->
-        <v-card>
-            <v-card-text>
+    <!-- Tabela com dados -->
+    <v-expansion-panels v-model="panel" class="mt-2">
+        <v-expansion-panel>
+            <v-expansion-panel-title class="bg-primary">
+                <span class="text-h6">{{ $t('budget-expense.title') }}</span>
+            </v-expansion-panel-title>
+            <v-expansion-panel-text class="pa-2">
                 <v-row dense>
                     <v-col md="12">
-                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
+                        <v-btn color="primary" :disabled="viewOnly" @click="newItem">{{ $t('default.new') }}</v-btn>
                     </v-col>
                     <v-col md="12">
                         <v-data-table
@@ -35,6 +32,7 @@
                             }"
                             fixed-header
                         >
+                            <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                             <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
                             <template #[`item.tags`]="{ item }">{{
@@ -51,6 +49,7 @@
                                             color="warning"
                                             icon="mdi-pencil"
                                             size="small"
+                                            :disabled="viewOnly"
                                             @click="editItem(item)"
                                         >
                                         </v-icon>
@@ -64,6 +63,7 @@
                                             color="error"
                                             icon="mdi-delete"
                                             size="small"
+                                            :disabled="viewOnly"
                                             @click="openDelete(item)"
                                         >
                                         </v-icon>
@@ -100,186 +100,181 @@
                         </v-data-table>
                     </v-col>
                 </v-row>
-            </v-card-text>
-        </v-card>
+            </v-expansion-panel-text>
+        </v-expansion-panel>
+    </v-expansion-panels>
 
-        <!-- Dialog Criacao/Edicao -->
-        <v-dialog v-model="editDialog" persistent width="800">
+    <!-- Dialog Criacao/Edicao -->
+    <v-dialog v-model="editDialog" persistent width="800">
+        <v-card>
+            <v-card-title>
+                <span class="text-h5">{{ titleModal }}</span>
+            </v-card-title>
+            <v-card-text>
+                <v-form ref="form" @submit.prevent>
+                    <v-row dense>
+                        <v-col cols="12" sm="12" md="12">
+                            <v-text-field
+                                ref="txtDescription"
+                                v-model="expense.description"
+                                :label="$t('default.description')"
+                                :rules="rules.textFieldRules"
+                                required
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                                v-model="expense.value"
+                                type="number"
+                                :label="$t('default.value')"
+                                min="0"
+                                required
+                                :rules="rules.currencyFieldRules"
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                            <v-select
+                                v-model="expense.due_date"
+                                :label="$t('fix-expense.due-date')"
+                                :items="dueDateList"
+                                clearable
+                                :rules="rules.textFieldRules"
+                                density="comfortable"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                                v-model="expense.share_value"
+                                :label="$t('default.share-value')"
+                                type="number"
+                                min="0"
+                                :rules="[
+                                    (value) => {
+                                        if (expense.share_user_id) {
+                                            if (!value) return $t('rules.required-text-field')
+                                            if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
+                                        }
+                                        return true
+                                    },
+                                ]"
+                                density="comfortable"
+                            />
+                        </v-col>
+                        <v-col cols="12" sm="6" md="8">
+                            <v-select
+                                v-model="expense.share_user_id"
+                                :label="$t('default.share-user')"
+                                :items="shareUsers"
+                                item-title="share_user_name"
+                                item-value="share_user_id"
+                                clearable
+                                :rules="[
+                                    (value) => {
+                                        if (expense.share_value && parseFloat(expense.share_value) > 0) {
+                                            if (!value) return $t('rules.required-text-field')
+                                        }
+                                        return true
+                                    },
+                                ]"
+                                density="comfortable"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" md="12">
+                            <v-text-field
+                                v-model="expense.remarks"
+                                :label="$t('default.remarks')"
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="12">
+                            <v-autocomplete
+                                v-model="expense.tags"
+                                v-model:search="search_tag"
+                                :label="$t('default.tags')"
+                                :items="itemsTags"
+                                :loading="loadingData"
+                                item-title="name"
+                                item-value="name"
+                                clearable
+                                multiple
+                                chips
+                                :closable-chips="true"
+                                :clear-on-select="true"
+                                return-object
+                                hide-no-data
+                                hide-selected
+                                placeholder="Start typing to Search"
+                                prepend-icon="mdi-database-search"
+                                @update:search="searchTags"
+                            ></v-autocomplete>
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
+                    {{ $t('default.cancel') }}
+                </v-btn>
+                <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
+                    {{ $t('default.save') }}
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <!-- Dialog delete -->
+    <v-row v-if="removeDialog" justify="center">
+        <v-dialog v-model="removeDialog" persistent width="auto">
             <v-card>
-                <v-card-title>
-                    <span class="text-h5">{{ titleModal }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-form ref="form" @submit.prevent>
-                        <v-row dense>
-                            <v-col cols="12" sm="12" md="12">
-                                <v-text-field
-                                    ref="txtDescription"
-                                    v-model="expense.description"
-                                    :label="$t('default.description')"
-                                    :rules="rules.textFieldRules"
-                                    required
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-text-field
-                                    v-model="expense.value"
-                                    type="number"
-                                    :label="$t('default.value')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-select
-                                    v-model="expense.due_date"
-                                    :label="$t('fix-expense.due-date')"
-                                    :items="dueDateList"
-                                    clearable
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-text-field
-                                    v-model="expense.share_value"
-                                    :label="$t('default.share-value')"
-                                    type="number"
-                                    min="0"
-                                    :rules="[
-                                        (value) => {
-                                            if (expense.share_user_id) {
-                                                if (!value) return $t('rules.required-text-field')
-                                                if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
-                                            }
-                                            return true
-                                        },
-                                    ]"
-                                    density="comfortable"
-                                />
-                            </v-col>
-                            <v-col cols="12" sm="6" md="8">
-                                <v-select
-                                    v-model="expense.share_user_id"
-                                    :label="$t('default.share-user')"
-                                    :items="shareUsers"
-                                    item-title="share_user_name"
-                                    item-value="share_user_id"
-                                    clearable
-                                    :rules="[
-                                        (value) => {
-                                            if (expense.share_value && parseFloat(expense.share_value) > 0) {
-                                                if (!value) return $t('rules.required-text-field')
-                                            }
-                                            return true
-                                        },
-                                    ]"
-                                    density="comfortable"
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="12" md="12">
-                                <v-text-field
-                                    v-model="expense.remarks"
-                                    :label="$t('default.remarks')"
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="12">
-                                <v-autocomplete
-                                    v-model="expense.tags"
-                                    v-model:search="search_tag"
-                                    :label="$t('default.tags')"
-                                    :items="itemsTags"
-                                    :loading="loadingData"
-                                    item-title="name"
-                                    item-value="name"
-                                    clearable
-                                    multiple
-                                    chips
-                                    :closable-chips="true"
-                                    :clear-on-select="true"
-                                    return-object
-                                    hide-no-data
-                                    hide-selected
-                                    placeholder="Start typing to Search"
-                                    prepend-icon="mdi-database-search"
-                                    @update:search="searchTags"
-                                ></v-autocomplete>
-                            </v-col>
-                        </v-row>
-                    </v-form>
-                </v-card-text>
+                <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
-                        {{ $t('default.cancel') }}
-                    </v-btn>
-                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
-                        {{ $t('default.save') }}
-                    </v-btn>
+                    <v-spacer />
+                    <v-btn color="error" elevated :loading="isLoading" @click="removeDialog = false">
+                        {{ $t('default.cancel') }}</v-btn
+                    >
+                    <v-btn color="primary" elevated :loading="isLoading" text @click="remove()">
+                        {{ $t('default.delete') }}</v-btn
+                    >
                 </v-card-actions>
             </v-card>
         </v-dialog>
-
-        <!-- Dialog delete -->
-        <v-row justify="center">
-            <v-dialog v-model="removeDialog" persistent width="auto">
-                <v-card>
-                    <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
-                    <v-card-actions>
-                        <v-spacer />
-                        <v-btn color="error" elevated :loading="isLoading" @click="removeDialog = false">
-                            {{ $t('default.cancel') }}</v-btn
-                        >
-                        <v-btn color="primary" elevated :loading="isLoading" text @click="remove()">
-                            {{ $t('default.delete') }}</v-btn
-                        >
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-        </v-row>
-    </AuthenticatedLayout>
+    </v-row>
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head } from '@inertiajs/vue3'
-import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import moment from 'moment'
+import { sumField, currencyField } from '../../utils/utils.js'
 </script>
 
 <script>
-import { sumField, currencyField } from '../../utils/utils.js'
-
 export default {
-    name: 'FixExpenseIndex',
+    name: 'BudgetExpense',
     props: {
         expenses: {
             type: Array,
         },
+        budgetId: {
+            type: Number,
+        },
         shareUsers: {
             type: Array,
+        },
+        installments: {
+            type: Array,
+        },
+        viewOnly: {
+            type: Boolean,
         },
     },
 
     data() {
         return {
-            breadcrumbs: [
-                {
-                    title: this.$t('menus.dashboard'),
-                    disabled: false,
-                    href: '/dashboard',
-                },
-                {
-                    title: this.$t('menus.fix-expense'),
-                    disabled: true,
-                },
-            ],
             headers: [
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('fix-expense.due-date'), align: 'center', key: 'due_date' },
+                { title: this.$t('fix-expense.due-date'), align: 'center', key: 'date' },
                 { title: this.$t('default.value'), align: 'end', key: 'value' },
                 { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
@@ -304,6 +299,7 @@ export default {
             isLoading: false,
             deleteId: null,
             modalEntryDateStart: false,
+            panel: 0,
             expense: {
                 id: null,
                 description: null,
@@ -410,7 +406,7 @@ export default {
         },
 
         newItem() {
-            this.titleModal = this.$t('fix-expense.new-item')
+            this.titleModal = this.$t('budget-expense.new-item')
             this.editDialog = true
             this.expense = {
                 id: null,
@@ -421,6 +417,7 @@ export default {
                 share_value: 0,
                 share_user_id: null,
                 tags: [],
+                budget_id: this.budgetId,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -428,7 +425,7 @@ export default {
         },
 
         editItem(item) {
-            this.titleModal = this.$t('fix-expense.edit-item')
+            this.titleModal = this.$t('budget-expense.edit-item')
             this.editDialog = true
             this.expense = {
                 id: item.id,
@@ -439,6 +436,7 @@ export default {
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
                 tags: item.tags,
+                budget_id: item.budget_id,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -463,7 +461,7 @@ export default {
         async create() {
             this.isLoading = true
             this.$inertia.post(
-                '/fix-expense',
+                '/budget-expense',
                 {
                     description: this.expense.description,
                     value: this.expense.value,
@@ -487,7 +485,7 @@ export default {
         async update() {
             this.isLoading = true
             this.$inertia.put(
-                '/fix-expense/' + this.expense.id,
+                '/budget-expense/' + this.expense.id,
                 {
                     description: this.expense.description,
                     value: this.expense.value,
@@ -515,7 +513,7 @@ export default {
 
         remove() {
             this.isLoading = true
-            this.$inertia.delete(`/fix-expense/${this.deleteId}`, {
+            this.$inertia.delete(`/budget-expense/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {

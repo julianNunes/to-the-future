@@ -18,7 +18,7 @@ class FinancingInstallmentController extends Controller
     }
 
     /**
-     * Retorna os dados para o index de Financiamento
+     * Retorna os dados para o index das Parcelas do Financiamento
      */
     public function index(int $financingId)
     {

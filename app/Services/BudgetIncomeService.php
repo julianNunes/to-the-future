@@ -20,8 +20,6 @@ class BudgetIncomeService
      * @param float $value
      * @param string $remarks
      * @param integer $budgetId
-     * @param float|null $shareValue
-     * @param integer|null $shareUserId
      * @param Collection|null $tags
      * @return BudgetIncome
      */
@@ -31,8 +29,6 @@ class BudgetIncomeService
         float $value,
         string $remarks,
         int $budgetId,
-        float $shareValue = null,
-        int $shareUserId = null,
         Collection $tags = null
     ): BudgetIncome {
         $income = BudgetIncome::create([
@@ -40,8 +36,6 @@ class BudgetIncomeService
             'date' => $date,
             'value' => $value,
             'remarks' => $remarks,
-            'share_value' => $shareValue,
-            'share_user_id' => $shareUserId,
             'budget_id' => $budgetId
         ]);
 
@@ -58,8 +52,6 @@ class BudgetIncomeService
      * @param string $date
      * @param float $value
      * @param string $remarks
-     * @param float|null $shareValue
-     * @param integer|null $shareUserId
      * @param Collection|null $tags
      * @return boolean
      */
@@ -69,8 +61,6 @@ class BudgetIncomeService
         string $date,
         float $value,
         string $remarks,
-        float $shareValue = null,
-        int $shareUserId = null,
         Collection $tags = null
     ): bool {
         $income = BudgetIncome::with('tags')->find($id);
@@ -87,8 +77,6 @@ class BudgetIncomeService
             'date' => $date,
             'value' => $value,
             'remarks' => $remarks,
-            'share_value' => $shareValue,
-            'share_user_id' => $shareUserId,
         ]);
     }
 

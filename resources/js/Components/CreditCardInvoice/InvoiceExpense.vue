@@ -1,6 +1,6 @@
 <template>
     <!-- Dados do cartão -->
-    <v-expansion-panels v-model="panel" :readonly="titleCard ? true : false">
+    <v-expansion-panels v-model="panel" :readonly="!titleCard">
         <v-expansion-panel>
             <v-expansion-panel-title class="bg-primary">
                 <template #default="{ expanded }">
@@ -13,7 +13,7 @@
                 </template>
             </v-expansion-panel-title>
 
-            <v-expansion-panel-text class="pt-4">
+            <v-expansion-panel-text class="pa-4">
                 <v-row dense>
                     <v-col cols="12" sm="12" md="2">
                         <v-text-field
@@ -74,11 +74,17 @@
                 </v-row> -->
                 <v-row dense>
                     <v-col md="12">
-                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-                        <v-btn color="info" class="ml-1" href="/storage/template/template-despesas.xlsx" download>{{
-                            $t('credit-card-invoice.download-template')
-                        }}</v-btn>
-                        <v-btn color="info" class="ml-1" @click="clickImportFile">{{
+                        <v-btn color="primary" :disabled="viewOnly" @click="newItem">{{ $t('default.new') }}</v-btn>
+                        <v-btn
+                            color="info"
+                            class="ml-1"
+                            href="/storage/template/template-despesas.xlsx"
+                            download
+                            :disabled="viewOnly"
+                        >
+                            {{ $t('credit-card-invoice.download-template') }}
+                        </v-btn>
+                        <v-btn color="info" class="ml-1" :disabled="viewOnly" @click="clickImportFile">{{
                             $t('credit-card-invoice.import-excel')
                         }}</v-btn>
                         <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
@@ -130,6 +136,7 @@
                                             icon="mdi-pencil"
                                             size="small"
                                             class="me-2"
+                                            :disabled="viewOnly"
                                             @click="editItem(item)"
                                         >
                                         </v-icon>
@@ -143,6 +150,7 @@
                                             color="error"
                                             icon="mdi-delete"
                                             size="small"
+                                            :disabled="viewOnly"
                                             @click="openDelete(item)"
                                         >
                                         </v-icon>
@@ -204,16 +212,6 @@
             </v-expansion-panel-text>
         </v-expansion-panel>
     </v-expansion-panels>
-
-    <!-- Dados  -->
-    <!-- <v-card>
-        <v-card-title class="bg-primary">
-            <span class="text-h6">
-                {{ $t('credit-card-invoice-expense.title') }} {{ titleCard ? ' - ' + creditCardname : '' }}
-            </span>
-        </v-card-title>
-        <v-card-text> </v-card-text>
-    </v-card> -->
 
     <!-- Dialog Criacao/Edicao -->
     <v-dialog v-model="editDialog" persistent :fullscreen="true" class="ma-4">
@@ -695,8 +693,16 @@ export default {
         shareUsers: {
             type: Array,
         },
+        installments: {
+            type: Array,
+        },
         titleCard: {
             type: Boolean,
+            default: false,
+        },
+        viewOnly: {
+            type: Boolean,
+            default: false,
         },
     },
 
@@ -764,9 +770,8 @@ export default {
                     value: 'WEEK_4',
                 },
             ],
-            viewOnly: false,
             toast: null,
-            panel: this.titleCard ? 0 : null,
+            panel: this.titleCard ? 1 : 0,
             search: null,
             timeOut: null,
             searchTag: '',

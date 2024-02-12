@@ -44,9 +44,9 @@ class FinancingService
         float $total,
         float $feesMonthly,
         int $portionTotal,
-        string $remarks,
         string $startDateInstallment,
-        float $valueInstallment
+        float $valueInstallment,
+        string $remarks = null
     ): Financing {
         $financing = new Financing([
             'description' => $description,
@@ -95,8 +95,8 @@ class FinancingService
         string $startDate,
         float $total,
         float $feesMonthly,
-        string $remarks,
-        float $valueInstallment = null
+        float $valueInstallment = null,
+        string $remarks = null
     ): bool {
         $financing = Financing::with('installments')->find($id);
 

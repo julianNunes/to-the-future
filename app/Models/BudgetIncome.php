@@ -19,19 +19,12 @@ class BudgetIncome extends Model
         'date',
         'value',
         'remarks',
-        'share_value',
-        'share_user_id',
         'budget_id',
     ];
 
     public function budget(): BelongsTo
     {
         return $this->belongsTo(Budget::class, 'budget_id', 'id');
-    }
-
-    public function shareUser(): HasOne
-    {
-        return $this->hasOne(User::class, 'id', 'share_user_id');
     }
 
     public function tags(): MorphToMany

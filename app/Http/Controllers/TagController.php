@@ -69,7 +69,7 @@ class TagController extends Controller
     }
 
     /**
-     * Busca por nome de tags
+     * Busca por nome das Tags. Utilizado no componente "v-auto-complete"
      */
     public function search(Request $request, string $name)
     {

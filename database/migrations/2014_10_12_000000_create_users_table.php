@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('email_verified_at')->nullable()->comment('Observacoes');
             $table->string('password');
-            $table->string('phone')->nullable();
-            $table->string('gender')->nullable();
-            $table->string('address')->nullable();
+            $table->string('phone')->nullable()->comment('Observacoes');
+            $table->string('gender')->nullable()->comment('Observacoes');
+            $table->string('address')->nullable()->comment('Observacoes');
             $table->rememberToken();
             $table->timestamps();
             $table->engine = 'InnoDB';

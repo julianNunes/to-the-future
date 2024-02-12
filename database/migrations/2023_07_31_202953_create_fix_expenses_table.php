@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('description')->comment('Descrição');
             $table->char('due_date', 2)->comment('Dia de Vencimento');
             $table->decimal('value');
-            $table->string('remarks')->nullable();
+            $table->string('remarks')->nullable()->comment('Observacoes');
             $table->decimal('share_value')->nullable()->comment('Valor Total compartilhado');
             $table->unsignedBigInteger('share_user_id')->nullable()->comment('Id do usuario que sera compartilhado o gasto');
             $table->foreign('share_user_id')->references('id')->on('users');

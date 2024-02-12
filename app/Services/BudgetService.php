@@ -8,6 +8,7 @@ use App\Models\BudgetGoal;
 use App\Models\BudgetIncome;
 use App\Models\BudgetProvision;
 use App\Models\CreditCardInvoice;
+use App\Models\FinancingInstallment;
 use App\Models\FixExpense;
 use App\Models\Provision;
 use App\Models\ShareUser;
@@ -303,8 +304,6 @@ class BudgetService
                     $income->value,
                     $income->remarks,
                     $new_budget->id,
-                    $income->share_value,
-                    $income->share_user_id,
                     $income->tags
                 );
             }
@@ -510,22 +509,69 @@ class BudgetService
         ]);
     }
 
+
+    /**
+     * Undocumented function
+     *
+     * @param string $year
+     * @param string $month
+     * @return Budget
+     */
+    public function findByYearMonth(string $year, string $month): Budget
+    {
+        $budget = Budget::where(['user_id' => auth()->user()->id, 'year' => $year, 'month' => $month])->first();
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        return $budget;
+    }
+
     public function show(int $id)
     {
         // Busca o budget do id
         // com despesas, receitas e provisionamento
         $budget = Budget::with([
-            'expenses.tags',
+            'expenses' => [
+                'tags',
+                'shareUser',
+                'financingInstallment'
+            ],
             'incomes.tags',
             'provisions.tags',
+            'goals.tags',
         ])->find($id);
 
         if (!$budget) {
-            throw new Exception('credit-card.not-found');
+            throw new Exception('budget.not-found');
         }
 
+        // Busca as parcelas de Financiamento em aberto para mostrar no select em tela
+
+        $installments = FinancingInstallment::with([
+            'financing' => function (Builder $query) {
+                $query->where('paid', false);
+            }
+        ])
+            ->whereHas('financing', function (Builder $query) use ($budget) {
+                $query->where('user_id', $budget->user_id)->addSelect(['id', 'description']);
+            })
+            ->get();
+
         // Busca as faturas dos cartões
-        $credit_card_invoices = CreditCardInvoice::with(['expenses.tags'])
+        $credit_card_invoices = CreditCardInvoice::with([
+            'creditCard',
+            'file',
+            'expenses' => [
+                'tags',
+                'shareUser',
+                'divisions' => [
+                    'tags',
+                    'shareUser'
+                ]
+            ]
+        ])
             ->where(['year' => $budget->year, 'month' => $budget->month])
             ->whereHas('creditCard', function (Builder $query) use ($budget) {
                 $query->where('user_id', $budget->user_id);
@@ -533,6 +579,149 @@ class BudgetService
             ->get();
 
         // busca share user
-        $share_user = ShareUser::where('user_id', $budget->user_id)->with('shareUser')->first();
+        $share_users = ShareUser::where('user_id', $budget->user_id)->with('shareUser')->get();
+        $share_user = null;
+
+        if ($share_users && $share_users->count()) {
+            $share_user = $share_users->first();
+        }
+
+        $budget_share = null;
+        $credit_card_invoices_share = null;
+
+        if ($share_user) {
+            // Busca orçamento com usuario compartilhado
+            $budget_share = Budget::with([
+                'expenses.tags',
+                'incomes.tags',
+                'provisions.tags',
+                'goals.tags',
+            ])
+                ->where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user->share_user_id])
+                ->first();
+
+            $credit_card_invoices_share = CreditCardInvoice::with([
+                'creditCard',
+                'file',
+                'expenses' => [
+                    'tags',
+                    'shareUser',
+                    'divisions' => [
+                        'tags',
+                        'shareUser'
+                    ]
+                ]
+            ])
+                ->where(['year' => $budget->year, 'month' => $budget->month])
+                ->whereHas('creditCard', function (Builder $query) use ($share_user) {
+                    $query->where('user_id', $share_user->share_user_id);
+                })
+                ->get();
+        }
+
+        /**
+         * @todo Montar as Metas e dados para o grafico
+         */
+
+        /**
+         * @todo Painel de Despesas
+         */
+        //  - Painel de Despesas (COLUNA 12)
+        //  - Na tabela de despesas ter o botão "+" para expandir a linha quando a despesa for uma parcela do financiamento
+        //  - Lançamento de Despesa
+        //      - Se existe "user_share_id" e valor a compartilhar:
+        //          - Gero um registro virtual na minha receite
+        //          - gero um registr virtual na despesa do compartilhado
+        //          - Painel de Receitas (COLUNA 6)
+
+        if (!$budget->expenses) {
+            $budget->expenses = collect();
+        }
+
+        // Gera os totalizadores dos cartões de credito para Despesas
+        if ($credit_card_invoices && $credit_card_invoices->count()) {
+            foreach ($credit_card_invoices as $invoice) {
+                $budget->expenses->push([
+                    'id' => null,
+                    'description' => 'Total ' . $invoice->creditCard->name,
+                    'date' => $invoice->due_date,
+                    'value' => $invoice->expenses->sum('value'),
+                    'remarks' => '',
+                    'paid' => $invoice->total_paid ? true : false,
+                    'share_value' => $invoice->expenses->sum('share_value'),
+                    'share_user_id' => $share_user ? $share_user->share_user_id : null,
+                    'tags' => []
+                ]);
+            }
+        }
+
+        // Verifica os valores compartilhados com usuario logado
+        // Verifica os valores das despesas do Orcamento do usuario compartilhado
+        if ($budget_share && $budget_share->expenses && $budget_share->expenses->count() && $budget_share->expenses->whereNotNull('share_user_id')->count()) {
+            $filtered = $budget_share->expenses->whereNotNull('share_user_id');
+
+            foreach ($filtered as $expense) {
+                $budget->expenses->push([
+                    'id' => null,
+                    'description' => $expense->description,
+                    'date' => $expense->date,
+                    'value' => $expense->share_value,
+                    'remarks' => 'budget.share-expense',
+                    'paid' => $expense->paid,
+                    'share_value' => null,
+                    'share_user_id' => null,
+                    'tags' => []
+                ]);
+            }
+        }
+
+        // Verifica as faturas do cartao de credito do usuario compartilhado
+        if ($credit_card_invoices_share && $credit_card_invoices_share->count()) {
+            foreach ($credit_card_invoices_share as $invoice) {
+                $filtered = $invoice->expenses->filter(function ($expense) {
+                    return $expense->share_user_id || ($expense->divisions && $expense->divisions->count() && $expense->divisions->whereNotNull('share_user_id')->count());
+                });
+
+                foreach ($filtered as $expense) {
+                    $budget->expenses->push([
+                        'id' => null,
+                        'description' => 'Total ' . $invoice->creditCard->name,
+                        'date' => $invoice->due_date,
+                        'value' => $invoice->expenses->sum('value'),
+                        'remarks' => 'budget.share-expense',
+                        'paid' => $invoice->total_paid ? true : false,
+                        'share_value' => $invoice->expenses->sum('share_value'),
+                        'share_user_id' => $share_user ? $share_user->share_user_id : null,
+                        'tags' => []
+                    ]);
+                }
+            }
+        }
+
+        // Montar as Receitas
+
+        // - Painel de Resumo dos Cartões (COLUNA 6)
+        //     - Parcelados
+        //     - Provisionamento
+        //     - Semana 1, 2, 3, 4
+
+        // - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
+        //      - Somar o valor que devo pagar para o "share_user_id"
+        //      - Somar o valor a receber do "share_user_id"
+
+        // - Expanse-painel com o componente de Cartões
+        //     - Foreach com todos os dados
+        //     - AJUSTE DO TITULO com nome do cartão
+
+
+        // - Expanse-painel com o componente para Provisionamento
+
+        return [
+            'budget' => $budget,
+            'budgetShare' => $budget_share,
+            'shareUser' => $share_user->shareUser,
+            'shareUsers' => $installments,
+            'installments' => $installments,
+        ];
     }
 }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('description')->comment('Descrição');
             $table->decimal('value')->comment('Valor da meta');
-            $table->enum('group', ['PORTION', 'MONTHLY', 'WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4'])->nullable();
+            $table->enum('group', ['PORTION', 'MONTHLY', 'WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4'])->nullable()->comment('Observacoes');
             $table->boolean('count_only_share')->default(false);
             $table->unsignedBigInteger('budget_id');
             $table->foreign('budget_id')->references('id')->on('budgets');

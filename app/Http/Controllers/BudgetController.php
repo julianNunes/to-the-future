@@ -99,13 +99,26 @@ class BudgetController extends Controller
     }
 
     /**
-     * Atualiza um Orçamento
+     * Mostra um Orçamento
+     */
+    public function findByYearMonth(string $year, string $month)
+    {
+        $budget = $this->budgetService->findByYearMonth(
+            $year,
+            $month
+        );
+
+        return to_route('budget.show', ['id' => $budget->id]);
+    }
+
+    /**
+     * Mostra um Orçamento com seus detalhamentos
      */
     public function show(int $id)
     {
-        $this->budgetService->show(
+        $data = $this->budgetService->show(
             $id
         );
-        return redirect()->back()->with('success', 'default.sucess-update');
+        return Inertia::render('Budget/Show', $data);
     }
 }

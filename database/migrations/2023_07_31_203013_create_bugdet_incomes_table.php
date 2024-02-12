@@ -16,11 +16,9 @@ return new class extends Migration
             $table->string('description')->comment('Descrição');
             $table->date('date')->comment('Data');
             $table->decimal('value');
-            $table->string('remarks');
+            $table->string('remarks')->nullable()->comment('Observacoes');
             $table->unsignedBigInteger('budget_id');
             $table->foreign('budget_id')->references('id')->on('budgets');
-            $table->unsignedBigInteger('share_user_id')->nullable()->comment('Id do usuario que sera compartilhado o gasto');
-            $table->foreign('share_user_id')->references('id')->on('users');
             $table->timestamps();
             $table->engine = 'InnoDB';
         });

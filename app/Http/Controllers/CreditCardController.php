@@ -26,7 +26,6 @@ class CreditCardController extends Controller
         return Inertia::render('CreditCard/Index', $data);
     }
 
-
     /**
      * Cria um novo Cartão de Credito
      */

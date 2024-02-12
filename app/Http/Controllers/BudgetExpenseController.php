@@ -3,47 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\FixExpenseService;
+use App\Services\BudgetExpenseService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class FixExpenseController extends Controller
+class BudgetExpenseController extends Controller
 {
+    protected $budgetExpenseSevice;
 
-    protected $fixExpenseService;
-
-    public function __construct(FixExpenseService $fixExpenseService)
+    public function __construct(BudgetExpenseService $budgetExpenseSevice)
     {
-        $this->fixExpenseService = $fixExpenseService;
+        $this->budgetExpenseSevice = $budgetExpenseSevice;
     }
 
     /**
-     * Retorna os dados para o index de Despesa FIxa
-     */
-    public function index()
-    {
-        $data = $this->fixExpenseService->index();
-        return Inertia::render('FixExpense/Index', $data);
-    }
-
-    /**
-     * Cria um novo Despesa FIxa
+     * Cria uma nova Despesa para um Orçamento
      */
     public function store(Request $request)
     {
         $this->validate($request, [
             'description' => ['required'],
-            'due_date' => ['required'],
+            'date' => ['required'],
             'value' => ['required'],
+            'paid' => ['required'],
+            'budget_id' => ['budget_id'],
         ]);
 
-        $this->fixExpenseService->create(
+        $this->budgetExpenseSevice->create(
             $request->description,
-            $request->due_date,
+            $request->date,
             floatval($request->value),
             $request->remarks,
+            $request->paid == 1 ? true : false,
+            intval($request->budget_id),
             $request->share_value ? floatval($request->share_value) : null,
             $request->share_user_id,
+            $request->financing_installment_id ? intval($request->financing_installment_id) : null,
             collect($request->tags)
         );
 
@@ -51,35 +46,40 @@ class FixExpenseController extends Controller
     }
 
     /**
-     * Atualiza um Despesa FIxa
+     * Atualiza uma nova Despesa para um Orçamento
      */
     public function update(Request $request, int $id)
     {
         $this->validate($request, [
             'description' => ['required'],
-            'due_date' => ['required'],
+            'date' => ['required'],
             'value' => ['required'],
+            'paid' => ['required'],
+            // 'budget_id' => ['budget_id'],
         ]);
 
-        $this->fixExpenseService->update(
+        $this->budgetExpenseSevice->update(
             $id,
             $request->description,
-            $request->due_date,
+            $request->date,
             floatval($request->value),
             $request->remarks,
-            $request->share_value,
+            $request->paid == 1 ? true : false,
+            $request->share_value ? floatval($request->share_value) : null,
             $request->share_user_id,
+            $request->financing_installment_id ? intval($request->financing_installment_id) : null,
             collect($request->tags)
         );
+
         return redirect()->back()->with('success', 'default.sucess-update');
     }
 
     /**
-     * Deleta um Despesa FIxa
+     * Deleta uma nova Despesa para um Orçamento
      */
     public function delete(int $id)
     {
-        $this->fixExpenseService->delete($id);
+        $this->budgetExpenseSevice->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

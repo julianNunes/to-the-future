@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('description')->comment('Descricao');
             $table->decimal('value');
-            $table->string('remarks');
+            $table->string('remarks')->nullable()->comment('Observacoes');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
             $table->unsignedBigInteger('expense_id');
             $table->foreign('expense_id')->references('id')->on('credit_card_invoice_expenses');

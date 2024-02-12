@@ -25,7 +25,6 @@ class FinancingController extends Controller
         return Inertia::render('Financing/Index', $data);
     }
 
-
     /**
      * Cria um novo Financiamento
      */
@@ -36,7 +35,7 @@ class FinancingController extends Controller
             'start_date' => ['required'],
             'total' => ['required'],
             'portion_total' => ['required'],
-            'remarks' => ['required'],
+            // 'remarks' => ['required'],
             'start_date_installment' => ['required'],
             'value_installment' => ['required'],
         ]);
@@ -47,9 +46,9 @@ class FinancingController extends Controller
             floatval($request->total),
             $request->fees_monthly ? floatval($request->fees_monthly) : null,
             intval($request->portion_total),
-            $request->remarks,
             $request->start_date_installment,
             floatval($request->value_installment),
+            $request->remarks
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -64,7 +63,7 @@ class FinancingController extends Controller
             'description' => ['required'],
             'start_date' => ['required'],
             'total' => ['required'],
-            'remarks' => ['required'],
+            // 'remarks' => ['required'],
         ]);
 
         $this->financingService->update(
@@ -73,8 +72,8 @@ class FinancingController extends Controller
             $request->start_date,
             floatval($request->total),
             $request->fees_monthly ? floatval($request->fees_monthly) : null,
-            $request->remarks,
             $request->value_installment ? floatval($request->value_installment) : null,
+            $request->remarks
         );
 
         return redirect()->back()->with('success', 'default.sucess-update');

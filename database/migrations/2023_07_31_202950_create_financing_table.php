@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('total')->comment('Valor total do emprestimo');
             $table->decimal('fees_monthly')->nullable()->comment('Valor mensal de juros');
             $table->char('portion_total', 3)->comment('Total de Parcelas');
-            $table->string('remarks');
+            $table->string('remarks')->nullable()->comment('Observacoes');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

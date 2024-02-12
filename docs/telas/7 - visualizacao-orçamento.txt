@@ -30,9 +30,8 @@ Orçamento (Show/Ver)
                 - Na tabela de despesas ter o botão "+" para expandir a linha quando a despesa for uma parcela do financiamento
                 - Lançamento de Despesa
                     - Se existe "user_share_id" e valor a compartilhar:
-                        - Gero um registro virtual na minha receite
+                        - Gero um registro virtual na minha receita
                         - gero um registr virtual na despesa do compartilhado
-                        - Painel de Receitas (COLUNA 6)
 
             - Painel de Receitas (Coluna 12)
 
@@ -46,6 +45,7 @@ Orçamento (Show/Ver)
             - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
                 - Somar o valor que devo pagar para o "share_user_id"
                 - Somar o valor a receber do "share_user_id"
+
 
             - Expanse-painel com o componente de Cartões
                 - Foreach com todos os dados
