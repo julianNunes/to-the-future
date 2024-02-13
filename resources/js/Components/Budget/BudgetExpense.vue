@@ -1,3 +1,4 @@
+import { VCardItem } from 'vuetify/lib/components/index.mjs';
 <template>
     <!-- Tabela com dados -->
     <v-expansion-panels v-model="panel" class="mt-2">
@@ -14,7 +15,6 @@
                         <v-data-table
                             :headers="headers"
                             :items="expenses"
-                            :sort-by="[{ key: 'created_at', order: 'asc' }]"
                             :search="search"
                             :loading="isLoading"
                             :loading-text="$t('default.loading-text-table')"
@@ -42,7 +42,7 @@
                                 item.share_user ? item.share_user.name : ''
                             }}</template>
                             <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('default.edit')" location="top">
+                                <v-tooltip v-if="item.id" :text="$t('default.edit')" location="top">
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
@@ -55,7 +55,7 @@
                                         </v-icon>
                                     </template>
                                 </v-tooltip>
-                                <v-tooltip :text="$t('default.delete')" location="top">
+                                <v-tooltip v-if="item.id" :text="$t('default.delete')" location="top">
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
@@ -77,6 +77,25 @@
                                     <th class="title font-weight-bold text-right">Total</th>
                                     <th class="title text-right">{{ sumField(expenses, 'value') }}</th>
                                     <th class="title text-right">{{ sumField(expenses, 'share_value') }}</th>
+                                </tr>
+                            </template>
+
+                            <!-- expand column -->
+                            <template #[`item.data-table-expand`]="{ item, internalItem, isExpanded, toggleExpand }">
+                                <v-btn
+                                    v-if="item.financing_installment"
+                                    color="black"
+                                    size="small"
+                                    :icon="isExpanded(internalItem) ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                                    variant="text"
+                                    @click="toggleExpand(internalItem)"
+                                ></v-btn>
+                            </template>
+
+                            <!-- Expand item -->
+                            <template #expanded-row="{ columns, item }">
+                                <tr>
+                                    <td :colspan="columns.length">{{ infoInstallment(item.financing_installment) }}</td>
                                 </tr>
                             </template>
 
@@ -123,7 +142,18 @@
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">
+                        <v-col cols="12" sm="3" md="4">
+                            <v-text-field
+                                ref="inputDate"
+                                v-model="expense.date"
+                                :label="$t('default.date')"
+                                type="date"
+                                required
+                                :rules="rules.textFieldRules"
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="4" md="4">
                             <v-text-field
                                 v-model="expense.value"
                                 type="number"
@@ -134,11 +164,13 @@
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="6" md="4">
+                        <v-col cols="12" sm="4" md="4">
                             <v-select
-                                v-model="expense.due_date"
-                                :label="$t('fix-expense.due-date')"
-                                :items="dueDateList"
+                                v-model="expense.paid"
+                                label="Status"
+                                :items="listStatus"
+                                item-title="name"
+                                item-value="value"
                                 clearable
                                 :rules="rules.textFieldRules"
                                 density="comfortable"
@@ -178,6 +210,16 @@
                                         return true
                                     },
                                 ]"
+                                density="comfortable"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="12">
+                            <v-select
+                                v-model="expense.financing_installment_id"
+                                :label="$t('budget-expense.finaning-installment')"
+                                :items="itemsInstallments"
+                                :item-props="itemPropsInstallment"
+                                clearable
                                 density="comfortable"
                             ></v-select>
                         </v-col>
@@ -253,11 +295,11 @@ import { sumField, currencyField } from '../../utils/utils.js'
 export default {
     name: 'BudgetExpense',
     props: {
-        expenses: {
-            type: Array,
-        },
         budgetId: {
             type: Number,
+        },
+        expenses: {
+            type: Array,
         },
         shareUsers: {
             type: Array,
@@ -274,12 +316,13 @@ export default {
         return {
             headers: [
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('fix-expense.due-date'), align: 'center', key: 'date' },
+                { title: this.$t('budget-expense.due-date'), align: 'center', key: 'date' },
                 { title: this.$t('default.value'), align: 'end', key: 'value' },
                 { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
                 { title: this.$t('default.tags'), key: 'tags' },
+                { title: this.$t('budget-expense.finaning-installment'), align: 'center', key: 'data-table-expand' },
                 { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false, width: 40 },
             ],
             rules: {
@@ -300,49 +343,28 @@ export default {
             deleteId: null,
             modalEntryDateStart: false,
             panel: 0,
+            expanded: [],
             expense: {
                 id: null,
                 description: null,
                 value: 0,
-                due_date: null,
+                date: null,
+                paid: 0,
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
+                financing_installment_id: null,
                 tags: [],
             },
-            dueDateList: [
-                '01',
-                '02',
-                '03',
-                '04',
-                '05',
-                '06',
-                '06',
-                '07',
-                '08',
-                '09',
-                '10',
-                '11',
-                '12',
-                '13',
-                '14',
-                '15',
-                '16',
-                '17',
-                '18',
-                '19',
-                '20',
-                '21',
-                '22',
-                '23',
-                '24',
-                '25',
-                '26',
-                '27',
-                '28',
-                '29',
-                '30',
-                '31',
+            listStatus: [
+                {
+                    value: 0,
+                    name: this.$t('default.open'),
+                },
+                {
+                    value: 1,
+                    name: this.$t('default.paid'),
+                },
             ],
             listTags: [],
             searchFieldsData: [],
@@ -354,6 +376,9 @@ export default {
     computed: {
         itemsTags() {
             return this.listTags
+        },
+        itemsInstallments() {
+            return this.installments
         },
     },
 
@@ -405,6 +430,52 @@ export default {
             }, 300)
         },
 
+        itemPropsInstallment(item) {
+            return {
+                title:
+                    this.$t('default.description') +
+                    ': ' +
+                    item.financing.description +
+                    ' | ' +
+                    this.$t('budget-expense.due-date') +
+                    ': ' +
+                    moment(item.date).format('DD/MM/YYYY') +
+                    ' | ' +
+                    this.$t('default.value') +
+                    ': ' +
+                    currencyField(item.value) +
+                    ' | ' +
+                    this.$t('financing-installment.portion') +
+                    ': ' +
+                    item.portion,
+                value: item.id,
+            }
+        },
+
+        infoInstallment(item) {
+            if (item) {
+                return (
+                    this.$t('default.description') +
+                    ': ' +
+                    item.financing.description +
+                    ' | ' +
+                    this.$t('budget-expense.due-date') +
+                    ': ' +
+                    moment(item.date).format('DD/MM/YYYY') +
+                    ' | ' +
+                    this.$t('default.value') +
+                    ': ' +
+                    currencyField(item.value) +
+                    ' | ' +
+                    this.$t('financing-installment.portion') +
+                    ': ' +
+                    item.portion
+                )
+            } else {
+                return 'nao tem item'
+            }
+        },
+
         newItem() {
             this.titleModal = this.$t('budget-expense.new-item')
             this.editDialog = true
@@ -412,10 +483,12 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
-                due_date: null,
+                date: null,
                 remarks: null,
+                paid: 0,
                 share_value: 0,
                 share_user_id: null,
+                financing_installment_id: null,
                 tags: [],
                 budget_id: this.budgetId,
             }
@@ -431,10 +504,12 @@ export default {
                 id: item.id,
                 description: item.description,
                 value: Number(item.value),
-                due_date: item.due_date,
+                date: item.date,
+                paid: item.paid ? 1 : 0,
                 remarks: item.remarks,
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
+                financing_installment_id: item.financing_installment_id,
                 tags: item.tags,
                 budget_id: item.budget_id,
             }
@@ -464,11 +539,13 @@ export default {
                 '/budget-expense',
                 {
                     description: this.expense.description,
+                    date: this.expense.date,
                     value: this.expense.value,
-                    due_date: this.expense.due_date,
+                    paid: this.expense.paid ? true : false,
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
+                    financing_installment_id: this.expense.financing_installment_id,
                     tags: this.expense.tags,
                 },
                 {
@@ -489,10 +566,12 @@ export default {
                 {
                     description: this.expense.description,
                     value: this.expense.value,
-                    due_date: this.expense.due_date,
+                    date: this.expense.date,
+                    paid: this.expense.paid ? true : false,
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
+                    financing_installment_id: this.expense.financing_installment_id,
                     tags: this.expense.tags,
                 },
                 {

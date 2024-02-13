@@ -536,7 +536,9 @@ class BudgetService
             'expenses' => [
                 'tags',
                 'shareUser',
-                'financingInstallment'
+                'financingInstallment' => [
+                    'financing:id,description'
+                ]
             ],
             'incomes.tags',
             'provisions.tags',
@@ -550,13 +552,13 @@ class BudgetService
         // Busca as parcelas de Financiamento em aberto para mostrar no select em tela
 
         $installments = FinancingInstallment::with([
-            'financing' => function (Builder $query) {
-                $query->where('paid', false);
-            }
+            'financing:id,description'
         ])
             ->whereHas('financing', function (Builder $query) use ($budget) {
-                $query->where('user_id', $budget->user_id)->addSelect(['id', 'description']);
+                $query->where('user_id', $budget->user_id);
             })
+            // ->doesntHave('budgetExpense')
+            ->where('paid', false)
             ->get();
 
         // Busca as faturas dos cartões

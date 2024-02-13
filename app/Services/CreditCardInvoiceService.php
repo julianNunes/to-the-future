@@ -149,14 +149,8 @@ class CreditCardInvoiceService
      * Retorna os dados para visualização/edição da Fatura de um Cartões de Credito
      * @return Array
      */
-    public function show(int $creditCardId, int $id): array
+    public function show(int $id): array
     {
-        $credit_card = CreditCard::find($creditCardId);
-
-        if (!$credit_card) {
-            throw new Exception('credit-card.not-found');
-        }
-
         $creditCardInvoice = CreditCardInvoice::where('id', $id)
             ->with([
                 'creditCard',

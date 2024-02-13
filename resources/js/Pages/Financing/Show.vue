@@ -104,7 +104,7 @@
                             }}</template>
 
                             <template #[`item.paid`]="{ item }">{{
-                                item.paid ? $t('financing-installment.paid') : $t('financing-installment.open')
+                                item.paid ? $t('default.paid') : $t('default.open')
                             }}</template>
 
                             <template #[`item.action`]="{ item }">
@@ -340,11 +340,11 @@ export default {
             listStatus: [
                 {
                     value: 0,
-                    name: this.$t('financing-installment.open'),
+                    name: this.$t('default.open'),
                 },
                 {
                     value: 1,
-                    name: this.$t('financing-installment.paid'),
+                    name: this.$t('default.paid'),
                 },
             ],
         }

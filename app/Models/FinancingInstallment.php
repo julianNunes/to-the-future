@@ -26,4 +26,9 @@ class FinancingInstallment extends Model
     {
         return $this->belongsTo(Financing::class, 'financing_id', 'id');
     }
+
+    public function budgetExpense(): BelongsTo
+    {
+        return $this->belongsTo(BudgetExpense::class, 'financing_id', 'id');
+    }
 }

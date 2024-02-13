@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\{
     BudgetController,
+    BudgetExpenseController,
     DashboardController,
     CreditCardController,
     CreditCardInvoiceController,
@@ -118,6 +119,13 @@ Route::controller(BudgetController::class)->group(function () {
     Route::delete('/budget/{id}', 'delete');
     Route::get('/budget/find/{year}/{month}', 'findByYearMonth');
     Route::get('/budget/show/{id}', 'show')->name('budget.show');
+});
+
+// Despesas do Orçamento
+Route::controller(BudgetExpenseController::class)->group(function () {
+    Route::post('/budget-expense', 'store');
+    Route::put('/budget-expense/{id}', 'update');
+    Route::delete('/fix-expense/{id}', 'delete');
 });
 
 require __DIR__ . '/auth.php';

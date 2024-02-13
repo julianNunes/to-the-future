@@ -63,7 +63,9 @@
         "active": "Ativo",
         "total-paid": "Total Pago",
         "closed": "Fechada",
-        "credit-card": "Cartão de Crédito"
+        "credit-card": "Cartão de Crédito",
+        "open": "Em aberto",
+        "paid": "Pago"
     },
     "rules": {
         "required-text-field": "E necessario preencher o campo",
@@ -162,8 +164,6 @@
         "data-financing": "Dados do Financiamento",
         "portions": "Parcelas",
         "portion": "Parcela",
-        "open": "Em aberto",
-        "paid": "Pago",
         "payment-date": "Data de Pagamento",
         "paid-value": "Valor Pago"
     },
@@ -192,6 +192,11 @@
         "include-provision": "Incluir Provisionamento"
     },
     "budget-expense": {
-        "title": "Despesas"
+        "title": "Despesas",
+        "finaning-installment": "Parcela Financimaneto",
+        "due-date": "Vencimento",
+        "new-item": "Nova Despesa do Orçamento",
+        "edit-item": "Editar Despesa do Orçamento",
+        "not-found": "Despesa do Orçamento não encontrada"
     }
 }

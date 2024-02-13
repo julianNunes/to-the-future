@@ -72,9 +72,9 @@ class CreditCardInvoiceController extends Controller
      * @param integer $id
      * @return void
      */
-    public function show(int $creditCardId, int $id)
+    public function show(int $id)
     {
-        $data = $this->creditCardInvoiceService->show($creditCardId, $id);
+        $data = $this->creditCardInvoiceService->show($id);
         return Inertia::render('CreditCardInvoice/Show', $data);
     }
 

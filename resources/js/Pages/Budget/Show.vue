@@ -43,8 +43,8 @@
             <v-window v-model="tab">
                 <v-window-item value="one">
                     <BudgetExpense
-                        :expenses="budgetExpenses"
                         :budget-id="budgetId"
+                        :expenses="budgetExpenses"
                         :share-users="shareUsers"
                         :installments="installments"
                     />

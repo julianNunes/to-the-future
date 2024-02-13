@@ -31,6 +31,19 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
 TO-DO
 ==================================================
+
+- Orçamento-Show:
+    - Backend
+        - Despesas
+            -
+    - Front:
+        - Despesas
+            - Adicionar as parcelas do financiamento como escolha
+                - Quando abrir para o new precisa remover quem tem ligação
+                - quando abrir para o edit precisa incluir a parcela da edição
+            - ajustar o datatable para ter o detalhamento da parcela quando houver
+
+
 - CRUD para "prepaid_card"
     - "prepaid_card_invoices"
         - "valor_creditado"
@@ -39,15 +52,6 @@ TO-DO
         - Quando houver despesas compartilhada sera somado como despesa para o usuario compartilhado
         - o valor que sobrar da diferença do compartilhado entra como RECEITA para o dono do cartao
 
-
-- Orçamento-Show:
-    - Construção do banckend por partes:
-        - Despesas
-        - Receitas
-    - Front:
-        - Despesas
-            - Adicionar as parcelas do financiamento como escolha
-            - ajustar o datatable para ter o detalhamento da parcela quando houver
 
 
 - CArtao de credito
