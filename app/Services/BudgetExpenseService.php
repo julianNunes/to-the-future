@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\BudgetExpense;
+use App\Models\FinancingInstallment;
 use Illuminate\Support\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class BudgetExpenseService
 {
@@ -19,6 +21,7 @@ class BudgetExpenseService
      * @param string $date
      * @param float $value
      * @param string $remarks
+     * @param bool $paid
      * @param integer $budgetId
      * @param float|null $shareValue
      * @param integer|null $shareUserId
@@ -31,6 +34,7 @@ class BudgetExpenseService
         string $date,
         float $value,
         string $remarks,
+        bool $paid,
         int $budgetId,
         float $shareValue = null,
         int $shareUserId = null,
@@ -42,6 +46,7 @@ class BudgetExpenseService
             'date' => $date,
             'value' => $value,
             'remarks' => $remarks,
+            'paid' => $paid,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
             'financing_installment_id' => $financingInstallmentId,
@@ -50,6 +55,21 @@ class BudgetExpenseService
 
         $expense->save();
         TagService::saveTagsToModel($expense, $tags);
+
+        // Atualizar Parcela do Finaciamento
+        if ($expense->paid && $expense->financing_installment_id) {
+            $installment = FinancingInstallment::find($expense->financing_installment_id);
+
+            if (!$installment) {
+                throw new Exception('financing-installment.not-found');
+            }
+
+            $installment->update([
+                'paid' => $paid,
+                'payment_date' => Carbon::parse($date)->format('y-m-d'),
+                'paid_value' => $value,
+            ]);
+        }
 
         return $expense;
     }
@@ -61,6 +81,7 @@ class BudgetExpenseService
      * @param string $date
      * @param float $value
      * @param string $remarks
+     * @param bool $paid
      * @param float|null $shareValue
      * @param integer|null $shareUserId
      * @param integer|null $financingInstallmentId
@@ -73,6 +94,7 @@ class BudgetExpenseService
         string $date,
         float $value,
         string $remarks,
+        bool $paid,
         float $shareValue = null,
         int $shareUserId = null,
         int $financingInstallmentId = null,
@@ -87,11 +109,28 @@ class BudgetExpenseService
         // Atualiza Tags
         TagService::saveTagsToModel($expense, $tags);
 
+        // Atualizar Parcela do Finaciamento
+        if ($expense->paid && $expense->financing_installment_id) {
+            Log::info('esta pago');
+            $installment = FinancingInstallment::find($expense->financing_installment_id);
+
+            if (!$installment) {
+                throw new Exception('financing-installment.not-found');
+            }
+
+            $installment->update([
+                'paid' => $paid,
+                'payment_date' => Carbon::parse($date)->format('y-m-d'),
+                'paid_value' => $value,
+            ]);
+        }
+
         return $expense->update([
             'description' => $description,
             'date' => $date,
             'value' => $value,
             'remarks' => $remarks,
+            'paid' => $paid,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
             'financing_installment_id' => $financingInstallmentId,

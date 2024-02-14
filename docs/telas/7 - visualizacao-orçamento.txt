@@ -1,15 +1,5 @@
 Orçamento (Show/Ver)
 
-- Backend:
-    - Dados de retorno ao abrir o show:
-        budget: {
-
-        }
-
-    - CRUD
-        - Metas
-
-
 - Front-end
     - Cabeçalho da tela
         - Mes/Ano: ao trocar, faz a busca novamente

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class FinancingInstallment extends Model
 {
@@ -27,8 +28,8 @@ class FinancingInstallment extends Model
         return $this->belongsTo(Financing::class, 'financing_id', 'id');
     }
 
-    public function budgetExpense(): BelongsTo
+    public function budgetExpense(): HasOne
     {
-        return $this->belongsTo(BudgetExpense::class, 'financing_id', 'id');
+        return $this->hasOne(BudgetExpense::class, 'financing_installment_id', 'id');
     }
 }

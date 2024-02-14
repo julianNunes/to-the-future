@@ -8,8 +8,8 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
             </v-expansion-panel-title>
             <v-expansion-panel-text class="pa-2">
                 <v-row dense>
-                    <v-col md="12">
-                        <v-btn color="primary" :disabled="viewOnly" @click="newItem">{{ $t('default.new') }}</v-btn>
+                    <v-col v-if="!viewOnly" md="12">
+                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
                     </v-col>
                     <v-col md="12">
                         <v-data-table
@@ -21,6 +21,7 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                             class="elevation-3"
                             density="compact"
                             :total-items="expenses.length"
+                            :items-per-page="25"
                             :no-data-text="$t('default.no-data-text')"
                             :no-results-text="$t('default.no-data-text')"
                             :footer-props="{
@@ -30,11 +31,16 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                             :header-props="{
                                 sortByText: $t('default.sort-by'),
                             }"
+                            :row-props="itemRowFont"
                             fixed-header
                         >
+                            <!-- Itens -->
                             <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                             <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
+                            <template #[`item.paid`]="{ item }">{{
+                                item.paid ? $t('default.paid') : $t('default.open')
+                            }}</template>
                             <template #[`item.tags`]="{ item }">{{
                                 item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
                             }}</template>
@@ -49,7 +55,6 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                                             color="warning"
                                             icon="mdi-pencil"
                                             size="small"
-                                            :disabled="viewOnly"
                                             @click="editItem(item)"
                                         >
                                         </v-icon>
@@ -63,14 +68,13 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                                             color="error"
                                             icon="mdi-delete"
                                             size="small"
-                                            :disabled="viewOnly"
                                             @click="openDelete(item)"
                                         >
                                         </v-icon>
                                     </template>
                                 </v-tooltip>
                             </template>
-
+                            <!-- Footer -->
                             <template v-if="expenses.length" #tfoot>
                                 <tr class="green--text">
                                     <th class="title"></th>
@@ -79,8 +83,7 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                                     <th class="title text-right">{{ sumField(expenses, 'share_value') }}</th>
                                 </tr>
                             </template>
-
-                            <!-- expand column -->
+                            <!-- Expand Column -->
                             <template #[`item.data-table-expand`]="{ item, internalItem, isExpanded, toggleExpand }">
                                 <v-btn
                                     v-if="item.financing_installment"
@@ -91,14 +94,13 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                                     @click="toggleExpand(internalItem)"
                                 ></v-btn>
                             </template>
-
                             <!-- Expand item -->
                             <template #expanded-row="{ columns, item }">
                                 <tr>
                                     <td :colspan="columns.length">{{ infoInstallment(item.financing_installment) }}</td>
                                 </tr>
                             </template>
-
+                            <!-- Top -->
                             <template #top>
                                 <v-toolbar density="comfortable">
                                     <v-row dense>
@@ -172,7 +174,7 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                                 item-title="name"
                                 item-value="value"
                                 clearable
-                                :rules="rules.textFieldRules"
+                                required
                                 density="comfortable"
                             ></v-select>
                         </v-col>
@@ -217,7 +219,7 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                             <v-select
                                 v-model="expense.financing_installment_id"
                                 :label="$t('budget-expense.finaning-installment')"
-                                :items="itemsInstallments"
+                                :items="listInstallments"
                                 :item-props="itemPropsInstallment"
                                 clearable
                                 density="comfortable"
@@ -298,6 +300,9 @@ export default {
         budgetId: {
             type: Number,
         },
+        yearMonth: {
+            type: String,
+        },
         expenses: {
             type: Array,
         },
@@ -314,17 +319,6 @@ export default {
 
     data() {
         return {
-            headers: [
-                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('budget-expense.due-date'), align: 'center', key: 'date' },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
-                { title: this.$t('default.share-user'), key: 'share_user_id' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.tags'), key: 'tags' },
-                { title: this.$t('budget-expense.finaning-installment'), align: 'center', key: 'data-table-expand' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false, width: 40 },
-            ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
@@ -354,8 +348,10 @@ export default {
                 share_value: 0,
                 share_user_id: null,
                 financing_installment_id: null,
+                budget_id: null,
                 tags: [],
             },
+            listInstallments: [],
             listStatus: [
                 {
                     value: 0,
@@ -377,8 +373,30 @@ export default {
         itemsTags() {
             return this.listTags
         },
-        itemsInstallments() {
-            return this.installments
+        headers() {
+            let headers = [
+                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
+                { title: this.$t('budget-expense.due-date'), align: 'center', key: 'date' },
+                { title: this.$t('default.value'), align: 'end', key: 'value' },
+                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
+                { title: this.$t('default.share-user'), key: 'share_user_id' },
+                { title: this.$t('default.remarks'), key: 'remarks' },
+                { title: this.$t('default.tags'), key: 'tags' },
+                { title: this.$t('default.paid'), key: 'paid' },
+                { title: this.$t('budget-expense.finaning-installment'), align: 'center', key: 'data-table-expand' },
+            ]
+
+            if (!this.viewOnly) {
+                headers.push({
+                    title: this.$t('default.action'),
+                    align: 'end',
+                    key: 'action',
+                    sortable: false,
+                    width: 40,
+                })
+            }
+
+            return headers
         },
     },
 
@@ -430,6 +448,10 @@ export default {
             }, 300)
         },
 
+        itemRowFont(row) {
+            return { class: !row.item.id ? 'font-weight-bold text-blue-darken-3' : '' }
+        },
+
         itemPropsInstallment(item) {
             return {
                 title:
@@ -479,11 +501,12 @@ export default {
         newItem() {
             this.titleModal = this.$t('budget-expense.new-item')
             this.editDialog = true
+            this.listInstallments = this.installments
             this.expense = {
                 id: null,
                 description: null,
                 value: 0,
-                date: null,
+                date: this.yearMonth + '-01',
                 remarks: null,
                 paid: 0,
                 share_value: 0,
@@ -500,6 +523,13 @@ export default {
         editItem(item) {
             this.titleModal = this.$t('budget-expense.edit-item')
             this.editDialog = true
+            let data = this.installments
+
+            if (item.financing_installment) {
+                data.unshift(item.financing_installment)
+            }
+
+            this.listInstallments = data
             this.expense = {
                 id: item.id,
                 description: item.description,
@@ -546,6 +576,7 @@ export default {
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
                     financing_installment_id: this.expense.financing_installment_id,
+                    budget_id: this.expense.budget_id,
                     tags: this.expense.tags,
                 },
                 {

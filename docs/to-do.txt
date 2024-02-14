@@ -35,13 +35,9 @@ TO-DO
 - Orçamento-Show:
     - Backend
         - Despesas
-            -
+            - Quando houver "Parcela de finaciamento" e mudar o status para pago, atualizo a parcela
     - Front:
         - Despesas
-            - Adicionar as parcelas do financiamento como escolha
-                - Quando abrir para o new precisa remover quem tem ligação
-                - quando abrir para o edit precisa incluir a parcela da edição
-            - ajustar o datatable para ter o detalhamento da parcela quando houver
 
 
 - CRUD para "prepaid_card"

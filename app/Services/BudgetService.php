@@ -550,14 +550,13 @@ class BudgetService
         }
 
         // Busca as parcelas de Financiamento em aberto para mostrar no select em tela
-
         $installments = FinancingInstallment::with([
             'financing:id,description'
         ])
             ->whereHas('financing', function (Builder $query) use ($budget) {
                 $query->where('user_id', $budget->user_id);
             })
-            // ->doesntHave('budgetExpense')
+            ->doesntHave('budgetExpense')
             ->where('paid', false)
             ->get();
 
@@ -586,6 +585,12 @@ class BudgetService
 
         if ($share_users && $share_users->count()) {
             $share_user = $share_users->first();
+            $share_users = $share_users->map(function ($item) {
+                return [
+                    'share_user_id' => $item->share_user_id,
+                    'share_user_name' => $item->shareUser->name
+                ];
+            });
         }
 
         $budget_share = null;
@@ -645,7 +650,7 @@ class BudgetService
             foreach ($credit_card_invoices as $invoice) {
                 $budget->expenses->push([
                     'id' => null,
-                    'description' => 'Total ' . $invoice->creditCard->name,
+                    'description' => 'Total: ' . $invoice->creditCard->name,
                     'date' => $invoice->due_date,
                     'value' => $invoice->expenses->sum('value'),
                     'remarks' => '',
@@ -687,7 +692,7 @@ class BudgetService
                 foreach ($filtered as $expense) {
                     $budget->expenses->push([
                         'id' => null,
-                        'description' => 'Total ' . $invoice->creditCard->name,
+                        'description' => 'Total: ' . $invoice->creditCard->name,
                         'date' => $invoice->due_date,
                         'value' => $invoice->expenses->sum('value'),
                         'remarks' => 'budget.share-expense',
@@ -722,7 +727,7 @@ class BudgetService
             'budget' => $budget,
             'budgetShare' => $budget_share,
             'shareUser' => $share_user->shareUser,
-            'shareUsers' => $installments,
+            'shareUsers' => $share_users,
             'installments' => $installments,
         ];
     }

@@ -44,6 +44,7 @@
                 <v-window-item value="one">
                     <BudgetExpense
                         :budget-id="budgetId"
+                        :year-month="yearMonthModel"
                         :expenses="budgetExpenses"
                         :share-users="shareUsers"
                         :installments="installments"

@@ -26,7 +26,7 @@ class BudgetExpenseController extends Controller
             'date' => ['required'],
             'value' => ['required'],
             'paid' => ['required'],
-            'budget_id' => ['budget_id'],
+            'budget_id' => ['required'],
         ]);
 
         $this->budgetExpenseSevice->create(
