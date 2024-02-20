@@ -197,6 +197,15 @@
         "due-date": "Vencimento",
         "new-item": "Nova Despesa do Orçamento",
         "edit-item": "Editar Despesa do Orçamento",
-        "not-found": "Despesa do Orçamento não encontrada"
+        "not-found": "Despesa do Orçamento não encontrada",
+        "share-expense": "Despesa compartilhada",
+        "total-provision": "Total Provisionamento"
+    },
+    "budget-income": {
+        "title": "Receitas",
+        "date": "Recebimento",
+        "new-item": "Nova Receita do Orçamento",
+        "edit-item": "Editar Receita do Orçamento",
+        "share-expense": "Despesa compartilhada"
     }
 }

@@ -21,4 +21,9 @@ class ShareUser extends Model
     {
         return $this->hasOne(User::class, 'id', 'share_user_id');
     }
+
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 }

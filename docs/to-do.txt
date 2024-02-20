@@ -1,8 +1,7 @@
 ==================================================
 LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
-- Criar componente para mudar dinamicamente a linguagem do sistema
-    - https://lokalise.com/blog/vue-i18n/
+
 
 - Mudar como os menu é montado e fazer ele agrupado
 
@@ -21,6 +20,7 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
     - TESTAR O DELETE
         - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
 
+
 - Orçamento
     - Decidir se vou ter o "closed" no Budget
 
@@ -28,16 +28,70 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 - Revisar todas as controllers e documentar corretamente
     -
 
+- Criar componente para mudar dinamicamente a linguagem do sistema
+    - https://lokalise.com/blog/vue-i18n/
+
+
 ==================================================
 TO-DO
 ==================================================
+- Ajuste geral para "user_share".
+    - Criar um novo registro com a referencia para o original
+    - No "update", caso haja alteração nos dados de compartilhamento, eu removoo e/ou atualizao
 
-- Orçamento-Show:
-    - Backend
-        - Despesas
-            - Quando houver "Parcela de finaciamento" e mudar o status para pago, atualizo a parcela
-    - Front:
-        - Despesas
+    - Modulos
+        - Provisionamento Orçamento
+        - Despesas Orçamento
+        - Receitas Orçamento
+        - Cartao de credito
+        - Orçamento
+            - Todas as funções
+
+
+ORÇAMENTO SHOW
+- Front-end
+    - Cabeçalho da tela
+        - Mes/Ano: ao trocar, faz a busca novamente
+        - Botões:
+            - "Adicionar Provisionamentos"
+            - "Adicionar Despesas Fixas"
+
+
+    - NAV-BAR
+        ! meu Painel e o painel de OUTRO USUARIO QUE COMPARTILHA COMIGO
+        - Componente:
+            - Painel com as metas (COLUNA 12)
+                - De um lado tabela com dados
+                - Do Outro grafico com o utilizado e a meta
+
+
+            - Painel de Despesas (COLUNA 12)
+                - Na tabela de despesas ter o botão "+" para expandir a linha quando a despesa for uma parcela do financiamento
+                - Lançamento de Despesa
+                    - Se existe "user_share_id" e valor a compartilhar:
+                        - Gero um registro virtual na minha receita
+                        - gero um registr virtual na despesa do compartilhado
+
+            - Painel de Receitas (Coluna 12)
+
+
+            - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
+                - Somar o valor que devo pagar para o "share_user_id"
+                - Somar o valor a receber do "share_user_id"
+                - BALANÇO entre RECEITAS E DESPESAS
+
+
+            - Painel de Resumo dos Cartões (COLUNA 6)
+                - Parcelados
+                - Provisionamento
+                - Semana 1, 2, 3, 4
+
+            - Expanse-painel com o componente de Cartões
+                - Foreach com todos os dados
+                ! AJUSTE DO TITULO com nome do cartão
+
+
+            - Expanse-painel com o componente para Provisionamento
 
 
 - CRUD para "prepaid_card"
@@ -47,7 +101,6 @@ TO-DO
     - "prepaid_card_invoice_expenses"
         - Quando houver despesas compartilhada sera somado como despesa para o usuario compartilhado
         - o valor que sobrar da diferença do compartilhado entra como RECEITA para o dono do cartao
-
 
 
 - CArtao de credito

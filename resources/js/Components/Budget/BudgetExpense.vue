@@ -1,4 +1,3 @@
-import { VCardItem } from 'vuetify/lib/components/index.mjs';
 <template>
     <!-- Tabela com dados -->
     <v-expansion-panels v-model="panel" class="mt-2">
@@ -35,11 +34,15 @@ import { VCardItem } from 'vuetify/lib/components/index.mjs';
                             fixed-header
                         >
                             <!-- Itens -->
-                            <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
+                            <template #[`item.description`]="{ item }">{{ $t(item.description) }}</template>
+                            <template #[`item.date`]="{ item }">{{
+                                item.date ? moment(item.date).format('DD/MM/YYYY') : null
+                            }}</template>
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                             <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
+                            <template #[`item.remarks`]="{ item }">{{ $t(item.remarks) }}</template>
                             <template #[`item.paid`]="{ item }">{{
-                                item.paid ? $t('default.paid') : $t('default.open')
+                                item.paid === null ? null : item.paid == true ? $t('default.paid') : $t('default.open')
                             }}</template>
                             <template #[`item.tags`]="{ item }">{{
                                 item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
@@ -449,7 +452,7 @@ export default {
         },
 
         itemRowFont(row) {
-            return { class: !row.item.id ? 'font-weight-bold text-blue-darken-3' : '' }
+            return { class: !row.item.id ? 'font-weight-bold ' : '' }
         },
 
         itemPropsInstallment(item) {

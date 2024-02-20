@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BudgetExpenseService;
+use App\Services\BudgetIncomeService;
 use Illuminate\Http\Request;
 
-class BudgetExpenseController extends Controller
+class BudgetIncomeController extends Controller
 {
-    public function __construct(private BudgetExpenseService $budgetExpenseSevice)
+
+    public function __construct(private BudgetIncomeService $budgetIncomeSevice)
     {
     }
 
     /**
-     * Cria uma nova Despesa para um Orçamento
+     * Cria uma nova Receita para um Orçamento
      */
     public function store(Request $request)
     {
@@ -21,20 +22,15 @@ class BudgetExpenseController extends Controller
             'description' => ['required'],
             'date' => ['required'],
             'value' => ['required'],
-            'paid' => ['required'],
             'budget_id' => ['required'],
         ]);
 
-        $this->budgetExpenseSevice->create(
+        $this->budgetIncomeSevice->create(
             $request->description,
             $request->date,
             floatval($request->value),
             $request->remarks,
-            $request->paid == 1 ? true : false,
             intval($request->budget_id),
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            $request->financing_installment_id ? intval($request->financing_installment_id) : null,
             collect($request->tags)
         );
 
@@ -42,7 +38,7 @@ class BudgetExpenseController extends Controller
     }
 
     /**
-     * Atualiza uma nova Despesa para um Orçamento
+     * Atualiza uma nova Receita para um Orçamento
      */
     public function update(Request $request, int $id)
     {
@@ -50,20 +46,15 @@ class BudgetExpenseController extends Controller
             'description' => ['required'],
             'date' => ['required'],
             'value' => ['required'],
-            'paid' => ['required'],
             // 'budget_id' => ['budget_id'],
         ]);
 
-        $this->budgetExpenseSevice->update(
+        $this->budgetIncomeSevice->update(
             $id,
             $request->description,
             $request->date,
             floatval($request->value),
             $request->remarks,
-            $request->paid == 1 ? true : false,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            $request->financing_installment_id ? intval($request->financing_installment_id) : null,
             collect($request->tags)
         );
 
@@ -71,11 +62,11 @@ class BudgetExpenseController extends Controller
     }
 
     /**
-     * Deleta uma nova Despesa para um Orçamento
+     * Deleta uma nova Receita para um Orçamento
      */
     public function delete(int $id)
     {
-        $this->budgetExpenseSevice->delete($id);
+        $this->budgetIncomeSevice->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

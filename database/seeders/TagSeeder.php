@@ -18,139 +18,52 @@ class TagSeeder extends Seeder
 
         $tags = [
             [
-                'name' => 'Casa',
-                'user_id' => 1,
+                'name' => 'CASA',
             ],
             [
-                'name' => 'Festa',
-                'user_id' => 1,
+                'name' => 'FESTA',
             ],
             [
-                'name' => 'Farmacia',
-                'user_id' => 1,
+                'name' => 'FARMACIA',
             ],
             [
-                'name' => 'Saúde',
-                'user_id' => 1,
+                'name' => 'SAÚDE',
             ],
             [
-                'name' => 'Lazer',
-                'user_id' => 1,
+                'name' => 'LAZER',
             ],
             [
-                'name' => 'Mercado',
-                'user_id' => 1,
+                'name' => 'MERCADO',
             ],
             [
-                'name' => 'Assinatura',
-                'user_id' => 1,
+                'name' => 'ASSINATURA',
             ],
             [
-                'name' => 'Transporte',
-                'user_id' => 1,
+                'name' => 'TRANSPORTE',
             ],
             [
-                'name' => 'Uber',
-                'user_id' => 1,
+                'name' => 'UBER',
             ],
             [
-                'name' => 'Viagem',
-                'user_id' => 1,
+                'name' => 'VIAGEM',
             ],
             [
-                'name' => 'Ifood',
-                'user_id' => 1,
+                'name' => 'IFOOD',
             ],
             [
-                'name' => 'Profissinal',
-                'user_id' => 1,
+                'name' => 'PROFISSINAL',
             ],
             [
-                'name' => 'Estudos',
-                'user_id' => 1,
+                'name' => 'ESTUDOS',
             ],
             [
-                'name' => 'Roupas',
-                'user_id' => 1,
+                'name' => 'ROUPAS',
             ],
             [
-                'name' => 'Alimentação',
-                'user_id' => 1,
+                'name' => 'ALIMENTAÇÃO',
             ],
             [
-                'name' => 'Supermercado',
-                'user_id' => 1,
-            ]
-        ];
-
-        collect($tags)->each(function ($tag) {
-            Tag::create($tag);
-        });
-
-        $tags = [
-            [
-                'name' => 'Casa',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Festa',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Farmacia',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Saúde',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Lazer',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Mercado',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Assinatura',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Transporte',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Uber',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Viagem',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Ifood',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Profissinal',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Estudos',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Roupas',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Alimentação',
-                'user_id' => 2,
-            ],
-            [
-                'name' => 'Supermercado',
-                'user_id' => 2,
+                'name' => 'SUPERMERCADO',
             ]
         ];
 

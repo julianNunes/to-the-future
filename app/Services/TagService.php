@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Tag;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -19,7 +20,7 @@ class TagService
      */
     public function index(): array
     {
-        $tags = Tag::where('user_id', auth()->user()->id)->orderBy('name')->get();
+        $tags = Tag::where('user_id', auth()->user()->id)->whereNull('user_id')->orderBy('name')->get();
 
         return [
             'tags' => $tags,
@@ -98,7 +99,9 @@ class TagService
         $name = strtoupper($name);
         return Tag::select('name')
             ->where('name', 'LIKE', "%{$name}%")
-            ->where('user_id', auth()->user()->id)
+            ->where(function (Builder $query) {
+                $query->where('user_id', auth()->user()->id)->orWhereNull('user_id');
+            })
             ->get();
     }
 

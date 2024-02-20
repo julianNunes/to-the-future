@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 
 class BudgetIncomeService
 {
+    // public function __construct(private BudgetService $budgetService)
     public function __construct()
     {
     }
@@ -42,6 +43,9 @@ class BudgetIncomeService
         $income->save();
         TagService::saveTagsToModel($income, $tags);
 
+        // Atualiza Orçamento
+        BudgetService::recalculateBugdet($budgetId);
+
         return $income;
     }
 
@@ -72,12 +76,17 @@ class BudgetIncomeService
         // Atualiza Tags
         TagService::saveTagsToModel($income, $tags);
 
-        return $income->update([
+        $income->update([
             'description' => $description,
             'date' => $date,
             'value' => $value,
             'remarks' => $remarks,
         ]);
+
+        // Atualiza Orçamento
+        BudgetService::recalculateBugdet($income->budget_id);
+
+        return true;
     }
 
     /**
@@ -94,6 +103,9 @@ class BudgetIncomeService
 
         // Remove Tags
         TagService::saveTagsToModel($income);
+
+        // Atualiza Orçamento
+        BudgetService::recalculateBugdet($income->budget_id);
 
         return $income->delete();
     }

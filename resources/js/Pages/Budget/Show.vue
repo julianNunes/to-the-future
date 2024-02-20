@@ -32,7 +32,7 @@
 
         <!-- Tabs -->
         <v-card class="mt-2">
-            <v-tabs v-model="tab" bg-color="primary">
+            <v-tabs v-model="tab" bg-color="light-green" density="comfortable">
                 <v-tab value="one">{{ $t('budget-show.my-budget') }}</v-tab>
                 <v-tab v-if="shareUser" value="two">{{ shareUserName }}</v-tab>
             </v-tabs>
@@ -49,11 +49,16 @@
                         :share-users="shareUsers"
                         :installments="installments"
                     />
-                    <BudgetIncome :incomes="budgetIncomes" />
+                    <BudgetIncome :budget-id="budgetId" :year-month="yearMonthModel" :incomes="budgetIncomes" />
                 </v-window-item>
                 <v-window-item v-if="shareUser" value="two">
                     <BudgetExpense :expenses="budgetShareExpenses" :view-only="true" />
-                    <BudgetIncome :incomes="budgetShareIncomes" :view-only="true" />
+                    <BudgetIncome
+                        :budget-id="budgetId"
+                        :year-month="yearMonthModel"
+                        :incomes="budgetShareIncomes"
+                        :view-only="true"
+                    />
                 </v-window-item>
             </v-window>
         </div>

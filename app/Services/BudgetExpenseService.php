@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Budget;
 use App\Models\BudgetExpense;
 use App\Models\FinancingInstallment;
 use Illuminate\Support\Carbon;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class BudgetExpenseService
 {
+    // public function __construct(private BudgetService $budgetService)
     public function __construct()
     {
     }
@@ -41,6 +43,12 @@ class BudgetExpenseService
         int $financingInstallmentId = null,
         Collection $tags = null
     ): BudgetExpense {
+        $budget = Budget::find($budgetId);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
         $expense = BudgetExpense::create([
             'description' => $description,
             'date' => $date,
@@ -69,6 +77,18 @@ class BudgetExpenseService
                 'payment_date' => Carbon::parse($date)->format('y-m-d'),
                 'paid_value' => $value,
             ]);
+        }
+
+        // Atualiza Orçamento
+        BudgetService::recalculateBugdet($budgetId);
+
+        // Se houver valor compartilhado, atualizado dados do Orçamento
+        if ($shareUserId) {
+            $budget_share = Budget::where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $shareUserId])->first();
+
+            if ($budget_share) {
+                BudgetService::recalculateBugdet($budget_share->id);
+            }
         }
 
         return $expense;
@@ -106,6 +126,12 @@ class BudgetExpenseService
             throw new Exception('budget-expense.not-found');
         }
 
+        $budget = Budget::find($expense->budget_id);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
         // Atualiza Tags
         TagService::saveTagsToModel($expense, $tags);
 
@@ -125,7 +151,7 @@ class BudgetExpenseService
             ]);
         }
 
-        return $expense->update([
+        $expense->update([
             'description' => $description,
             'date' => $date,
             'value' => $value,
@@ -135,6 +161,20 @@ class BudgetExpenseService
             'share_user_id' => $shareUserId,
             'financing_installment_id' => $financingInstallmentId,
         ]);
+
+        // Atualiza Orçamento
+        BudgetService::recalculateBugdet($expense->budget_id);
+
+        // Se houver valor compartilhado, atualizado dados do Orçamento
+        if ($shareUserId) {
+            $budget_share = Budget::where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $shareUserId])->first();
+
+            if ($budget_share) {
+                BudgetService::recalculateBugdet($budget_share->id);
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -149,9 +189,31 @@ class BudgetExpenseService
             throw new Exception('budget-expense.not-found');
         }
 
+        $budget = Budget::find($expense->budget_id);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
         // Remove Tags
         TagService::saveTagsToModel($expense);
 
-        return $expense->delete();
+        $budget_id = $expense->budget_id;
+        $share_user_id = $expense->share_user_id;
+        $expense->delete();
+
+        // Se houver valor compartilhado, atualizado dados do Orçamento
+        if ($share_user_id) {
+            $budget_share = Budget::where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user_id])->first();
+
+            if ($budget_share) {
+                BudgetService::recalculateBugdet($budget_share->id);
+            }
+        }
+
+        // Atualiza Orçamento
+        BudgetService::recalculateBugdet($budget_id);
+
+        return true;
     }
 }
