@@ -568,7 +568,7 @@ class BudgetService
         ])
             ->where(['year' => $budget->year, 'month' => $budget->month])
             ->whereHas('creditCard', function (Builder $query) use ($budget) {
-                $query->where('user_id', $budget->user_id);
+                $query->where('user_id', $budget->user_id)->where('is_active', true);
             })
             ->get();
 
@@ -623,9 +623,19 @@ class BudgetService
             ])
                 ->where(['year' => $budget->year, 'month' => $budget->month])
                 ->whereHas('creditCard', function (Builder $query) use ($share_user) {
-                    $query->where('user_id', $share_user->share_user_id);
+                    $query->where('user_id', $share_user->share_user_id)->where('is_active', true);
                 })
                 ->get();
+
+            if ($budget_share) {
+                if (!$budget_share->expenses) {
+                    $budget_share->expenses = collect();
+                }
+
+                if (!$budget_share->incomes) {
+                    $budget_share->incomes = collect();
+                }
+            }
         }
 
         /**
@@ -635,15 +645,15 @@ class BudgetService
         $goals_charts = [];
 
         /**
-         * Painel de Despesas
+         * Painel de Despesas e Receitas
          */
         if (!$budget->expenses) {
             $budget->expenses = collect();
         }
 
-        /**
-         * Gerar os totalizadores para as despesas do usuario logado
-         */
+        if (!$budget->incomes) {
+            $budget->incomes = collect();
+        }
 
         // Gera o totalizador para Provisionamento para Despesas
         if ($budget->provisions && $budget->provisions->count()) {
@@ -683,6 +693,7 @@ class BudgetService
         // Verifica os valores das despesas do Orcamento do usuario compartilhado
         if ($budget_share && $budget_share->expenses && $budget_share->expenses->count() && $budget_share->expenses->where('share_user_id', $budget->user_id)->count()) {
             $filtered = $budget_share->expenses->where('share_user_id', $budget->user_id);
+
             foreach ($filtered as $expense) {
                 $budget->expenses->push([
                     'id' => null,
@@ -695,6 +706,14 @@ class BudgetService
                     'share_user_id' => null,
                     'tags' => []
                 ]);
+
+                $budget_share->incomes->push([
+                    'id' => null,
+                    'description' => $expense->description,
+                    'date' => null,
+                    'value' => $expense->share_value,
+                    'remarks' => 'budget-expense.share-expense',
+                ]);
             }
         }
 
@@ -703,7 +722,7 @@ class BudgetService
             $filtered = $budget_share->provisions->where('share_user_id', $budget->user_id);
             $budget->expenses->push([
                 'id' => null,
-                'description' => 'budget-expense.total-provision',
+                'description' => 'budget-expense.total-share-provision',
                 'date' => null,
                 'value' => $filtered->sum('share_value'),
                 'remarks' => 'budget-expense.share-expense',
@@ -712,11 +731,19 @@ class BudgetService
                 'share_user_id' => null,
                 'tags' => []
             ]);
+
+            $budget_share->incomes->push([
+                'id' => null,
+                'description' => 'budget-expense.total-share-provision',
+                'date' => null,
+                'value' => $filtered->sum('share_value'),
+                'remarks' => 'budget-expense.share-expense',
+            ]);
         }
 
         // Verifica as faturas do cartao de credito do usuario compartilhado para adicionar nas Despesas
         if ($credit_card_invoices_share && $credit_card_invoices_share->count()) {
-            foreach ($credit_card_invoices_share->invoices as $invoice) {
+            foreach ($credit_card_invoices_share as $invoice) {
                 $filtered = $invoice->expenses->filter(function ($expense) use ($budget) {
                     return $expense->share_user_id == $budget->user_id || ($expense->divisions && $expense->divisions->count() && $expense->divisions->where('share_user_id', $budget->user_id)->count());
                 });
@@ -732,6 +759,14 @@ class BudgetService
                         'share_value' => null,
                         'share_user_id' => null,
                         'tags' => []
+                    ]);
+
+                    $budget_share->incomes->push([
+                        'id' => null,
+                        'description' => 'Total: ' . $invoice->creditCard->name,
+                        'date' => null,
+                        'value' => $filtered->sum('share_value'),
+                        'remarks' => 'budget-expense.share-expense',
                     ]);
                 }
             }
@@ -763,7 +798,7 @@ class BudgetService
 
             // Gera os totalizadores dos cartões de credito para Despesas
             if ($credit_card_invoices_share && $credit_card_invoices_share->count()) {
-                foreach ($credit_card_invoices_share->invoices as $invoice) {
+                foreach ($credit_card_invoices_share as $invoice) {
                     $share_value = $invoice->expenses->sum('share_value');
                     $budget_share->expenses->push([
                         'id' => null,
@@ -839,9 +874,6 @@ class BudgetService
             }
         }
 
-
-        // Montar as Receitas
-
         // - Painel de Resumo dos Cartões (COLUNA 6)
         //     - Parcelados
         //     - Provisionamento
@@ -860,11 +892,13 @@ class BudgetService
 
         return [
             'budget' => $budget,
-            'goalsCharts' => $goals_charts,
+            'creditCardInvoices' => $credit_card_invoices,
             'budgetShare' => $budget_share,
+            'creditCardInvoicesShare' => $credit_card_invoices_share,
             'shareUser' => $share_user->shareUser,
             'shareUsers' => $share_users,
             'installments' => $installments,
+            'goalsCharts' => $goals_charts,
         ];
     }
 }

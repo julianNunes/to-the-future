@@ -11,11 +11,9 @@ use Illuminate\Support\Facades\Log;
 class BudgetController extends Controller
 {
 
-    protected $budgetService;
 
-    public function __construct(BudgetService $budgetService)
+    public function __construct(private BudgetService $budgetService)
     {
-        $this->budgetService = $budgetService;
     }
 
     /**

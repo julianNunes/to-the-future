@@ -3,14 +3,16 @@
 namespace App\Services;
 
 use App\Models\Tag;
+use App\Repositories\TagRepository;
+use App\Services\Interfaces\TagServiceInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-class TagService
+class TagService implements TagServiceInterface
 {
-    public function __construct()
+    public function __construct(private TagRepository $tagRepository)
     {
     }
 
@@ -20,8 +22,7 @@ class TagService
      */
     public function index(): array
     {
-        $tags = Tag::where('user_id', auth()->user()->id)->whereNull('user_id')->orderBy('name')->get();
-
+        $tags = $this->tagRepository->index();
         return [
             'tags' => $tags,
         ];
@@ -32,112 +33,84 @@ class TagService
      * @param string $name
      * @return Tag
      */
-    public function create(
-        string $name
-    ): Tag {
-        $tag = Tag::where('name', $name)->first();
+    public function create(string $name): Tag
+    {
+        $tag = $this->tagRepository->getOne(['name' => $name]);
 
         if ($tag) {
             throw new Exception('tag.already-exists');
         }
 
-        $tag = new Tag([
+        $tag = $this->tagRepository->store([
             'name' => $name,
             'user_id' => auth()->user()->id
         ]);
 
-        $tag->save();
         return $tag;
     }
 
     /**
      * Atualiza uma Tag
      * @param int $id
-     * @param string $data
-     * @return bool
+     * @param string $name
+     * @return Tag
      */
-    public function update(
-        int $id,
-        string $name
-    ): bool {
-        $tag = Tag::where('name', $name)->first();
+    public function update(int $id, string $name): Tag
+    {
+        $tag = $this->tagRepository->getOne(function (Builder $query) use ($id, $name) {
+            $query->where('name', $name)->where('id', '!=', $id);
+        });
 
         if ($tag) {
             throw new Exception('tag.already-exists');
         }
 
-        $tag = Tag::find($id);
+        $tag = $this->tagRepository->show($id);
 
         if (!$tag) {
             throw new Exception('tag.not-found');
         }
 
-        return $tag->update([
+        return $this->tagRepository->store([
             'name' => $name,
             'user_id' => auth()->user()->id
-        ]);
+        ], $tag);
     }
 
     /**
      * Deleta uma Tag
-     * @param bool
+     * @param int $id
+     * @return bool
      */
     public function delete(int $id): bool
     {
-        $tag = Tag::find($id);
+        $tag = $this->tagRepository->show($id);
 
         if (!$tag) {
             throw new Exception('tag.not-found');
         }
 
-        return $tag->delete();
-    }
-
-
-    public function search(string $name): Collection
-    {
-        $name = strtoupper($name);
-        return Tag::select('name')
-            ->where('name', 'LIKE', "%{$name}%")
-            ->where(function (Builder $query) {
-                $query->where('user_id', auth()->user()->id)->orWhereNull('user_id');
-            })
-            ->get();
+        return $this->tagRepository->delete($id);
     }
 
     /**
-     * @todo DOCUMENTAR
+     * Busca tags atraves do nome
+     * @param string $name
+     * @return Collection
+     */
+    public function search(string $name): Collection
+    {
+        return $this->tagRepository->search($name);
+    }
+
+    /**
+     * Metodo generico responsavel por salvar/atualizar as tagas para um determinado Model
      * @param Model $model
      * @param Collection|null $tags
      * @return void
      */
-    public static function saveTagsToModel(Model $model, Collection $tags = null)
+    public function saveTagsToModel(Model $model, Collection $tags = null)
     {
-        if ($tags && $tags->count()) {
-            $tags_sync = collect();
-
-            // Busca as Tags no banco
-            foreach ($tags as $tag) {
-                $new_tag = Tag::where('name', $tag['name'])->first();
-
-                if (!$new_tag) {
-                    $new_tag = new Tag([
-                        'name' => $tag['name'],
-                        'user_id' => auth()->user()->id
-                    ]);
-                    $new_tag->save();
-                }
-
-                $tags_sync->push($new_tag);
-            }
-
-            if ($tags_sync->count()) {
-                $model->tags()->sync($tags_sync->pluck('id')->toArray());
-            } else {
-                $model->tags()->detach();
-            }
-        } else {
-            $model->tags()->detach();
-        }
+        $this->tagRepository->saveTagsToModel($model, $tags);
     }
 }

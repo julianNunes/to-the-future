@@ -20,9 +20,14 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
     - TESTAR O DELETE
         - Apos fazer a tela das despesas do cartão junto com as tags e o arquivo
 
-
 - Orçamento
     - Decidir se vou ter o "closed" no Budget
+
+- Backend
+    - Adicionar a camada do REPOSITORY
+        - Criar um BaseRepository baseado no Model instaciado para fazer o CRUD padrão ?
+            - https://asperbrothers.com/blog/implement-repository-pattern-in-laravel/
+            - https://medium.com/levantelab/repository-pattern-contracts-e-service-layer-no-laravel-6-670aa9f50173
 
 
 - Revisar todas as controllers e documentar corretamente
@@ -35,17 +40,11 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
 TO-DO
 ==================================================
-- Ajuste geral para "user_share".
-    - Criar um novo registro com a referencia para o original
-    - No "update", caso haja alteração nos dados de compartilhamento, eu removoo e/ou atualizao
 
-    - Modulos
-        - Provisionamento Orçamento
-        - Despesas Orçamento
-        - Receitas Orçamento
-        - Cartao de credito
-        - Orçamento
-            - Todas as funções
+- BudgetCOntroller
+    - Remover os Serviços do "BudgetService" e mover para controller
+    - Transformar todos os serviços em FACADES como no projeto da AGV
+        - Problema de Referencia circular
 
 
 ORÇAMENTO SHOW
@@ -85,10 +84,6 @@ ORÇAMENTO SHOW
                 - Parcelados
                 - Provisionamento
                 - Semana 1, 2, 3, 4
-
-            - Expanse-painel com o componente de Cartões
-                - Foreach com todos os dados
-                ! AJUSTE DO TITULO com nome do cartão
 
 
             - Expanse-painel com o componente para Provisionamento

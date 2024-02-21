@@ -3,24 +3,25 @@
     <v-expansion-panels v-model="panel" class="mt-2">
         <v-expansion-panel>
             <v-expansion-panel-title class="bg-primary">
-                <span class="text-h6">{{ $t('budget-expense.title') }}</span>
+                <span class="text-h6">{{ $t('budget-income.title') }}</span>
             </v-expansion-panel-title>
             <v-expansion-panel-text class="pa-2">
                 <v-row dense>
-                    <v-col v-if="!viewOnly" md="12">
+                    <v-col md="12">
                         <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
                     </v-col>
                     <v-col md="12">
                         <v-data-table
+                            :group-by="[{ key: 'group', order: 'asc' }]"
                             :headers="headers"
-                            :items="expenses"
+                            :items="provisions"
+                            :sort-by="[{ key: 'created_at', order: 'asc' }]"
                             :search="search"
                             :loading="isLoading"
                             :loading-text="$t('default.loading-text-table')"
                             class="elevation-3"
                             density="compact"
-                            :total-items="expenses.length"
-                            :items-per-page="25"
+                            :total-items="provisions.length"
                             :no-data-text="$t('default.no-data-text')"
                             :no-results-text="$t('default.no-data-text')"
                             :footer-props="{
@@ -30,24 +31,11 @@
                             :header-props="{
                                 sortByText: $t('default.sort-by'),
                             }"
-                            :row-props="itemRowFont"
                             fixed-header
                         >
-                            <!-- Itens -->
-                            <template #[`item.description`]="{ item }">{{
-                                item.description.match(/(\S+)\.(\S+)/gm) ? $t(item.description) : item.description
-                            }}</template>
-                            <template #[`item.date`]="{ item }">{{
-                                item.date ? moment(item.date).format('DD/MM/YYYY') : null
-                            }}</template>
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                             <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                            <template #[`item.remarks`]="{ item }">{{
-                                item.remarks.match(/(\S+)\.(\S+)/gm) ? $t(item.remarks) : item.remarks
-                            }}</template>
-                            <template #[`item.paid`]="{ item }">{{
-                                item.paid === null ? null : item.paid == true ? $t('default.paid') : $t('default.open')
-                            }}</template>
+                            <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
                             <template #[`item.tags`]="{ item }">{{
                                 item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
                             }}</template>
@@ -55,7 +43,7 @@
                                 item.share_user ? item.share_user.name : ''
                             }}</template>
                             <template #[`item.action`]="{ item }">
-                                <v-tooltip v-if="item.id" :text="$t('default.edit')" location="top">
+                                <v-tooltip :text="$t('default.edit')" location="top">
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
@@ -67,7 +55,7 @@
                                         </v-icon>
                                     </template>
                                 </v-tooltip>
-                                <v-tooltip v-if="item.id" :text="$t('default.delete')" location="top">
+                                <v-tooltip :text="$t('default.delete')" location="top">
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
@@ -81,33 +69,38 @@
                                     </template>
                                 </v-tooltip>
                             </template>
-                            <!-- Footer -->
-                            <template v-if="expenses.length" #tfoot>
+
+                            <template #group-header="{ item, toggleGroup, isGroupOpen }">
+                                <tr>
+                                    <th class="title">
+                                        <VBtn
+                                            size="small"
+                                            variant="text"
+                                            :icon="isGroupOpen(item) ? '$expand' : '$next'"
+                                            @click="toggleGroup(item)"
+                                        ></VBtn>
+                                        {{ convertGroup(item.value) }}
+                                    </th>
+                                    <th class="title font-weight-bold text-right">Total</th>
+                                    <th class="title text-right">
+                                        {{ sumGroup(provisions, item.key, item.value, 'value') }}
+                                    </th>
+                                    <th class="title text-right">
+                                        {{ sumGroup(provisions, item.key, item.value, 'share_value') }}
+                                    </th>
+                                    <th :colspan="3"></th>
+                                </tr>
+                            </template>
+
+                            <template v-if="provisions.length" #tfoot>
                                 <tr class="green--text">
                                     <th class="title"></th>
                                     <th class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">{{ sumField(expenses, 'value') }}</th>
-                                    <th class="title text-right">{{ sumField(expenses, 'share_value') }}</th>
+                                    <th class="title text-right">{{ sumField(provisions, 'value') }}</th>
+                                    <th class="title text-right">{{ sumField(provisions, 'share_value') }}</th>
                                 </tr>
                             </template>
-                            <!-- Expand Column -->
-                            <template #[`item.data-table-expand`]="{ item, internalItem, isExpanded, toggleExpand }">
-                                <v-btn
-                                    v-if="item.financing_installment"
-                                    color="black"
-                                    size="small"
-                                    :icon="isExpanded(internalItem) ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                                    variant="text"
-                                    @click="toggleExpand(internalItem)"
-                                ></v-btn>
-                            </template>
-                            <!-- Expand item -->
-                            <template #expanded-row="{ columns, item }">
-                                <tr>
-                                    <td :colspan="columns.length">{{ infoInstallment(item.financing_installment) }}</td>
-                                </tr>
-                            </template>
-                            <!-- Top -->
+
                             <template #top>
                                 <v-toolbar density="comfortable">
                                     <v-row dense>
@@ -144,7 +137,7 @@
                         <v-col cols="12" sm="12" md="12">
                             <v-text-field
                                 ref="txtDescription"
-                                v-model="expense.description"
+                                v-model="income.description"
                                 :label="$t('default.description')"
                                 :rules="rules.textFieldRules"
                                 required
@@ -154,7 +147,7 @@
                         <v-col cols="12" sm="3" md="4">
                             <v-text-field
                                 ref="inputDate"
-                                v-model="expense.date"
+                                v-model="income.date"
                                 :label="$t('default.date')"
                                 type="date"
                                 required
@@ -164,7 +157,7 @@
                         </v-col>
                         <v-col cols="12" sm="4" md="4">
                             <v-text-field
-                                v-model="expense.value"
+                                v-model="income.value"
                                 type="number"
                                 :label="$t('default.value')"
                                 min="0"
@@ -173,75 +166,16 @@
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="4" md="4">
-                            <v-select
-                                v-model="expense.paid"
-                                label="Status"
-                                :items="listStatus"
-                                item-title="name"
-                                item-value="value"
-                                clearable
-                                required
-                                density="comfortable"
-                            ></v-select>
-                        </v-col>
-                        <v-col cols="12" sm="6" md="4">
-                            <v-text-field
-                                v-model="expense.share_value"
-                                :label="$t('default.share-value')"
-                                type="number"
-                                min="0"
-                                :rules="[
-                                    (value) => {
-                                        if (expense.share_user_id) {
-                                            if (!value) return $t('rules.required-text-field')
-                                            if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
-                                        }
-                                        return true
-                                    },
-                                ]"
-                                density="comfortable"
-                            />
-                        </v-col>
-                        <v-col cols="12" sm="6" md="8">
-                            <v-select
-                                v-model="expense.share_user_id"
-                                :label="$t('default.share-user')"
-                                :items="shareUsers"
-                                item-title="share_user_name"
-                                item-value="share_user_id"
-                                clearable
-                                :rules="[
-                                    (value) => {
-                                        if (expense.share_value && parseFloat(expense.share_value) > 0) {
-                                            if (!value) return $t('rules.required-text-field')
-                                        }
-                                        return true
-                                    },
-                                ]"
-                                density="comfortable"
-                            ></v-select>
-                        </v-col>
-                        <v-col cols="12" sm="12" md="12">
-                            <v-select
-                                v-model="expense.financing_installment_id"
-                                :label="$t('budget-expense.finaning-installment')"
-                                :items="listInstallments"
-                                :item-props="itemPropsInstallment"
-                                clearable
-                                density="comfortable"
-                            ></v-select>
-                        </v-col>
                         <v-col cols="12" md="12">
                             <v-text-field
-                                v-model="expense.remarks"
+                                v-model="income.remarks"
                                 :label="$t('default.remarks')"
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" md="12">
                             <v-autocomplete
-                                v-model="expense.tags"
+                                v-model="income.tags"
                                 v-model:search="search_tag"
                                 :label="$t('default.tags')"
                                 :items="itemsTags"
@@ -296,27 +230,20 @@
 </template>
 
 <script setup>
-import moment from 'moment'
 import { sumField, currencyField } from '../../utils/utils.js'
 </script>
 
 <script>
 export default {
-    name: 'BudgetExpense',
+    name: 'BudgetProvision',
     props: {
         budgetId: {
             type: Number,
         },
-        yearMonth: {
-            type: String,
-        },
-        expenses: {
+        provisions: {
             type: Array,
         },
         shareUsers: {
-            type: Array,
-        },
-        installments: {
             type: Array,
         },
         viewOnly: {
@@ -326,6 +253,15 @@ export default {
 
     data() {
         return {
+            headers: [
+                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
+                { title: this.$t('default.value'), align: 'end', key: 'value' },
+                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
+                { title: this.$t('default.share-user'), key: 'share_user_id' },
+                { title: this.$t('default.remarks'), key: 'remarks' },
+                { title: this.$t('default.tags'), key: 'tags' },
+                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
+            ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
@@ -342,31 +278,37 @@ export default {
             removeDialog: false,
             isLoading: false,
             deleteId: null,
-            modalEntryDateStart: false,
-            panel: 1,
-            expanded: [],
-            expense: {
+            provision: {
                 id: null,
                 description: null,
                 value: 0,
-                date: null,
-                paid: 0,
+                group: null,
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
-                financing_installment_id: null,
-                budget_id: null,
                 tags: [],
+                budget_id: null,
             },
-            listInstallments: [],
-            listStatus: [
+            groupList: [
                 {
-                    value: 0,
-                    name: this.$t('default.open'),
+                    name: this.$t('default.monthly'),
+                    value: 'MONTHLY',
                 },
                 {
-                    value: 1,
-                    name: this.$t('default.paid'),
+                    name: this.$t('default.week-1'),
+                    value: 'WEEK_1',
+                },
+                {
+                    name: this.$t('default.week-2'),
+                    value: 'WEEK_2',
+                },
+                {
+                    name: this.$t('default.week-3'),
+                    value: 'WEEK_3',
+                },
+                {
+                    name: this.$t('default.week-4'),
+                    value: 'WEEK_4',
                 },
             ],
             listTags: [],
@@ -380,31 +322,6 @@ export default {
         itemsTags() {
             return this.listTags
         },
-        headers() {
-            let headers = [
-                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('budget-expense.due-date'), align: 'center', key: 'date' },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
-                { title: this.$t('default.share-user'), key: 'share_user_id' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.tags'), key: 'tags' },
-                { title: this.$t('default.paid'), key: 'paid' },
-                { title: this.$t('budget-expense.finaning-installment'), align: 'center', key: 'data-table-expand' },
-            ]
-
-            if (!this.viewOnly) {
-                headers.push({
-                    title: this.$t('default.action'),
-                    align: 'end',
-                    key: 'action',
-                    sortable: false,
-                    width: 40,
-                })
-            }
-
-            return headers
-        },
     },
 
     async created() {},
@@ -412,6 +329,10 @@ export default {
     async mounted() {},
 
     methods: {
+        convertGroup(group) {
+            return this.groupList.find((x) => x.value === group).name
+        },
+
         async searchTags(val) {
             if (this.loadingData) return
 
@@ -421,7 +342,11 @@ export default {
                 return
             }
 
-            if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
+            if (
+                this.provision.tags &&
+                this.provision.tags.length > 0 &&
+                this.provision.tags.find((x) => x.name == val)
+            ) {
                 return
             }
 
@@ -455,72 +380,18 @@ export default {
             }, 300)
         },
 
-        itemRowFont(row) {
-            return { class: !row.item.id ? 'font-weight-bold ' : '' }
-        },
-
-        itemPropsInstallment(item) {
-            return {
-                title:
-                    this.$t('default.description') +
-                    ': ' +
-                    item.financing.description +
-                    ' | ' +
-                    this.$t('budget-expense.due-date') +
-                    ': ' +
-                    moment(item.date).format('DD/MM/YYYY') +
-                    ' | ' +
-                    this.$t('default.value') +
-                    ': ' +
-                    currencyField(item.value) +
-                    ' | ' +
-                    this.$t('financing-installment.portion') +
-                    ': ' +
-                    item.portion,
-                value: item.id,
-            }
-        },
-
-        infoInstallment(item) {
-            if (item) {
-                return (
-                    this.$t('default.description') +
-                    ': ' +
-                    item.financing.description +
-                    ' | ' +
-                    this.$t('budget-expense.due-date') +
-                    ': ' +
-                    moment(item.date).format('DD/MM/YYYY') +
-                    ' | ' +
-                    this.$t('default.value') +
-                    ': ' +
-                    currencyField(item.value) +
-                    ' | ' +
-                    this.$t('financing-installment.portion') +
-                    ': ' +
-                    item.portion
-                )
-            } else {
-                return 'nao tem item'
-            }
-        },
-
         newItem() {
-            this.titleModal = this.$t('budget-expense.new-item')
+            this.titleModal = this.$t('provision.new-item')
             this.editDialog = true
-            this.listInstallments = this.installments
-            this.expense = {
+            this.provision = {
                 id: null,
                 description: null,
                 value: 0,
-                date: this.yearMonth + '-01',
+                group: null,
                 remarks: null,
-                paid: 0,
                 share_value: 0,
                 share_user_id: null,
-                financing_installment_id: null,
                 tags: [],
-                budget_id: this.budgetId,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -528,27 +399,17 @@ export default {
         },
 
         editItem(item) {
-            this.titleModal = this.$t('budget-expense.edit-item')
+            this.titleModal = this.$t('provision.edit-item')
             this.editDialog = true
-            let data = this.installments
-
-            if (item.financing_installment) {
-                data.unshift(item.financing_installment)
-            }
-
-            this.listInstallments = data
-            this.expense = {
+            this.provision = {
                 id: item.id,
                 description: item.description,
                 value: Number(item.value),
-                date: item.date,
-                paid: item.paid ? 1 : 0,
+                group: item.group,
                 remarks: item.remarks,
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
-                financing_installment_id: item.financing_installment_id,
                 tags: item.tags,
-                budget_id: item.budget_id,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -562,7 +423,7 @@ export default {
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                if (this.expense.id) {
+                if (this.provision.id) {
                     await this.update()
                 } else {
                     await this.create()
@@ -573,18 +434,15 @@ export default {
         async create() {
             this.isLoading = true
             this.$inertia.post(
-                '/budget-expense',
+                '/provision',
                 {
-                    description: this.expense.description,
-                    date: this.expense.date,
-                    value: this.expense.value,
-                    paid: this.expense.paid ? true : false,
-                    remarks: this.expense.remarks,
-                    share_value: this.expense.share_value,
-                    share_user_id: this.expense.share_user_id,
-                    financing_installment_id: this.expense.financing_installment_id,
-                    budget_id: this.expense.budget_id,
-                    tags: this.expense.tags,
+                    description: this.provision.description,
+                    value: this.provision.value,
+                    group: this.provision.group,
+                    remarks: this.provision.remarks,
+                    share_value: this.provision.share_value,
+                    share_user_id: this.provision.share_user_id,
+                    tags: this.provision.tags,
                 },
                 {
                     onSuccess: () => {
@@ -600,17 +458,15 @@ export default {
         async update() {
             this.isLoading = true
             this.$inertia.put(
-                '/budget-expense/' + this.expense.id,
+                '/provision/' + this.provision.id,
                 {
-                    description: this.expense.description,
-                    value: this.expense.value,
-                    date: this.expense.date,
-                    paid: this.expense.paid ? true : false,
-                    remarks: this.expense.remarks,
-                    share_value: this.expense.share_value,
-                    share_user_id: this.expense.share_user_id,
-                    financing_installment_id: this.expense.financing_installment_id,
-                    tags: this.expense.tags,
+                    description: this.provision.description,
+                    value: this.provision.value,
+                    group: this.provision.group,
+                    remarks: this.provision.remarks,
+                    share_value: this.provision.share_value,
+                    share_user_id: this.provision.share_user_id,
+                    tags: this.provision.tags,
                 },
                 {
                     onSuccess: () => {
@@ -630,7 +486,7 @@ export default {
 
         remove() {
             this.isLoading = true
-            this.$inertia.delete(`/budget-expense/${this.deleteId}`, {
+            this.$inertia.delete(`/provision/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {

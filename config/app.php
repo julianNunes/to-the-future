@@ -168,6 +168,12 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        /**
+         * Others Providers
+         */
+        App\Providers\RepositoryServiceProvider::class,
+
     ])->toArray(),
 
     /*
@@ -183,6 +189,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
+        'TagService' => App\Services\Facades\TagService::class
+
     ])->toArray(),
 
 ];

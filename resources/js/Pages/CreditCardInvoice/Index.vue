@@ -71,7 +71,7 @@
                         <v-data-table
                             :headers="headers"
                             :items="invoices"
-                            :sort-by="[{ key: 'due_date', order: 'desc' }]"
+                            :sort-by="[{ key: 'due_date', order: 'asc' }]"
                             :search="search"
                             :loading="isLoading"
                             :loading-text="$t('default.loading-text-table')"
@@ -260,7 +260,7 @@ export default {
                 { title: 'Total', key: 'total' },
                 { title: this.$t('default.total-paid'), key: 'total_paid' },
                 { title: this.$t('credit-card-invoice.closed'), key: 'closed' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
+                // { title: this.$t('default.remarks'), key: 'remarks' },
                 { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
             ],
             rules: {

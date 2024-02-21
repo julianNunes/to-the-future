@@ -3,19 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\TagService;
+use App\Services\Interfaces\TagServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class TagController extends Controller
 {
-
-    protected $tagService;
-
-    public function __construct(TagService $tagService)
+    public function __construct(private TagServiceInterface $tagService)
     {
-        $this->tagService = $tagService;
     }
 
     /**

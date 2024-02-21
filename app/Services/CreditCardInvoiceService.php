@@ -54,7 +54,7 @@ class CreditCardInvoiceService
             throw new Exception('credit-card.not-found');
         }
 
-        $credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $month])->first();
+        $credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $month, 'credit_card_id' => $creditCardId])->first();
 
         if ($credit_card_invoice) {
             throw new Exception('credit-card-invoice.already-exists');
@@ -78,7 +78,7 @@ class CreditCardInvoiceService
             $new_closing_date = $closing_date->copy()->addMonth();
 
             for ($i = $new_due_date->month; $i <= 12; $i++) {
-                $new_credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $new_due_date->month])->first();
+                $new_credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $new_due_date->month, 'credit_card_id' => $creditCardId])->first();
 
                 if (!$new_credit_card_invoice) {
                     $new_credit_card_invoice = new CreditCardInvoice([

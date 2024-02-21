@@ -50,6 +50,13 @@
                         :installments="installments"
                     />
                     <BudgetIncome :budget-id="budgetId" :year-month="yearMonthModel" :incomes="budgetIncomes" />
+                    <InvoiceExpense
+                        v-for="invoice in creditCardInvoices"
+                        :key="invoice.id"
+                        :invoice="invoice"
+                        :share-users="shareUsers"
+                        :title-card="true"
+                    />
                 </v-window-item>
                 <v-window-item v-if="shareUser" value="two">
                     <BudgetExpense :expenses="budgetShareExpenses" :view-only="true" />
@@ -57,6 +64,14 @@
                         :budget-id="budgetId"
                         :year-month="yearMonthModel"
                         :incomes="budgetShareIncomes"
+                        :view-only="true"
+                    />
+                    <InvoiceExpense
+                        v-for="invoice in creditCardInvoicesShare"
+                        :key="invoice.id"
+                        :invoice="invoice"
+                        :share-users="shareUsers"
+                        :title-card="true"
                         :view-only="true"
                     />
                 </v-window-item>
@@ -70,6 +85,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import BudgetExpense from '../../Components/Budget/BudgetExpense.vue'
 import BudgetIncome from '../../Components/Budget/BudgetIncome.vue'
+import InvoiceExpense from '../../Components/CreditCardInvoice/InvoiceExpense.vue'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 </script>
 
@@ -88,8 +104,14 @@ export default {
         budget: {
             type: Object,
         },
+        creditCardInvoices: {
+            type: Array,
+        },
         budgetShare: {
             type: Object,
+        },
+        creditCardInvoicesShare: {
+            type: Array,
         },
         shareUser: {
             type: Object,
@@ -98,6 +120,9 @@ export default {
             type: Array,
         },
         installments: {
+            type: Array,
+        },
+        goalsCharts: {
             type: Array,
         },
     },

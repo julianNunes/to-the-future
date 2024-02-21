@@ -1,6 +1,6 @@
 <template>
     <!-- Dados do cartão -->
-    <v-expansion-panels v-model="panel" :readonly="!titleCard">
+    <v-expansion-panels v-model="panel" :readonly="!titleCard" class="mt-2">
         <v-expansion-panel>
             <v-expansion-panel-title class="bg-primary">
                 <template #default="{ expanded }">
@@ -12,7 +12,6 @@
                     </v-row>
                 </template>
             </v-expansion-panel-title>
-
             <v-expansion-panel-text class="pa-4">
                 <v-row dense>
                     <v-col cols="12" sm="12" md="2">
@@ -511,7 +510,7 @@
     </v-dialog>
 
     <!-- Dialog delete -->
-    <v-row justify="center">
+    <v-row v-if="deleteDialog" justify="center">
         <v-dialog v-model="deleteDialog" persistent width="800">
             <v-card>
                 <v-card-text>
@@ -650,7 +649,7 @@
     </v-dialog>
 
     <!-- Dialog delete Division -->
-    <v-row justify="center">
+    <v-row v-if="deleteDivisionDialog" justify="center">
         <v-dialog v-model="deleteDivisionDialog" persistent width="auto">
             <v-card>
                 <v-card-text>
@@ -691,9 +690,6 @@ export default {
             type: Object,
         },
         shareUsers: {
-            type: Array,
-        },
-        installments: {
             type: Array,
         },
         titleCard: {

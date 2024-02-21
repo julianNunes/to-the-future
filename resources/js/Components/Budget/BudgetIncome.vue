@@ -36,7 +36,9 @@
                             <!-- Itens -->
                             <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                            <template #[`item.remarks`]="{ item }">{{ $t(item.remarks) }}</template>
+                            <template #[`item.remarks`]="{ item }">{{
+                                item.remarks.match(/(\S+)\.(\S+)/gm) ? $t(item.remarks) : item.remarks
+                            }}</template>
                             <template #[`item.tags`]="{ item }">{{
                                 item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
                             }}</template>
@@ -211,7 +213,7 @@ import { sumField, currencyField } from '../../utils/utils.js'
 
 <script>
 export default {
-    name: 'BudgetExpense',
+    name: 'BudgetIncome',
     props: {
         budgetId: {
             type: Number,
@@ -245,8 +247,8 @@ export default {
             removeDialog: false,
             isLoading: false,
             deleteId: null,
-            panel: 0,
-            invoice: {
+            panel: 1,
+            income: {
                 id: null,
                 description: null,
                 value: 0,

@@ -16,7 +16,6 @@
                         <v-data-table
                             :headers="headers"
                             :items="tags"
-                            :sort-by="[{ key: 'name', order: 'asc' }]"
                             :search="search"
                             :loading="isLoading"
                             :loading-text="$t('default.loading-text-table')"
@@ -35,7 +34,7 @@
                             fixed-header
                         >
                             <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('default.edit')" location="top">
+                                <v-tooltip v-if="item.user_id" :text="$t('default.edit')" location="top">
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
@@ -47,7 +46,7 @@
                                         </v-icon>
                                     </template>
                                 </v-tooltip>
-                                <v-tooltip :text="$t('default.delete')" location="top">
+                                <v-tooltip v-if="item.user_id" :text="$t('default.delete')" location="top">
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
@@ -61,6 +60,7 @@
                                     </template>
                                 </v-tooltip>
                             </template>
+                            <!-- Barra de pesquisa -->
                             <template #top>
                                 <v-toolbar density="comfortable">
                                     <v-row dense>
@@ -119,7 +119,7 @@
         </v-dialog>
 
         <!-- Dialog delete -->
-        <v-row justify="center">
+        <v-row v-if="removeDialog" justify="center">
             <v-dialog v-model="removeDialog" persistent width="auto">
                 <v-card>
                     <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
