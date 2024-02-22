@@ -3,25 +3,27 @@
 namespace App\Services;
 
 use App\Models\FinancingInstallment;
-use App\Models\Financing;
-use App\Models\ShareUser;
+use App\Repositories\Interfaces\FinancingInstallmentRepositoryInterface;
+use App\Repositories\Interfaces\FinancingRepositoryInterface;
+use App\Services\Interfaces\FinancingInstallmentServiceInterface;
 use Exception;
 use Illuminate\Support\Carbon;
 
-class FinancingInstallmentService
+class FinancingInstallmentService implements FinancingInstallmentServiceInterface
 {
-    public function __construct()
-    {
+    public function __construct(
+        private FinancingRepositoryInterface $financingRepository,
+        private FinancingInstallmentRepositoryInterface $financingInstallmentRepository
+    ) {
     }
 
     /**
-     * Retorna os dados para o Gerenciamento das Parcelas do Financiamento
+     * Returns data for Financing Installment Management
      * @return Array
      */
     public function index(int $financingId): array
     {
-        $financing = Financing::with('installments')->find($financingId);
-
+        $financing = $this->financingRepository->show($financingId, ['installments']);
         return [
             'financing' => $financing,
             'installments' => $financing->installments,
@@ -29,7 +31,7 @@ class FinancingInstallmentService
     }
 
     /**
-     *
+     * Update a Installment of Financing
      * @param integer $id
      * @param string $date
      * @param float $value
@@ -45,64 +47,19 @@ class FinancingInstallmentService
         bool $paid,
         string $paymentDate = null,
         float $paidValue = null,
-    ): bool {
-        $installment = FinancingInstallment::find($id);
+    ): FinancingInstallment {
+        $installment = $this->financingInstallmentRepository->show($id);
 
         if (!$installment) {
             throw new Exception('financing-installment.not-found');
         }
 
-        return $installment->update([
+        return $this->financingInstallmentRepository->store([
             'date' => Carbon::parse($date)->format('y-m-d'),
             'value' => $value,
             'paid' => $paid,
             'payment_date' => $paymentDate ? Carbon::parse($paymentDate)->format('y-m-d') : null,
             'paid_value' => $paidValue,
-        ]);
-    }
-
-    /**
-     * Deleta uma fatura do cartão de credito
-     * @param int $id
-     */
-    public function delete(int $id): bool
-    {
-        $credit_card_invoice = FinancingInstallment::with([
-            'file',
-            'expenses' => [
-                'divisions' => [
-                    'tags'
-                ],
-                'tags'
-            ]
-        ])->find($id);
-
-
-        if (!$credit_card_invoice) {
-            throw new Exception('credit-card-invoice.not-found');
-        }
-
-        // Remove todos os vinculos
-        foreach ($credit_card_invoice->expenses as $expense) {
-            foreach ($expense->divisions as $division) {
-                if ($division->tags && $division->tags->count()) {
-                    $division->tags()->detach();
-                }
-
-                $division->delete();
-            }
-
-            if ($expense->tags && $expense->tags->count()) {
-                $expense->tags()->detach();
-            }
-
-            $expense->delete();
-        }
-
-        if ($credit_card_invoice->file) {
-            $credit_card_invoice->file->delete();
-        }
-
-        return $credit_card_invoice->delete();
+        ], $installment);
     }
 }

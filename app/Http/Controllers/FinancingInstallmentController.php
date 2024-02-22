@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\FinancingInstallmentService;
-use App\Services\FinancingService;
+use App\Services\Interfaces\FinancingInstallmentServiceInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FinancingInstallmentController extends Controller
 {
-    protected $financingInstallmentService;
 
-    public function __construct(FinancingInstallmentService $financingInstallmentService)
+    public function __construct(private FinancingInstallmentServiceInterface $financingInstallmentService)
     {
-        $this->financingInstallmentService = $financingInstallmentService;
     }
 
     /**

@@ -424,29 +424,6 @@ export default {
                 }
             )
         },
-
-        openDelete(item) {
-            this.deleteId = item.id
-            this.removeDialog = true
-        },
-
-        remove() {
-            this.isLoading = true
-            this.$inertia.delete(`/financing/installment/${this.deleteId}`, {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {
-                    this.removeDialog = false
-                    this.editDialog = false
-                },
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-            })
-        },
     },
 }
 </script>
