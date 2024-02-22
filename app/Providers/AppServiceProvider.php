@@ -3,11 +3,15 @@
 namespace App\Providers;
 
 use App\Services\Interfaces\{
+    FinancingInstallmentServiceInterface,
+    FinancingServiceInterface,
     FixExpenseServiceInterface,
     ProvisionServiceInterface,
     TagServiceInterface
 };
 use App\Services\{
+    FinancingInstallmentService,
+    FinancingService,
     FixExpenseService,
     ProvisionService,
     TagService
@@ -27,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
 
         // Apps Services
+        $this->app->bind(FinancingServiceInterface::class, FinancingService::class);
+        $this->app->bind(FinancingInstallmentServiceInterface::class, FinancingInstallmentService::class);
         $this->app->bind(FixExpenseServiceInterface::class, FixExpenseService::class);
         $this->app->bind(ProvisionServiceInterface::class, ProvisionService::class);
         $this->app->bind(TagServiceInterface::class, TagService::class);

@@ -53,6 +53,7 @@
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
+                                            class="ml-1"
                                             color="warning"
                                             icon="mdi-pencil"
                                             size="small"

@@ -4,21 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\CreditCardService;
+use App\Services\Interfaces\CreditCardServiceInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CreditCardController extends Controller
 {
-
-    protected $creditCardService;
-
-    public function __construct(CreditCardService $creditCardService)
+    public function __construct(private CreditCardServiceInterface $creditCardService)
     {
-        $this->creditCardService = $creditCardService;
     }
 
     /**
-     * Retorna os dados para o index de Cartão de Credito
+     * Returns data to Credit Card Management
      */
     public function index()
     {
@@ -27,7 +24,8 @@ class CreditCardController extends Controller
     }
 
     /**
-     * Cria um novo Cartão de Credito
+     * Create new Credit Card
+     * @param Request $request
      */
     public function store(Request $request)
     {
@@ -51,7 +49,9 @@ class CreditCardController extends Controller
     }
 
     /**
-     * Atualiza um Cartão de Credito
+     * Update a Credit Card
+     * @param Request $request
+     * @param integer $id
      */
     public function update(Request $request, int $id)
     {
@@ -75,7 +75,8 @@ class CreditCardController extends Controller
     }
 
     /**
-     * Deleta um Cartão de Credito
+     * Deleta a Credit Card
+     * @param integer $id
      */
     public function delete(int $id)
     {
