@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Tag;
+use App\Repositories\Interfaces\TagRepositoryInterface;
 use App\Repositories\TagRepository;
 use App\Services\Interfaces\TagServiceInterface;
 use Exception;
@@ -12,7 +13,7 @@ use Illuminate\Support\Collection;
 
 class TagService implements TagServiceInterface
 {
-    public function __construct(private TagRepository $tagRepository)
+    public function __construct(private TagRepositoryInterface $tagRepository)
     {
     }
 
