@@ -4,30 +4,34 @@ namespace App\Services;
 
 use App\Models\Financing;
 use App\Models\FinancingInstallment;
+use App\Repositories\Interfaces\FinancingInstallmentRepositoryInterface;
+use App\Repositories\Interfaces\FinancingRepositoryInterface;
+use App\Services\Interfaces\FinancingServiceInterface;
 use Illuminate\Support\Carbon;
 use Exception;
 
-class FinancingService
+class FinancingService implements FinancingServiceInterface
 {
-    public function __construct()
-    {
+    public function __construct(
+        private FinancingRepositoryInterface $financingRepository,
+        private FinancingInstallmentRepositoryInterface $financingInstallmentRepository
+    ) {
     }
 
     /**
-     * Retorna os dados para o Gerenciamento de Financiamentos
+     * Returns data to Financial Management
      * @return Array
      */
     public function index(): array
     {
-        $financings = Financing::where('user_id', auth()->user()->id)->get();
-
+        $financings = $this->financingRepository->get(['user_id' => auth()->user()->id], [], [], []);
         return [
             'financings' => $financings,
         ];
     }
 
     /**
-     * Cria um novo Financiamento
+     * Create a new Financing amd your installments
      * @param string $description
      * @param string $startDate
      * @param float $total
@@ -48,7 +52,7 @@ class FinancingService
         float $valueInstallment,
         string $remarks = null
     ): Financing {
-        $financing = new Financing([
+        $financing = $this->financingRepository->store([
             'description' => $description,
             'start_date' => Carbon::parse($startDate)->format('y-m-d'),
             'total' => $total,
@@ -58,11 +62,9 @@ class FinancingService
             'user_id' => auth()->user()->id
         ]);
 
-        $financing->save();
-
         $start_date = Carbon::parse($startDateInstallment);
         for ($i = 1; $i <= $portionTotal; $i++) {
-            $installment = new FinancingInstallment([
+            $this->financingInstallmentRepository->store([
                 'value' => $valueInstallment,
                 'portion' => $i,
                 'date' => $start_date->format('Y-m-d'),
@@ -70,7 +72,6 @@ class FinancingService
                 'financing_id' => $financing->id,
             ]);
 
-            $installment->save();
             $start_date->addMonth(1);
         }
 
@@ -78,8 +79,8 @@ class FinancingService
     }
 
     /**
-     * Edita um Financiamento. Apenas alguns dados estao disponiveis
-     * A atualização das parcelas irá ocorrer apenas nas parcelas que estiverem em aberto
+     * Edit a Financing. Only some data are available.
+     * Updating of installments will only occur in installments that are open
      * @param integer $id
      * @param string $description
      * @param string $startDate
@@ -97,8 +98,8 @@ class FinancingService
         float $feesMonthly,
         float $valueInstallment = null,
         string $remarks = null
-    ): bool {
-        $financing = Financing::with('installments')->find($id);
+    ): Financing {
+        $financing = $this->financingRepository->show($id, ['installments']);
 
         if (!$financing) {
             throw new Exception('financing.not-found');
@@ -107,27 +108,27 @@ class FinancingService
         if ($valueInstallment) {
             foreach ($financing->installments as $installment) {
                 if (!$installment->paid) {
-                    $installment->update(['value' => $valueInstallment]);
+                    $this->financingInstallmentRepository->store(['value' => $valueInstallment], $installment);
                 }
             }
         }
 
-        return $financing->update([
+        return $this->financingRepository->store([
             'description' => $description,
             'start_date' => Carbon::parse($startDate)->format('y-m-d'),
             'total' => $total,
             'feesMonthly' => $feesMonthly,
             'remarks' => $remarks,
-        ]);
+        ], $financing);
     }
 
     /**
-     * Deleta um Financiamento
+     * Deleta a Financing
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $financing = Financing::with(['installments'])->find($id);
+        $financing = $this->financingRepository->show($id, ['installments']);
 
         if (!$financing) {
             throw new Exception('financing.not-found');
@@ -135,9 +136,9 @@ class FinancingService
 
         // Remove todos os vinculos
         foreach ($financing->installments as $installment) {
-            $installment->delete();
+            $this->financingInstallmentRepository->delete($installment->id);
         }
 
-        return $financing->delete();
+        return $this->financingRepository->delete($id);
     }
 }

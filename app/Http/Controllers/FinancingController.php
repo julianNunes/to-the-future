@@ -4,20 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\FinancingService;
+use App\Services\Interfaces\FinancingServiceInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FinancingController extends Controller
 {
-    protected $financingService;
-
-    public function __construct(FinancingService $financingService)
+    public function __construct(private FinancingServiceInterface $financingService)
     {
-        $this->financingService = $financingService;
     }
 
     /**
-     * Retorna os dados para o index de Financiamento
+     * Returns data to Financial Management
      */
     public function index()
     {

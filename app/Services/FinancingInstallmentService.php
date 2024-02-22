@@ -7,7 +7,6 @@ use App\Models\Financing;
 use App\Models\ShareUser;
 use Exception;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class FinancingInstallmentService
 {

@@ -5,10 +5,10 @@ namespace App\Services;
 use App\Models\Provision;
 use App\Repositories\Interfaces\ProvisionRepositoryInterface;
 use App\Repositories\Interfaces\ShareUserRepositoryInterface;
-use App\Services\Facades\TagService;
 use App\Services\Interfaces\ProvisionServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
+use TagService;
 
 class ProvisionService implements ProvisionServiceInterface
 {
@@ -24,7 +24,6 @@ class ProvisionService implements ProvisionServiceInterface
      */
     public function index(): array
     {
-        // $provisions = Provision::where('user_id', auth()->user()->id)->with('shareUser', 'tags')->get();
         $provisions = $this->provisionRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser', 'tags']);
         $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
 

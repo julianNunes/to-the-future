@@ -3,22 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\FixExpenseService;
+use App\Services\Interfaces\FixExpenseServiceInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FixExpenseController extends Controller
 {
-
-    protected $fixExpenseService;
-
-    public function __construct(FixExpenseService $fixExpenseService)
+    public function __construct(private FixExpenseServiceInterface $fixExpenseService)
     {
-        $this->fixExpenseService = $fixExpenseService;
     }
 
     /**
-     * Retorna os dados para o index de Despesa FIxa
+     * Returns data for the Fixed Expense index
      */
     public function index()
     {
@@ -27,7 +23,8 @@ class FixExpenseController extends Controller
     }
 
     /**
-     * Cria um novo Despesa FIxa
+     *  Create a new Fix Expense
+     *  @param Request $request
      */
     public function store(Request $request)
     {
@@ -51,7 +48,9 @@ class FixExpenseController extends Controller
     }
 
     /**
-     * Atualiza um Despesa FIxa
+     * Update a Fix Expense
+     * @param Request $request
+     * @param int $id
      */
     public function update(Request $request, int $id)
     {
@@ -75,7 +74,8 @@ class FixExpenseController extends Controller
     }
 
     /**
-     * Deleta um Despesa FIxa
+     * Deleta a Fix Expense
+     * @param int $id
      */
     public function delete(int $id)
     {

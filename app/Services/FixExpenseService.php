@@ -3,26 +3,29 @@
 namespace App\Services;
 
 use App\Models\FixExpense;
-use App\Models\ShareUser;
-use App\Services\TagService;
+use App\Repositories\Interfaces\FixExpenseRepositoryInterface;
+use App\Repositories\Interfaces\ShareUserRepositoryInterface;
+use App\Services\Interfaces\FixExpenseServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
+use TagService;
 
-
-class FixExpenseService
+class FixExpenseService implements FixExpenseServiceInterface
 {
-    public function __construct()
-    {
+    public function __construct(
+        private FixExpenseRepositoryInterface $fixExpenseRepository,
+        private ShareUserRepositoryInterface $shareUserRepository
+    ) {
     }
 
     /**
-     * Retorna os dados para o index de Gerenciamento de Despesas Fixas
+     *  Returns data for the Fixed Expense index
      * @return Array
      */
     public function index(): array
     {
-        $expenses = FixExpense::where('user_id', auth()->user()->id)->with(['shareUser', 'tags'])->get();
-        $shareUsers = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->get();
+        $expenses = $this->fixExpenseRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser', 'tags']);
+        $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
 
         if ($shareUsers && $shareUsers->count()) {
             $shareUsers = $shareUsers->map(function ($item) {
@@ -39,7 +42,17 @@ class FixExpenseService
         ];
     }
 
-
+    /**
+     * Create a new Fix Expense
+     * @param string $description
+     * @param string $dueDate
+     * @param float $value
+     * @param string|null $remarks
+     * @param float|null $shareValue
+     * @param integer|null $shareUserId
+     * @param Collection|null $tags
+     * @return FixExpense
+     */
     public function create(
         string $description,
         string $dueDate,
@@ -49,7 +62,7 @@ class FixExpenseService
         int $shareUserId = null,
         Collection $tags = null,
     ): FixExpense {
-        $expense = new FixExpense([
+        $expense = $this->fixExpenseRepository->store([
             'description' => $description,
             'due_date' => $dueDate,
             'value' => $value,
@@ -59,14 +72,23 @@ class FixExpenseService
             'user_id' => auth()->user()->id
         ]);
 
-        $expense->save();
-
         // Salva Tags
         TagService::saveTagsToModel($expense, $tags);
-
         return $expense;
     }
 
+    /**
+     * Update a Fix Expense
+     * @param integer $id
+     * @param string $description
+     * @param string $dueDate
+     * @param float $value
+     * @param string|null $remarks
+     * @param float|null $shareValue
+     * @param integer|null $shareUserId
+     * @param Collection|null $tags
+     * @return FixExpense
+     */
     public function update(
         int $id,
         string $description,
@@ -76,17 +98,17 @@ class FixExpenseService
         float $shareValue = null,
         int $shareUserId = null,
         Collection $tags = null,
-    ): bool {
-        $expense = FixExpense::with(['tags'])->find($id);
+    ): FixExpense {
+        $expense = $this->fixExpenseRepository->show($id);
 
         if (!$expense) {
-            throw new Exception('provision.not-found');
+            throw new Exception('fix-expense.not-found');
         }
 
         // Atualiza Tags
         TagService::saveTagsToModel($expense, $tags);
 
-        return $expense->update([
+        return $this->fixExpenseRepository->store([
             'description' => $description,
             'value' => $value,
             'due_date' => $dueDate,
@@ -94,16 +116,16 @@ class FixExpenseService
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
             'user_id' => auth()->user()->id
-        ]);
+        ], $expense);
     }
 
     /**
-     * Deleta um Provisionamento
+     * Deleta a Fix Expense
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $expense = FixExpense::find($id);
+        $expense = $this->fixExpenseRepository->show($id);
 
         if (!$expense) {
             throw new Exception('fix-expense.not-found');
@@ -112,6 +134,6 @@ class FixExpenseService
         // Remove Tags
         TagService::saveTagsToModel($expense);
 
-        return $expense->delete();
+        return $this->fixExpenseRepository->delete($id);
     }
 }

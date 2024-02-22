@@ -126,14 +126,14 @@ Route::controller(BudgetController::class)->group(function () {
 Route::controller(BudgetExpenseController::class)->group(function () {
     Route::post('/budget-expense', 'store');
     Route::put('/budget-expense/{id}', 'update');
-    Route::delete('/fix-expense/{id}', 'delete');
+    Route::delete('/budget-expense/{id}', 'delete');
 });
 
 // Despesas do Orçamento
 Route::controller(BudgetIncomeController::class)->group(function () {
     Route::post('/budget-income', 'store');
     Route::put('/budget-income/{id}', 'update');
-    Route::delete('/fix-income/{id}', 'delete');
+    Route::delete('/budget-income/{id}', 'delete');
 });
 
 require __DIR__ . '/auth.php';
