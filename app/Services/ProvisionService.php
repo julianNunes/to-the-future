@@ -3,15 +3,19 @@
 namespace App\Services;
 
 use App\Models\Provision;
-use App\Models\ShareUser;
+use App\Repositories\Interfaces\ProvisionRepositoryInterface;
+use App\Repositories\Interfaces\ShareUserRepositoryInterface;
 use App\Services\Facades\TagService;
+use App\Services\Interfaces\ProvisionServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
 
-class ProvisionService
+class ProvisionService implements ProvisionServiceInterface
 {
-    public function __construct()
-    {
+    public function __construct(
+        private ProvisionRepositoryInterface $provisionRepository,
+        private ShareUserRepositoryInterface $shareUserRepository
+    ) {
     }
 
     /**
@@ -20,8 +24,9 @@ class ProvisionService
      */
     public function index(): array
     {
-        $provisions = Provision::where('user_id', auth()->user()->id)->with('shareUser', 'tags')->get();
-        $shareUsers = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->get();
+        // $provisions = Provision::where('user_id', auth()->user()->id)->with('shareUser', 'tags')->get();
+        $provisions = $this->provisionRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser', 'tags']);
+        $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
 
         if ($shareUsers && $shareUsers->count()) {
             $shareUsers = $shareUsers->map(function ($item) {
@@ -58,7 +63,7 @@ class ProvisionService
         int $shareUserId = null,
         Collection $tags
     ): Provision {
-        $provision = new Provision([
+        $provision = $this->provisionRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
@@ -67,8 +72,6 @@ class ProvisionService
             'share_user_id' => $shareUserId,
             'user_id' => auth()->user()->id
         ]);
-
-        $provision->save();
 
         // Atualiza Tags
         TagService::saveTagsToModel($provision, $tags);
@@ -85,7 +88,7 @@ class ProvisionService
      * @param integer $shareValue
      * @param integer|null $shareUserId
      * @param Collection $tags
-     * @return bool
+     * @return Provision
      */
     public function update(
         int $id,
@@ -96,8 +99,8 @@ class ProvisionService
         float $shareValue = null,
         int $shareUserId = null,
         Collection $tags
-    ): bool {
-        $provision = Provision::find($id);
+    ): Provision {
+        $provision = $this->provisionRepository->show($id);
 
         if (!$provision) {
             throw new Exception('provision.not-found');
@@ -106,7 +109,7 @@ class ProvisionService
         // Atualiza Tags
         TagService::saveTagsToModel($provision, $tags);
 
-        return $provision->update([
+        return $this->provisionRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
@@ -114,7 +117,7 @@ class ProvisionService
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
             'user_id' => auth()->user()->id
-        ]);
+        ], $provision);
     }
 
     /**
@@ -123,8 +126,7 @@ class ProvisionService
      */
     public function delete(int $id): bool
     {
-        $provision = Provision::find($id);
-
+        $provision = $this->provisionRepository->show($id);
 
         if (!$provision) {
             throw new Exception('provision.not-found');
@@ -133,6 +135,6 @@ class ProvisionService
         // Remove Tags
         TagService::saveTagsToModel($provision);
 
-        return $provision->delete();
+        return $this->provisionRepository->delete($id);
     }
 }

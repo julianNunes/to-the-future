@@ -5,7 +5,7 @@ namespace App\Repositories\Interfaces;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-interface TagRepositoryInterface
+interface TagRepositoryInterface extends AppRepositoryInterface
 {
     /**
      * Retorna os dados para o index de Tag

@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\Interfaces\ProvisionServiceInterface;
 use App\Services\ProvisionService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProvisionController extends Controller
 {
-
-    protected $provisionService;
-
-    public function __construct(ProvisionService $provisionService)
+    public function __construct(private ProvisionServiceInterface $provisionService)
     {
-        $this->provisionService = $provisionService;
     }
 
     /**

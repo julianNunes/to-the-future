@@ -8,6 +8,41 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * App\Models\Budget
+ *
+ * @property int $id
+ * @property string $year Ano da fatura
+ * @property string $month Mês de vencimento
+ * @property string $total_expense Total de Despesas
+ * @property string $total_income Total da Receita
+ * @property int $closed Marcador para finalizar o Orçamento
+ * @property int $user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BudgetExpense> $expenses
+ * @property-read int|null $expenses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BudgetGoal> $goals
+ * @property-read int|null $goals_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BudgetIncome> $incomes
+ * @property-read int|null $incomes_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BudgetProvision> $provisions
+ * @property-read int|null $provisions_count
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereClosed($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereMonth($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereTotalExpense($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereTotalIncome($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Budget whereYear($value)
+ * @mixin \Eloquent
+ */
 class Budget extends Model
 {
     use HasFactory;

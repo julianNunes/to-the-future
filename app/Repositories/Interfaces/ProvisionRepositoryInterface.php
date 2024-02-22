@@ -2,6 +2,6 @@
 
 namespace App\Repositories\Interfaces;
 
-interface ProvisionRepositoryInterface
+interface ProvisionRepositoryInterface extends AppRepositoryInterface
 {
 }

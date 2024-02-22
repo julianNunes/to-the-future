@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Tag;
 use App\Repositories\Interfaces\TagRepositoryInterface;
-use App\Repositories\TagRepository;
 use App\Services\Interfaces\TagServiceInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -44,7 +43,7 @@ class TagService implements TagServiceInterface
 
         $tag = $this->tagRepository->store([
             'name' => $name,
-            'user_id' => auth()->user()->id
+            'user_id' => auth()->user()->id,
         ]);
 
         return $tag;
@@ -73,8 +72,8 @@ class TagService implements TagServiceInterface
         }
 
         return $this->tagRepository->store([
-            'name' => $name,
-            'user_id' => auth()->user()->id
+            'name'    => $name,
+            'user_id' => auth()->user()->id,
         ], $tag);
     }
 

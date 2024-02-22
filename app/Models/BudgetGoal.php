@@ -8,6 +8,33 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+/**
+ * App\Models\BudgetGoal
+ *
+ * @property int $id
+ * @property string $description Descrição
+ * @property string $value Valor da meta
+ * @property string|null $group
+ * @property int $count_only_share
+ * @property int $budget_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Budget $budget
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Tag> $tags
+ * @property-read int|null $tags_count
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal query()
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal whereBudgetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal whereCountOnlyShare($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal whereGroup($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|BudgetGoal whereValue($value)
+ * @mixin \Eloquent
+ */
 class BudgetGoal extends Model
 {
     use HasFactory;

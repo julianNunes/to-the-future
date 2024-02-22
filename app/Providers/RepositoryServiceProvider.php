@@ -4,10 +4,14 @@ namespace App\Providers;
 
 use App\Repositories\{
     AppRepository,
+    ProvisionRepository,
+    ShareUserRepository,
     TagRepository
 };
 use App\Repositories\Interfaces\{
     AppRepositoryInterface,
+    ProvisionRepositoryInterface,
+    ShareUserRepositoryInterface,
     TagRepositoryInterface
 };
 use Illuminate\Support\ServiceProvider;
@@ -20,7 +24,9 @@ class RepositoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(AppRepositoryInterface::class, AppRepository::class);
+        $this->app->bind(ShareUserRepositoryInterface::class, ShareUserRepository::class);
         $this->app->bind(TagRepositoryInterface::class, TagRepository::class);
+        $this->app->bind(ProvisionRepositoryInterface::class, ProvisionRepository::class);
     }
 
     /**

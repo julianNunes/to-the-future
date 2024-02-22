@@ -170,9 +170,14 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         /**
-         * Others Providers
+         * System Providers
          */
         App\Providers\RepositoryServiceProvider::class,
+
+        /**
+         * Others Providers
+         */
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
     ])->toArray(),
 

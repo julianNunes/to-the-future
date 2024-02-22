@@ -2,8 +2,14 @@
 
 namespace App\Providers;
 
-use App\Services\Interfaces\TagServiceInterface;
-use App\Services\TagService;
+use App\Services\Interfaces\{
+    ProvisionServiceInterface,
+    TagServiceInterface
+};
+use App\Services\{
+    ProvisionService,
+    TagService
+};
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,11 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if ($this->app->isLocal()) {
-            $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
-        }
+        // if ($this->app->isLocal()) {
+        //     $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        // }
+        $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
 
+        // Apps Services
         $this->app->bind(TagServiceInterface::class, TagService::class);
+        $this->app->bind(ProvisionServiceInterface::class, ProvisionService::class);
     }
 
     /**
