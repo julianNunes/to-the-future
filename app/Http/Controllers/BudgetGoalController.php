@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\BudgetExpenseService;
 use App\Services\Interfaces\BudgetExpenseServiceInterface;
+use App\Services\Interfaces\BudgetGoalServiceInterface;
 use Illuminate\Http\Request;
 
-class BudgetExpenseController extends Controller
+class BudgetGoalController extends Controller
 {
-    public function __construct(private BudgetExpenseServiceInterface $budgetExpenseSevice)
+    public function __construct(private BudgetGoalServiceInterface $budgetGoalService)
     {
     }
 
@@ -20,22 +22,18 @@ class BudgetExpenseController extends Controller
     {
         $this->validate($request, [
             'description' => ['required'],
-            'date' => ['required'],
             'value' => ['required'],
-            'paid' => ['required'],
+            'group' => ['required'],
+            'count_only_share' => ['required'],
             'budget_id' => ['required'],
         ]);
 
-        $this->budgetExpenseSevice->create(
+        $this->budgetGoalService->create(
             $request->description,
-            $request->date,
             floatval($request->value),
-            $request->remarks,
-            $request->paid == 1 ? true : false,
+            $request->group,
+            $request->count_only_share == 1 ? true : false,
             intval($request->budget_id),
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            $request->financing_installment_id ? intval($request->financing_installment_id) : null,
             collect($request->tags)
         );
 
@@ -51,22 +49,18 @@ class BudgetExpenseController extends Controller
     {
         $this->validate($request, [
             'description' => ['required'],
-            'date' => ['required'],
             'value' => ['required'],
-            'paid' => ['required'],
-            // 'budget_id' => ['budget_id'],
+            'group' => ['required'],
+            'count_only_share' => ['required'],
+            'budget_id' => ['required'],
         ]);
 
-        $this->budgetExpenseSevice->update(
+        $this->budgetGoalService->update(
             $id,
             $request->description,
-            $request->date,
             floatval($request->value),
-            $request->remarks,
-            $request->paid == 1 ? true : false,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            $request->financing_installment_id ? intval($request->financing_installment_id) : null,
+            $request->group,
+            $request->count_only_share == 1 ? true : false,
             collect($request->tags)
         );
 
@@ -79,7 +73,7 @@ class BudgetExpenseController extends Controller
      */
     public function delete(int $id)
     {
-        $this->budgetExpenseSevice->delete($id);
+        $this->budgetGoalService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

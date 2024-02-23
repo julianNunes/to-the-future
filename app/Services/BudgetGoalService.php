@@ -3,18 +3,26 @@
 namespace App\Services;
 
 use App\Models\BudgetGoal;
+use App\Repositories\Interfaces\BudgetGoalRepositoryInterface;
+use App\Repositories\Interfaces\BudgetRepositoryInterface;
+use App\Repositories\Interfaces\TagRepositoryInterface;
 use App\Services\Interfaces\BudgetGoalServiceInterface;
+use App\Services\Interfaces\BudgetServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
 
 class BudgetGoalService implements BudgetGoalServiceInterface
 {
-    public function __construct()
-    {
+    public function __construct(
+        private BudgetServiceInterface $budgetService,
+        private BudgetRepositoryInterface $budgetRepository,
+        private BudgetGoalRepositoryInterface $budgetGoalRepository,
+        private TagRepositoryInterface $tagRepository,
+    ) {
     }
 
     /**
-     * Cria uma nova Meta para o Orçamento
+     * Create a new Goal to Budget
      * @param string $description
      * @param float $value
      * @param float $group
@@ -31,7 +39,7 @@ class BudgetGoalService implements BudgetGoalServiceInterface
         int $budgetId,
         Collection $tags = null
     ): BudgetGoal {
-        $goal = BudgetGoal::create([
+        $goal = $this->budgetGoalRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
@@ -39,14 +47,12 @@ class BudgetGoalService implements BudgetGoalServiceInterface
             'budget_id' => $budgetId,
         ]);
 
-        $goal->save();
-        TagService::saveTagsToModel($goal, $tags);
-
+        $this->tagRepository->saveTagsToModel($goal, $tags);
         return $goal;
     }
 
     /**
-     * Atualiza uma Meta do Orçamento
+     * Update a new Goal to Budget
      * @param integer $id
      * @param string $description
      * @param float $value
@@ -62,39 +68,39 @@ class BudgetGoalService implements BudgetGoalServiceInterface
         string $group,
         bool $countOnlyShare,
         Collection $tags = null
-    ): bool {
-        $goal = BudgetGoal::with('tags')->find($id);
+    ): BudgetGoal {
+        $goal = $this->budgetGoalRepository->show($id);
 
         if (!$goal) {
-            throw new Exception('budget-provision.not-found');
+            throw new Exception('budget-goal.not-found');
         }
 
         // Atualiza Tags
-        TagService::saveTagsToModel($goal, $tags);
+        $this->tagRepository->saveTagsToModel($goal, $tags);
 
-        return $goal->update([
+        return $this->budgetGoalRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
             'count_only_share' => $countOnlyShare,
-        ]);
+        ], $goal);
     }
 
     /**
-     * Deleta uma Provisão do Orçamento
+     * Delete a new Goal to Budget
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $goal = BudgetGoal::with('tags')->find($id);
+        $goal = $this->budgetGoalRepository->show($id);
 
         if (!$goal) {
             throw new Exception('budget-provision.not-found');
         }
 
         // Remove Tags
-        TagService::saveTagsToModel($goal);
+        $this->tagRepository->saveTagsToModel($goal);
 
-        return $goal->delete();
+        return $this->budgetGoalRepository->delete($id);
     }
 }

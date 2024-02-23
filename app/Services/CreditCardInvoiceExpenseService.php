@@ -2,10 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\CreditCard;
-use App\Models\CreditCardInvoice;
 use App\Models\CreditCardInvoiceExpense;
-use App\Models\CreditCardInvoiceExpenseDivision;
 use App\Repositories\Interfaces\{
     CreditCardInvoiceExpenseDivisionRepositoryInterface,
     CreditCardInvoiceExpenseRepositoryInterface,

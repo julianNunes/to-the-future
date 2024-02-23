@@ -43,12 +43,19 @@ TO-DO
 - Testar todo o contexto de Cartões
     - Verificar a melhor forma para fazer update das Despesas quando ela for uma parcela
 
+- CreditCardInvoiceService
+    - Verificar se tem algo que possa ser chamado em outro serviço
+
+- CreditCardInvoiceExpenseService
+    - Verificar se tem algo que possa ser chamado em outro serviço
 
 
-- BudgetCOntroller
-    - Remover os Serviços do "BudgetService" e mover para controller
-    - Transformar todos os serviços em FACADES como no projeto da AGV
-        - Problema de Referencia circular
+- Faltando ajustar:
+    - BudgetExpenseService
+    - BudgetGoalService
+    - BudgetIncomeService
+    - BudgetProvisionService
+    - BudgetService
 
 
 ORÇAMENTO SHOW
