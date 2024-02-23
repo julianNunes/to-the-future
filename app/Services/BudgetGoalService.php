@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\BudgetGoal;
-use App\Repositories\Interfaces\BudgetGoalRepositoryInterface;
-use App\Repositories\Interfaces\BudgetRepositoryInterface;
-use App\Repositories\Interfaces\TagRepositoryInterface;
+use App\Repositories\Interfaces\{
+    BudgetGoalRepositoryInterface,
+    BudgetRepositoryInterface,
+    TagRepositoryInterface,
+};
 use App\Services\Interfaces\BudgetGoalServiceInterface;
 use App\Services\Interfaces\BudgetServiceInterface;
 use Exception;
@@ -73,6 +75,12 @@ class BudgetGoalService implements BudgetGoalServiceInterface
 
         if (!$goal) {
             throw new Exception('budget-goal.not-found');
+        }
+
+        $budget = $this->budgetRepository->show($goal->budget_id);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
         }
 
         // Atualiza Tags

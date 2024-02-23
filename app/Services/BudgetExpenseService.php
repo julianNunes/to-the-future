@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Budget;
 use App\Models\BudgetExpense;
-use App\Repositories\Interfaces\BudgetExpenseRepositoryInterface;
-use App\Repositories\Interfaces\BudgetRepositoryInterface;
-use App\Repositories\Interfaces\FinancingInstallmentRepositoryInterface;
-use App\Repositories\Interfaces\TagRepositoryInterface;
+use App\Repositories\Interfaces\{
+    BudgetExpenseRepositoryInterface,
+    BudgetRepositoryInterface,
+    FinancingInstallmentRepositoryInterface,
+    TagRepositoryInterface,
+};
 use App\Services\Interfaces\BudgetExpenseServiceInterface;
 use App\Services\Interfaces\BudgetServiceInterface;
 use Illuminate\Support\Carbon;
@@ -134,7 +135,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         int $financingInstallmentId = null,
         Collection $tags = null
     ): bool {
-        $expense = $this->budgetExpenseRepository->show($id, ['tags']);
+        $expense = $this->budgetExpenseRepository->show($id);
 
         if (!$expense) {
             throw new Exception('budget-expense.not-found');

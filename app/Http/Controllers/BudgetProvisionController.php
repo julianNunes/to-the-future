@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BudgetIncomeService;
-use App\Services\Interfaces\BudgetIncomeServiceInterface;
+use App\Services\BudgetProvisionService;
+use App\Services\Interfaces\BudgetProvisionServiceInterface;
 use Illuminate\Http\Request;
 
-class BudgetIncomeController extends Controller
+class BudgetProvisionController extends Controller
 {
 
-    public function __construct(private BudgetIncomeServiceInterface $budgetIncomeSevice)
+    public function __construct(private BudgetProvisionServiceInterface $budgetProvisionSevice)
     {
     }
 
     /**
-     * Create a new Income to Budget
+     * Create a new Provision to Budget
      * @param Request $request
      */
     public function store(Request $request)
@@ -27,7 +27,7 @@ class BudgetIncomeController extends Controller
             'budget_id' => ['required'],
         ]);
 
-        $this->budgetIncomeSevice->create(
+        $this->budgetProvisionSevice->create(
             $request->description,
             $request->date,
             floatval($request->value),
@@ -40,7 +40,7 @@ class BudgetIncomeController extends Controller
     }
 
     /**
-     * Update a new Income to Budget
+     * Update a new Provision to Budget
      * @param Request $request
      * @param int $id
      */
@@ -53,7 +53,7 @@ class BudgetIncomeController extends Controller
             // 'budget_id' => ['budget_id'],
         ]);
 
-        $this->budgetIncomeSevice->update(
+        $this->budgetProvisionSevice->update(
             $id,
             $request->description,
             $request->date,
@@ -66,12 +66,12 @@ class BudgetIncomeController extends Controller
     }
 
     /**
-     * Delete a new Income to Budget
+     * Delete a new Provision to Budget
      * @param int $id
      */
     public function delete(int $id)
     {
-        $this->budgetIncomeSevice->delete($id);
+        $this->budgetProvisionSevice->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

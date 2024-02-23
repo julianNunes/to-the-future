@@ -3,20 +3,28 @@
 namespace App\Services;
 
 use App\Models\BudgetIncome;
+use App\Repositories\Interfaces\{
+    BudgetIncomeRepositoryInterface,
+    BudgetRepositoryInterface,
+    TagRepositoryInterface,
+};
 use App\Services\Interfaces\BudgetIncomeServiceInterface;
-use Illuminate\Support\Carbon;
+use App\Services\Interfaces\BudgetServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
 
 class BudgetIncomeService implements BudgetIncomeServiceInterface
 {
-    // public function __construct(private BudgetService $budgetService)
-    public function __construct()
-    {
+    public function __construct(
+        private BudgetServiceInterface $budgetService,
+        private BudgetRepositoryInterface $budgetRepository,
+        private BudgetIncomeRepositoryInterface $budgetIncomeRepository,
+        private TagRepositoryInterface $tagRepository,
+    ) {
     }
 
     /**
-     * Cria uma nova Receita do Orçamento
+     * Create a new Income to Budget
      * @param string $description
      * @param string $date
      * @param float $value
@@ -33,7 +41,13 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         int $budgetId,
         Collection $tags = null
     ): BudgetIncome {
-        $income = BudgetIncome::create([
+        $budget = $this->budgetRepository->show($budgetId);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $income = $this->budgetIncomeRepository->store([
             'description' => $description,
             'date' => $date,
             'value' => $value,
@@ -41,8 +55,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
             'budget_id' => $budgetId
         ]);
 
-        $income->save();
-        TagService::saveTagsToModel($income, $tags);
+        $this->tagRepository->saveTagsToModel($income, $tags);
 
         // Atualiza Orçamento
         BudgetService::recalculateBugdet($budgetId);
@@ -51,7 +64,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
     }
 
     /**
-     * Atualiza a Receita do Orçamento
+     * Update a new Income to Budget
      * @param integer $id
      * @param string $description
      * @param string $date
@@ -68,21 +81,27 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         string $remarks,
         Collection $tags = null
     ): bool {
-        $income = BudgetIncome::with('tags')->find($id);
+        $income = $this->budgetIncomeRepository->show($id);
 
         if (!$income) {
             throw new Exception('budget-expense.not-found');
         }
 
-        // Atualiza Tags
-        TagService::saveTagsToModel($income, $tags);
+        $budget = $this->budgetRepository->show($income->budget_id);
 
-        $income->update([
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        // Atualiza Tags
+        $this->tagRepository->saveTagsToModel($income, $tags);
+
+        $this->budgetIncomeRepository->store([
             'description' => $description,
             'date' => $date,
             'value' => $value,
             'remarks' => $remarks,
-        ]);
+        ], $income);
 
         // Atualiza Orçamento
         BudgetService::recalculateBugdet($income->budget_id);
@@ -91,23 +110,23 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
     }
 
     /**
-     * Deleta uma Receita do Orçamento
+     * Delete a new Income to Budget
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $income = BudgetIncome::with('tags')->find($id);
+        $income = $this->budgetIncomeRepository->show($id);
 
         if (!$income) {
             throw new Exception('budget-expense.not-found');
         }
 
         // Remove Tags
-        TagService::saveTagsToModel($income);
+        $this->tagRepository->saveTagsToModel($income);
 
         // Atualiza Orçamento
         BudgetService::recalculateBugdet($income->budget_id);
 
-        return $income->delete();
+        return $this->budgetIncomeRepository->delete($id);
     }
 }

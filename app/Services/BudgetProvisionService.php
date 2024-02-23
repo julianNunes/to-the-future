@@ -3,23 +3,33 @@
 namespace App\Services;
 
 use App\Models\BudgetProvision;
+use App\Repositories\Interfaces\{
+    BudgetProvisionRepositoryInterface,
+    BudgetRepositoryInterface,
+    TagRepositoryInterface,
+};
 use App\Services\Interfaces\BudgetProvisionServiceInterface;
+use App\Services\Interfaces\BudgetServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
 
 class BudgetProvisionService implements BudgetProvisionServiceInterface
 {
-    public function __construct()
-    {
+    public function __construct(
+        private BudgetServiceInterface $budgetService,
+        private BudgetRepositoryInterface $budgetRepository,
+        private BudgetProvisionRepositoryInterface $budgetProvisionRepository,
+        private TagRepositoryInterface $tagRepository,
+    ) {
     }
 
     /**
-     * Cria uma nova Provisão para o Orçamento
+     * Create a new Provision to Budget
      * @param string $description
      * @param float $value
      * @param string $group
-     * @param string $remarks
      * @param integer $budgetId
+     * @param string|null $remarks
      * @param float|null $shareValue
      * @param integer|null $shareUserId
      * @param Collection|null $tags
@@ -29,13 +39,19 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         string $description,
         float $value,
         string $group,
-        string $remarks,
         int $budgetId,
+        string $remarks = null,
         float $shareValue = null,
         int $shareUserId = null,
         Collection $tags = null
     ): BudgetProvision {
-        $provision = BudgetProvision::create([
+        $budget = $this->budgetRepository->show($budgetId);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $provision = $this->budgetProvisionRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
@@ -45,19 +61,18 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
             'share_user_id' => $shareUserId
         ]);
 
-        $provision->save();
-        TagService::saveTagsToModel($provision, $tags);
+        $this->tagRepository->saveTagsToModel($provision, $tags);
 
         return $provision;
     }
 
     /**
-     * Atualiza uma Provisão do Orçamento
+     * Update a new Provision to Budget
      * @param integer $id
      * @param string $description
      * @param float $value
      * @param string $group
-     * @param string $remarks
+     * @param string|null $remarks
      * @param float|null $shareValue
      * @param integer|null $shareUserId
      * @param Collection|null $tags
@@ -68,45 +83,51 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         string $description,
         float $value,
         string $group,
-        string $remarks,
+        string $remarks = null,
         float $shareValue = null,
         int $shareUserId = null,
         Collection $tags = null
-    ): bool {
-        $provision = BudgetProvision::with('tags')->find($id);
+    ): BudgetProvision {
+        $provision = $this->budgetProvisionRepository->show($id);
 
         if (!$provision) {
             throw new Exception('budget-provision.not-found');
         }
 
-        // Atualiza Tags
-        TagService::saveTagsToModel($provision, $tags);
+        $budget = $this->budgetRepository->show($provision->budget_id);
 
-        return $provision->update([
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        // Atualiza Tags
+        $this->tagRepository->saveTagsToModel($provision, $tags);
+
+        return $this->budgetProvisionRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
             'remarks' => $remarks,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
-        ]);
+        ], $provision);
     }
 
     /**
-     * Deleta uma Provisão do Orçamento
+     * Delete a new Provision to Budget
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $provision = BudgetProvision::with('tags')->find($id);
+        $provision = $this->budgetProvisionRepository->show($id);
 
         if (!$provision) {
             throw new Exception('budget-provision.not-found');
         }
 
         // Remove Tags
-        TagService::saveTagsToModel($provision);
+        $this->tagRepository->saveTagsToModel($provision);
 
-        return $provision->delete();
+        return $this->budgetProvisionRepository->delete($id);
     }
 }
