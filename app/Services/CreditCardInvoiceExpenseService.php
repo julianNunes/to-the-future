@@ -6,20 +6,146 @@ use App\Models\CreditCard;
 use App\Models\CreditCardInvoice;
 use App\Models\CreditCardInvoiceExpense;
 use App\Models\CreditCardInvoiceExpenseDivision;
-use App\Models\Tag;
+use App\Repositories\Interfaces\{
+    CreditCardInvoiceExpenseDivisionRepositoryInterface,
+    CreditCardInvoiceExpenseRepositoryInterface,
+    CreditCardInvoiceFileRepositoryInterface,
+    CreditCardInvoiceRepositoryInterface,
+    CreditCardRepositoryInterface,
+    ShareUserRepositoryInterface,
+    TagRepositoryInterface
+};
+use App\Services\Interfaces\CreditCardInvoiceExpenseServiceInterface;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
-class CreditCardInvoiceExpenseService
+class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseServiceInterface
 {
-    public function __construct()
-    {
+    public function __construct(
+        private CreditCardRepositoryInterface $creditCardRepository,
+        private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
+        private CreditCardInvoiceExpenseRepositoryInterface $creditCardInvoiceExpenseRepository,
+        private CreditCardInvoiceExpenseDivisionRepositoryInterface $creditCardInvoiceExpenseDivisionRepository,
+        private CreditCardInvoiceFileRepositoryInterface $creditCardInvoiceFileRepository,
+        private TagRepositoryInterface $tagRepository,
+        private ShareUserRepositoryInterface $shareUserRepository
+    ) {
     }
 
     /**
-     * Undocumented function
-     *
+     * Create new Expense to Invoice and your portions
+     * @param integer $creditCardId
+     * @param integer $invoiceId
+     * @param string $description
+     * @param string $date
+     * @param float $value
+     * @param string $group
+     * @param integer|null $portion
+     * @param integer|null $portionTotal
+     * @param string|null $remarks
+     * @param float|null $shareValue
+     * @param integer|null $shareUserId
+     * @param Collection|null $tags
+     * @param Collection|null $divisions
+     * @return CreditCardInvoiceExpense
+     */
+    public function createWithPortions(
+        int $creditCardId,
+        int $invoiceId,
+        string $description,
+        string $date,
+        float $value,
+        string $group,
+        int $portion,
+        int $portionTotal,
+        string $remarks = null,
+        float $shareValue = null,
+        int $shareUserId = null,
+        Collection $tags = null,
+        Collection $divisions = null
+    ): CreditCardInvoiceExpense {
+        $credit_card = $this->creditCardRepository->show($creditCardId);
+
+        if (!$credit_card) {
+            throw new Exception('credit-card.not-found');
+        }
+
+        $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
+
+        if (!$credit_card_invoice) {
+            throw new Exception('credit-card-invoice.not-found');
+        }
+
+        $credit_card_invoice_expense = $this->create(
+            $creditCardId,
+            $invoiceId,
+            $description,
+            $date,
+            $value,
+            $group,
+            $portion,
+            $portionTotal,
+            $remarks,
+            $shareValue,
+            $shareUserId,
+            $tags,
+            $divisions,
+        );
+
+        // Crio as outras parcelas
+        if ($portionTotal && $portionTotal > 1) {
+            $due_date = Carbon::parse($credit_card_invoice->due_date);
+            $closing_date = Carbon::parse($credit_card_invoice->closing_date);
+            $new_date = Carbon::parse($credit_card_invoice_expense->date);
+
+            $new_due_date = $due_date->copy()->addMonth();
+            $new_closing_date = $closing_date->copy()->addMonth();
+            $new_date = $new_date->copy()->addMonth();
+
+            for ($i = ($portion + 1); $i <= $portionTotal; $i++) {
+                // Busca a fatura do mes seguinte
+                $new_credit_card_invoice = $this->creditCardInvoiceRepository->getOne(['year' => $new_due_date->year, 'month' => $new_due_date->month, 'credit_card_id' => $creditCardId]);
+
+                // Se não existe, ela é criada
+                if (!$new_credit_card_invoice) {
+                    $new_credit_card_invoice = $this->creditCardInvoiceRepository->store([
+                        'due_date' => $new_due_date->format('y-m-d'),
+                        'closing_date' => $new_closing_date->format('y-m-d'),
+                        'year' => $new_due_date->year,
+                        'month' => $new_due_date->format('m'),
+                        'credit_card_id' => $creditCardId,
+                    ]);
+                }
+
+                $credit_card_invoice_expense = $this->create(
+                    $creditCardId,
+                    $new_credit_card_invoice->id,
+                    $description,
+                    $new_due_date,
+                    $value,
+                    $group,
+                    $i,
+                    $portionTotal,
+                    $remarks,
+                    $shareValue,
+                    $shareUserId,
+                    $tags,
+                    $divisions
+                );
+
+                $new_due_date->addMonth();
+                $new_closing_date->addMonth();
+                $new_date->addMonth();
+            }
+        }
+
+        return $credit_card_invoice_expense;
+    }
+
+    /**
+     * Create new Expense to Invoice
      * @param integer $creditCardId
      * @param integer $invoiceId
      * @param string $description
@@ -50,19 +176,19 @@ class CreditCardInvoiceExpenseService
         Collection $tags = null,
         Collection $divisions = null
     ): CreditCardInvoiceExpense {
-        $credit_card = CreditCard::find($creditCardId);
+        $credit_card = $this->creditCardRepository->show($creditCardId);
 
         if (!$credit_card) {
             throw new Exception('credit-card.not-found');
         }
 
-        $credit_card_invoice = CreditCardInvoice::find($invoiceId);
+        $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
 
         if (!$credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
-        $credit_card_invoice_expense = new CreditCardInvoiceExpense([
+        $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->store([
             'description' => $description,
             'date' => Carbon::parse($date)->format('y-m-d'),
             'value' => $value,
@@ -75,114 +201,37 @@ class CreditCardInvoiceExpenseService
             'invoice_id' => $invoiceId
         ]);
 
-        $credit_card_invoice_expense->save();
-
         // Atualiza Tags
-        TagService::saveTagsToModel($credit_card_invoice_expense, $tags);
+        $this->tagRepository->saveTagsToModel($credit_card_invoice_expense, $tags);
 
         // Tratativa para Divisão de despesas
         // Removo sempre todos os registros
-        CreditCardInvoiceExpenseDivision::where('expense_id', $credit_card_invoice_expense->id)->delete();
+        $this->creditCardInvoiceExpenseDivisionRepository->deleteDivisions($credit_card_invoice_expense->id);
 
         if ($divisions && $divisions->count()) {
             foreach ($divisions as $division) {
-                $new_division = new CreditCardInvoiceExpenseDivision([
+                $new_division = $this->creditCardInvoiceExpenseDivisionRepository->store([
                     'description' => $division['description'],
                     'value' => $division['value'],
                     'remarks' => $division['remarks'],
                     'share_value' => $division['share_value'],
-                    'share_user_id' => $credit_card_invoice_expense->id,
-                    'expense_id' => $division['share_user_id'],
+                    'share_user_id' => $division['share_user_id'],
+                    'expense_id' => $credit_card_invoice_expense->id,
                 ]);
 
-                $new_division->save();
-
                 // Atualiza Tags
-                TagService::saveTagsToModel($new_division, $division->tags);
+                $this->tagRepository->saveTagsToModel($new_division, $division['tags']);
             }
         }
 
         // Atualiza o saldo total da fatura
         $this->recalculateTotalInvoice($invoiceId);
 
-        // Crio as outras parcelas
-        if ($portionTotal && $portionTotal > 1) {
-            $due_date = Carbon::parse($credit_card_invoice->due_date);
-            $closing_date = Carbon::parse($credit_card_invoice->closing_date);
-            $new_date = Carbon::parse($credit_card_invoice_expense->date);
-
-            $new_due_date = $due_date->copy()->addMonth();
-            $new_closing_date = $closing_date->copy()->addMonth();
-            $new_date = $new_date->copy()->addMonth();
-
-            for ($i = ($portion + 1); $i <= $portionTotal; $i++) {
-                // Busca a fatura do mes seguinte
-                $new_credit_card_invoice = CreditCardInvoice::where(['year' => $new_due_date->year, 'month' => $new_due_date->month])->first();
-
-                // Se não existe, ela é criada
-                if (!$new_credit_card_invoice) {
-                    $new_credit_card_invoice = new CreditCardInvoice([
-                        'due_date' => $new_due_date->format('y-m-d'),
-                        'closing_date' => $new_closing_date->format('y-m-d'),
-                        'year' => $new_due_date->year,
-                        'month' => $new_due_date->format('m'),
-                        'credit_card_id' => $creditCardId,
-                    ]);
-
-                    $new_credit_card_invoice->save();
-                }
-
-                $new_expense = new CreditCardInvoiceExpense([
-                    'description' => $description,
-                    'date' => $new_date->format('y-m-d'),
-                    'value' => $value,
-                    'group' => $group,
-                    'portion' => $i,
-                    'portion_total' => $portionTotal,
-                    'remarks' => $remarks,
-                    'share_value' => $shareValue,
-                    'share_user_id' => $shareUserId,
-                    'invoice_id' => $new_credit_card_invoice->id
-                ]);
-
-                $new_expense->save();
-
-                // Atualiza Tags
-                TagService::saveTagsToModel($new_expense, $tags);
-
-                if ($divisions && $divisions->count()) {
-                    foreach ($divisions as $division) {
-                        $new_division = new CreditCardInvoiceExpenseDivision([
-                            'description' => $division['description'],
-                            'value' => $division['value'],
-                            'remarks' => $division['remarks'],
-                            'share_value' => $division['share_value'],
-                            'share_user_id' => $new_expense->id,
-                            'expense_id' => $division['share_user_id'],
-                        ]);
-
-                        $new_division->save();
-
-                        // Atualiza Tags
-                        TagService::saveTagsToModel($new_division, $division->tags);
-                    }
-                }
-
-                // Atualiza o saldo total da fatura
-                $this->recalculateTotalInvoice($new_credit_card_invoice->id);
-
-                $new_due_date->addMonth();
-                $new_closing_date->addMonth();
-                $new_date->addMonth();
-            }
-        }
-
         return $credit_card_invoice_expense;
     }
 
     /**
-     * Undocumented function
-     *
+     * Update a Expense
      * @param integer $id
      * @param integer $creditCardId
      * @param integer $invoiceId
@@ -215,25 +264,25 @@ class CreditCardInvoiceExpenseService
         Collection $tags = null,
         Collection $divisions = null,
     ): CreditCardInvoiceExpense {
-        $credit_card = CreditCard::find($creditCardId);
+        $credit_card = $this->creditCardRepository->show($creditCardId);
 
         if (!$credit_card) {
             throw new Exception('credit-card.not-found');
         }
 
-        $credit_card_invoice = CreditCardInvoice::find($invoiceId);
+        $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
 
         if (!$credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
-        $credit_card_invoice_expense = CreditCardInvoiceExpense::find($id);
+        $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->show($id);
 
         if (!$credit_card_invoice_expense) {
             throw new Exception('credit-card-invoice-expense.not-found');
         }
 
-        $credit_card_invoice_expense->update([
+        $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->store([
             'description' => $description,
             'date' => Carbon::parse($date)->format('y-m-d'),
             'value' => $value,
@@ -243,30 +292,28 @@ class CreditCardInvoiceExpenseService
             'remarks' => $remarks,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
-        ]);
+        ], $credit_card_invoice_expense);
 
         // Atualiza Tags
-        TagService::saveTagsToModel($credit_card_invoice_expense, $tags);
+        $this->tagRepository->saveTagsToModel($credit_card_invoice_expense, $tags);
 
         // Tratativa para Divisão de despesas
         // Removo sempre todos os registros
-        CreditCardInvoiceExpenseDivision::where('expense_id', $credit_card_invoice_expense->id)->delete();
+        $this->creditCardInvoiceExpenseDivisionRepository->deleteDivisions($credit_card_invoice_expense->id);
 
         if ($divisions && $divisions->count()) {
             foreach ($divisions as $division) {
-                $new_division = new CreditCardInvoiceExpenseDivision([
-                    'description' => $division->description,
-                    'value' => $division->value,
-                    'remarks' => $division->remarks,
-                    'share_value' => $division->share_value,
-                    'share_user_id' => $credit_card_invoice_expense->id,
-                    'expense_id' => $division->share_user_id,
+                $new_division = $this->creditCardInvoiceExpenseDivisionRepository->store([
+                    'description' => $division['description'],
+                    'value' => $division['value'],
+                    'remarks' => $division['remarks'],
+                    'share_value' => $division['share_value'],
+                    'share_user_id' => $division['share_user_id'],
+                    'expense_id' => $credit_card_invoice_expense->id,
                 ]);
 
-                $new_division->save();
-
                 // Atualiza Tags
-                TagService::saveTagsToModel($new_division, $division->tags);
+                $this->tagRepository->saveTagsToModel($new_division, $division['tags']);
             }
         }
 
@@ -277,17 +324,17 @@ class CreditCardInvoiceExpenseService
     }
 
     /**
-     * Deleta uma Despesa da Fatura do Cartão de credito
+     * Delete a Expense
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $credit_card_invoice_expense = CreditCardInvoiceExpense::with([
+        $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->show($id, [
             'divisions' => [
                 'tags'
             ],
             'tags'
-        ])->find($id);
+        ]);
 
         if (!$credit_card_invoice_expense) {
             throw new Exception('credit-card-invoice-expense.not-found');
@@ -295,27 +342,22 @@ class CreditCardInvoiceExpenseService
 
         // Remove todos os vinculos
         foreach ($credit_card_invoice_expense->divisions as $division) {
-            if ($division->tags && $division->tags->count()) {
-                $division->tags()->detach();
-            }
-
-            $division->delete();
+            $this->tagRepository->saveTagsToModel($division, $$division->tags);
+            $this->creditCardInvoiceExpenseDivisionRepository->delete($division->id);
         }
 
-        if ($credit_card_invoice_expense->tags && $credit_card_invoice_expense->tags->count()) {
-            $credit_card_invoice_expense->tags()->detach();
-        }
-
-        return  $credit_card_invoice_expense->delete();
+        $this->tagRepository->saveTagsToModel($credit_card_invoice_expense, $$credit_card_invoice_expense->tags);
+        return $this->creditCardInvoiceExpenseRepository->delete($credit_card_invoice_expense->id);
     }
 
     /**
-     * Deleta todas as Despesas parceladas da Fatura do Cartão de credito
+     * Delete all Expense portions of a Invoice Credit Card
      * @param int $id
+     * @return bool
      */
     public function deletePortions(int $id): bool
     {
-        $credit_card_invoice_expense = CreditCardInvoiceExpense::with(['invoice'])->find($id);
+        $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->show($id, ['invoice']);
 
         if (!$credit_card_invoice_expense) {
             throw new Exception('credit-card-invoice-expense.not-found');
@@ -326,62 +368,45 @@ class CreditCardInvoiceExpenseService
         }
 
         $credit_card_id = $credit_card_invoice_expense->invoice->credit_card_id;
+        $portion_total = $credit_card_invoice_expense->portion_total;
+        $description = $credit_card_invoice_expense->description;
 
         // Busca todas as despesas referente a parcela
-        $expenses = CreditCardInvoiceExpense::where('portion_total', $credit_card_invoice_expense->portion_total)
-            ->where('description', $credit_card_invoice_expense->description)
-            ->whereRelation('invoice', 'credit_card_id', '=', $credit_card_id)
-            ->with([
-                'divisions' => [
-                    'tags'
-                ],
-                'tags',
-                'invoice'
-            ])
-            ->get();
+        $expenses = $this->creditCardInvoiceExpenseRepository->get(function (Builder $query) use ($credit_card_id, $portion_total, $description) {
+            $query->where('portion_total', $portion_total)
+                ->where('description', $description)
+                ->whereRelation('invoice', 'credit_card_id', '=', $credit_card_id);
+        });
 
         foreach ($expenses as $expense) {
-            // Remove todos os vinculos
-            foreach ($expense->divisions as $division) {
-                if ($division->tags && $division->tags->count()) {
-                    $division->tags()->detach();
-                }
-
-                $division->delete();
-            }
-
-            if ($expense->tags && $expense->tags->count()) {
-                $expense->tags()->detach();
-            }
-
-            $expense->delete();
+            $this->delete($expense->id);
         }
 
         return  true;
     }
 
     /**
-     * Atualiza o saldo total da fatura
+     * Update Invoice total value
      * @param integer $invoiceId
      * @return void
      */
-    protected function recalculateTotalInvoice(int $invoiceId)
+    public function recalculateTotalInvoice(int $invoiceId)
     {
-        $credit_card_invoice = CreditCardInvoice::find($invoiceId);
+        $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
 
         if (!$credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
         // Atualiza o saldo total da fatura
-        $expenses = CreditCardInvoiceExpense::where('invoice_id', $invoiceId)->get();
+        $expenses = $this->creditCardInvoiceExpenseRepository->get(['invoice_id', $invoiceId]);
 
         // Atualiza o saldo total da fatura
         if ($expenses && $expenses->count()) {
-            $credit_card_invoice->total = $expenses->sum(function ($item) {
+            $total = $expenses->sum(function ($item) {
                 return floatval($item['value']);
             });
-            $credit_card_invoice->save();
+            $this->creditCardInvoiceRepository->store(['total' => $total], $credit_card_invoice);
         }
     }
 }

@@ -8,11 +8,12 @@ use App\Models\FinancingInstallment;
 use App\Models\FixExpense;
 use App\Models\Provision;
 use App\Models\ShareUser;
+use App\Services\Interfaces\BudgetServiceInterface;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 
-class BudgetService
+class BudgetService implements BudgetServiceInterface
 {
     public function __construct(
         private BudgetExpenseService $budgetExpenseService,

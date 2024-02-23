@@ -3,6 +3,14 @@
 namespace App\Providers;
 
 use App\Services\Interfaces\{
+    BudgetExpenseServiceInterface,
+    BudgetGoalServiceInterface,
+    BudgetIncomeServiceInterface,
+    BudgetProvisionServiceInterface,
+    BudgetServiceInterface,
+    CreditCardInvoiceExpenseServiceInterface,
+    CreditCardInvoiceServiceInterface,
+    CreditCardServiceInterface,
     FinancingInstallmentServiceInterface,
     FinancingServiceInterface,
     FixExpenseServiceInterface,
@@ -10,6 +18,14 @@ use App\Services\Interfaces\{
     TagServiceInterface
 };
 use App\Services\{
+    BudgetExpenseService,
+    BudgetGoalService,
+    BudgetIncomeService,
+    BudgetProvisionService,
+    BudgetService,
+    CreditCardInvoiceExpenseService,
+    CreditCardInvoiceService,
+    CreditCardService,
     FinancingInstallmentService,
     FinancingService,
     FixExpenseService,
@@ -31,6 +47,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
 
         // Apps Services
+        $this->app->bind(BudgetExpenseServiceInterface::class, BudgetExpenseService::class);
+        $this->app->bind(BudgetGoalServiceInterface::class, BudgetGoalService::class);
+        $this->app->bind(BudgetIncomeServiceInterface::class, BudgetIncomeService::class);
+        $this->app->bind(BudgetProvisionServiceInterface::class, BudgetProvisionService::class);
+        $this->app->bind(BudgetServiceInterface::class, BudgetService::class);
+        $this->app->bind(CreditCardInvoiceServiceInterface::class, CreditCardInvoiceService::class);
+        $this->app->bind(CreditCardInvoiceExpenseServiceInterface::class, CreditCardInvoiceExpenseService::class);
+        $this->app->bind(CreditCardServiceInterface::class, CreditCardService::class);
         $this->app->bind(FinancingServiceInterface::class, FinancingService::class);
         $this->app->bind(FinancingInstallmentServiceInterface::class, FinancingInstallmentService::class);
         $this->app->bind(FixExpenseServiceInterface::class, FixExpenseService::class);

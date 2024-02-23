@@ -2,27 +2,40 @@
 
 namespace App\Services;
 
-use App\Models\CreditCard;
 use App\Models\CreditCardInvoice;
-use App\Models\ShareUser;
+use App\Repositories\Interfaces\{
+    CreditCardInvoiceExpenseDivisionRepositoryInterface,
+    CreditCardInvoiceExpenseRepositoryInterface,
+    CreditCardInvoiceFileRepositoryInterface,
+    CreditCardInvoiceRepositoryInterface,
+    CreditCardRepositoryInterface,
+    ShareUserRepositoryInterface,
+    TagRepositoryInterface
+};
+use App\Services\Interfaces\CreditCardInvoiceServiceInterface;
 use Exception;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 
-class CreditCardInvoiceService
+class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
 {
-    public function __construct()
-    {
+    public function __construct(
+        private CreditCardRepositoryInterface $creditCardRepository,
+        private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
+        private CreditCardInvoiceExpenseRepositoryInterface $creditCardInvoiceExpenseRepository,
+        private CreditCardInvoiceExpenseDivisionRepositoryInterface $creditCardInvoiceExpenseDivisionRepository,
+        private CreditCardInvoiceFileRepositoryInterface $creditCardInvoiceFileRepository,
+        private TagRepositoryInterface $tagRepository,
+        private ShareUserRepositoryInterface $shareUserRepository
+    ) {
     }
 
     /**
-     * Retorna os dados para o Gerenciamento de Faturas de um Cartões de Credito
+     * Returns data for Credit Card Invoice Management
      * @return Array
      */
     public function index(int $creditCardId): array
     {
-        $creditCard = CreditCard::where('id', $creditCardId)->with('invoices')->first();
-
+        $creditCard = $this->creditCardRepository->show($creditCardId, ['invoices']);
         return [
             'creditCard' => $creditCard,
             'invoices' => $creditCard->invoices,
@@ -30,14 +43,44 @@ class CreditCardInvoiceService
     }
 
     /**
-     * Undocumented function
-     *
+     * Create a new Invoices at to end of year
      * @param string $dueDate
      * @param string $closingDate
      * @param string $year
      * @param string $month
      * @param integer $creditCardId
-     * @param boolean $automaticGenerate
+     * @return CreditCardInvoice
+     */
+    public function createAutomatic(
+        string $dueDate,
+        string $closingDate,
+        string $year,
+        string $month,
+        int $creditCardId,
+    ): bool {
+        $this->create($dueDate, $closingDate, $year, $month, $creditCardId);
+        $due_date = Carbon::parse($dueDate);
+        $closing_date = Carbon::parse($closingDate);
+
+        $new_due_date = $due_date->copy()->addMonth();
+        $new_closing_date = $closing_date->copy()->addMonth();
+
+        for ($i = $new_due_date->month; $i <= 12; $i++) {
+            $this->create($new_due_date, $new_closing_date, $year, $new_due_date->month, $creditCardId);
+            $new_due_date->addMonth();
+            $new_closing_date->addMonth();
+        }
+
+        return true;
+    }
+
+    /**
+     * Create a new Invoice
+     * @param string $dueDate
+     * @param string $closingDate
+     * @param string $year
+     * @param string $month
+     * @param integer $creditCardId
      * @return CreditCardInvoice
      */
     public function create(
@@ -46,67 +89,35 @@ class CreditCardInvoiceService
         string $year,
         string $month,
         int $creditCardId,
-        bool $automaticGenerate = false
     ): CreditCardInvoice {
-        $credit_card = CreditCard::find($creditCardId);
+        $credit_card = $this->creditCardRepository->show($creditCardId);
 
         if (!$credit_card) {
             throw new Exception('credit-card.not-found');
         }
 
-        $credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $month, 'credit_card_id' => $creditCardId])->first();
+        $credit_card_invoice = $this->creditCardInvoiceRepository->getOne(['year' => $year, 'month' => $month, 'credit_card_id' => $creditCardId]);
 
         if ($credit_card_invoice) {
             throw new Exception('credit-card-invoice.already-exists');
         }
 
-        $credit_card_invoice = new CreditCardInvoice([
+        return $this->creditCardInvoiceRepository->store([
             'due_date' => $dueDate,
             'closing_date' => $closingDate,
             'year' => $year,
             'month' => $month,
             'credit_card_id' => $creditCardId,
         ]);
-
-        $credit_card_invoice->save();
-
-        if ($automaticGenerate) {
-            $due_date = Carbon::parse($dueDate);
-            $closing_date = Carbon::parse($closingDate);
-
-            $new_due_date = $due_date->copy()->addMonth();
-            $new_closing_date = $closing_date->copy()->addMonth();
-
-            for ($i = $new_due_date->month; $i <= 12; $i++) {
-                $new_credit_card_invoice = CreditCardInvoice::where(['year' => $year, 'month' => $new_due_date->month, 'credit_card_id' => $creditCardId])->first();
-
-                if (!$new_credit_card_invoice) {
-                    $new_credit_card_invoice = new CreditCardInvoice([
-                        'due_date' => $new_due_date->format('y-m-d'),
-                        'closing_date' => $new_closing_date->format('y-m-d'),
-                        'year' => $year,
-                        'month' => $new_closing_date->format('m'),
-                        'credit_card_id' => $creditCardId,
-                    ]);
-
-                    $new_credit_card_invoice->save();
-                }
-
-                $new_due_date->addMonth();
-                $new_closing_date->addMonth();
-            }
-        }
-
-        return $credit_card_invoice;
     }
 
     /**
-     * Deleta uma fatura do cartão de credito
+     * Delete a Invoice
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $credit_card_invoice = CreditCardInvoice::with([
+        $credit_card_invoice = $this->creditCardInvoiceRepository->show($id, [
             'file',
             'expenses' => [
                 'divisions' => [
@@ -114,8 +125,7 @@ class CreditCardInvoiceService
                 ],
                 'tags'
             ]
-        ])->find($id);
-
+        ]);
 
         if (!$credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
@@ -124,53 +134,46 @@ class CreditCardInvoiceService
         // Remove todos os vinculos
         foreach ($credit_card_invoice->expenses as $expense) {
             foreach ($expense->divisions as $division) {
-                if ($division->tags && $division->tags->count()) {
-                    $division->tags()->detach();
-                }
-
-                $division->delete();
+                $this->tagRepository->saveTagsToModel($division, $$division->tags);
+                $this->creditCardInvoiceExpenseDivisionRepository->delete($division->id);
             }
 
-            if ($expense->tags && $expense->tags->count()) {
-                $expense->tags()->detach();
-            }
-
-            $expense->delete();
+            $this->tagRepository->saveTagsToModel($expense, $$expense->tags);
+            $this->creditCardInvoiceExpenseRepository->delete($expense->id);
         }
 
         if ($credit_card_invoice->file) {
-            $credit_card_invoice->file->delete();
+            $this->creditCardInvoiceFileRepository->delete($credit_card_invoice->file->id);
         }
 
-        return $credit_card_invoice->delete();
+        return $this->creditCardInvoiceRepository->delete($credit_card_invoice->id);
     }
 
     /**
-     * Retorna os dados para visualização/edição da Fatura de um Cartões de Credito
+     * Returns data for viewing/editing a Credit Card Invoice
+     * @param int $id
      * @return Array
      */
     public function show(int $id): array
     {
-        $creditCardInvoice = CreditCardInvoice::where('id', $id)
-            ->with([
-                'creditCard',
-                'file',
-                'expenses' => [
+        $credit_card_invoice = $this->creditCardInvoiceRepository->show($id, [
+            'creditCard',
+            'file',
+            'expenses' => [
+                'tags',
+                'shareUser',
+                'divisions' => [
                     'tags',
-                    'shareUser',
-                    'divisions' => [
-                        'tags',
-                        'shareUser'
-                    ]
+                    'shareUser'
                 ]
-            ])
-            ->first();
+            ]
+        ]);
 
-        if (!$creditCardInvoice) {
+        if (!$credit_card_invoice) {
             throw new Exception('credit-card-inovice.not-found');
         }
 
-        $shareUsers = ShareUser::where('user_id', auth()->user()->id)->with('shareUser')->get();
+        $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
 
         if ($shareUsers && $shareUsers->count()) {
             $shareUsers = $shareUsers->map(function ($item) {
@@ -182,7 +185,7 @@ class CreditCardInvoiceService
         }
 
         return [
-            'invoice' => $creditCardInvoice,
+            'invoice' => $credit_card_invoice,
             'shareUsers' => $shareUsers,
         ];
     }

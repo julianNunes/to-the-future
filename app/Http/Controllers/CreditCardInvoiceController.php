@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\CreditCardInvoiceService;
+use App\Services\Interfaces\CreditCardInvoiceServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class CreditCardInvoiceController extends Controller
 {
-    protected $creditCardInvoiceService;
-
-    public function __construct(CreditCardInvoiceService $creditCardInvoiceService)
+    public function __construct(private CreditCardInvoiceServiceInterface $creditCardInvoiceService)
     {
-        $this->creditCardInvoiceService = $creditCardInvoiceService;
     }
 
     /**
@@ -43,14 +40,23 @@ class CreditCardInvoiceController extends Controller
             'credit_card_id' => ['required'],
         ]);
 
-        $this->creditCardInvoiceService->create(
-            $request->due_date,
-            $request->closing_date,
-            $request->year,
-            $request->month,
-            $request->credit_card_id,
-            $request->automatic_generate,
-        );
+        if ($request->automatic_generate == true) {
+            $this->creditCardInvoiceService->createAutomatic(
+                $request->due_date,
+                $request->closing_date,
+                $request->year,
+                $request->month,
+                $request->credit_card_id,
+            );
+        } else {
+            $this->creditCardInvoiceService->create(
+                $request->due_date,
+                $request->closing_date,
+                $request->year,
+                $request->month,
+                $request->credit_card_id,
+            );
+        }
 
         return redirect()->back()->with('success', 'default.sucess-save');
     }
@@ -79,9 +85,7 @@ class CreditCardInvoiceController extends Controller
     }
 
     /**
-     *
-     * @param integer $creditCardId
-     * @param integer $id
+     * Download xlxs file template
      * @return void
      */
     public function downloadTemplate()

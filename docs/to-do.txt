@@ -40,6 +40,10 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
 TO-DO
 ==================================================
+- Testar todo o contexto de Cartões
+    - Verificar a melhor forma para fazer update das Despesas quando ela for uma parcela
+
+
 
 - BudgetCOntroller
     - Remover os Serviços do "BudgetService" e mover para controller

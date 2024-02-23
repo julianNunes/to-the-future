@@ -3,11 +3,12 @@
 namespace App\Services;
 
 use App\Models\BudgetIncome;
+use App\Services\Interfaces\BudgetIncomeServiceInterface;
 use Illuminate\Support\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
 
-class BudgetIncomeService
+class BudgetIncomeService implements BudgetIncomeServiceInterface
 {
     // public function __construct(private BudgetService $budgetService)
     public function __construct()

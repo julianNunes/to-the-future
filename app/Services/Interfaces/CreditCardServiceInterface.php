@@ -3,11 +3,9 @@
 namespace App\Services\Interfaces;
 
 use App\Models\CreditCard;
-use App\Models\FinancingInstallment;
 
 interface CreditCardServiceInterface
 {
-
     /**
      * Returns data to Credit Card Management
      * @return Array

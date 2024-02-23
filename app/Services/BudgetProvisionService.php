@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use App\Models\BudgetProvision;
+use App\Services\Interfaces\BudgetProvisionServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
 
-class BudgetProvisionService
+class BudgetProvisionService implements BudgetProvisionServiceInterface
 {
     public function __construct()
     {

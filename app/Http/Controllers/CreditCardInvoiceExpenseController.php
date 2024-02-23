@@ -4,17 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\CreditCardInvoiceExpenseService;
+use App\Services\Interfaces\CreditCardInvoiceExpenseServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class CreditCardInvoiceExpenseController extends Controller
 {
-    protected $creditCardInvoiceExpenseService;
-
-    public function __construct(CreditCardInvoiceExpenseService $creditCardInvoiceExpenseService)
+    public function __construct(private CreditCardInvoiceExpenseServiceInterface $creditCardInvoiceExpenseService)
     {
-        $this->creditCardInvoiceExpenseService = $creditCardInvoiceExpenseService;
     }
 
     /**
@@ -30,25 +27,39 @@ class CreditCardInvoiceExpenseController extends Controller
             'value' => ['required'],
         ]);
 
-        DB::beginTransaction();
-
-        $this->creditCardInvoiceExpenseService->create(
-            $request->credit_card_id,
-            $request->invoice_id,
-            $request->description,
-            $request->date,
-            floatval($request->value),
-            $request->group,
-            $request->portion,
-            $request->portion_total,
-            $request->remarks,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags),
-            collect($request->divisions)
-        );
-
-        DB::commit();
+        if ($request->portion_total && intval($request->portion_total) >= 2) {
+            $this->creditCardInvoiceExpenseService->createWithPortions(
+                $request->credit_card_id,
+                $request->invoice_id,
+                $request->description,
+                $request->date,
+                floatval($request->value),
+                $request->group,
+                $request->portion ? intval($request->portion) : null,
+                $request->portion_total ? intval($request->portion_total) : null,
+                $request->remarks,
+                $request->share_value ? floatval($request->share_value) : null,
+                $request->share_user_id,
+                collect($request->tags),
+                collect($request->divisions)
+            );
+        } else {
+            $this->creditCardInvoiceExpenseService->create(
+                $request->credit_card_id,
+                $request->invoice_id,
+                $request->description,
+                $request->date,
+                floatval($request->value),
+                $request->group,
+                $request->portion ? intval($request->portion) : null,
+                $request->portion_total ? intval($request->portion_total) : null,
+                $request->remarks,
+                $request->share_value ? floatval($request->share_value) : null,
+                $request->share_user_id,
+                collect($request->tags),
+                collect($request->divisions)
+            );
+        }
 
         return redirect()->back()->with('success', 'default.sucess-save');
     }
@@ -100,7 +111,6 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
-     * Deleta uma Despesa de uma Fatura do cartão de credito
      */
     public function deletePortions(int $id)
     {

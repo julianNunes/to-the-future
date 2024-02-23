@@ -11,4 +11,14 @@ class CreditCardInvoiceExpenseDivisionRepository extends AppRepository implement
     {
         parent::__construct($creditCardInvoiceExpenseDivision ?? new CreditCardInvoiceExpenseDivision);
     }
+
+    /**
+     * Delete all divisions in Expense
+     * @param integer $expenseId
+     * @return bool
+     */
+    public function deleteDivisions(int $expenseId): bool
+    {
+        return $this->model->where('expense_id', $expenseId)->delete();
+    }
 }

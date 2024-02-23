@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Models\CreditCard;
-use App\Repositories\Interfaces\CreditCardInvoiceExpenseDivisionRepositoryInterface;
-use App\Repositories\Interfaces\CreditCardInvoiceExpenseRepositoryInterface;
-use App\Repositories\Interfaces\CreditCardInvoiceFileRepositoryInterface;
-use App\Repositories\Interfaces\CreditCardInvoiceRepositoryInterface;
-use App\Repositories\Interfaces\CreditCardRepositoryInterface;
-use App\Repositories\Interfaces\TagRepositoryInterface;
+use App\Repositories\Interfaces\{
+    CreditCardInvoiceExpenseDivisionRepositoryInterface,
+    CreditCardInvoiceExpenseRepositoryInterface,
+    CreditCardInvoiceFileRepositoryInterface,
+    CreditCardInvoiceRepositoryInterface,
+    CreditCardRepositoryInterface,
+    TagRepositoryInterface
+};
 use App\Services\Interfaces\CreditCardServiceInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;

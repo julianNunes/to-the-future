@@ -6,12 +6,13 @@ use App\Models\Budget;
 use App\Models\BudgetExpense;
 use App\Models\FinancingInstallment;
 use App\Services\Facades\TagService;
+use App\Services\Interfaces\BudgetExpenseServiceInterface;
 use Illuminate\Support\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
-class BudgetExpenseService
+class BudgetExpenseService implements BudgetExpenseServiceInterface
 {
     // public function __construct(private BudgetService $budgetService)
     public function __construct()
