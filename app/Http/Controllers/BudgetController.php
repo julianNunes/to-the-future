@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\BudgetService;
+use App\Services\Interfaces\BudgetServiceInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Log;
 
 class BudgetController extends Controller
 {
-
-
-    public function __construct(private BudgetService $budgetService)
+    public function __construct(private BudgetServiceInterface $budgetService)
     {
     }
 
@@ -35,7 +33,7 @@ class BudgetController extends Controller
             'month' => ['required'],
         ]);
 
-        $this->budgetService->create(
+        $this->budgetService->createComplete(
             auth()->user()->id,
             $request->year,
             $request->month,

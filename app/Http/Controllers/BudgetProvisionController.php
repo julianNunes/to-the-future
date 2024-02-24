@@ -22,8 +22,8 @@ class BudgetProvisionController extends Controller
     {
         $this->validate($request, [
             'description' => ['required'],
-            'date' => ['required'],
             'value' => ['required'],
+            'group' => ['required'],
             'budget_id' => ['required'],
         ]);
 
@@ -33,6 +33,8 @@ class BudgetProvisionController extends Controller
             floatval($request->value),
             $request->remarks,
             intval($request->budget_id),
+            $request->share_value ? floatval($request->share_value) : null,
+            $request->share_user_id,
             collect($request->tags)
         );
 
@@ -48,9 +50,8 @@ class BudgetProvisionController extends Controller
     {
         $this->validate($request, [
             'description' => ['required'],
-            'date' => ['required'],
             'value' => ['required'],
-            // 'budget_id' => ['budget_id'],
+            'group' => ['required'],
         ]);
 
         $this->budgetProvisionSevice->update(
@@ -59,6 +60,9 @@ class BudgetProvisionController extends Controller
             $request->date,
             floatval($request->value),
             $request->remarks,
+            intval($request->budget_id),
+            $request->share_value ? floatval($request->share_value) : null,
+            $request->share_user_id,
             collect($request->tags)
         );
 

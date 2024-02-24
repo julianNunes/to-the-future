@@ -89,20 +89,14 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         }
 
         // Atualiza Orçamento
-        /**
-         * @todo TROCAR POSTERIORMENTE
-         */
-        BudgetService::recalculateBugdet($budgetId);
+        $this->budgetService->recalculateBugdet($budgetId);
 
         // Se houver valor compartilhado, atualizado dados do Orçamento
         if ($shareUserId) {
             $budget_share = $this->budgetRepository->getOne(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $shareUserId]);
 
             if ($budget_share) {
-                /**
-                 * @todo TROCAR POSTERIORMENTE
-                 */
-                BudgetService::recalculateBugdet($budget_share->id);
+                $this->budgetService->recalculateBugdet($budget_share->id);
             }
         }
 
@@ -177,20 +171,14 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         ], $expense);
 
         // Atualiza Orçamento
-        /**
-         * @todo TROCAR POSTERIORMENTE
-         */
-        BudgetService::recalculateBugdet($expense->budget_id);
+        $this->budgetService->recalculateBugdet($expense->budget_id);
 
         // Se houver valor compartilhado, atualizado dados do Orçamento
         if ($shareUserId) {
             $budget_share = $this->budgetRepository->getOne(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $shareUserId]);
 
             if ($budget_share) {
-                /**
-                 * @todo TROCAR POSTERIORMENTE
-                 */
-                BudgetService::recalculateBugdet($budget_share->id);
+                $this->budgetService->recalculateBugdet($budget_share->id);
             }
         }
 
@@ -229,18 +217,12 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             $budget_share = $this->budgetRepository->getOne(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user_id]);
 
             if ($budget_share) {
-                /**
-                 * @todo TROCAR POSTERIORMENTE
-                 */
-                BudgetService::recalculateBugdet($budget_share->id);
+                $this->budgetService->recalculateBugdet($budget_share->id);
             }
         }
 
         // Atualiza Orçamento
-        /**
-         * @todo TROCAR POSTERIORMENTE
-         */
-        BudgetService::recalculateBugdet($budget_id);
+        $this->budgetService->recalculateBugdet($budget_id);
 
         return true;
     }

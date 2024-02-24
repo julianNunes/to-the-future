@@ -35,12 +35,12 @@ interface AppRepositoryInterface
     public function get($condition, array $columns = [], array $simpleJoins = [], array $withs = []): Collection;
 
     /**
-     * Builder Query and return Collection
+     * Builder Query and return Model
      * @param \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression $condition function | To array ['field' => 'value']
      * @param array $columns ['field1', 'field2', 'field3', ...]
      * @param array $simpleJoins [ 'tableName1' => ['field1', 'operator||field2', 'field2'], ...]
      * @param array $withs ['relationship1', 'relationship2', ...]
-     * @return Collection
+     * @return Model
      */
     public function getOne($condition, array $columns = [], array $simpleJoins = [], array $withs = []): Model|null;
 

@@ -58,7 +58,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         $this->tagRepository->saveTagsToModel($income, $tags);
 
         // Atualiza Orçamento
-        BudgetService::recalculateBugdet($budgetId);
+        $this->budgetService->recalculateBugdet($budgetId);
 
         return $income;
     }
@@ -104,7 +104,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         ], $income);
 
         // Atualiza Orçamento
-        BudgetService::recalculateBugdet($income->budget_id);
+        $this->budgetService->recalculateBugdet($income->budget_id);
 
         return true;
     }
@@ -125,7 +125,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         $this->tagRepository->saveTagsToModel($income);
 
         // Atualiza Orçamento
-        BudgetService::recalculateBugdet($income->budget_id);
+        $this->budgetService->recalculateBugdet($income->budget_id);
 
         return $this->budgetIncomeRepository->delete($id);
     }

@@ -8,7 +8,25 @@ use App\Models\FinancingInstallment;
 use App\Models\FixExpense;
 use App\Models\Provision;
 use App\Models\ShareUser;
-use App\Services\Interfaces\BudgetServiceInterface;
+use App\Repositories\Interfaces\{
+    BudgetExpenseRepositoryInterface,
+    BudgetGoalRepositoryInterface,
+    BudgetIncomeRepositoryInterface,
+    BudgetProvisionRepositoryInterface,
+    BudgetRepositoryInterface,
+    CreditCardInvoiceRepositoryInterface,
+    FinancingInstallmentRepositoryInterface,
+    FixExpenseRepositoryInterface,
+    ProvisionRepositoryInterface,
+    ShareUserRepositoryInterface,
+};
+use App\Services\Interfaces\{
+    BudgetExpenseServiceInterface,
+    BudgetGoalServiceInterface,
+    BudgetIncomeServiceInterface,
+    BudgetProvisionServiceInterface,
+    BudgetServiceInterface,
+};
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,21 +34,33 @@ use Illuminate\Database\Eloquent\Builder;
 class BudgetService implements BudgetServiceInterface
 {
     public function __construct(
-        private BudgetExpenseService $budgetExpenseService,
-        private BudgetProvisionService $budgetProvisionService,
-        private BudgetIncomeService $budgetIncomeService,
-        private BudgetGoalService $budgetGoalService
+        // Services
+        private BudgetExpenseServiceInterface $budgetExpenseService,
+        private BudgetProvisionServiceInterface $budgetProvisionService,
+        private BudgetIncomeServiceInterface $budgetIncomeService,
+        private BudgetGoalServiceInterface $budgetGoalService,
+        // Repositories
+        private FixExpenseRepositoryInterface $fixExpenseRepository,
+        private ProvisionRepositoryInterface $provisionRepository,
+        private BudgetRepositoryInterface $budgetRepository,
+        private ShareUserRepositoryInterface $shareUserRepository,
+        private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
+        private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
+        private BudgetExpenseRepositoryInterface $budgetExpenseRepository,
+        private BudgetProvisionRepositoryInterface $budgetProvisionRepository,
+        private BudgetIncomeRepositoryInterface $budgetIncomeRepository,
+        private BudgetGoalRepositoryInterface $budgetGoalRepository,
     ) {
     }
 
     /**
-     * @todo DOCUMENTAR
+     * Return data to view Budget
      * @param string $year
      * @return array
      */
     public function index(string $year): array
     {
-        $budgets = Budget::where(['user_id' => auth()->user()->id, 'year' => $year])->get();
+        $budgets = $this->budgetRepository->get(['user_id' => auth()->user()->id, 'year' => $year]);
         return [
             'budgets' => $budgets,
             'year' => $year,
@@ -38,7 +68,7 @@ class BudgetService implements BudgetServiceInterface
     }
 
     /**
-     * @todo DOCUMENTAR
+     * Create Budget with your relations
      * @param integer $userId
      * @param string $year
      * @param string $month
@@ -47,7 +77,7 @@ class BudgetService implements BudgetServiceInterface
      * @param boolean $includeProvision
      * @return Budget
      */
-    public function create(
+    public function createComplete(
         int $userId,
         string $year,
         string $month,
@@ -55,29 +85,21 @@ class BudgetService implements BudgetServiceInterface
         bool $includeFixExpense = false,
         bool $includeProvision = false
     ): Budget {
-        $budget = Budget::where(['year' => $year, 'month' => $month, 'user_id' => $userId])->first();
-
-        if ($budget) {
-            throw new Exception('budget.already-exists');
-        }
+        $budget = $this->create(
+            $year,
+            $month,
+            $userId
+        );
 
         $fix_expenses = null;
         $provisions = null;
         $has_share_fix_expense = false;
         $has_share_provision = false;
         $date = Carbon::parse($year . '-' . $month . '-01');
-        $shareUser = ShareUser::where('user_id', $userId)->first();
-
-        $budget = new Budget([
-            'year' => $year,
-            'month' => $month,
-            'user_id' => $userId
-        ]);
-
-        $budget->save();
+        $shareUser = $this->shareUserRepository->getOne(['user_id' => $userId]);
 
         if ($includeFixExpense) {
-            $fix_expenses = FixExpense::with(['tags'])->where('user_id', $userId)->get();
+            $fix_expenses = $this->fixExpenseRepository->get(['user_id' => $userId], [], [], ['tags']);
 
             if ($fix_expenses && $fix_expenses->count()) {
                 $new_date = $date->copy();
@@ -100,7 +122,7 @@ class BudgetService implements BudgetServiceInterface
         }
 
         if ($includeProvision) {
-            $provisions = Provision::with(['tags'])->where('user_id', $userId)->get();
+            $provisions = $this->provisionRepository->get(['user_id' => $userId], [], [], ['tags']);
 
             if ($provisions && $provisions->count()) {
                 foreach ($provisions as $provision) {
@@ -133,10 +155,10 @@ class BudgetService implements BudgetServiceInterface
             $new_date = $date->copy()->addMonth();
 
             for ($i = $new_date->month; $i <= 12; $i++) {
-                $new_budget = Budget::where(['year' => $year, 'month' => $new_date->month, 'user_id' => $userId])->first();
+                $new_budget = $this->budgetRepository->getOne(['year' => $year, 'month' => $new_date->month, 'user_id' => $userId]);
 
                 if (!$new_budget) {
-                    $new_budget = new Budget([
+                    $new_budget = $this->budgetRepository->store([
                         'year' => $year,
                         'month' => $new_date->format('m'),
                         'user_id' => $userId
@@ -198,7 +220,32 @@ class BudgetService implements BudgetServiceInterface
     }
 
     /**
-     * @todo DOCUMENTAR
+     * Create a new Budget
+     * @param integer $userId
+     * @param string $year
+     * @param string $month
+     * @return Budget
+     */
+    public function create(
+        int $userId,
+        string $year,
+        string $month
+    ): Budget {
+        $budget = $this->budgetRepository->getOne(['year' => $year, 'month' => $month, 'user_id' => $userId]);
+
+        if ($budget) {
+            throw new Exception('budget.already-exists');
+        }
+
+        return $this->budgetRepository->store([
+            'year' => $year,
+            'month' => $month,
+            'user_id' => $userId
+        ]);
+    }
+
+    /**
+     * Clone a Budget with your relations
      * @param integer $id
      * @param string $year
      * @param string $month
@@ -217,42 +264,58 @@ class BudgetService implements BudgetServiceInterface
         bool $cloneBugdetIncome = false,
         bool $cloneBugdetGoals = false
     ): Budget {
-        $budget = Budget::where(['year', $year, 'month' => $month, 'user_id', auth()->user()->id])->first();
+        $budget = $this->budgetRepository->getOne(['year', $year, 'month' => $month, 'user_id', auth()->user()->id]);
 
         if ($budget) {
             throw new Exception('budget.already-exists');
         }
 
-        $budget = Budget::when($cloneBugdetExpense, function (Builder $query) {
-            $query->with([
-                'expenses' => function (Builder $query2) {
-                    $query2->whereNull('financing_installment_id')->with(['tags']);
-                }
-            ]);
-        })
-            ->when($cloneBugdetIncome, function (Builder $query) {
-                $query->with(['incomes.tags']);
-            })
-            ->when($cloneBugdetGoals, function (Builder $query) {
-                $query->with(['goals.tags']);
-            })
-            ->find($id);
+        $with = collect();
+
+        if ($cloneBugdetExpense) {
+            $with->push(['expenses' => function (Builder $query2) {
+                $query2->whereNull('financing_installment_id')->with(['tags']);
+            }]);
+        }
+
+        if ($cloneBugdetIncome) {
+            $with->push('incomes.tags');
+        }
+
+        if ($cloneBugdetGoals) {
+            $with->push('goals.tags');
+        }
+
+        $budget = $this->budgetRepository->show($id, $with->toArray());
+
+        // $budget = Budget::when($cloneBugdetExpense, function (Builder $query) {
+        //     $query->with([
+        //         'expenses' => function (Builder $query2) {
+        //             $query2->whereNull('financing_installment_id')->with(['tags']);
+        //         }
+        //     ]);
+        // })
+        //     ->when($cloneBugdetIncome, function (Builder $query) {
+        //         $query->with(['incomes.tags']);
+        //     })
+        //     ->when($cloneBugdetGoals, function (Builder $query) {
+        //         $query->with(['goals.tags']);
+        //     })
+        //     ->find($id);
 
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
 
         $provisions = null;
-        $new_budget = new Budget([
-            'year' => $year,
-            'month' => $month,
-            'user_id' => auth()->user()->id
-        ]);
-
-        $new_budget->save();
+        $new_budget = $this->create(
+            $year,
+            $month,
+            auth()->user()->id
+        );
 
         if ($includeProvision) {
-            $provisions = Provision::with(['tags'])->where('user_id', auth()->user()->id)->get();
+            $provisions = $this->provisionRepository->get(['user_id' => auth()->user()->id], [], [], ['tags']);
 
             if ($provisions && $provisions->count()) {
                 foreach ($provisions as $provision) {
@@ -315,7 +378,7 @@ class BudgetService implements BudgetServiceInterface
     }
 
     /**
-     * @todo DOCUMENTAR
+     * Update a Budget
      * @param integer $id
      * @param boolean $closed
      * @return boolean
@@ -323,29 +386,29 @@ class BudgetService implements BudgetServiceInterface
     public function update(
         int $id,
         bool $closed
-    ): bool {
-        $budget = Budget::find($id);
+    ): Budget {
+        $budget = $this->budgetRepository->show($id);
 
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
 
-        return $budget->update(['closed' => $closed]);
+        return $this->budgetRepository->store(['closed' => $closed], $budget);
     }
 
     /**
-     * @todo DOCUMENTAR
+     * Delete a Budget
      * @param integer $id
      * @return boolean
      */
     public function delete(int $id): bool
     {
-        $budget = Budget::with([
+        $budget = $this->budgetRepository->show($id, [
             'expenses.tags',
             'incomes.tags',
             'provisions.tags',
             'goals'
-        ])->find($id);
+        ]);
 
         if (!$budget) {
             throw new Exception('budget.not-found');
@@ -353,44 +416,36 @@ class BudgetService implements BudgetServiceInterface
 
         // Despesas
         foreach ($budget->expenses as $expense) {
-            if ($expense->tags && $expense->tags->count()) {
-                $expense->tags()->detach();
-            }
-
-            $expense->delete();
+            $this->budgetExpenseService->delete($expense->id);
         }
 
         // Receitas
         foreach ($budget->incomes as $income) {
-            if ($income->tags && $income->tags->count()) {
-                $income->tags()->detach();
-            }
-
-            $income->delete();
+            $this->budgetIncomeService->delete($income->id);
         }
 
         // Metas
         foreach ($budget->goals as $goal) {
-            $goal->delete();
+            $this->budgetGoalService->delete($goal->id);
         }
 
-        return $budget->delete();
+        return $$this->budgetRepository->delete($id);
     }
 
     /**
-     * @todo DOCUMENTAR
-     * @param integer $id Id do Orçamento
-     * @return void
+     * Recalculate the totals to Budget
+     * @param integer $id
+     * @return Budget
      */
-    public static function recalculateBugdet(int $id)
+    public function recalculateBugdet(int $id): Budget
     {
         // Busca o budget do id
         // com despesas, receitas e provisionamento
-        $budget = Budget::with([
+        $budget = $this->budgetRepository->show($id, [
             'expenses',
             'incomes',
             'provisions',
-        ])->find($id);
+        ]);
 
         if (!$budget) {
             throw new Exception('budget.not-found');
@@ -416,12 +471,18 @@ class BudgetService implements BudgetServiceInterface
             $total_income += $budget->provisions->sum('share_value');
         }
 
-        $credit_card_invoices = CreditCardInvoice::with(['expenses'])
-            ->where(['year' => $budget->year, 'month' => $budget->month])
-            ->whereHas('creditCard', function (Builder $query) use ($budget) {
-                $query->where('user_id', $budget->user_id);
-            })
-            ->get();
+        $credit_card_invoices = $this->creditCardInvoiceRepository->get(
+            function (Builder $query) use ($budget) {
+                $query
+                    ->where(['year' => $budget->year, 'month' => $budget->month])
+                    ->whereHas('creditCard', function (Builder $query2) use ($budget) {
+                        $query2->where('user_id', $budget->user_id);
+                    });
+            },
+            [],
+            [],
+            ['expenses']
+        );
 
         if ($credit_card_invoices && $credit_card_invoices->count()) {
             foreach ($credit_card_invoices as $invoice) {
@@ -433,28 +494,52 @@ class BudgetService implements BudgetServiceInterface
         }
 
         // busca share user
-        $share_user = ShareUser::where('user_id', $budget->user_id)->with('shareUser')->first();
+        $share_user = $this->shareUserRepository->getOne(['user_id' => $budget->user_id], ['shareUser']);
 
         if ($share_user) {
-            // Busca orçamento com usuario compartilhado
-            $budget_share = Budget::with([
-                'expenses' => function ($query) use ($budget) {
-                    $query->where('share_user_id', $budget->user_id);
-                },
-                'provisions' => function ($query) use ($budget) {
-                    $query->where('share_user_id', $budget->user_id);
-                },
-            ])
-                ->where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user->share_user_id])
-                ->where(function (Builder $query) use ($budget) {
-                    $query->whereHas('expenses', function (Builder $query2) use ($budget) {
-                        $query2->where('share_user_id', $budget->user_id);
-                    })
-                        ->orWhereHas('provisions', function (Builder $query2) use ($budget) {
-                            $query2->where('share_user_id', $budget->user_id);
+            $budget_share = $this->budgetRepository->getOne(
+                function (Builder $query) use ($budget, $share_user) {
+                    $query->where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user->share_user_id])
+                        ->where(function (Builder $query) use ($budget) {
+                            $query->whereHas('expenses', function (Builder $query2) use ($budget) {
+                                $query2->where('share_user_id', $budget->user_id);
+                            })
+                                ->orWhereHas('provisions', function (Builder $query2) use ($budget) {
+                                    $query2->where('share_user_id', $budget->user_id);
+                                });
                         });
-                })
-                ->first();
+                },
+                [],
+                [],
+                [
+                    'expenses' => function ($query) use ($budget) {
+                        $query->where('share_user_id', $budget->user_id);
+                    },
+                    'provisions' => function ($query) use ($budget) {
+                        $query->where('share_user_id', $budget->user_id);
+                    },
+                ]
+            );
+
+            // Busca orçamento com usuario compartilhado
+            // $budget_share = Budget::with([
+            //     'expenses' => function ($query) use ($budget) {
+            //         $query->where('share_user_id', $budget->user_id);
+            //     },
+            //     'provisions' => function ($query) use ($budget) {
+            //         $query->where('share_user_id', $budget->user_id);
+            //     },
+            // ])
+            //     ->where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user->share_user_id])
+            //     ->where(function (Builder $query) use ($budget) {
+            //         $query->whereHas('expenses', function (Builder $query2) use ($budget) {
+            //             $query2->where('share_user_id', $budget->user_id);
+            //         })
+            //             ->orWhereHas('provisions', function (Builder $query2) use ($budget) {
+            //                 $query2->where('share_user_id', $budget->user_id);
+            //             });
+            //     })
+            //     ->first();
 
             if ($budget_share) {
                 // Soma Despesas
@@ -468,19 +553,38 @@ class BudgetService implements BudgetServiceInterface
                 }
             }
 
-            $credit_card_invoices = CreditCardInvoice::with([
-                'expenses' => function (Builder $query) use ($budget) {
-                    $query->where('share_user_id', $budget->user_id);
-                }
-            ])
-                ->where(['year' => $budget->year, 'month' => $budget->month])
-                ->whereHas('creditCard', function (Builder $query) use ($share_user) {
-                    $query->where('user_id', $share_user->share_user_id);
-                })
-                ->whereHas('expenses', function (Builder $query) use ($budget) {
-                    $query->where('share_user_id', $budget->user_id);
-                })
-                ->get();
+            $credit_card_invoices = $this->creditCardInvoiceRepository->get(
+                function (Builder $query) use ($budget, $share_user) {
+                    $query->where(['year' => $budget->year, 'month' => $budget->month])
+                        ->whereHas('creditCard', function (Builder $query) use ($share_user) {
+                            $query->where('user_id', $share_user->share_user_id);
+                        })
+                        ->whereHas('expenses', function (Builder $query) use ($budget) {
+                            $query->where('share_user_id', $budget->user_id);
+                        });
+                },
+                [],
+                [],
+                [
+                    'expenses' => function (Builder $query) use ($budget) {
+                        $query->where('share_user_id', $budget->user_id);
+                    }
+                ]
+            );
+
+            // $credit_card_invoices = CreditCardInvoice::with([
+            //     'expenses' => function (Builder $query) use ($budget) {
+            //         $query->where('share_user_id', $budget->user_id);
+            //     }
+            // ])
+            //     ->where(['year' => $budget->year, 'month' => $budget->month])
+            //     ->whereHas('creditCard', function (Builder $query) use ($share_user) {
+            //         $query->where('user_id', $share_user->share_user_id);
+            //     })
+            //     ->whereHas('expenses', function (Builder $query) use ($budget) {
+            //         $query->where('share_user_id', $budget->user_id);
+            //     })
+            //     ->get();
 
             if ($credit_card_invoices && $credit_card_invoices->count()) {
                 foreach ($credit_card_invoices as $invoice) {
@@ -491,21 +595,21 @@ class BudgetService implements BudgetServiceInterface
             }
         }
 
-        return $budget->update([
+        return $this->budgetRepository->store([
             'total_expense' => $total_expense,
             'total_income' => $total_income
-        ]);
+        ], $budget);
     }
 
     /**
-     * @todo DOCUMENTAR
+     * Find a Budget by year and month
      * @param string $year
      * @param string $month
      * @return Budget
      */
     public function findByYearMonth(string $year, string $month): Budget
     {
-        $budget = Budget::where(['user_id' => auth()->user()->id, 'year' => $year, 'month' => $month])->first();
+        $budget = $this->budgetRepository->getOne(['user_id' => auth()->user()->id, 'year' => $year, 'month' => $month]);
 
         if (!$budget) {
             throw new Exception('budget.not-found');
@@ -515,15 +619,15 @@ class BudgetService implements BudgetServiceInterface
     }
 
     /**
-     * @todo DOCUMENTAR
+     * Show data to the view
      * @param integer $id
-     * @return void
+     * @return array
      */
-    public function show(int $id)
+    public function show(int $id): array
     {
         // Busca o budget do id
         // com despesas, receitas e provisionamento
-        $budget = Budget::with([
+        $budget = $this->budgetRepository->show($id, [
             'expenses' => [
                 'tags',
                 'shareUser',
@@ -537,44 +641,80 @@ class BudgetService implements BudgetServiceInterface
                 'shareUser',
             ],
             'goals.tags',
-        ])->find($id);
+        ]);
 
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
 
         // Busca as parcelas de Financiamento em aberto para mostrar no select em tela
-        $installments = FinancingInstallment::with([
-            'financing:id,description'
-        ])
-            ->whereHas('financing', function (Builder $query) use ($budget) {
-                $query->where('user_id', $budget->user_id);
-            })
-            ->doesntHave('budgetExpense')
-            ->where('paid', false)
-            ->get();
+        $installments = $this->financingInstallmentRepository->get(
+            function (Builder $query) use ($budget) {
+                $query->whereHas('financing', function (Builder $query) use ($budget) {
+                    $query->where('user_id', $budget->user_id);
+                })
+                    ->doesntHave('budgetExpense')
+                    ->where('paid', false);
+            },
+            [],
+            [],
+            ['financing:id,description']
+        );
 
-        // Busca as faturas dos cartões
-        $credit_card_invoices = CreditCardInvoice::with([
-            'creditCard',
-            'file',
-            'expenses' => [
-                'tags',
-                'shareUser',
-                'divisions' => [
+        // $installments = FinancingInstallment::with([
+        //     'financing:id,description'
+        // ])
+        //     ->whereHas('financing', function (Builder $query) use ($budget) {
+        //         $query->where('user_id', $budget->user_id);
+        //     })
+        //     ->doesntHave('budgetExpense')
+        //     ->where('paid', false)
+        //     ->get();
+
+        $credit_card_invoices = $this->creditCardInvoiceRepository->get(
+            function (Builder $query) use ($budget) {
+                $query
+                    ->where(['year' => $budget->year, 'month' => $budget->month])
+                    ->whereHas('creditCard', function (Builder $query) use ($budget) {
+                        $query->where('user_id', $budget->user_id)->where('is_active', true);
+                    });
+            },
+            [],
+            [],
+            [
+                'creditCard',
+                'file',
+                'expenses' => [
                     'tags',
-                    'shareUser'
+                    'shareUser',
+                    'divisions' => [
+                        'tags',
+                        'shareUser'
+                    ]
                 ]
             ]
-        ])
-            ->where(['year' => $budget->year, 'month' => $budget->month])
-            ->whereHas('creditCard', function (Builder $query) use ($budget) {
-                $query->where('user_id', $budget->user_id)->where('is_active', true);
-            })
-            ->get();
+        );
 
-        // busca share user
-        $share_users = ShareUser::where('user_id', $budget->user_id)->with('shareUser', 'user')->get();
+        // Busca as faturas dos cartões
+        // $credit_card_invoices = CreditCardInvoice::with([
+        //     'creditCard',
+        //     'file',
+        //     'expenses' => [
+        //         'tags',
+        //         'shareUser',
+        //         'divisions' => [
+        //             'tags',
+        //             'shareUser'
+        //         ]
+        //     ]
+        // ])
+        //     ->where(['year' => $budget->year, 'month' => $budget->month])
+        //     ->whereHas('creditCard', function (Builder $query) use ($budget) {
+        //         $query->where('user_id', $budget->user_id)->where('is_active', true);
+        //     })
+        //     ->get();
+
+        $share_users = $this->shareUserRepository->get(['user_id' => $budget->user_id], ['shareUser', 'user']);
         $share_user = null;
 
         if ($share_users && $share_users->count()) {
@@ -592,41 +732,82 @@ class BudgetService implements BudgetServiceInterface
 
         if ($share_user) {
             // Busca orçamento com usuario compartilhado
-            $budget_share = Budget::with([
-                'expenses' => [
-                    'tags',
-                    'shareUser',
-                    'financingInstallment' => [
-                        'financing:id,description'
-                    ]
-                ],
-                'incomes.tags',
-                'provisions' => [
-                    'tags',
-                    'shareUser',
-                ],
-                'goals.tags',
-            ])
-                ->where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user->share_user_id])
-                ->first();
-
-            $credit_card_invoices_share = CreditCardInvoice::with([
-                'creditCard',
-                'file',
-                'expenses' => [
-                    'tags',
-                    'shareUser',
-                    'divisions' => [
+            $budget_share = $this->budgetRepository->getOne(
+                ['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user->share_user_id],
+                [
+                    'expenses' => [
                         'tags',
-                        'shareUser'
+                        'shareUser',
+                        'financingInstallment' => [
+                            'financing:id,description'
+                        ]
+                    ],
+                    'incomes.tags',
+                    'provisions' => [
+                        'tags',
+                        'shareUser',
+                    ],
+                    'goals.tags',
+                ]
+            );
+            // $budget_share = Budget::with([
+            //     'expenses' => [
+            //         'tags',
+            //         'shareUser',
+            //         'financingInstallment' => [
+            //             'financing:id,description'
+            //         ]
+            //     ],
+            //     'incomes.tags',
+            //     'provisions' => [
+            //         'tags',
+            //         'shareUser',
+            //     ],
+            //     'goals.tags',
+            // ])
+            //     ->where(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user->share_user_id])
+            //     ->first();
+            $credit_card_invoices_share = $this->creditCardInvoiceRepository->get(
+                function (Builder $query) use ($budget, $share_user) {
+                    $query
+                        ->where(['year' => $budget->year, 'month' => $budget->month])
+                        ->whereHas('creditCard', function (Builder $query) use ($share_user) {
+                            $query->where('user_id', $share_user->share_user_id)->where('is_active', true);
+                        });
+                },
+                [],
+                [],
+                [
+                    'creditCard',
+                    'file',
+                    'expenses' => [
+                        'tags',
+                        'shareUser',
+                        'divisions' => [
+                            'tags',
+                            'shareUser'
+                        ]
                     ]
                 ]
-            ])
-                ->where(['year' => $budget->year, 'month' => $budget->month])
-                ->whereHas('creditCard', function (Builder $query) use ($share_user) {
-                    $query->where('user_id', $share_user->share_user_id)->where('is_active', true);
-                })
-                ->get();
+            );
+
+            // $credit_card_invoices_share = CreditCardInvoice::with([
+            //     'creditCard',
+            //     'file',
+            //     'expenses' => [
+            //         'tags',
+            //         'shareUser',
+            //         'divisions' => [
+            //             'tags',
+            //             'shareUser'
+            //         ]
+            //     ]
+            // ])
+            //     ->where(['year' => $budget->year, 'month' => $budget->month])
+            //     ->whereHas('creditCard', function (Builder $query) use ($share_user) {
+            //         $query->where('user_id', $share_user->share_user_id)->where('is_active', true);
+            //     })
+            //     ->get();
 
             if ($budget_share) {
                 if (!$budget_share->expenses) {
@@ -638,12 +819,6 @@ class BudgetService implements BudgetServiceInterface
                 }
             }
         }
-
-        /**
-         * @todo Montar as Metas e dados para o grafico
-         */
-
-        $goals_charts = [];
 
         /**
          * Painel de Despesas e Receitas
@@ -875,6 +1050,17 @@ class BudgetService implements BudgetServiceInterface
             }
         }
 
+
+        /**
+         * @todo Montar as Metas e dados para o grafico
+         */
+
+        $goals_charts = [];
+
+        // Painel de Despesas por Tag
+
+        // Painel de Metas
+
         // - Painel de Resumo dos Cartões (COLUNA 6)
         //     - Parcelados
         //     - Provisionamento
@@ -883,11 +1069,6 @@ class BudgetService implements BudgetServiceInterface
         // - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
         //      - Somar o valor que devo pagar para o "share_user_id"
         //      - Somar o valor a receber do "share_user_id"
-
-        // - Expanse-painel com o componente de Cartões
-        //     - Foreach com todos os dados
-        //     - AJUSTE DO TITULO com nome do cartão
-
 
         // - Expanse-painel com o componente para Provisionamento
 
