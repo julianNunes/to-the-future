@@ -194,7 +194,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
-        'TagService' => App\Services\Facades\TagService::class
+        'TagService' => App\Services\Facades\TagService::class,
+        'BudgetService' => App\Services\Facades\BudgetService::class
 
     ])->toArray(),
 

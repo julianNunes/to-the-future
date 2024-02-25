@@ -381,7 +381,7 @@ export default {
         },
 
         newItem() {
-            this.titleModal = this.$t('provision.new-item')
+            this.titleModal = this.$t('budget-provision.new-item')
             this.editDialog = true
             this.provision = {
                 id: null,
@@ -392,6 +392,7 @@ export default {
                 share_value: 0,
                 share_user_id: null,
                 tags: [],
+                budget_id: this.budgetId,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -399,7 +400,7 @@ export default {
         },
 
         editItem(item) {
-            this.titleModal = this.$t('provision.edit-item')
+            this.titleModal = this.$t('budget-provision.edit-item')
             this.editDialog = true
             this.provision = {
                 id: item.id,
@@ -410,6 +411,7 @@ export default {
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
                 tags: item.tags,
+                budget_id: this.budgetId,
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -434,7 +436,7 @@ export default {
         async create() {
             this.isLoading = true
             this.$inertia.post(
-                '/provision',
+                '/budget-provision',
                 {
                     description: this.provision.description,
                     value: this.provision.value,
@@ -443,6 +445,7 @@ export default {
                     share_value: this.provision.share_value,
                     share_user_id: this.provision.share_user_id,
                     tags: this.provision.tags,
+                    budget_id: this.provision.budget_id,
                 },
                 {
                     onSuccess: () => {
@@ -458,7 +461,7 @@ export default {
         async update() {
             this.isLoading = true
             this.$inertia.put(
-                '/provision/' + this.provision.id,
+                '/budget-provision/' + this.provision.id,
                 {
                     description: this.provision.description,
                     value: this.provision.value,
@@ -467,6 +470,7 @@ export default {
                     share_value: this.provision.share_value,
                     share_user_id: this.provision.share_user_id,
                     tags: this.provision.tags,
+                    budget_id: this.provision.budget_id,
                 },
                 {
                     onSuccess: () => {
@@ -486,7 +490,7 @@ export default {
 
         remove() {
             this.isLoading = true
-            this.$inertia.delete(`/provision/${this.deleteId}`, {
+            this.$inertia.delete(`/budget-provision/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {

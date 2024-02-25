@@ -16,7 +16,6 @@ use Illuminate\Support\Collection;
 class BudgetProvisionService implements BudgetProvisionServiceInterface
 {
     public function __construct(
-        private BudgetServiceInterface $budgetService,
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetProvisionRepositoryInterface $budgetProvisionRepository,
         private TagRepositoryInterface $tagRepository,

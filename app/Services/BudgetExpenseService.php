@@ -10,15 +10,14 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetExpenseServiceInterface;
-use App\Services\Interfaces\BudgetServiceInterface;
 use Illuminate\Support\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
+use App\Services\Facades\BudgetService;
 
 class BudgetExpenseService implements BudgetExpenseServiceInterface
 {
     public function __construct(
-        private BudgetServiceInterface $budgetService,
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetExpenseRepositoryInterface $budgetExpenseRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
@@ -89,14 +88,14 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         }
 
         // Atualiza Orçamento
-        $this->budgetService->recalculateBugdet($budgetId);
+        BudgetService::recalculateBugdet($budgetId);
 
         // Se houver valor compartilhado, atualizado dados do Orçamento
         if ($shareUserId) {
             $budget_share = $this->budgetRepository->getOne(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $shareUserId]);
 
             if ($budget_share) {
-                $this->budgetService->recalculateBugdet($budget_share->id);
+                BudgetService::recalculateBugdet($budget_share->id);
             }
         }
 
@@ -171,14 +170,14 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         ], $expense);
 
         // Atualiza Orçamento
-        $this->budgetService->recalculateBugdet($expense->budget_id);
+        BudgetService::recalculateBugdet($expense->budget_id);
 
         // Se houver valor compartilhado, atualizado dados do Orçamento
         if ($shareUserId) {
             $budget_share = $this->budgetRepository->getOne(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $shareUserId]);
 
             if ($budget_share) {
-                $this->budgetService->recalculateBugdet($budget_share->id);
+                BudgetService::recalculateBugdet($budget_share->id);
             }
         }
 
@@ -217,12 +216,12 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             $budget_share = $this->budgetRepository->getOne(['year' => $budget->year, 'month' => $budget->month, 'user_id' => $share_user_id]);
 
             if ($budget_share) {
-                $this->budgetService->recalculateBugdet($budget_share->id);
+                BudgetService::recalculateBugdet($budget_share->id);
             }
         }
 
         // Atualiza Orçamento
-        $this->budgetService->recalculateBugdet($budget_id);
+        BudgetService::recalculateBugdet($budget_id);
 
         return true;
     }

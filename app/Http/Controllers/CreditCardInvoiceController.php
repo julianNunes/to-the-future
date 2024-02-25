@@ -40,23 +40,14 @@ class CreditCardInvoiceController extends Controller
             'credit_card_id' => ['required'],
         ]);
 
-        if ($request->automatic_generate == true) {
-            $this->creditCardInvoiceService->createAutomatic(
-                $request->due_date,
-                $request->closing_date,
-                $request->year,
-                $request->month,
-                $request->credit_card_id,
-            );
-        } else {
-            $this->creditCardInvoiceService->create(
-                $request->due_date,
-                $request->closing_date,
-                $request->year,
-                $request->month,
-                $request->credit_card_id,
-            );
-        }
+        $this->creditCardInvoiceService->createAutomatic(
+            $request->due_date,
+            $request->closing_date,
+            $request->year,
+            $request->month,
+            $request->credit_card_id,
+            $request->automatic_generate
+        );
 
         return redirect()->back()->with('success', 'default.sucess-save');
     }

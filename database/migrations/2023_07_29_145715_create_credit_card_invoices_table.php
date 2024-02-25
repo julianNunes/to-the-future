@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('remarks')->nullable()->comment('Observações');
             $table->unsignedBigInteger('credit_card_id');
             $table->foreign('credit_card_id')->references('id')->on('credit_cards');
+            $table->unsignedBigInteger('budget_id')->nullable();
+            $table->foreign('budget_id')->references('id')->on('budgets');
             $table->timestamps();
             $table->engine = 'InnoDB';
         });

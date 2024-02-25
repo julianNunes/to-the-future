@@ -217,7 +217,7 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
                 ]);
 
                 // Atualiza Tags
-                $this->tagRepository->saveTagsToModel($new_division, $division['tags']);
+                $this->tagRepository->saveTagsToModel($new_division, collect($division['tags']));
             }
         }
 
@@ -310,7 +310,7 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
                 ]);
 
                 // Atualiza Tags
-                $this->tagRepository->saveTagsToModel($new_division, $division['tags']);
+                $this->tagRepository->saveTagsToModel($new_division, collect($division['tags']));
             }
         }
 
@@ -337,14 +337,21 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
             throw new Exception('credit-card-invoice-expense.not-found');
         }
 
+        $invoice_id = $credit_card_invoice_expense->invoice_id;
+
         // Remove todos os vinculos
         foreach ($credit_card_invoice_expense->divisions as $division) {
-            $this->tagRepository->saveTagsToModel($division, $$division->tags);
+            $this->tagRepository->saveTagsToModel($division, $division->tags);
             $this->creditCardInvoiceExpenseDivisionRepository->delete($division->id);
         }
 
-        $this->tagRepository->saveTagsToModel($credit_card_invoice_expense, $$credit_card_invoice_expense->tags);
-        return $this->creditCardInvoiceExpenseRepository->delete($credit_card_invoice_expense->id);
+        $this->tagRepository->saveTagsToModel($credit_card_invoice_expense, $credit_card_invoice_expense->tags);
+        $this->creditCardInvoiceExpenseRepository->delete($credit_card_invoice_expense->id);
+
+        // Atualiza o saldo total da fatura
+        $this->recalculateTotalInvoice($invoice_id);
+
+        return true;
     }
 
     /**
@@ -396,7 +403,7 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         }
 
         // Atualiza o saldo total da fatura
-        $expenses = $this->creditCardInvoiceExpenseRepository->get(['invoice_id', $invoiceId]);
+        $expenses = $this->creditCardInvoiceExpenseRepository->get(['invoice_id' => $invoiceId]);
 
         // Atualiza o saldo total da fatura
         if ($expenses && $expenses->count()) {

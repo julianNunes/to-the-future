@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CreditCardInvoice;
 use App\Repositories\Interfaces\{
+    BudgetRepositoryInterface,
     CreditCardInvoiceExpenseDivisionRepositoryInterface,
     CreditCardInvoiceExpenseRepositoryInterface,
     CreditCardInvoiceFileRepositoryInterface,
@@ -25,7 +26,8 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
         private CreditCardInvoiceExpenseDivisionRepositoryInterface $creditCardInvoiceExpenseDivisionRepository,
         private CreditCardInvoiceFileRepositoryInterface $creditCardInvoiceFileRepository,
         private TagRepositoryInterface $tagRepository,
-        private ShareUserRepositoryInterface $shareUserRepository
+        private ShareUserRepositoryInterface $shareUserRepository,
+        private BudgetRepositoryInterface $budgetRepository,
     ) {
     }
 
@@ -49,6 +51,7 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
      * @param string $year
      * @param string $month
      * @param integer $creditCardId
+     * @param boolean $creditCardId
      * @return CreditCardInvoice
      */
     public function createAutomatic(
@@ -57,18 +60,36 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
         string $year,
         string $month,
         int $creditCardId,
+        bool $automaticGenerate
     ): bool {
-        $this->create($dueDate, $closingDate, $year, $month, $creditCardId);
-        $due_date = Carbon::parse($dueDate);
-        $closing_date = Carbon::parse($closingDate);
+        $invoice = $this->create($dueDate, $closingDate, $year, $month, $creditCardId);
 
-        $new_due_date = $due_date->copy()->addMonth();
-        $new_closing_date = $closing_date->copy()->addMonth();
+        // Verifico se existe Budget
+        $budget = $this->budgetRepository->getOne(['month' => $month, 'year' => $year, 'user_id' => auth()->user()->id]);
 
-        for ($i = $new_due_date->month; $i <= 12; $i++) {
-            $this->create($new_due_date, $new_closing_date, $year, $new_due_date->month, $creditCardId);
-            $new_due_date->addMonth();
-            $new_closing_date->addMonth();
+        if ($budget) {
+            $this->creditCardInvoiceRepository->store(['budget_id' => $budget->id], $invoice);
+        }
+
+        if ($automaticGenerate) {
+            $due_date = Carbon::parse($dueDate);
+            $closing_date = Carbon::parse($closingDate);
+
+            $new_due_date = $due_date->copy()->addMonth();
+            $new_closing_date = $closing_date->copy()->addMonth();
+
+            for ($i = $new_due_date->month; $i <= 12; $i++) {
+                $invoice = $this->create($new_due_date, $new_closing_date, $year, $new_due_date->month, $creditCardId);
+                // Verifico se existe Budget
+                $budget = $this->budgetRepository->getOne(['month' => $new_due_date->month, 'year' => $year, 'user_id' => auth()->user()->id]);
+
+                if ($budget) {
+                    $this->creditCardInvoiceRepository->store(['budget_id' => $budget->id], $invoice);
+                }
+
+                $new_due_date->addMonth();
+                $new_closing_date->addMonth();
+            }
         }
 
         return true;
@@ -134,11 +155,11 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
         // Remove todos os vinculos
         foreach ($credit_card_invoice->expenses as $expense) {
             foreach ($expense->divisions as $division) {
-                $this->tagRepository->saveTagsToModel($division, $$division->tags);
+                $this->tagRepository->saveTagsToModel($division, $division->tags);
                 $this->creditCardInvoiceExpenseDivisionRepository->delete($division->id);
             }
 
-            $this->tagRepository->saveTagsToModel($expense, $$expense->tags);
+            $this->tagRepository->saveTagsToModel($expense, $expense->tags);
             $this->creditCardInvoiceExpenseRepository->delete($expense->id);
         }
 

@@ -50,6 +50,7 @@
                         :installments="installments"
                     />
                     <BudgetIncome :budget-id="budgetId" :year-month="yearMonthModel" :incomes="budgetIncomes" />
+                    <BudgetProvision :budget-id="budgetId" :year-month="yearMonthModel" :incomes="budgetProvisions" />
                     <InvoiceExpense
                         v-for="invoice in creditCardInvoices"
                         :key="invoice.id"
@@ -60,12 +61,8 @@
                 </v-window-item>
                 <v-window-item v-if="shareUser" value="two">
                     <BudgetExpense :expenses="budgetShareExpenses" :view-only="true" />
-                    <BudgetIncome
-                        :budget-id="budgetId"
-                        :year-month="yearMonthModel"
-                        :incomes="budgetShareIncomes"
-                        :view-only="true"
-                    />
+                    <BudgetIncome :year-month="yearMonthModel" :incomes="budgetShareIncomes" :view-only="true" />
+                    <BudgetProvision :year-month="yearMonthModel" :incomes="budgetShareProvisions" :view-only="true" />
                     <InvoiceExpense
                         v-for="invoice in creditCardInvoicesShare"
                         :key="invoice.id"
@@ -85,6 +82,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import BudgetExpense from '../../Components/Budget/BudgetExpense.vue'
 import BudgetIncome from '../../Components/Budget/BudgetIncome.vue'
+import BudgetProvision from '../../Components/Budget/BudgetProvision.vue'
 import InvoiceExpense from '../../Components/CreditCardInvoice/InvoiceExpense.vue'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 </script>
@@ -164,11 +162,17 @@ export default {
         budgetIncomes() {
             return this.budget.incomes
         },
+        budgetProvisions() {
+            return this.budget.provisions
+        },
         budgetShareExpenses() {
             return this.budgetShare.expenses
         },
         budgetShareIncomes() {
             return this.budgetShare.incomes
+        },
+        budgetShareProvisions() {
+            return this.budgetShare.provisions
         },
         shareUserName() {
             return this.shareUser.name
@@ -177,7 +181,6 @@ export default {
 
     methods: {
         changeYearMonth(event) {
-            console.log('value', event.target.value)
             let year = event.target.value.substring(0, 4)
             let month = event.target.value.substring(5, 7)
 

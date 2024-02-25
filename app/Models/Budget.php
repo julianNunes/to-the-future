@@ -29,6 +29,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BudgetProvision> $provisions
  * @property-read int|null $provisions_count
  * @property-read \App\Models\User|null $user
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CreditCardInvoice> $invoices
+ * @property-read int|null $invoices_count
  * @method static \Illuminate\Database\Eloquent\Builder|Budget newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Budget newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Budget query()
@@ -98,5 +100,10 @@ class Budget extends Model
     public function provisions(): HasMany
     {
         return $this->hasMany(BudgetProvision::class, 'budget_id', 'id');
+    }
+
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(CreditCardInvoice::class, 'budget_id', 'id');
     }
 }

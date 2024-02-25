@@ -884,9 +884,11 @@ export default {
                         }
 
                         if (
-                            searchFieldsData &&
-                            searchFieldsData.length > 0 &&
-                            !searchFieldsData.find((x) => x.name.toUpperCase() == val.toUpperCase())
+                            (searchFieldsData &&
+                                searchFieldsData.length > 0 &&
+                                !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                            !searchFieldsData ||
+                            searchFieldsData.length == 0
                         ) {
                             searchFieldsData.unshift({ name: val.toUpperCase() })
                         }
@@ -942,7 +944,7 @@ export default {
                 tags: item.tags,
                 divisions: item.divisions,
             }
-            this.hasDivisions = this.expense.divisions ? true : false
+            this.hasDivisions = this.expense.divisions && this.expense.divisions.length ? true : false
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
             })

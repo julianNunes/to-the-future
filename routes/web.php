@@ -4,6 +4,7 @@ use App\Http\Controllers\{
     BudgetController,
     BudgetExpenseController,
     BudgetIncomeController,
+    BudgetProvisionController,
     DashboardController,
     CreditCardController,
     CreditCardInvoiceController,
@@ -129,11 +130,18 @@ Route::controller(BudgetExpenseController::class)->group(function () {
     Route::delete('/budget-expense/{id}', 'delete');
 });
 
-// Despesas do Orçamento
+// Receitas do Orçamento
 Route::controller(BudgetIncomeController::class)->group(function () {
     Route::post('/budget-income', 'store');
     Route::put('/budget-income/{id}', 'update');
     Route::delete('/budget-income/{id}', 'delete');
+});
+
+// Provisionamento do Orçamento
+Route::controller(BudgetProvisionController::class)->group(function () {
+    Route::post('/provision-budget', 'store');
+    Route::put('/provision-budget/{id}', 'update');
+    Route::delete('/provision-budget/{id}', 'delete');
 });
 
 require __DIR__ . '/auth.php';

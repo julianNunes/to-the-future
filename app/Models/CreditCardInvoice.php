@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CreditCardInvoiceExpense> $expenses
  * @property-read int|null $expenses_count
  * @property-read \App\Models\CreditCardInvoiceFile|null $file
+ * @property-read \App\Models\Budget $budget
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCardInvoice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCardInvoice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCardInvoice query()
@@ -60,6 +61,7 @@ class CreditCardInvoice extends Model
         'closed',
         'remarks',
         'credit_card_id',
+        'budget_id'
     ];
 
     public function creditCard(): BelongsTo
@@ -75,5 +77,10 @@ class CreditCardInvoice extends Model
     public function expenses(): HasMany
     {
         return $this->hasMany(CreditCardInvoiceExpense::class, 'invoice_id', 'id');
+    }
+
+    public function budget(): BelongsTo
+    {
+        return $this->belongsTo(Budget::class, 'budget_id', 'id');
     }
 }

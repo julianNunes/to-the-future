@@ -27,6 +27,7 @@ interface CreditCardInvoiceServiceInterface
         string $year,
         string $month,
         int $creditCardId,
+        bool $automaticGenerate
     ): bool;
 
     /**

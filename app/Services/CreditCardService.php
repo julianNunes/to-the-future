@@ -141,11 +141,11 @@ class CreditCardService implements CreditCardServiceInterface
         foreach ($credit_card->invoices as $invoice) {
             foreach ($invoice->expenses as $expense) {
                 foreach ($expense->divisions as $division) {
-                    $this->tagRepository->saveTagsToModel($division, $$division->tags);
+                    $this->tagRepository->saveTagsToModel($division, $division->tags);
                     $this->creditCardInvoiceExpenseDivisionRepository->delete($division->id);
                 }
 
-                $this->tagRepository->saveTagsToModel($expense, $$expense->tags);
+                $this->tagRepository->saveTagsToModel($expense, $expense->tags);
                 $this->creditCardInvoiceExpenseRepository->delete($expense->id);
             }
 

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BudgetService;
 use App\Services\Interfaces\BudgetServiceInterface;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

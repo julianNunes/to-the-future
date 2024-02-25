@@ -40,32 +40,27 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 ==================================================
 TO-DO
 ==================================================
-- Testar todo o contexto de Cartões
-    - Verificar a melhor forma para fazer update das Despesas quando ela for uma parcela
 
-- CreditCardInvoiceService
-    - Verificar se tem algo que possa ser chamado em outro serviço
+- Ao criar uma fatura de cartao de credito verificar se nao existe budget para o mesmo mes, se houver gravar fk do budget
 
-- CreditCardInvoiceExpenseService
-    - Verificar se tem algo que possa ser chamado em outro serviço
+- Ao criar um novo budget verificar se existem faturas para cartoes ativos no mesmo mes.
 
+- Verificar se na divisao das despesas esta somando o total e comparando o valor declarado total
 
-- Faltando ajustar:
-    - BudgetExpenseService
-    - BudgetGoalService
+- Verificar em todos os MOdels que tem relação com o total do Budget onde eu preciso chamar o novo HELPER
     - BudgetIncomeService
+    - BudgetExpenseService
     - BudgetProvisionService
-    - BudgetService
+    - CreditCardInvoiceExpenseService
+
 
 
 ORÇAMENTO SHOW
 - Front-end
     - Cabeçalho da tela
-        - Mes/Ano: ao trocar, faz a busca novamente
         - Botões:
             - "Adicionar Provisionamentos"
             - "Adicionar Despesas Fixas"
-
 
     - NAV-BAR
         ! meu Painel e o painel de OUTRO USUARIO QUE COMPARTILHA COMIGO
@@ -73,14 +68,6 @@ ORÇAMENTO SHOW
             - Painel com as metas (COLUNA 12)
                 - De um lado tabela com dados
                 - Do Outro grafico com o utilizado e a meta
-
-
-            - Painel de Despesas (COLUNA 12)
-                - Na tabela de despesas ter o botão "+" para expandir a linha quando a despesa for uma parcela do financiamento
-                - Lançamento de Despesa
-                    - Se existe "user_share_id" e valor a compartilhar:
-                        - Gero um registro virtual na minha receita
-                        - gero um registr virtual na despesa do compartilhado
 
             - Painel de Receitas (Coluna 12)
 

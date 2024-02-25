@@ -12,6 +12,7 @@ use App\Services\Interfaces\BudgetIncomeServiceInterface;
 use App\Services\Interfaces\BudgetServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
+use App\Services\Facades\BudgetService;
 
 class BudgetIncomeService implements BudgetIncomeServiceInterface
 {
@@ -58,7 +59,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         $this->tagRepository->saveTagsToModel($income, $tags);
 
         // Atualiza Orçamento
-        $this->budgetService->recalculateBugdet($budgetId);
+        BudgetService::recalculateBugdet($budgetId);
 
         return $income;
     }
@@ -104,7 +105,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         ], $income);
 
         // Atualiza Orçamento
-        $this->budgetService->recalculateBugdet($income->budget_id);
+        BudgetService::recalculateBugdet($income->budget_id);
 
         return true;
     }
@@ -125,7 +126,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         $this->tagRepository->saveTagsToModel($income);
 
         // Atualiza Orçamento
-        $this->budgetService->recalculateBugdet($income->budget_id);
+        BudgetService::recalculateBugdet($income->budget_id);
 
         return $this->budgetIncomeRepository->delete($id);
     }
