@@ -43,7 +43,7 @@
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                             <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
                             <template #[`item.remarks`]="{ item }">{{
-                                item.remarks.match(/(\S+)\.(\S+)/gm) ? $t(item.remarks) : item.remarks
+                                item.remarks && item.remarks.match(/(\S+)\.(\S+)/gm) ? $t(item.remarks) : item.remarks
                             }}</template>
                             <template #[`item.paid`]="{ item }">{{
                                 item.paid === null ? null : item.paid == true ? $t('default.paid') : $t('default.open')

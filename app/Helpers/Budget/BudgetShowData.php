@@ -191,24 +191,22 @@ class BudgetShowData implements BudgetShowDataInterface
             'shareUsers' => $shareUsers,
             'owner' => [
                 'budget' => $budget,
-                'goalsCharts' => [],
-                'expenseToTags' => [],
                 'summary' => [],
                 'summaryCrediCard' => [],
+                'goalsCharts' => [],
+                'expenseToTags' => [],
             ],
             'share' => [
                 'budget' => $budgetShare,
-                'goalsCharts' => [],
-                'expenseToTags' => [],
                 'summary' => [],
                 'summaryCrediCard' => [],
+                'goalsCharts' => [],
+                'expenseToTags' => [],
             ]
         ];
     }
 
     /**
-     * Undocumented function
-     *
      * @param Budget $budget
      * @param Budget|null $budgetShare
      * @param User|null $shareUser
@@ -234,6 +232,9 @@ class BudgetShowData implements BudgetShowDataInterface
         // Receitas - Compartilhado Receitas
         if ($budget->expenses->count()) {
             $filtered = $budget->expenses->where('share_user_id', '!=', null)->where('id', '=', null);
+            // $filtered = $budget->expenses->filter(function ($expense) use ($budget) {
+            //     return $expense['share_user_id'] != null && $expense['id'] == null;
+            // });
 
             if ($filtered && $filtered->count()) {
                 foreach ($filtered as $expense) {
@@ -243,6 +244,7 @@ class BudgetShowData implements BudgetShowDataInterface
                         'date' => null,
                         'value' => $expense->share_value,
                         'remarks' => 'budget.share-expense',
+                        'tags' => []
                     ]);
                 }
             }
@@ -271,6 +273,7 @@ class BudgetShowData implements BudgetShowDataInterface
                     'date' => null,
                     'value' => $share_value,
                     'remarks' => 'budget.share-expense',
+                    'tags' => []
                 ]);
             }
         }
@@ -285,7 +288,7 @@ class BudgetShowData implements BudgetShowDataInterface
                     'date' => $invoice->due_date,
                     'value' => $invoice->expenses->sum('value'),
                     'remarks' => '',
-                    'paid' => $invoice->total_paid ? true : false,
+                    'paid' => null,
                     'share_value' => $share_value,
                     'share_user_id' => $share_value && $shareUser ? $shareUser->id : null,
                     'tags' => []
@@ -299,6 +302,7 @@ class BudgetShowData implements BudgetShowDataInterface
                         'date' => null,
                         'value' => $share_value,
                         'remarks' => 'budget.share-expense',
+                        'tags' => []
                     ]);
                 }
             }
@@ -310,9 +314,8 @@ class BudgetShowData implements BudgetShowDataInterface
 
         // Despesas - Compartilhado com owner Totalizador dos cartoes
         if ($budgetShare && $budgetShare->expenses && $budgetShare->expenses->count() && $budgetShare->expenses->where('share_user_id', $budget->user_id)->count()) {
-            // $filtered = $budgetShare->expenses->where('share_user_id', '=', $budget->user_id)->where('id', '=', null);
             $filtered = $budgetShare->expenses->filter(function ($expense) use ($budget) {
-                return $expense['share_user_id'] == $budget->user_id && $expense['id'] == null;
+                return $expense['share_user_id'] == $budget->user_id && $expense['id'] != null;
             });
 
             foreach ($filtered as $expense) {
@@ -332,9 +335,8 @@ class BudgetShowData implements BudgetShowDataInterface
 
         // Despesas - Compartilhado com owner Totalizador do Provisionamento
         if ($budgetShare && $budgetShare->provisions && $budgetShare->provisions->count() && $budgetShare->provisions->where('share_user_id', $budget->user_id)->count()) {
-            // $filtered = $budgetShare->provisions->where('share_user_id', $budget->user_id)->where('id', '=', null);
             $filtered = $budgetShare->provisions->filter(function ($provision) use ($budget) {
-                return $provision->share_user_id == $budget->user_id && $provision->id == null;
+                return $provision->share_user_id == $budget->user_id && $provision->id != null;
             });
 
             $budget->expenses->push([

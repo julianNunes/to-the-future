@@ -34,10 +34,15 @@
                             fixed-header
                         >
                             <!-- Itens -->
-                            <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
+                            <template #[`item.date`]="{ item }">{{
+                                item.date ? moment(item.date).format('DD/MM/YYYY') : null
+                            }}</template>
+                            <template #[`item.description`]="{ item }">{{
+                                item.description.match(/(\S+)\.(\S+)/gm) ? $t(item.description) : item.description
+                            }}</template>
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                             <template #[`item.remarks`]="{ item }">{{
-                                item.remarks.match(/(\S+)\.(\S+)/gm) ? $t(item.remarks) : item.remarks
+                                item.remarks && item.remarks.match(/(\S+)\.(\S+)/gm) ? $t(item.remarks) : item.remarks
                             }}</template>
                             <template #[`item.tags`]="{ item }">{{
                                 item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''

@@ -90,7 +90,7 @@ class BudgetCalculate implements BudgetCalculateInterface
                                 })
                                 ->orWhereHas('invoices.expenses', function (Builder $query) use ($budget) {
                                     $query->where('share_user_id', $budget->user_id)
-                                        ->orWhereHas('divisons', function (Builder $query2) use ($budget) {
+                                        ->orWhereHas('divisions', function (Builder $query2) use ($budget) {
                                             $query2->where('share_user_id', $budget->user_id);
                                         });
                                 });
@@ -107,7 +107,7 @@ class BudgetCalculate implements BudgetCalculateInterface
                     },
                     'invoices.expenses' => function (Builder $query) use ($budget) {
                         $query->where('share_user_id', $budget->user_id)
-                            ->orWhereHas('divisons', function (Builder $query2) use ($budget) {
+                            ->orWhereHas('divisions', function (Builder $query2) use ($budget) {
                                 $query2->where('share_user_id', $budget->user_id);
                             });
                     },
@@ -137,7 +137,7 @@ class BudgetCalculate implements BudgetCalculateInterface
             }
         }
 
-        return $this->budgetRepository->store([
+        $this->budgetRepository->store([
             'total_expense' => $total_expense,
             'total_income' => $total_income
         ], $budget);
