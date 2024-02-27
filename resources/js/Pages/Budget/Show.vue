@@ -50,9 +50,13 @@
                         :installments="installments"
                     />
                     <BudgetIncome :budget-id="budgetId" :year-month="yearMonthModel" :incomes="budgetIncomes" />
-                    <BudgetProvision :budget-id="budgetId" :year-month="yearMonthModel" :incomes="budgetProvisions" />
+                    <BudgetProvision
+                        :budget-id="budgetId"
+                        :year-month="yearMonthModel"
+                        :provisions="budgetProvisions"
+                    />
                     <InvoiceExpense
-                        v-for="invoice in creditCardInvoices"
+                        v-for="invoice in budgetInvoices"
                         :key="invoice.id"
                         :invoice="invoice"
                         :share-users="shareUsers"
@@ -62,9 +66,13 @@
                 <v-window-item v-if="shareUser" value="two">
                     <BudgetExpense :expenses="budgetShareExpenses" :view-only="true" />
                     <BudgetIncome :year-month="yearMonthModel" :incomes="budgetShareIncomes" :view-only="true" />
-                    <BudgetProvision :year-month="yearMonthModel" :incomes="budgetShareProvisions" :view-only="true" />
+                    <BudgetProvision
+                        :year-month="yearMonthModel"
+                        :provisions="budgetShareProvisions"
+                        :view-only="true"
+                    />
                     <InvoiceExpense
-                        v-for="invoice in creditCardInvoicesShare"
+                        v-for="invoice in budgetShareInvoices"
                         :key="invoice.id"
                         :invoice="invoice"
                         :share-users="shareUsers"
@@ -99,16 +107,7 @@ export default {
     },
 
     props: {
-        budget: {
-            type: Object,
-        },
-        creditCardInvoices: {
-            type: Array,
-        },
-        budgetShare: {
-            type: Object,
-        },
-        creditCardInvoicesShare: {
+        installments: {
             type: Array,
         },
         shareUser: {
@@ -117,11 +116,11 @@ export default {
         shareUsers: {
             type: Array,
         },
-        installments: {
-            type: Array,
+        owner: {
+            type: Object,
         },
-        goalsCharts: {
-            type: Array,
+        share: {
+            type: Object,
         },
     },
 
@@ -151,31 +150,37 @@ export default {
 
     computed: {
         yearMonthModel() {
-            return this.budget.year + '-' + this.budget.month
+            return this.owner.budget.year + '-' + this.owner.budget.month
         },
         budgetId() {
-            return this.budget.id
+            return this.owner.budget.id
         },
         budgetExpenses() {
-            return this.budget.expenses
+            return this.owner.budget.expenses
         },
         budgetIncomes() {
-            return this.budget.incomes
+            return this.owner.budget.incomes
         },
         budgetProvisions() {
-            return this.budget.provisions
+            return this.owner.budget.provisions
+        },
+        budgetInvoices() {
+            return this.owner.budget.invoices
         },
         budgetShareExpenses() {
-            return this.budgetShare.expenses
+            return this.share.budget.expenses
         },
         budgetShareIncomes() {
-            return this.budgetShare.incomes
+            return this.share.budget.incomes
         },
         budgetShareProvisions() {
-            return this.budgetShare.provisions
+            return this.share.budget.provisions
+        },
+        budgetShareInvoices() {
+            return this.share.budget.invoices
         },
         shareUserName() {
-            return this.shareUser.name
+            return this.shareUser.share_user.name
         },
     },
 

@@ -9,10 +9,10 @@ interface BudgetProvisionServiceInterface
 {
     /**
      * Create a new Provision to Budget
+     * @param integer $budgetId
      * @param string $description
      * @param float $value
      * @param string $group
-     * @param integer $budgetId
      * @param string|null $remarks
      * @param float|null $shareValue
      * @param integer|null $shareUserId
@@ -20,10 +20,10 @@ interface BudgetProvisionServiceInterface
      * @return BudgetProvision
      */
     public function create(
+        int $budgetId,
         string $description,
         float $value,
         string $group,
-        int $budgetId,
         string $remarks = null,
         float $shareValue = null,
         int $shareUserId = null,
@@ -51,7 +51,7 @@ interface BudgetProvisionServiceInterface
         float $shareValue = null,
         int $shareUserId = null,
         Collection $tags = null
-    ): BudgetProvision;
+    ): bool;
 
     /**
      * Delete a new Provision to Budget

@@ -28,11 +28,11 @@ class BudgetProvisionController extends Controller
         ]);
 
         $this->budgetProvisionSevice->create(
+            intval($request->budget_id),
             $request->description,
             $request->date,
             floatval($request->value),
             $request->remarks,
-            intval($request->budget_id),
             $request->share_value ? floatval($request->share_value) : null,
             $request->share_user_id,
             collect($request->tags)

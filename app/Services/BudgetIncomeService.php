@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\Budget\Interfaces\BudgetCalculateInterface;
 use App\Models\BudgetIncome;
 use App\Repositories\Interfaces\{
     BudgetIncomeRepositoryInterface,
@@ -9,7 +10,6 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetIncomeServiceInterface;
-use App\Services\Interfaces\BudgetServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
 use App\Services\Facades\BudgetService;
@@ -17,10 +17,10 @@ use App\Services\Facades\BudgetService;
 class BudgetIncomeService implements BudgetIncomeServiceInterface
 {
     public function __construct(
-        private BudgetServiceInterface $budgetService,
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetIncomeRepositoryInterface $budgetIncomeRepository,
         private TagRepositoryInterface $tagRepository,
+        private BudgetCalculateInterface $budgetCalculate
     ) {
     }
 
@@ -59,7 +59,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         $this->tagRepository->saveTagsToModel($income, $tags);
 
         // Atualiza Orçamento
-        BudgetService::recalculateBugdet($budgetId);
+        $this->budgetCalculate->recalculate($budgetId);
 
         return $income;
     }
@@ -105,7 +105,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         ], $income);
 
         // Atualiza Orçamento
-        BudgetService::recalculateBugdet($income->budget_id);
+        $this->budgetCalculate->recalculate($income->budget_id);
 
         return true;
     }
@@ -125,9 +125,11 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         // Remove Tags
         $this->tagRepository->saveTagsToModel($income);
 
-        // Atualiza Orçamento
-        BudgetService::recalculateBugdet($income->budget_id);
+        $this->budgetIncomeRepository->delete($id);
 
-        return $this->budgetIncomeRepository->delete($id);
+        // Atualiza Orçamento
+        $this->budgetCalculate->recalculate($income->budget_id);
+
+        return true;
     }
 }

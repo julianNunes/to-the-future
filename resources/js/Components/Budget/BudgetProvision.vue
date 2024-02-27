@@ -3,7 +3,7 @@
     <v-expansion-panels v-model="panel" class="mt-2">
         <v-expansion-panel>
             <v-expansion-panel-title class="bg-primary">
-                <span class="text-h6">{{ $t('budget-income.title') }}</span>
+                <span class="text-h6">{{ $t('budget-provision.title') }}</span>
             </v-expansion-panel-title>
             <v-expansion-panel-text class="pa-2">
                 <v-row dense>
@@ -166,6 +166,55 @@
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                            <v-select
+                                v-model="provision.group"
+                                :label="$t('default.group')"
+                                :items="groupList"
+                                item-title="name"
+                                item-value="value"
+                                clearable
+                                :rules="rules.textFieldRules"
+                                density="comfortable"
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                                v-model="provision.share_value"
+                                :label="$t('default.share-value')"
+                                type="number"
+                                min="0"
+                                :rules="[
+                                    (value) => {
+                                        if (provision.share_user_id) {
+                                            if (!value) return $t('rules.required-text-field')
+                                            if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
+                                        }
+                                        return true
+                                    },
+                                ]"
+                                density="comfortable"
+                            />
+                        </v-col>
+                        <v-col cols="12" sm="6" md="8">
+                            <v-select
+                                v-model="provision.share_user_id"
+                                :label="$t('default.share-user')"
+                                :items="shareUsers"
+                                item-title="share_user_name"
+                                item-value="share_user_id"
+                                clearable
+                                :rules="[
+                                    (value) => {
+                                        if (provision.share_value && parseFloat(provision.share_value) > 0) {
+                                            if (!value) return $t('rules.required-text-field')
+                                        }
+                                        return true
+                                    },
+                                ]"
+                                density="comfortable"
+                            ></v-select>
+                        </v-col>
                         <v-col cols="12" md="12">
                             <v-text-field
                                 v-model="income.remarks"
@@ -230,7 +279,7 @@
 </template>
 
 <script setup>
-import { sumField, currencyField } from '../../utils/utils.js'
+import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -242,6 +291,9 @@ export default {
         },
         provisions: {
             type: Array,
+        },
+        yearMonth: {
+            type: String,
         },
         shareUsers: {
             type: Array,
@@ -278,6 +330,7 @@ export default {
             removeDialog: false,
             isLoading: false,
             deleteId: null,
+            panel: 1,
             provision: {
                 id: null,
                 description: null,

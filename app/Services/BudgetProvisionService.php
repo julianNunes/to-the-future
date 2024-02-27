@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\Budget\Interfaces\BudgetCalculateInterface;
 use App\Models\BudgetProvision;
 use App\Repositories\Interfaces\{
     BudgetProvisionRepositoryInterface,
@@ -9,7 +10,6 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetProvisionServiceInterface;
-use App\Services\Interfaces\BudgetServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -19,15 +19,16 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetProvisionRepositoryInterface $budgetProvisionRepository,
         private TagRepositoryInterface $tagRepository,
+        private BudgetCalculateInterface $budgetCalculate
     ) {
     }
 
     /**
      * Create a new Provision to Budget
+     * @param integer $budgetId
      * @param string $description
      * @param float $value
      * @param string $group
-     * @param integer $budgetId
      * @param string|null $remarks
      * @param float|null $shareValue
      * @param integer|null $shareUserId
@@ -35,10 +36,10 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
      * @return BudgetProvision
      */
     public function create(
+        int $budgetId,
         string $description,
         float $value,
         string $group,
-        int $budgetId,
         string $remarks = null,
         float $shareValue = null,
         int $shareUserId = null,
@@ -51,16 +52,19 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         }
 
         $provision = $this->budgetProvisionRepository->store([
+            'budget_id' => $budgetId,
             'description' => $description,
             'value' => $value,
             'group' => $group,
             'remarks' => $remarks,
-            'budget_id' => $budgetId,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId
         ]);
 
         $this->tagRepository->saveTagsToModel($provision, $tags);
+
+        // Atualiza Orçamento
+        $this->budgetCalculate->recalculate($budgetId, $shareUserId ? true : false);
 
         return $provision;
     }
@@ -86,7 +90,7 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         float $shareValue = null,
         int $shareUserId = null,
         Collection $tags = null
-    ): BudgetProvision {
+    ): bool {
         $provision = $this->budgetProvisionRepository->show($id);
 
         if (!$provision) {
@@ -99,10 +103,12 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $change_share_user = ($shareUserId != $provision->share_user_id) || ($shareValue != $provision->share_value) ? true : false;
+
         // Atualiza Tags
         $this->tagRepository->saveTagsToModel($provision, $tags);
 
-        return $this->budgetProvisionRepository->store([
+        $this->budgetProvisionRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
@@ -110,6 +116,11 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
         ], $provision);
+
+        // Atualiza Orçamento
+        $this->budgetCalculate->recalculate($provision->budget_id, $change_share_user);
+
+        return true;
     }
 
     /**
@@ -124,9 +135,17 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
             throw new Exception('budget-provision.not-found');
         }
 
+        $budget_id = $provision->budget_id;
+        $share_user_id = $provision->share_user_id;
+
         // Remove Tags
         $this->tagRepository->saveTagsToModel($provision);
 
-        return $this->budgetProvisionRepository->delete($id);
+        $this->budgetProvisionRepository->delete($id);
+
+        // Atualiza Orçamento
+        $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
+
+        return true;
     }
 }

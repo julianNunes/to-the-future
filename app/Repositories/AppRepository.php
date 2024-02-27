@@ -74,7 +74,7 @@ class AppRepository implements AppRepositoryInterface
      * @param array $withs ['relationship1', 'relationship2', ...]
      * @return Collection
      */
-    public function get($condition, array $columns = [], array $simpleJoins = [], array $withs = []): Collection
+    public function get(mixed $condition, array $columns = [], array $simpleJoins = [], array $withs = []): Collection
     {
         $query = $this->queryGet($condition, $columns, $simpleJoins, $withs);
         return $query->get();
@@ -88,7 +88,7 @@ class AppRepository implements AppRepositoryInterface
      * @param array $withs ['relationship1', 'relationship2', ...]
      * @return Collection
      */
-    public function getOne($condition, array $columns = [], array $simpleJoins = [], array $withs = []): Model|null
+    public function getOne(mixed $condition, array $columns = [], array $simpleJoins = [], array $withs = []): Model|null
     {
         $query = $this->queryGet($condition, $columns, $simpleJoins, $withs);
         return $query->first();

@@ -32,7 +32,7 @@ interface AppRepositoryInterface
      * @param array $withs ['relationship1', 'relationship2', ...]
      * @return Collection
      */
-    public function get($condition, array $columns = [], array $simpleJoins = [], array $withs = []): Collection;
+    public function get(mixed $condition, array $columns = [], array $simpleJoins = [], array $withs = []): Collection;
 
     /**
      * Builder Query and return Model
@@ -42,7 +42,7 @@ interface AppRepositoryInterface
      * @param array $withs ['relationship1', 'relationship2', ...]
      * @return Model
      */
-    public function getOne($condition, array $columns = [], array $simpleJoins = [], array $withs = []): Model|null;
+    public function getOne(mixed $condition, array $columns = [], array $simpleJoins = [], array $withs = []): Model|null;
 
     /**
      * Find object for id

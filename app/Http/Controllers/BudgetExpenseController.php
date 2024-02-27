@@ -19,20 +19,20 @@ class BudgetExpenseController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
+            'budget_id' => ['required'],
             'description' => ['required'],
             'date' => ['required'],
             'value' => ['required'],
             'paid' => ['required'],
-            'budget_id' => ['required'],
         ]);
 
         $this->budgetExpenseSevice->create(
+            intval($request->budget_id),
             $request->description,
             $request->date,
             floatval($request->value),
             $request->remarks,
             $request->paid == 1 ? true : false,
-            intval($request->budget_id),
             $request->share_value ? floatval($request->share_value) : null,
             $request->share_user_id,
             $request->financing_installment_id ? intval($request->financing_installment_id) : null,
@@ -53,7 +53,7 @@ class BudgetExpenseController extends Controller
             'description' => ['required'],
             'date' => ['required'],
             'value' => ['required'],
-            'paid' => ['required'],
+            // 'paid' => ['required'],
             // 'budget_id' => ['budget_id'],
         ]);
 

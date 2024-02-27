@@ -183,7 +183,10 @@
         "include-fix-expense": "Incluir Despesas Fixas?",
         "include-provision": "Incluir Provisionamento?",
         "total-expense": "Total Despesas",
-        "total-income": "Total Receitas"
+        "total-income": "Total Receitas",
+        "share-expense": "Despesa compartilhada",
+        "total-provision": "Total Provisionamento",
+        "share-expense-owner": "Despesa compartilhada comigo"
     },
     "budget-show" : {
         "title": "Visualização Orçamento",
@@ -197,15 +200,20 @@
         "due-date": "Vencimento",
         "new-item": "Nova Despesa do Orçamento",
         "edit-item": "Editar Despesa do Orçamento",
-        "not-found": "Despesa do Orçamento não encontrada",
-        "share-expense": "Despesa compartilhada",
-        "total-provision": "Total Provisionamento"
+        "not-found": "Despesa do Orçamento não encontrada"
     },
     "budget-income": {
         "title": "Receitas",
         "date": "Recebimento",
         "new-item": "Nova Receita do Orçamento",
         "edit-item": "Editar Receita do Orçamento",
-        "share-expense": "Despesa compartilhada"
+        "not-found": "Receita do Orçamento não encontrada"
+    },
+    "budget-provision": {
+        "title": "Provisionamentos",
+        "date": "Recebimento",
+        "new-item": "Novo Provisionamento do Orçamento",
+        "edit-item": "Editar Provisionamento do Orçamento",
+        "not-found": "Provisionamento do Orçamento não encontrada"
     }
 }

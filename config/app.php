@@ -173,6 +173,7 @@ return [
          * System Providers
          */
         App\Providers\RepositoryServiceProvider::class,
+        App\Providers\HelperServiceProvider::class,
 
         /**
          * Others Providers

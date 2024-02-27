@@ -29,7 +29,7 @@ interface ProvisionServiceInterface
         float $value,
         string $group,
         string $remarks = null,
-        float $shareValue = 0,
+        float $shareValue = null,
         int $shareUserId = null,
         Collection $tags
     ): Provision;

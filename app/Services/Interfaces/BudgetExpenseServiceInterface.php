@@ -9,12 +9,12 @@ interface BudgetExpenseServiceInterface
 {
     /**
      * Create a new Expense to Budget
+     * @param integer $budgetId
      * @param string $description
      * @param string $date
      * @param float $value
-     * @param string $remarks
-     * @param bool $paid
-     * @param integer $budgetId
+     * @param string|null $remarks
+     * @param bool|false $paid
      * @param float|null $shareValue
      * @param integer|null $shareUserId
      * @param integer|null $financingInstallmentId
@@ -22,12 +22,12 @@ interface BudgetExpenseServiceInterface
      * @return BudgetExpense
      */
     public function create(
+        int $budgetId,
         string $description,
         string $date,
         float $value,
-        string $remarks,
-        bool $paid,
-        int $budgetId,
+        string $remarks = null,
+        bool $paid = false,
         float $shareValue = null,
         int $shareUserId = null,
         int $financingInstallmentId = null,
@@ -40,8 +40,8 @@ interface BudgetExpenseServiceInterface
      * @param string $description
      * @param string $date
      * @param float $value
-     * @param string $remarks
-     * @param bool $paid
+     * @param string|null $remarks
+     * @param bool|false $paid
      * @param float|null $shareValue
      * @param integer|null $shareUserId
      * @param integer|null $financingInstallmentId
@@ -53,8 +53,8 @@ interface BudgetExpenseServiceInterface
         string $description,
         string $date,
         float $value,
-        string $remarks,
-        bool $paid,
+        string $remarks = null,
+        bool $paid = false,
         float $shareValue = null,
         int $shareUserId = null,
         int $financingInstallmentId = null,

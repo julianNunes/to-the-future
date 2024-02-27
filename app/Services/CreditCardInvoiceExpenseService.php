@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\Budget\Interfaces\BudgetCalculateInterface;
 use App\Models\CreditCardInvoiceExpense;
 use App\Repositories\Interfaces\{
     CreditCardInvoiceExpenseDivisionRepositoryInterface,
@@ -27,7 +28,8 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         private CreditCardInvoiceExpenseDivisionRepositoryInterface $creditCardInvoiceExpenseDivisionRepository,
         private CreditCardInvoiceFileRepositoryInterface $creditCardInvoiceFileRepository,
         private TagRepositoryInterface $tagRepository,
-        private ShareUserRepositoryInterface $shareUserRepository
+        private ShareUserRepositoryInterface $shareUserRepository,
+        private BudgetCalculateInterface $budgetCalculate
     ) {
     }
 
@@ -224,6 +226,11 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         // Atualiza o saldo total da fatura
         $this->recalculateTotalInvoice($invoiceId);
 
+        // Atualiza Orçamento
+        if ($credit_card_invoice->budget_id) {
+            $this->budgetCalculate->recalculate($credit_card_invoice->budget_id, $shareUserId ? true : false);
+        }
+
         return $credit_card_invoice_expense;
     }
 
@@ -279,6 +286,8 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
             throw new Exception('credit-card-invoice-expense.not-found');
         }
 
+        $change_share_user = ($shareUserId != $credit_card_invoice_expense->share_user_id) || ($shareValue != $credit_card_invoice_expense->share_value) ? true : false;
+
         $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->store([
             'description' => $description,
             'date' => Carbon::parse($date)->format('y-m-d'),
@@ -317,6 +326,11 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         // Atualiza o saldo total da fatura
         $this->recalculateTotalInvoice($invoiceId);
 
+        // Atualiza Orçamento
+        if ($credit_card_invoice->budget_id) {
+            $this->budgetCalculate->recalculate($credit_card_invoice->budget_id, $change_share_user);
+        }
+
         return $credit_card_invoice_expense;
     }
 
@@ -327,6 +341,7 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
     public function delete(int $id): bool
     {
         $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->show($id, [
+            'invoice:id,budget_id',
             'divisions' => [
                 'tags'
             ],
@@ -338,6 +353,8 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         }
 
         $invoice_id = $credit_card_invoice_expense->invoice_id;
+        $budget_id = $credit_card_invoice_expense->invoice->budget_id;
+        $share_user_id = $credit_card_invoice_expense->share_user_id;
 
         // Remove todos os vinculos
         foreach ($credit_card_invoice_expense->divisions as $division) {
@@ -350,6 +367,11 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
 
         // Atualiza o saldo total da fatura
         $this->recalculateTotalInvoice($invoice_id);
+
+        // Atualiza Orçamento
+        if ($budget_id) {
+            $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
+        }
 
         return true;
     }

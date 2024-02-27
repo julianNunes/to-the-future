@@ -9,14 +9,12 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetGoalServiceInterface;
-use App\Services\Interfaces\BudgetServiceInterface;
 use Exception;
 use Illuminate\Support\Collection;
 
 class BudgetGoalService implements BudgetGoalServiceInterface
 {
     public function __construct(
-        private BudgetServiceInterface $budgetService,
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetGoalRepositoryInterface $budgetGoalRepository,
         private TagRepositoryInterface $tagRepository,

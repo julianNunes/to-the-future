@@ -41,17 +41,31 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 TO-DO
 ==================================================
 
-- Ao criar uma fatura de cartao de credito verificar se nao existe budget para o mesmo mes, se houver gravar fk do budget
-
-- Ao criar um novo budget verificar se existem faturas para cartoes ativos no mesmo mes.
-
 - Verificar se na divisao das despesas esta somando o total e comparando o valor declarado total
+    - Se alguma das divisioes tiver "share_user", devo aplicar no valor principal
 
-- Verificar em todos os MOdels que tem relação com o total do Budget onde eu preciso chamar o novo HELPER
-    - BudgetIncomeService
-    - BudgetExpenseService
-    - BudgetProvisionService
-    - CreditCardInvoiceExpenseService
+
+- Finalizar o showData do budget
+    - Fazer todos os passos que estao faltando:
+        - PRovisionamento
+        - metas
+        - Tags por Despesas-
+        - Resumo do Orçamento
+        - Resumo de pagamento e recebimento para o compartilhado
+
+
+- montar o "BudgetRecalculate"  nos Helpers
+    public function recalculate (int $id, bool $shareValue)
+
+
+- RETESTAR TUDO
+
+
+    - Verificar em todos os MOdels que tem relação com o total do Budget onde eu preciso chamar o novo HELPER
+        - BudgetIncomeService
+        - BudgetExpenseService
+        - BudgetProvisionService
+        - CreditCardInvoiceExpenseService
 
 
 
@@ -69,22 +83,19 @@ ORÇAMENTO SHOW
                 - De um lado tabela com dados
                 - Do Outro grafico com o utilizado e a meta
 
-            - Painel de Receitas (Coluna 12)
-
+            - Painel "Despesas por Tags"
+                - De um lado tabela com dados
+                - Do Outro grafico com o utilizado e a meta
 
             - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
                 - Somar o valor que devo pagar para o "share_user_id"
                 - Somar o valor a receber do "share_user_id"
                 - BALANÇO entre RECEITAS E DESPESAS
 
-
             - Painel de Resumo dos Cartões (COLUNA 6)
                 - Parcelados
                 - Provisionamento
                 - Semana 1, 2, 3, 4
-
-
-            - Expanse-painel com o componente para Provisionamento
 
 
 - CRUD para "prepaid_card"

@@ -86,13 +86,6 @@ interface BudgetServiceInterface
     public function delete(int $id): bool;
 
     /**
-     * Recalculate the totals to Budget
-     * @param integer $id
-     * @return Budget
-     */
-    public function recalculateBugdet(int $id): Budget;
-
-    /**
      * Find a Budget by year and month
      * @param string $year
      * @param string $month
