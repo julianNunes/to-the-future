@@ -33,9 +33,6 @@ class TagSeeder extends Seeder
                 'name' => 'LAZER',
             ],
             [
-                'name' => 'MERCADO',
-            ],
-            [
                 'name' => 'ASSINATURA',
             ],
             [
@@ -48,6 +45,12 @@ class TagSeeder extends Seeder
                 'name' => 'VIAGEM',
             ],
             [
+                'name' => 'SUPERMERCADO',
+            ],
+            [
+                'name' => 'ALIMENTAÇÃO',
+            ],
+            [
                 'name' => 'IFOOD',
             ],
             [
@@ -57,13 +60,7 @@ class TagSeeder extends Seeder
                 'name' => 'ESTUDOS',
             ],
             [
-                'name' => 'ROUPAS',
-            ],
-            [
-                'name' => 'ALIMENTAÇÃO',
-            ],
-            [
-                'name' => 'SUPERMERCADO',
+                'name' => 'VESTUARIO',
             ]
         ];
 

@@ -324,7 +324,7 @@ class BudgetService implements BudgetServiceInterface
         }
 
         if ($cloneBugdetGoals) {
-            $with->push('goals.tags');
+            $with->push('goals.tag');
         }
 
         $budget = $this->budgetRepository->show($id, $with->toArray());

@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class BudgetGoal extends Model
 {
@@ -18,7 +17,7 @@ class BudgetGoal extends Model
         'description',
         'value',
         'group',
-        'count_only_share',
+        'count_share',
         'budget_id'
     ];
 
@@ -27,8 +26,8 @@ class BudgetGoal extends Model
         return $this->belongsTo(Budget::class, 'budget_id', 'id');
     }
 
-    public function tags(): MorphToMany
+    public function tag(): MorphOne
     {
-        return $this->morphToMany(Tag::class, 'taggable');
+        return $this->morphOne(Tag::class, 'taggable');
     }
 }
