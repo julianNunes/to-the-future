@@ -4,6 +4,8 @@ namespace App\Helpers\Budget;
 
 use App\Helpers\Budget\Interfaces\BudgetShowDataInterface;
 use App\Models\Budget;
+use App\Models\BudgetExpense;
+use App\Models\BudgetIncome;
 use App\Models\ShareUser;
 use App\Models\User;
 use App\Repositories\Interfaces\{
@@ -228,14 +230,14 @@ class BudgetShowData implements BudgetShowDataInterface
 
             if ($filtered && $filtered->count()) {
                 foreach ($filtered as $expense) {
-                    $budget->incomes->push([
+                    $budget->incomes->push(new BudgetIncome([
                         'id' => null,
                         'description' => $expense->description,
                         'date' => null,
                         'value' => $expense->share_value,
                         'remarks' => 'budget.share-expense',
-                        'tags' => []
-                    ]);
+                        'tags' => collect()
+                    ]));
                 }
             }
         }
@@ -243,7 +245,7 @@ class BudgetShowData implements BudgetShowDataInterface
         // Despesas - Totalizador do Provisionamento
         if ($budget->provisions && $budget->provisions->count()) {
             $share_value = $budget->provisions->sum('share_value');
-            $budget->expenses->push([
+            $budget->expenses->push(new BudgetExpense([
                 'id' => null,
                 'description' => 'budget.total-provision',
                 'date' => null,
@@ -252,19 +254,19 @@ class BudgetShowData implements BudgetShowDataInterface
                 'paid' => null,
                 'share_value' => $share_value,
                 'share_user_id' => $share_value && $shareUser ? $shareUser->id : null,
-                'tags' => []
-            ]);
+                'tags' => collect()
+            ]));
 
             // Receitas - Compartilhado Totalizador do Provisionamento
             if ($share_value > 0) {
-                $budget->incomes->push([
+                $budget->incomes->push(new BudgetIncome([
                     'id' => null,
                     'description' => 'budget.total-provision',
                     'date' => null,
                     'value' => $share_value,
                     'remarks' => 'budget.share-expense',
-                    'tags' => []
-                ]);
+                    'tags' => collect()
+                ]));
             }
         }
 
@@ -272,7 +274,7 @@ class BudgetShowData implements BudgetShowDataInterface
         if ($budget->invoices && $budget->invoices->count()) {
             foreach ($budget->invoices as $invoice) {
                 $share_value = $invoice->expenses->sum('share_value');
-                $budget->expenses->push([
+                $budget->expenses->push(new BudgetExpense([
                     'id' => null,
                     'description' => 'Total ' . $invoice->creditCard->name,
                     'date' => $invoice->due_date,
@@ -281,19 +283,19 @@ class BudgetShowData implements BudgetShowDataInterface
                     'paid' => null,
                     'share_value' => $share_value,
                     'share_user_id' => $share_value && $shareUser ? $shareUser->id : null,
-                    'tags' => []
-                ]);
+                    'tags' => collect()
+                ]));
 
                 // Receitas - Compartilhado Totalizador dos Cartões de credito
                 if ($share_value > 0) {
-                    $budget->incomes->push([
+                    $budget->incomes->push(new BudgetIncome([
                         'id' => null,
                         'description' => 'Total ' . $invoice->creditCard->name,
                         'date' => null,
                         'value' => $share_value,
                         'remarks' => 'budget.share-expense',
-                        'tags' => []
-                    ]);
+                        'tags' => collect()
+                    ]));
                 }
             }
         }
@@ -309,7 +311,7 @@ class BudgetShowData implements BudgetShowDataInterface
             });
 
             foreach ($filtered as $expense) {
-                $budget->expenses->push([
+                $budget->expenses->push(new BudgetExpense([
                     'id' => null,
                     'description' => $expense['description'],
                     'date' => $expense['date'],
@@ -318,8 +320,8 @@ class BudgetShowData implements BudgetShowDataInterface
                     'paid' => null,
                     'share_value' => null,
                     'share_user_id' => null,
-                    'tags' => []
-                ]);
+                    'tags' => collect()
+                ]));
             }
         }
 
@@ -329,7 +331,7 @@ class BudgetShowData implements BudgetShowDataInterface
                 return $provision->share_user_id == $budget->user_id && $provision->id != null;
             });
 
-            $budget->expenses->push([
+            $budget->expenses->push(new BudgetExpense([
                 'id' => null,
                 'description' => 'budget.total-provision',
                 'date' => null,
@@ -338,8 +340,8 @@ class BudgetShowData implements BudgetShowDataInterface
                 'paid' => null,
                 'share_value' => null,
                 'share_user_id' => null,
-                'tags' => []
-            ]);
+                'tags' => collect()
+            ]));
         }
 
         // Despesas - Compartilhado com owner Totalizador dos cartoes
@@ -350,7 +352,7 @@ class BudgetShowData implements BudgetShowDataInterface
                 });
 
                 if ($filtered && $filtered->count()) {
-                    $budget->expenses->push([
+                    $budget->expenses->push(new BudgetExpense([
                         'id' => null,
                         'description' => 'Total: ' . $invoice->creditCard->name,
                         'date' => $invoice->due_date,
@@ -359,8 +361,8 @@ class BudgetShowData implements BudgetShowDataInterface
                         'paid' => null,
                         'share_value' => null,
                         'share_user_id' => null,
-                        'tags' => []
-                    ]);
+                        'tags' => collect()
+                    ]));
                 }
             }
         }
@@ -400,40 +402,40 @@ class BudgetShowData implements BudgetShowDataInterface
         $balance_share = 0;
 
         if ($budget->expenses && $budget->expenses->count()) {
-            $pay_share += $budget->expenses->sum('share_value');
+            $receive_share += $budget->expenses->sum('share_value');
         }
 
         if ($budget->provisions && $budget->provisions->count()) {
-            $pay_share += $budget->provisions->sum('share_value');
+            $receive_share += $budget->provisions->sum('share_value');
         }
 
         if ($budget->invoices && $budget->invoices->count()) {
             foreach ($budget->invoices as $invoice) {
                 if ($invoice->expenses && $invoice->expenses->count()) {
-                    $pay_share += $invoice->expenses->sum('share_value');
+                    $receive_share += $invoice->expenses->sum('share_value');
                 }
             }
         }
 
         if ($budgetShare) {
             if ($budgetShare->expenses && $budgetShare->expenses->count()) {
-                $receive_share += $budgetShare->expenses->sum('share_value');
+                $pay_share += $budgetShare->expenses->sum('share_value');
             }
 
             if ($budgetShare->provisions && $budgetShare->provisions->count()) {
-                $receive_share += $budgetShare->provisions->sum('share_value');
+                $pay_share += $budgetShare->provisions->sum('share_value');
             }
 
             if ($budgetShare->invoices && $budgetShare->invoices->count()) {
                 foreach ($budgetShare->invoices as $invoice) {
                     if ($invoice->expenses && $invoice->expenses->count()) {
-                        $receive_share += $invoice->expenses->sum('share_value');
+                        $pay_share += $invoice->expenses->sum('share_value');
                     }
                 }
             }
         }
 
-        $balance_share = $pay_share - $receive_share;
+        $balance_share = $receive_share - $pay_share;
 
         // Dados para o resumo do cartão e Provisionamento
         $resume_credit_card = collect();
@@ -454,7 +456,7 @@ class BudgetShowData implements BudgetShowDataInterface
             }
 
             $resume_credit_card->push([
-                'text' => 'budget.total-portion',
+                'name' => 'budget-resume.total-portion',
                 'total_value' => $total_value,
                 'total_share_value' => $total_share_value,
             ]);
@@ -463,7 +465,7 @@ class BudgetShowData implements BudgetShowDataInterface
         // Total Provisionamento
         if ($budget->provisions && $budget->provisions->count()) {
             $resume_credit_card->push([
-                'text' => 'budget.total-portion',
+                'name' => 'budget-resume.total-portion',
                 'total_value' => $budget->provisions->sum('value'),
                 'total_share_value' => $budget->provisions->sum('share_value'),
             ]);
@@ -471,6 +473,8 @@ class BudgetShowData implements BudgetShowDataInterface
 
         // Total das semanas
         if ($budget->invoices && $budget->invoices->count()) {
+            $total_value = 0;
+            $total_share_value = 0;
             // Semana 1
             foreach ($budget->invoices as $invoice) {
                 if ($invoice->expenses && $invoice->expenses->count()) {
@@ -484,11 +488,13 @@ class BudgetShowData implements BudgetShowDataInterface
             }
 
             $resume_credit_card->push([
-                'text' => 'budget.total-week-1',
+                'name' => 'budget-resume.total-week-1',
                 'total_value' => $total_value,
                 'total_share_value' => $total_share_value,
             ]);
 
+            $total_value = 0;
+            $total_share_value = 0;
             // Semana 2
             foreach ($budget->invoices as $invoice) {
                 if ($invoice->expenses && $invoice->expenses->count()) {
@@ -502,10 +508,13 @@ class BudgetShowData implements BudgetShowDataInterface
             }
 
             $resume_credit_card->push([
-                'text' => 'budget.total-week-2',
+                'name' => 'budget-resume.total-week-2',
                 'total_value' => $total_value,
                 'total_share_value' => $total_share_value,
             ]);
+
+            $total_value = 0;
+            $total_share_value = 0;
 
             // Semana 3
             foreach ($budget->invoices as $invoice) {
@@ -520,10 +529,13 @@ class BudgetShowData implements BudgetShowDataInterface
             }
 
             $resume_credit_card->push([
-                'text' => 'budget.total-week-3',
+                'name' => 'budget-resume.total-week-3',
                 'total_value' => $total_value,
                 'total_share_value' => $total_share_value,
             ]);
+
+            $total_value = 0;
+            $total_share_value = 0;
 
             // Semana 4
             foreach ($budget->invoices as $invoice) {
@@ -538,7 +550,7 @@ class BudgetShowData implements BudgetShowDataInterface
             }
 
             $resume_credit_card->push([
-                'text' => 'budget.total-week-4',
+                'name' => 'budget-resume.total-week-4',
                 'total_value' => $total_value,
                 'total_share_value' => $total_share_value,
             ]);
@@ -547,14 +559,14 @@ class BudgetShowData implements BudgetShowDataInterface
         // Total a vista
         $filtered_cash = $resume_credit_card->shift();
         $resume_credit_card->push([
-            'text' => 'budget.total-cash',
-            'total_value' => $filtered_cash->sum('total_value'),
-            'total_share_value' => $filtered_cash->sum('total_share_value'),
+            'name' => 'budget-resume.total-cash',
+            'total_value' => collect($filtered_cash)->sum('total_value'),
+            'total_share_value' => collect($filtered_cash)->sum('total_share_value'),
         ]);
 
         // Total Geral
         $resume_credit_card->push([
-            'text' => 'Total',
+            'name' => 'Total',
             'total_value' => $resume_credit_card->sum('total_value'),
             'total_share_value' => $resume_credit_card->sum('total_share_value'),
         ]);
@@ -662,7 +674,7 @@ class BudgetShowData implements BudgetShowDataInterface
                 }
 
                 $goals_charts->push([
-                    'name' => $goal->tag->name,
+                    'tag' => $goal->tag->name,
                     'value' => $goal->value,
                     'total' => $total_expense
                 ]);
@@ -683,6 +695,7 @@ class BudgetShowData implements BudgetShowDataInterface
     {
         $expense_to_tags = [];
         $return_data = collect();
+        $sorted = [];
 
         // Procuro em Provisionamento
         if ($budget->provisions && $budget->provisions->count()) {
@@ -746,14 +759,16 @@ class BudgetShowData implements BudgetShowDataInterface
         }
 
         if (count($expense_to_tags) > 0) {
-            $return_data = collect($expense_to_tags)->map(function (float $value, string $key) {
-                return [
+            collect($expense_to_tags)->each(function (float $value, string $key) use ($return_data) {
+                $return_data->push([
                     'tag' => $key,
                     'value' => $value,
-                ];
+                ]);
             });
+
+            $sorted = $return_data->sortBy('value');
         }
 
-        return $return_data->toArray();
+        return count($sorted) ? $sorted->values()->all() : $sorted;
     }
 }

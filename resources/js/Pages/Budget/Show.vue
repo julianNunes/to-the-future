@@ -42,6 +42,7 @@
         <div>
             <v-window v-model="tab">
                 <v-window-item value="one">
+                    <BudgetResume :resume="budgetResume" />
                     <BudgetExpense
                         :budget-id="budgetId"
                         :year-month="yearMonthModel"
@@ -50,11 +51,7 @@
                         :installments="installments"
                     />
                     <BudgetIncome :budget-id="budgetId" :year-month="yearMonthModel" :incomes="budgetIncomes" />
-                    <BudgetProvision
-                        :budget-id="budgetId"
-                        :year-month="yearMonthModel"
-                        :provisions="budgetProvisions"
-                    />
+                    <BudgetExpenseTags :expense-to-tags="budgetExpanseToTags" />
                     <InvoiceExpense
                         v-for="invoice in budgetInvoices"
                         :key="invoice.id"
@@ -62,21 +59,27 @@
                         :share-users="shareUsers"
                         :title-card="true"
                     />
+                    <BudgetProvision
+                        :budget-id="budgetId"
+                        :year-month="yearMonthModel"
+                        :provisions="budgetProvisions"
+                    />
                 </v-window-item>
                 <v-window-item v-if="shareUser" value="two">
+                    <BudgetResume :resume="budgetShareResume" />
                     <BudgetExpense :expenses="budgetShareExpenses" :view-only="true" />
                     <BudgetIncome :year-month="yearMonthModel" :incomes="budgetShareIncomes" :view-only="true" />
-                    <BudgetProvision
-                        :year-month="yearMonthModel"
-                        :provisions="budgetShareProvisions"
-                        :view-only="true"
-                    />
                     <InvoiceExpense
                         v-for="invoice in budgetShareInvoices"
                         :key="invoice.id"
                         :invoice="invoice"
                         :share-users="shareUsers"
                         :title-card="true"
+                        :view-only="true"
+                    />
+                    <BudgetProvision
+                        :year-month="yearMonthModel"
+                        :provisions="budgetShareProvisions"
                         :view-only="true"
                     />
                 </v-window-item>
@@ -88,6 +91,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
+import BudgetExpenseTags from '../../Components/Budget/BudgetExpenseTags.vue'
+import BudgetResume from '../../Components/Budget/BudgetResume.vue'
 import BudgetExpense from '../../Components/Budget/BudgetExpense.vue'
 import BudgetIncome from '../../Components/Budget/BudgetIncome.vue'
 import BudgetProvision from '../../Components/Budget/BudgetProvision.vue'
@@ -102,8 +107,12 @@ export default {
     name: 'BudgetShow',
 
     components: {
+        BudgetExpenseTags,
+        BudgetResume,
         BudgetExpense,
         BudgetIncome,
+        BudgetProvision,
+        InvoiceExpense,
     },
 
     props: {
@@ -152,8 +161,17 @@ export default {
         yearMonthModel() {
             return this.owner.budget.year + '-' + this.owner.budget.month
         },
+        shareUserName() {
+            return this.shareUser.share_user.name
+        },
         budgetId() {
             return this.owner.budget.id
+        },
+        budgetResume() {
+            return this.owner.resume
+        },
+        budgetExpanseToTags() {
+            return this.owner.expenseToTags
         },
         budgetExpenses() {
             return this.owner.budget.expenses
@@ -167,6 +185,9 @@ export default {
         budgetInvoices() {
             return this.owner.budget.invoices
         },
+        budgetShareResume() {
+            return this.share.resume
+        },
         budgetShareExpenses() {
             return this.share.budget.expenses
         },
@@ -178,9 +199,6 @@ export default {
         },
         budgetShareInvoices() {
             return this.share.budget.invoices
-        },
-        shareUserName() {
-            return this.shareUser.share_user.name
         },
     },
 

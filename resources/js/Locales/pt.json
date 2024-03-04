@@ -215,5 +215,23 @@
         "new-item": "Novo Provisionamento do Orçamento",
         "edit-item": "Editar Provisionamento do Orçamento",
         "not-found": "Provisionamento do Orçamento não encontrada"
+    },
+    "budget-resume": {
+        "title": "Resumo do Orçamento",
+        "total-expense": "Total Despesas",
+        "total-incomes": "Total Receitas",
+        "balance": "Balanço",
+        "pay-share": "Pagar para usuário compartilhado",
+        "receive-share": "Receber do usuário compartilhado",
+        "resume-credit-card": "Resumo dos cartões de credito",
+        "total-portion": "Total Parcelado",
+        "total-cash": "Total a vista",
+        "total-week-1": "Total Semana 1",
+        "total-week-2": "Total Semana 2",
+        "total-week-3": "Total Semana 3",
+        "total-week-4": "Total Semana 4"
+    },
+    "budget-expense-tags": {
+        "title": "Despesas por Tag"
     }
 }

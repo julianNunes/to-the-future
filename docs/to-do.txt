@@ -37,6 +37,8 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
     - https://lokalise.com/blog/vue-i18n/
 
 
+0ecea533
+
 ==================================================
 TO-DO
 ==================================================
@@ -45,27 +47,22 @@ TO-DO
     - Se alguma das divisioes tiver "share_user", devo aplicar no valor principal
 
 
-- Finalizar o showData do budget
-    - Fazer todos os passos que estao faltando:
-        - PRovisionamento
-        - metas
-        - Tags por Despesas-
-        - Resumo do Orçamento
-        - Resumo de pagamento e recebimento para o compartilhado
-
-
 - montar o "BudgetRecalculate"  nos Helpers
     public function recalculate (int $id, bool $shareValue)
-
-
-- RETESTAR TUDO
-
 
     - Verificar em todos os MOdels que tem relação com o total do Budget onde eu preciso chamar o novo HELPER
         - BudgetIncomeService
         - BudgetExpenseService
         - BudgetProvisionService
         - CreditCardInvoiceExpenseService
+
+- Budget-show
+    - CRUD das Metas
+    - INcluir "Despesas FIxas"
+    - Incluir "Provisonamento"
+
+- RETESTAR TUDO
+
 
 
 
