@@ -9,21 +9,21 @@ interface BudgetGoalServiceInterface
 {
     /**
      * Create a new Goal to Budget
+     * @param integer $budgetId
      * @param string $description
      * @param float $value
-     * @param float $group
-     * @param boolean $countOnlyShare
-     * @param integer $budgetId
-     * @param Collection|null $tags
+     * @param Collection $tag
+     * @param boolean $countShare
+     * @param string|null $group
      * @return BudgetGoal
      */
     public function create(
+        int $budgetId,
         string $description,
         float $value,
-        float $group,
-        bool $countOnlyShare,
-        int $budgetId,
-        Collection $tags = null
+        Collection $tag,
+        bool $countShare,
+        string $group = null
     ): BudgetGoal;
 
     /**
@@ -31,18 +31,18 @@ interface BudgetGoalServiceInterface
      * @param integer $id
      * @param string $description
      * @param float $value
-     * @param string $group
-     * @param boolean $countOnlyShare
-     * @param Collection|null $tags
-     * @return boolean
+     * @param boolean $countShare
+     * @param Collection $tag
+     * @param string|null $group
+     * @return BudgetGoal
      */
     public function update(
         int $id,
         string $description,
         float $value,
-        string $group,
-        bool $countOnlyShare,
-        Collection $tags = null
+        Collection $tag,
+        bool $countShare,
+        string $group = null
     ): BudgetGoal;
 
     /**

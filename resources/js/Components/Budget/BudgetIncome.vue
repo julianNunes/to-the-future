@@ -45,7 +45,7 @@
                                 item.remarks && item.remarks.match(/(\S+)\.(\S+)/gm) ? $t(item.remarks) : item.remarks
                             }}</template>
                             <template #[`item.tags`]="{ item }">{{
-                                item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
+                                item.tags?.length ? item.tags.map((x) => x.name).join(' | ') : ''
                             }}</template>
                             <template #[`item.action`]="{ item }">
                                 <v-tooltip v-if="item.id" :text="$t('default.edit')" location="top">

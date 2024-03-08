@@ -19,6 +19,7 @@ class BudgetExpense extends Model
         'date',
         'value',
         'remarks',
+        'group',
         'paid',
         'share_value',
         'share_user_id',

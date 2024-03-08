@@ -116,4 +116,28 @@ class BudgetController extends Controller
         );
         return Inertia::render('Budget/Show', $data);
     }
+
+    /**
+     * Include in Budget all the Fix Expenses
+     * @param integer $id
+     */
+    public function includeFixExpenses(int $id)
+    {
+        $data = $this->budgetService->includeFixExpenses(
+            $id
+        );
+        return redirect()->back()->with('success', 'default.sucess-save');
+    }
+
+    /**
+     * Include in Budget all the default Provisions
+     * @param integer $id
+     */
+    public function includeProvisions(int $id)
+    {
+        $data = $this->budgetService->includeProvisions(
+            $id
+        );
+        return redirect()->back()->with('success', 'default.sucess-save');
+    }
 }

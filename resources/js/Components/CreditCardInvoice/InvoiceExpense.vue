@@ -661,7 +661,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn color="error" elevated :loading="isLoading" @click="deleteDivisionDialog = false">
+                    <v-btn color="error" elevated :loading="isLoading" text @click="deleteDivisionDialog = false">
                         {{ $t('default.cancel') }}</v-btn
                     >
                     <v-btn color="primary" elevated :loading="isLoading" text @click="deleteeDivision()">
@@ -695,6 +695,9 @@ export default {
         titleCard: {
             type: Boolean,
             default: false,
+        },
+        yearMonth: {
+            type: String,
         },
         viewOnly: {
             type: Boolean,
@@ -908,7 +911,7 @@ export default {
             this.expense = {
                 id: null,
                 description: null,
-                date: null,
+                date: this.yearMonth ? this.yearMonth + '-01' : null,
                 value: null,
                 group: null,
                 portion: null,
@@ -1197,7 +1200,7 @@ export default {
             // )
         },
 
-        // Metodos para a divisão da despesa
+        // Metodos para validação da divisão da despesa
         validateDivisions() {
             if (this.expense.divisions && this.expense.divisions.length) {
                 let total = 0

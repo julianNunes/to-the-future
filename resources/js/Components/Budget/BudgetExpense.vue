@@ -42,6 +42,9 @@
                             }}</template>
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
                             <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
+                            <template #[`item.group`]="{ item }">{{
+                                item.group ? convertGroup(item.group) : null
+                            }}</template>
                             <template #[`item.remarks`]="{ item }">{{
                                 item.remarks && item.remarks.match(/(\S+)\.(\S+)/gm) ? $t(item.remarks) : item.remarks
                             }}</template>
@@ -172,6 +175,18 @@
                                 :rules="rules.currencyFieldRules"
                                 density="comfortable"
                             ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                            <v-select
+                                v-model="expense.group"
+                                :label="$t('default.group')"
+                                :items="groupList"
+                                item-title="name"
+                                item-value="value"
+                                clearable
+                                :rules="rules.textFieldRules"
+                                density="comfortable"
+                            ></v-select>
                         </v-col>
                         <v-col cols="12" sm="4" md="4">
                             <v-select
@@ -349,6 +364,7 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
+                group: null,
                 date: null,
                 paid: 0,
                 remarks: null,
@@ -373,6 +389,16 @@ export default {
             searchFieldsData: [],
             search_tag: '',
             loadingData: false,
+            groupList: [
+                {
+                    name: this.$t('default.monthly'),
+                    value: 'MONTHLY',
+                },
+                {
+                    name: this.$t('default.individual'),
+                    value: 'INDIVIDUAL',
+                },
+            ],
         }
     },
 
@@ -385,11 +411,12 @@ export default {
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
                 { title: this.$t('budget-expense.due-date'), align: 'center', key: 'date' },
                 { title: this.$t('default.value'), align: 'end', key: 'value' },
+                { title: this.$t('default.group'), align: 'start', key: 'group' },
                 { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
                 { title: this.$t('default.tags'), key: 'tags' },
-                { title: this.$t('default.paid'), key: 'paid' },
+                { title: 'Status', key: 'paid' },
                 { title: this.$t('budget-expense.finaning-installment'), align: 'center', key: 'data-table-expand' },
             ]
 
@@ -412,6 +439,10 @@ export default {
     async mounted() {},
 
     methods: {
+        convertGroup(group) {
+            return this.groupList.find((x) => x.value == group).name
+        },
+
         async searchTags(val) {
             if (this.loadingData) return
 
@@ -514,6 +545,7 @@ export default {
                 description: null,
                 value: 0,
                 date: this.yearMonth + '-01',
+                group: null,
                 remarks: null,
                 paid: 0,
                 share_value: 0,
@@ -543,6 +575,7 @@ export default {
                 value: Number(item.value),
                 date: item.date,
                 paid: item.paid ? 1 : 0,
+                group: item.group,
                 remarks: item.remarks,
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
@@ -579,6 +612,7 @@ export default {
                     date: this.expense.date,
                     value: this.expense.value,
                     paid: this.expense.paid ? true : false,
+                    group: this.expense.group,
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
@@ -606,6 +640,7 @@ export default {
                     value: this.expense.value,
                     date: this.expense.date,
                     paid: this.expense.paid ? true : false,
+                    group: this.expense.group,
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,

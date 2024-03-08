@@ -7,7 +7,7 @@
             </v-expansion-panel-title>
             <v-expansion-panel-text class="pa-2">
                 <v-row dense>
-                    <v-col md="12">
+                    <v-col v-if="!viewOnly" md="12">
                         <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
                     </v-col>
                     <v-col md="12">
@@ -137,27 +137,16 @@
                         <v-col cols="12" sm="12" md="12">
                             <v-text-field
                                 ref="txtDescription"
-                                v-model="income.description"
+                                v-model="provision.description"
                                 :label="$t('default.description')"
                                 :rules="rules.textFieldRules"
                                 required
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
-                        <v-col cols="12" sm="3" md="4">
-                            <v-text-field
-                                ref="inputDate"
-                                v-model="income.date"
-                                :label="$t('default.date')"
-                                type="date"
-                                required
-                                :rules="rules.textFieldRules"
-                                density="comfortable"
-                            ></v-text-field>
-                        </v-col>
                         <v-col cols="12" sm="4" md="4">
                             <v-text-field
-                                v-model="income.value"
+                                v-model="provision.value"
                                 type="number"
                                 :label="$t('default.value')"
                                 min="0"
@@ -217,14 +206,14 @@
                         </v-col>
                         <v-col cols="12" md="12">
                             <v-text-field
-                                v-model="income.remarks"
+                                v-model="provision.remarks"
                                 :label="$t('default.remarks')"
                                 density="comfortable"
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" md="12">
                             <v-autocomplete
-                                v-model="income.tags"
+                                v-model="provision.tags"
                                 v-model:search="search_tag"
                                 :label="$t('default.tags')"
                                 :items="itemsTags"
@@ -305,15 +294,6 @@ export default {
 
     data() {
         return {
-            headers: [
-                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
-                { title: this.$t('default.share-user'), key: 'share_user_id' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.tags'), key: 'tags' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
-            ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
@@ -374,6 +354,28 @@ export default {
     computed: {
         itemsTags() {
             return this.listTags
+        },
+        headers() {
+            let headers = [
+                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
+                { title: this.$t('default.value'), align: 'end', key: 'value' },
+                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
+                { title: this.$t('default.share-user'), key: 'share_user_id' },
+                { title: this.$t('default.remarks'), key: 'remarks' },
+                { title: this.$t('default.tags'), key: 'tags' },
+            ]
+
+            if (!this.viewOnly) {
+                headers.push({
+                    title: this.$t('default.action'),
+                    align: 'end',
+                    key: 'action',
+                    sortable: false,
+                    width: 40,
+                })
+            }
+
+            return headers
         },
     },
 

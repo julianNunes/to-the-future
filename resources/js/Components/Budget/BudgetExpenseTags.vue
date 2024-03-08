@@ -7,8 +7,8 @@
             </v-expansion-panel-title>
             <v-expansion-panel-text class="pa-2">
                 <v-tabs v-model="tab" bg-color="light-blue" density="comfortable">
-                    <v-tab value="one">Dados</v-tab>
-                    <v-tab value="two">Grafico</v-tab>
+                    <v-tab value="one">{{ $t('default.data') }}</v-tab>
+                    <v-tab value="two">{{ $t('default.charts') }}</v-tab>
                 </v-tabs>
                 <v-window v-model="tab">
                     <v-window-item value="one">
@@ -61,7 +61,7 @@
                     <v-window-item value="two">
                         <v-row dense>
                             <v-col md="12">
-                                <BarChart :chart-data="chartData" />
+                                <BarChart :options="chartOptions" :series="chartSeries" />
                             </v-col>
                         </v-row>
                     </v-window-item>
@@ -105,15 +105,65 @@ export default {
     },
 
     computed: {
-        chartData() {
+        chartOptions() {
+            return {
+                chart: {
+                    id: 'basic-bar',
+                    heigth: 10,
+                },
+                colors: ['#FB8C00'],
+                xaxis: {
+                    categories: this.expenseToTags?.length ? this.expenseToTags.map((x) => x.tag) : [],
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function (value) {
+                            return currencyField(value)
+                        },
+                    },
+                },
+                responsive: [
+                    {
+                        breakpoint: 1280,
+                    },
+                ],
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            position: 'top',
+                        },
+                    },
+                },
+                dataLabels: {
+                    enabled: true,
+                    style: {
+                        colors: ['#333'],
+                    },
+                    offsetY: -20,
+                    formatter: function (val) {
+                        return currencyField(val)
+                    },
+                },
+                noData: {
+                    text: this.$t('default.no-data-text'),
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    offsetX: 0,
+                    offsetY: 0,
+                },
+            }
+        },
+        chartSeries() {
             if (this.expenseToTags?.length) {
-                return {
-                    labels: this.expenseToTags.map((x) => x.tag),
-                    serie: this.expenseToTags.map((x) => x.value),
-                }
+                return [
+                    {
+                        name: 'Despesas',
+                        data: this.expenseToTags.map((x) => x.value),
+                    },
+                ]
             }
 
-            return null
+            return []
         },
     },
 

@@ -23,6 +23,7 @@ class BudgetExpenseController extends Controller
             'description' => ['required'],
             'date' => ['required'],
             'value' => ['required'],
+            'group' => ['required'],
             'paid' => ['required'],
         ]);
 
@@ -31,6 +32,7 @@ class BudgetExpenseController extends Controller
             $request->description,
             $request->date,
             floatval($request->value),
+            $request->date,
             $request->remarks,
             $request->paid == 1 ? true : false,
             $request->share_value ? floatval($request->share_value) : null,
@@ -43,7 +45,7 @@ class BudgetExpenseController extends Controller
     }
 
     /**
-     * Update a new Expense to Budget
+     * Update a Expense to Budget
      * @param Request $request
      * @param int $id
      */
@@ -53,6 +55,7 @@ class BudgetExpenseController extends Controller
             'description' => ['required'],
             'date' => ['required'],
             'value' => ['required'],
+            'group' => ['required'],
             // 'paid' => ['required'],
             // 'budget_id' => ['budget_id'],
         ]);
@@ -62,6 +65,7 @@ class BudgetExpenseController extends Controller
             $request->description,
             $request->date,
             floatval($request->value),
+            $request->group,
             $request->remarks,
             $request->paid == 1 ? true : false,
             $request->share_value ? floatval($request->share_value) : null,

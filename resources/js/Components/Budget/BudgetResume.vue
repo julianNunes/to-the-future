@@ -53,7 +53,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-left"></th>
-                                    <th class="text-right">{{ $t('default.total') }}</th>
+                                    <th class="text-right">Total</th>
                                     <th class="text-right">{{ $t('default.share-value') }}</th>
                                 </tr>
                             </thead>

@@ -13,6 +13,7 @@ interface BudgetExpenseServiceInterface
      * @param string $description
      * @param string $date
      * @param float $value
+     * @param string $group
      * @param string|null $remarks
      * @param bool|false $paid
      * @param float|null $shareValue
@@ -26,6 +27,7 @@ interface BudgetExpenseServiceInterface
         string $description,
         string $date,
         float $value,
+        string $group,
         string $remarks = null,
         bool $paid = false,
         float $shareValue = null,
@@ -40,6 +42,7 @@ interface BudgetExpenseServiceInterface
      * @param string $description
      * @param string $date
      * @param float $value
+     * @param string $group
      * @param string|null $remarks
      * @param bool|false $paid
      * @param float|null $shareValue
@@ -53,6 +56,7 @@ interface BudgetExpenseServiceInterface
         string $description,
         string $date,
         float $value,
+        string $group,
         string $remarks = null,
         bool $paid = false,
         float $shareValue = null,

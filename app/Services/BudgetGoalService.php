@@ -23,31 +23,33 @@ class BudgetGoalService implements BudgetGoalServiceInterface
 
     /**
      * Create a new Goal to Budget
+     * @param integer $budgetId
      * @param string $description
      * @param float $value
-     * @param float $group
-     * @param boolean $countOnlyShare
-     * @param integer $budgetId
-     * @param Collection|null $tags
+     * @param Collection $tag
+     * @param boolean $countShare
+     * @param string|null $group
      * @return BudgetGoal
      */
     public function create(
+        int $budgetId,
         string $description,
         float $value,
-        float $group,
-        bool $countOnlyShare,
-        int $budgetId,
-        Collection $tags = null
+        Collection $tags,
+        bool $countShare,
+        string $group = null
     ): BudgetGoal {
         $goal = $this->budgetGoalRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
-            'count_only_share' => $countOnlyShare,
+            'count_share' => $countShare,
             'budget_id' => $budgetId,
         ]);
 
+        // Atualiza Tag
         $this->tagRepository->saveTagsToModel($goal, $tags);
+
         return $goal;
     }
 
@@ -56,18 +58,18 @@ class BudgetGoalService implements BudgetGoalServiceInterface
      * @param integer $id
      * @param string $description
      * @param float $value
-     * @param string $group
-     * @param boolean $countOnlyShare
-     * @param Collection|null $tags
-     * @return boolean
+     * @param Collection $tags
+     * @param boolean $countShare
+     * @param string|null $group
+     * @return BudgetGoal
      */
     public function update(
         int $id,
         string $description,
         float $value,
-        string $group,
-        bool $countOnlyShare,
-        Collection $tags = null
+        Collection $tags,
+        bool $countShare,
+        string $group = null
     ): BudgetGoal {
         $goal = $this->budgetGoalRepository->show($id);
 
@@ -81,14 +83,14 @@ class BudgetGoalService implements BudgetGoalServiceInterface
             throw new Exception('budget.not-found');
         }
 
-        // Atualiza Tags
+        // Atualiza Tag
         $this->tagRepository->saveTagsToModel($goal, $tags);
 
         return $this->budgetGoalRepository->store([
             'description' => $description,
             'value' => $value,
             'group' => $group,
-            'count_only_share' => $countOnlyShare,
+            'count_share' => $countShare,
         ], $goal);
     }
 
@@ -101,7 +103,7 @@ class BudgetGoalService implements BudgetGoalServiceInterface
         $goal = $this->budgetGoalRepository->show($id);
 
         if (!$goal) {
-            throw new Exception('budget-provision.not-found');
+            throw new Exception('budget-goal.not-found');
         }
 
         // Remove Tags

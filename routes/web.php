@@ -3,6 +3,7 @@
 use App\Http\Controllers\{
     BudgetController,
     BudgetExpenseController,
+    BudgetGoalController,
     BudgetIncomeController,
     BudgetProvisionController,
     DashboardController,
@@ -121,6 +122,8 @@ Route::controller(BudgetController::class)->group(function () {
     Route::delete('/budget/{id}', 'delete');
     Route::get('/budget/find/{year}/{month}', 'findByYearMonth');
     Route::get('/budget/show/{id}', 'show')->name('budget.show');
+    Route::post('/budget/{id}/include-fix-expenses', 'includeFixExpenses');
+    Route::post('/budget/{id}/include-provisions', 'includeProvisions');
 });
 
 // Despesas do Orçamento
@@ -139,9 +142,16 @@ Route::controller(BudgetIncomeController::class)->group(function () {
 
 // Provisionamento do Orçamento
 Route::controller(BudgetProvisionController::class)->group(function () {
-    Route::post('/provision-budget', 'store');
-    Route::put('/provision-budget/{id}', 'update');
-    Route::delete('/provision-budget/{id}', 'delete');
+    Route::post('/budget-provision', 'store');
+    Route::put('/budget-provision/{id}', 'update');
+    Route::delete('/budget-provision/{id}', 'delete');
+});
+
+// Metas do Orçamento
+Route::controller(BudgetGoalController::class)->group(function () {
+    Route::post('/budget-goal', 'store');
+    Route::put('/budget-goal/{id}', 'update');
+    Route::delete('/budget-goal/{id}', 'delete');
 });
 
 require __DIR__ . '/auth.php';

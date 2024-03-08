@@ -21,8 +21,10 @@
                     ></v-text-field>
                 </v-col>
                 <v-col md="6" class="mt-2">
-                    <v-btn color="primary" @click="addFixExpense">{{ $t('budget-show.include-fix-expense') }}</v-btn>
-                    <v-btn class="ml-2" color="primary" @click="addProvision">{{
+                    <v-btn color="primary" @click="confirmIncludeFixExpenses">{{
+                        $t('budget-show.include-fix-expense')
+                    }}</v-btn>
+                    <v-btn class="ml-2" color="primary" @click="confirmIncludeProvisionss">{{
                         $t('budget-show.include-provision')
                     }}</v-btn>
                 </v-col>
@@ -43,6 +45,8 @@
             <v-window v-model="tab">
                 <v-window-item value="one">
                     <BudgetResume :resume="budgetResume" />
+                    <BudgetExpenseTags :expense-to-tags="budgetExpanseToTags" />
+                    <BudgetGoal :budget-id="budgetId" :goals="budgetGoals" :goals-charts="budgetGoalsCharts" />
                     <BudgetExpense
                         :budget-id="budgetId"
                         :year-month="yearMonthModel"
@@ -51,22 +55,30 @@
                         :installments="installments"
                     />
                     <BudgetIncome :budget-id="budgetId" :year-month="yearMonthModel" :incomes="budgetIncomes" />
-                    <BudgetExpenseTags :expense-to-tags="budgetExpanseToTags" />
                     <InvoiceExpense
                         v-for="invoice in budgetInvoices"
                         :key="invoice.id"
                         :invoice="invoice"
                         :share-users="shareUsers"
                         :title-card="true"
+                        :year-month="yearMonthModel"
                     />
                     <BudgetProvision
                         :budget-id="budgetId"
                         :year-month="yearMonthModel"
                         :provisions="budgetProvisions"
+                        :share-users="shareUsers"
                     />
                 </v-window-item>
                 <v-window-item v-if="shareUser" value="two">
                     <BudgetResume :resume="budgetShareResume" />
+                    <BudgetExpenseTags :expense-to-tags="budgetShareExpanseToTags" />
+                    <BudgetGoal
+                        :budget-id="budgetId"
+                        :goals="budgetShareGoals"
+                        :goals-charts="budgetShareGoalsCharts"
+                        :view-only="true"
+                    />
                     <BudgetExpense :expenses="budgetShareExpenses" :view-only="true" />
                     <BudgetIncome :year-month="yearMonthModel" :incomes="budgetShareIncomes" :view-only="true" />
                     <InvoiceExpense
@@ -85,12 +97,15 @@
                 </v-window-item>
             </v-window>
         </div>
+
+        <ConfirmDialog ref="confirm" />
     </AuthenticatedLayout>
 </template>
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
+import BudgetGoal from '../../Components/Budget/BudgetGoal.vue'
 import BudgetExpenseTags from '../../Components/Budget/BudgetExpenseTags.vue'
 import BudgetResume from '../../Components/Budget/BudgetResume.vue'
 import BudgetExpense from '../../Components/Budget/BudgetExpense.vue'
@@ -108,6 +123,7 @@ export default {
 
     components: {
         BudgetExpenseTags,
+        BudgetGoal,
         BudgetResume,
         BudgetExpense,
         BudgetIncome,
@@ -185,8 +201,17 @@ export default {
         budgetInvoices() {
             return this.owner.budget.invoices
         },
+        budgetGoals() {
+            return this.owner.budget.goals
+        },
+        budgetGoalsCharts() {
+            return this.owner.goalsCharts
+        },
         budgetShareResume() {
             return this.share.resume
+        },
+        budgetShareExpanseToTags() {
+            return this.share.expenseToTags
         },
         budgetShareExpenses() {
             return this.share.budget.expenses
@@ -200,6 +225,12 @@ export default {
         budgetShareInvoices() {
             return this.share.budget.invoices
         },
+        budgetShareGoals() {
+            return this.share.budget.goals
+        },
+        budgetShareGoalsCharts() {
+            return this.share.goalsCharts
+        },
     },
 
     methods: {
@@ -210,12 +241,56 @@ export default {
             this.$inertia.get(`/budget/find/${year}/${month}`)
         },
 
-        addFixExpense() {
-            return false
+        async confirmIncludeFixExpenses() {
+            if (
+                await this.$refs.confirm.open(
+                    this.$t('budget-show.include-fix-expense'),
+                    this.$t('budget-show.confirm-include-fix-expense')
+                )
+            ) {
+                this.includeFixExpenses()
+            }
         },
 
-        addProvision() {
-            return false
+        includeFixExpenses() {
+            this.isLoading = true
+            this.$inertia.post(`/budget/${this.owner.budget.id}/include-fix-expenses`, {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {},
+                onError: () => {
+                    this.isLoading = false
+                },
+                onFinish: () => {
+                    this.isLoading = false
+                },
+            })
+        },
+
+        async confirmIncludeProvisionss() {
+            if (
+                await this.$refs.confirm.open(
+                    this.$t('budget-show.include-provision'),
+                    this.$t('budget-show.confirm-include-provision')
+                )
+            ) {
+                this.includeProvisions()
+            }
+        },
+
+        includeProvisions() {
+            this.isLoading = true
+            this.$inertia.post(`/budget/${this.owner.budget.id}/include-provisions`, {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {},
+                onError: () => {
+                    this.isLoading = false
+                },
+                onFinish: () => {
+                    this.isLoading = false
+                },
+            })
         },
     },
 }

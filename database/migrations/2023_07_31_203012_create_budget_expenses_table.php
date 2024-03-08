@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('value');
             $table->string('remarks')->nullable()->comment('Observacoes');;
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
+            $table->enum('group', ['MONTHLY', 'INDIVIDUAL'])->default('MONTHLY')->comment('Valor fixo demonstrar que os valores são RECORRENTES');
             $table->boolean('paid')->default(false);
             $table->unsignedBigInteger('budget_id');
             $table->foreign('budget_id')->references('id')->on('budgets');

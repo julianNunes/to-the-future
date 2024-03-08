@@ -1,7 +1,29 @@
 ==================================================
-LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
+LISTA DE TAREFAS PENDENTES - TO DO
 ==================================================
+- Adicionar o "ConfirmDialog" nos lugares onde tem DELETE
 
+
+
+- CRUD para "prepaid_card"
+    - "prepaid_card_invoices"
+        - "valor_creditado"
+        - "dia do creditado"
+    - "prepaid_card_invoice_expenses"
+        - Quando houver despesas compartilhada sera somado como despesa para o usuario compartilhado
+        - o valor que sobrar da diferença do compartilhado entra como RECEITA para o dono do cartao
+
+
+- CArtao de credito
+    - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
+
+- Orçamento
+    - TEstar novamente o "Create"
+    - Testar o Clone
+
+- RETESTAR TUDO
+
+- Revisar todas as controllers e documentar corretamente
 
 - Mudar como os menu é montado e fazer ele agrupado
 
@@ -23,270 +45,17 @@ LISTA DE TAREFAS PENDENTES - FAZER NO FINAL
 - Orçamento
     - Decidir se vou ter o "closed" no Budget
 
-- Backend
-    - Adicionar a camada do REPOSITORY
-        - Criar um BaseRepository baseado no Model instaciado para fazer o CRUD padrão ?
-            - https://asperbrothers.com/blog/implement-repository-pattern-in-laravel/
-            - https://medium.com/levantelab/repository-pattern-contracts-e-service-layer-no-laravel-6-670aa9f50173
-
-
-- Revisar todas as controllers e documentar corretamente
-    -
-
 - Criar componente para mudar dinamicamente a linguagem do sistema
     - https://lokalise.com/blog/vue-i18n/
 
 
+- Credit-card-invoice
+    - a coluna "Group" nao fica 100%
+
+
+
 0ecea533
 
-==================================================
-TO-DO
-==================================================
-
-- Verificar se na divisao das despesas esta somando o total e comparando o valor declarado total
-    - Se alguma das divisioes tiver "share_user", devo aplicar no valor principal
-
-
-- montar o "BudgetRecalculate"  nos Helpers
-    public function recalculate (int $id, bool $shareValue)
-
-    - Verificar em todos os MOdels que tem relação com o total do Budget onde eu preciso chamar o novo HELPER
-        - BudgetIncomeService
-        - BudgetExpenseService
-        - BudgetProvisionService
-        - CreditCardInvoiceExpenseService
-
-- Budget-show
-    - CRUD das Metas
-    - INcluir "Despesas FIxas"
-    - Incluir "Provisonamento"
-
-- RETESTAR TUDO
-
-
-
-
-ORÇAMENTO SHOW
-- Front-end
-    - Cabeçalho da tela
-        - Botões:
-            - "Adicionar Provisionamentos"
-            - "Adicionar Despesas Fixas"
-
-    - NAV-BAR
-        ! meu Painel e o painel de OUTRO USUARIO QUE COMPARTILHA COMIGO
-        - Componente:
-            - Painel com as metas (COLUNA 12)
-                - De um lado tabela com dados
-                - Do Outro grafico com o utilizado e a meta
-
-            - Painel "Despesas por Tags"
-                - De um lado tabela com dados
-                - Do Outro grafico com o utilizado e a meta
-
-            - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
-                - Somar o valor que devo pagar para o "share_user_id"
-                - Somar o valor a receber do "share_user_id"
-                - BALANÇO entre RECEITAS E DESPESAS
-
-            - Painel de Resumo dos Cartões (COLUNA 6)
-                - Parcelados
-                - Provisionamento
-                - Semana 1, 2, 3, 4
-
-
-- CRUD para "prepaid_card"
-    - "prepaid_card_invoices"
-        - "valor_creditado"
-        - "dia do creditado"
-    - "prepaid_card_invoice_expenses"
-        - Quando houver despesas compartilhada sera somado como despesa para o usuario compartilhado
-        - o valor que sobrar da diferença do compartilhado entra como RECEITA para o dono do cartao
-
-
-- CArtao de credito
-    - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
-
-
-- Orçamento
-    - TEstar novamente o "Create"
-    - Testar o Clone
-
-
-
-
-=============================================================================================================
-DATE PICKER
-                            <v-col md="4">
-                                <v-dialog persistent width="290px">
-                                    <template #activator="{ props }">
-                                        <v-text-field
-                                            v-model="expense.due_date"
-                                            :label="$t('fix-expense.due-date')"
-                                            prepend-icon="mdi-calendar"
-                                            readonly
-                                            v-bind="props"
-                                        ></v-text-field>
-                                    </template>
-                                    <template #default="{ isActive }">
-                                        <v-date-picker
-                                            v-model="expense.due_date"
-                                            color="primary"
-                                            show-week
-                                            no-title
-                                            scrollable
-                                        >
-                                        </v-date-picker>
-                                        <v-spacer></v-spacer>
-                                        <v-btn text small @click="isActive.value = false">Cancel</v-btn>
-                                        <v-btn text small @click="$refs.modalEntryDateStart.save(expense.due_date)"
-                                            >OK</v-btn
-                                        >
-                                    </template>
-                                </v-dialog>
-                            </v-col>
-
-
-    <!-- Despesas  -->
-    <v-card class="mt-4">
-        <v-card-title class="bg-primary">
-            <span class="text-h6">
-                {{ $t('credit-card-invoice-expense.title') }} {{ titleCard ? ' - ' + creditCardname : '' }}
-            </span>
-        </v-card-title>
-        <v-card-text class="pa-4">
-            <v-row>
-                <v-col md="12">
-                    <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-
-                    <v-btn color="info" class="ml-1" href="/storage/template/template-despesas.xlsx" download>{{
-                        $t('credit-card-invoice.download-template')
-                    }}</v-btn>
-                    <v-btn color="info" class="ml-1" @click="clickImportFile">{{
-                        $t('credit-card-invoice.import-excel')
-                    }}</v-btn>
-                    <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
-                </v-col>
-            </v-row>
-            <v-row dense>
-                <v-col md="12">
-                    <v-data-table
-                        :group-by="[{ key: 'group', order: 'asc' }]"
-                        :headers="headers"
-                        :items="invoice.expenses"
-                        :sort-by="[{ key: 'created_at', order: 'asc' }]"
-                        :search="search"
-                        :loading="isLoading"
-                        :loading-text="$t('default.loading-text-table')"
-                        class="elevation-3"
-                        density="compact"
-                        :total-items="invoice.expenses"
-                        :no-data-text="$t('default.no-data-text')"
-                        :no-results-text="$t('default.no-data-text')"
-                        :footer-props="{
-                            'items-per-page-text': $t('default.itens-per-page'),
-                            'page-text': $t('default.page-text'),
-                        }"
-                        :header-props="{
-                            sortByText: $t('default.sort-by'),
-                        }"
-                        fixed-header
-                    >
-                        <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                        <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                        <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
-                        <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
-                        <template #[`item.tags`]="{ item }">{{
-                            item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
-                        }}</template>
-                        <template #[`item.potion`]="{ item }">{{
-                            item.portion ? item.portion + '/' + item.portion_total : ''
-                        }}</template>
-                        <template #[`item.share_user_id`]="{ item }">{{
-                            item.share_user ? item.share_user.name : ''
-                        }}</template>
-                        <template #[`item.action`]="{ item }">
-                            <v-tooltip :text="$t('default.edit')" location="top">
-                                <template #activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        color="warning"
-                                        icon="mdi-pencil"
-                                        size="small"
-                                        class="me-2"
-                                        @click="editItem(item)"
-                                    >
-                                    </v-icon>
-                                </template>
-                            </v-tooltip>
-                            <v-tooltip :text="$t('default.delete')" location="top">
-                                <template #activator="{ props }">
-                                    <v-icon
-                                        v-bind="props"
-                                        class="ml-2"
-                                        color="error"
-                                        icon="mdi-delete"
-                                        size="small"
-                                        @click="openDelete(item)"
-                                    >
-                                    </v-icon>
-                                </template>
-                            </v-tooltip>
-                        </template>
-
-                        <template #group-header="{ item, toggleGroup, isGroupOpen }">
-                            <tr>
-                                <th class="title" style="width: auto">
-                                    <VBtn
-                                        size="small"
-                                        variant="text"
-                                        :icon="isGroupOpen(item) ? '$expand' : '$next'"
-                                        @click="toggleGroup(item)"
-                                    ></VBtn>
-                                    {{ convertGroup(item.value) }}
-                                </th>
-                                <th :colspan="2" class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">
-                                    {{ sumGroup(invoice.expenses, item.key, item.value, 'value') }}
-                                </th>
-                                <th class="title text-right">
-                                    {{ sumGroup(invoice.expenses, item.key, item.value, 'share_value') }}
-                                </th>
-                                <th :colspan="6"></th>
-                            </tr>
-                        </template>
-
-                        <template v-if="invoice.expenses.length" #tfoot>
-                            <tr class="green--text">
-                                <th class="title"></th>
-                                <th colspan="2" class="title font-weight-bold text-right">Total</th>
-                                <th class="title text-right">{{ sumField(invoice.expenses, 'value') }}</th>
-                                <th class="title text-right">{{ sumField(invoice.expenses, 'share_value') }}</th>
-                            </tr>
-                        </template>
-
-                        <template #top>
-                            <v-toolbar density="comfortable">
-                                <v-row dense>
-                                    <v-col cols="12" lg="12" md="12" sm="12">
-                                        <v-text-field
-                                            v-model="search"
-                                            :label="$t('default.search')"
-                                            append-icon="mdi-magnify"
-                                            single-line
-                                            hide-details
-                                            clearable
-                                            @click:clear="search = null"
-                                        ></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-toolbar>
-                        </template>
-                    </v-data-table>
-                </v-col>
-            </v-row>
-        </v-card-text>
-    </v-card>
 =============================================================================================================
 
 In all my carrer i worked like a fullstack developer.

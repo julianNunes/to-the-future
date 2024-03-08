@@ -99,4 +99,18 @@ interface BudgetServiceInterface
      * @return array
      */
     public function show(int $id): array;
+
+    /**
+     * Include in Budget all the Fix Expenses
+     * @param integer $id
+     * @return boolean
+     */
+    public function includeFixExpenses(int $id): bool;
+
+    /**
+     * Include in Budget all the default Provisions
+     * @param integer $id
+     * @return boolean
+     */
+    public function includeProvisions(int $id): bool;
 }

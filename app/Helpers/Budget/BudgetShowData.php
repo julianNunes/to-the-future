@@ -50,7 +50,7 @@ class BudgetShowData implements BudgetShowDataInterface
                 'tags',
                 'shareUser',
             ],
-            'goals.tag',
+            'goals.tags',
             'invoices' => [
                 'creditCard',
                 'file',
@@ -117,7 +117,7 @@ class BudgetShowData implements BudgetShowDataInterface
                         'tags',
                         'shareUser',
                     ],
-                    'goals.tag',
+                    'goals.tags',
                     'invoices' => [
                         'creditCard',
                         'file',
@@ -161,7 +161,7 @@ class BudgetShowData implements BudgetShowDataInterface
             $this->mountExpensesIncomes($budgetShare, $budget, $shareUser->user);
         }
 
-        $resume =  $this->mountResume($budget, $budgetShare);
+        $resume = $this->mountResume($budget, $budgetShare);
         $resume_share = null;
 
         if ($shareUser && $budgetShare) {
@@ -304,59 +304,19 @@ class BudgetShowData implements BudgetShowDataInterface
          * @todo INSERIR POSTERIOR O CARTAO PRE PAGO
          */
 
-        // Despesas - Compartilhado com owner Totalizador dos cartoes
-        if ($budgetShare && $budgetShare->expenses && $budgetShare->expenses->count() && $budgetShare->expenses->where('share_user_id', $budget->user_id)->count()) {
-            $filtered = $budgetShare->expenses->filter(function ($expense) use ($budget) {
-                return $expense['share_user_id'] == $budget->user_id && $expense['id'] != null;
-            });
-
-            foreach ($filtered as $expense) {
-                $budget->expenses->push(new BudgetExpense([
-                    'id' => null,
-                    'description' => $expense['description'],
-                    'date' => $expense['date'],
-                    'value' => $expense['share_value'],
-                    'remarks' => 'budget.share-expense-owner',
-                    'paid' => null,
-                    'share_value' => null,
-                    'share_user_id' => null,
-                    'tags' => collect()
-                ]));
-            }
-        }
-
-        // Despesas - Compartilhado com owner Totalizador do Provisionamento
-        if ($budgetShare && $budgetShare->provisions && $budgetShare->provisions->count() && $budgetShare->provisions->where('share_user_id', $budget->user_id)->count()) {
-            $filtered = $budgetShare->provisions->filter(function ($provision) use ($budget) {
-                return $provision->share_user_id == $budget->user_id && $provision->id != null;
-            });
-
-            $budget->expenses->push(new BudgetExpense([
-                'id' => null,
-                'description' => 'budget.total-provision',
-                'date' => null,
-                'value' => $filtered->sum('share_value'),
-                'remarks' => 'budget.share-expense-owner',
-                'paid' => null,
-                'share_value' => null,
-                'share_user_id' => null,
-                'tags' => collect()
-            ]));
-        }
-
-        // Despesas - Compartilhado com owner Totalizador dos cartoes
-        if ($budgetShare->invoices && $budgetShare->invoices->count()) {
-            foreach ($budgetShare->invoices as $invoice) {
-                $filtered = $invoice->expenses->filter(function ($expense) use ($budget) {
-                    return $expense->share_user_id == $budget->user_id || ($expense->divisions && $expense->divisions->count() && $expense->divisions->where('share_user_id', $budget->user_id)->count());
+        if ($budgetShare) {
+            // Despesas - Compartilhado com owner Totalizador dos cartoes
+            if ($budgetShare && $budgetShare->expenses && $budgetShare->expenses->count() && $budgetShare->expenses->where('share_user_id', $budget->user_id)->count()) {
+                $filtered = $budgetShare->expenses->filter(function ($expense) use ($budget) {
+                    return $expense['share_user_id'] == $budget->user_id && $expense['id'] != null;
                 });
 
-                if ($filtered && $filtered->count()) {
+                foreach ($filtered as $expense) {
                     $budget->expenses->push(new BudgetExpense([
                         'id' => null,
-                        'description' => 'Total: ' . $invoice->creditCard->name,
-                        'date' => $invoice->due_date,
-                        'value' => $filtered->sum('share_value'),
+                        'description' => $expense['description'],
+                        'date' => $expense['date'],
+                        'value' => $expense['share_value'],
                         'remarks' => 'budget.share-expense-owner',
                         'paid' => null,
                         'share_value' => null,
@@ -365,37 +325,58 @@ class BudgetShowData implements BudgetShowDataInterface
                     ]));
                 }
             }
+
+            // Despesas - Compartilhado com owner Totalizador do Provisionamento
+            if ($budgetShare && $budgetShare->provisions && $budgetShare->provisions->count() && $budgetShare->provisions->where('share_user_id', $budget->user_id)->count()) {
+                $filtered = $budgetShare->provisions->filter(function ($provision) use ($budget) {
+                    return $provision->share_user_id == $budget->user_id && $provision->id != null;
+                });
+
+                $budget->expenses->push(new BudgetExpense([
+                    'id' => null,
+                    'description' => 'budget.total-provision',
+                    'date' => null,
+                    'value' => $filtered->sum('share_value'),
+                    'remarks' => 'budget.share-expense-owner',
+                    'paid' => null,
+                    'share_value' => null,
+                    'share_user_id' => null,
+                    'tags' => collect()
+                ]));
+            }
+
+            // Despesas - Compartilhado com owner Totalizador dos cartoes
+            if ($budgetShare->invoices && $budgetShare->invoices->count()) {
+                foreach ($budgetShare->invoices as $invoice) {
+                    $filtered = $invoice->expenses->filter(function ($expense) use ($budget) {
+                        return $expense->share_user_id == $budget->user_id || ($expense->divisions && $expense->divisions->count() && $expense->divisions->where('share_user_id', $budget->user_id)->count());
+                    });
+
+                    if ($filtered && $filtered->count()) {
+                        $budget->expenses->push(new BudgetExpense([
+                            'id' => null,
+                            'description' => 'Total: ' . $invoice->creditCard->name,
+                            'date' => $invoice->due_date,
+                            'value' => $filtered->sum('share_value'),
+                            'remarks' => 'budget.share-expense-owner',
+                            'paid' => null,
+                            'share_value' => null,
+                            'share_user_id' => null,
+                            'tags' => collect()
+                        ]));
+                    }
+                }
+            }
         }
     }
 
     /**
-     * Undocumented function
-     *
      * @param Budget $budget
      * @param Budget|null $budgetShare
      * @return array
      */
     private function mountResume(Budget $budget, Budget $budgetShare = null): array
     {
-        // RESUMO
-        //  Total de Despesas
-        //  total de receitas
-        //  Balanço / VERDE se positivo; vermelho se negativo
-
-        //  v-dvider
-
-        //     - Painel de Resumo de pagamento/recebimento do usuario compartilhado  (COLUNA 6)
-        //         - Somar o valor que devo pagar para o "share_user_id"
-        //         - Somar o valor a receber do "share_user_id"
-        //         - BALANÇO
-
-        //     - Painel de Resumo dos Cartões (COLUNA 6)
-        //         - Parcelados
-        //         - Provisionamento
-        //         - Semana 1, 2, 3, 4
-        //         - Total a Vista
-        //         - Total
-
         $balance = $budget->total_income - $budget->total_expense;
         $pay_share = 0;
         $receive_share = 0;
@@ -454,110 +435,115 @@ class BudgetShowData implements BudgetShowDataInterface
                     }
                 }
             }
-
-            $resume_credit_card->push([
-                'name' => 'budget-resume.total-portion',
-                'total_value' => $total_value,
-                'total_share_value' => $total_share_value,
-            ]);
         }
+
+        $resume_credit_card->push([
+            'name' => 'budget-resume.total-portion',
+            'total_value' => $total_value,
+            'total_share_value' => $total_share_value,
+        ]);
+
+        $total_value = 0;
+        $total_share_value = 0;
 
         // Total Provisionamento
         if ($budget->provisions && $budget->provisions->count()) {
-            $resume_credit_card->push([
-                'name' => 'budget-resume.total-portion',
-                'total_value' => $budget->provisions->sum('value'),
-                'total_share_value' => $budget->provisions->sum('share_value'),
-            ]);
+            $total_value = $budget->provisions->sum('value');
+            $total_share_value = $budget->provisions->sum('share_value');
         }
+
+        $resume_credit_card->push([
+            'name' => 'budget-resume.total-provisions',
+            'total_value' => $total_value,
+            'total_share_value' => $total_share_value,
+        ]);
 
         // Total das semanas
-        if ($budget->invoices && $budget->invoices->count()) {
-            $total_value = 0;
-            $total_share_value = 0;
-            // Semana 1
-            foreach ($budget->invoices as $invoice) {
-                if ($invoice->expenses && $invoice->expenses->count()) {
-                    $filtered = $invoice->expenses->where('group', '=', 'WEEK_1');
+        $total_value = 0;
+        $total_share_value = 0;
+        // Semana 1
+        foreach ($budget->invoices as $invoice) {
+            if ($invoice->expenses && $invoice->expenses->count()) {
+                $filtered = $invoice->expenses->where('group', '=', 'WEEK_1');
 
-                    if ($filtered && $filtered->count()) {
-                        $total_value += $filtered->sum('value');
-                        $total_share_value += $filtered->sum('share_value');
-                    }
+                if ($filtered && $filtered->count()) {
+                    $total_value += $filtered->sum('value');
+                    $total_share_value += $filtered->sum('share_value');
                 }
             }
-
-            $resume_credit_card->push([
-                'name' => 'budget-resume.total-week-1',
-                'total_value' => $total_value,
-                'total_share_value' => $total_share_value,
-            ]);
-
-            $total_value = 0;
-            $total_share_value = 0;
-            // Semana 2
-            foreach ($budget->invoices as $invoice) {
-                if ($invoice->expenses && $invoice->expenses->count()) {
-                    $filtered = $invoice->expenses->where('group', '=', 'WEEK_2');
-
-                    if ($filtered && $filtered->count()) {
-                        $total_value += $filtered->sum('value');
-                        $total_share_value += $filtered->sum('share_value');
-                    }
-                }
-            }
-
-            $resume_credit_card->push([
-                'name' => 'budget-resume.total-week-2',
-                'total_value' => $total_value,
-                'total_share_value' => $total_share_value,
-            ]);
-
-            $total_value = 0;
-            $total_share_value = 0;
-
-            // Semana 3
-            foreach ($budget->invoices as $invoice) {
-                if ($invoice->expenses && $invoice->expenses->count()) {
-                    $filtered = $invoice->expenses->where('group', '=', 'WEEK_3');
-
-                    if ($filtered && $filtered->count()) {
-                        $total_value += $filtered->sum('value');
-                        $total_share_value += $filtered->sum('share_value');
-                    }
-                }
-            }
-
-            $resume_credit_card->push([
-                'name' => 'budget-resume.total-week-3',
-                'total_value' => $total_value,
-                'total_share_value' => $total_share_value,
-            ]);
-
-            $total_value = 0;
-            $total_share_value = 0;
-
-            // Semana 4
-            foreach ($budget->invoices as $invoice) {
-                if ($invoice->expenses && $invoice->expenses->count()) {
-                    $filtered = $invoice->expenses->where('group', '=', 'WEEK_4');
-
-                    if ($filtered && $filtered->count()) {
-                        $total_value += $filtered->sum('value');
-                        $total_share_value += $filtered->sum('share_value');
-                    }
-                }
-            }
-
-            $resume_credit_card->push([
-                'name' => 'budget-resume.total-week-4',
-                'total_value' => $total_value,
-                'total_share_value' => $total_share_value,
-            ]);
         }
 
+        $resume_credit_card->push([
+            'name' => 'budget-resume.total-week-1',
+            'total_value' => $total_value,
+            'total_share_value' => $total_share_value,
+        ]);
+
+
+        $total_value = 0;
+        $total_share_value = 0;
+        // Semana 2
+        foreach ($budget->invoices as $invoice) {
+            if ($invoice->expenses && $invoice->expenses->count()) {
+                $filtered = $invoice->expenses->where('group', '=', 'WEEK_2');
+
+                if ($filtered && $filtered->count()) {
+                    $total_value += $filtered->sum('value');
+                    $total_share_value += $filtered->sum('share_value');
+                }
+            }
+        }
+
+        $resume_credit_card->push([
+            'name' => 'budget-resume.total-week-2',
+            'total_value' => $total_value,
+            'total_share_value' => $total_share_value,
+        ]);
+
+        $total_value = 0;
+        $total_share_value = 0;
+
+        // Semana 3
+        foreach ($budget->invoices as $invoice) {
+            if ($invoice->expenses && $invoice->expenses->count()) {
+                $filtered = $invoice->expenses->where('group', '=', 'WEEK_3');
+
+                if ($filtered && $filtered->count()) {
+                    $total_value += $filtered->sum('value');
+                    $total_share_value += $filtered->sum('share_value');
+                }
+            }
+        }
+
+        $resume_credit_card->push([
+            'name' => 'budget-resume.total-week-3',
+            'total_value' => $total_value,
+            'total_share_value' => $total_share_value,
+        ]);
+
+        $total_value = 0;
+        $total_share_value = 0;
+
+        // Semana 4
+        foreach ($budget->invoices as $invoice) {
+            if ($invoice->expenses && $invoice->expenses->count()) {
+                $filtered = $invoice->expenses->where('group', '=', 'WEEK_4');
+
+                if ($filtered && $filtered->count()) {
+                    $total_value += $filtered->sum('value');
+                    $total_share_value += $filtered->sum('share_value');
+                }
+            }
+        }
+
+        $resume_credit_card->push([
+            'name' => 'budget-resume.total-week-4',
+            'total_value' => $total_value,
+            'total_share_value' => $total_share_value,
+        ]);
+
         // Total a vista
-        $filtered_cash = $resume_credit_card->shift();
+        $filtered_cash = $resume_credit_card->slice(1);
         $resume_credit_card->push([
             'name' => 'budget-resume.total-cash',
             'total_value' => collect($filtered_cash)->sum('total_value'),
@@ -566,7 +552,7 @@ class BudgetShowData implements BudgetShowDataInterface
 
         // Total Geral
         $resume_credit_card->push([
-            'name' => 'Total',
+            'name' => 'default.total',
             'total_value' => $resume_credit_card->sum('total_value'),
             'total_share_value' => $resume_credit_card->sum('total_share_value'),
         ]);
@@ -597,87 +583,94 @@ class BudgetShowData implements BudgetShowDataInterface
         if ($budget->goals && $budget->goals->count()) {
             foreach ($budget->goals as $goal) {
                 $total_expense = 0;
-                // Procuro em Provisionamento
-                if ($budget->provisions && $budget->provisions->count()) {
-                    foreach ($budget->provisions as $provision) {
-                        if ($provision->tags && $provision->tags->count() && $provision->tags->contains('name', $goal->tag->name)) {
-                            $total_expense += $provision->value;
-                        }
-                    }
-                }
-
-                // Procuro em Despesas
-                if ($budget->expenses && $budget->expenses->count()) {
-                    foreach ($budget->expenses as $expense) {
-                        if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $goal->tag->name)) {
-                            $total_expense += $expense->value;
-                        }
-                    }
-                }
-
-                // Procuro em Cartoes de Credito
-                if ($budget->invoices && $budget->invoices->count()) {
-                    foreach ($budget->invoices as $invoice) {
-                        if ($invoice->expenses && $invoice->expenses->count()) {
-                            foreach ($invoice->expenses as $expense) {
-                                if ($expense->divisions && $expense->divisions->count()) {
-                                    foreach ($expense->divisions as $division) {
-                                        if ($division->tags && $division->tags->count() && $division->tags->contains('name', $goal->tag->name)) {
-                                            $total_expense += $division->value;
-                                        }
-                                    }
-                                } else if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $goal->tag->name)) {
-                                    $total_expense += $expense->value;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if ($goal->count_share && $budgetShare) {
+                foreach ($goal->tags as $tag) {
                     // Procuro em Provisionamento
-                    if ($budgetShare->provisions && $budgetShare->provisions->count()) {
-                        foreach ($budgetShare->provisions as $provision) {
-                            if ($provision->tags && $provision->tags->count() && $provision->tags->contains('name', $goal->tag->name)) {
+                    if ($budget->provisions && $budget->provisions->count()) {
+                        foreach ($budget->provisions as $provision) {
+                            if ($provision->tags && $provision->tags->count() && $provision->tags->contains('name', $tag->name) && (!$goal->group || $provision->group === $goal->group)) {
                                 $total_expense += $provision->value;
                             }
                         }
                     }
 
                     // Procuro em Despesas
-                    if ($budgetShare->expenses && $budgetShare->expenses->count()) {
-                        foreach ($budgetShare->expenses as $expense) {
-                            if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $goal->tag->name)) {
+                    if ($budget->expenses && $budget->expenses->count()) {
+                        foreach ($budget->expenses as $expense) {
+                            if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name) && (!$goal->group || $goal->group === 'MONTHLY')) {
                                 $total_expense += $expense->value;
                             }
                         }
                     }
 
                     // Procuro em Cartoes de Credito
-                    if ($budgetShare->invoices && $budgetShare->invoices->count()) {
-                        foreach ($budgetShare->invoices as $invoice) {
+                    if ($budget->invoices && $budget->invoices->count()) {
+                        foreach ($budget->invoices as $invoice) {
                             if ($invoice->expenses && $invoice->expenses->count()) {
                                 foreach ($invoice->expenses as $expense) {
-                                    if ($expense->divisions && $expense->divisions->count()) {
-                                        foreach ($expense->divisions as $division) {
-                                            if ($division->tags && $division->tags->count() && $division->tags->contains('name', $goal->tag->name)) {
-                                                $total_expense += $division->value;
+                                    if (!$goal->group || $expense->group === $goal->group) {
+                                        if ($expense->divisions && $expense->divisions->count()) {
+                                            foreach ($expense->divisions as $division) {
+                                                if ($division->tags && $division->tags->count() && $division->tags->contains('name', $tag->name)) {
+                                                    $total_expense += $division->value;
+                                                }
                                             }
+                                        } else if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name)) {
+                                            $total_expense += $expense->value;
                                         }
-                                    } else if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $goal->tag->name)) {
-                                        $total_expense += $expense->value;
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                $goals_charts->push([
-                    'tag' => $goal->tag->name,
-                    'value' => $goal->value,
-                    'total' => $total_expense
-                ]);
+                    if ($goal->count_share && $budgetShare) {
+                        // Procuro em Provisionamento
+                        if ($budgetShare->provisions && $budgetShare->provisions->count()) {
+                            foreach ($budgetShare->provisions as $provision) {
+                                if ($provision->tags && $provision->tags->count() && $provision->tags->contains('name', $tag->name) && (!$goal->group || $provision->group === 'MONTHLY')) {
+                                    $total_expense += $provision->value;
+                                }
+                            }
+                        }
+
+                        // Procuro em Despesas
+                        if ($budgetShare->expenses && $budgetShare->expenses->count()) {
+                            foreach ($budgetShare->expenses as $expense) {
+                                if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name) && (!$goal->group || $goal->group === 'MONTHLY')) {
+                                    $total_expense += $expense->value;
+                                }
+                            }
+                        }
+
+                        // Procuro em Cartoes de Credito
+                        if ($budgetShare->invoices && $budgetShare->invoices->count()) {
+                            foreach ($budgetShare->invoices as $invoice) {
+                                if ($invoice->expenses && $invoice->expenses->count()) {
+                                    foreach ($invoice->expenses as $expense) {
+                                        if (!$goal->group || $expense->group === $goal->group) {
+                                            if ($expense->divisions && $expense->divisions->count()) {
+                                                foreach ($expense->divisions as $division) {
+                                                    if ($division->tags && $division->tags->count() && $division->tags->contains('name', $tag->name)) {
+                                                        $total_expense += $division->value;
+                                                    }
+                                                }
+                                            } else if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name)) {
+                                                $total_expense += $expense->value;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $goals_charts->push([
+                        'tag' => $tag->name,
+                        'description' => $goal->description,
+                        'value' => $goal->value,
+                        'total' => $total_expense
+                    ]);
+                }
             }
         }
 
@@ -685,8 +678,6 @@ class BudgetShowData implements BudgetShowDataInterface
     }
 
     /**
-     * Undocumented function
-     *
      * @param Budget $budget
      * @param Budget|null $budgetShare
      * @return array

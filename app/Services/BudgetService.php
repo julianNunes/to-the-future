@@ -15,7 +15,6 @@ use App\Repositories\Interfaces\{
     FinancingInstallmentRepositoryInterface,
     FixExpenseRepositoryInterface,
     ProvisionRepositoryInterface,
-    ShareUserRepositoryInterface,
 };
 use App\Services\Interfaces\{
     BudgetExpenseServiceInterface,
@@ -42,7 +41,6 @@ class BudgetService implements BudgetServiceInterface
         private FixExpenseRepositoryInterface $fixExpenseRepository,
         private ProvisionRepositoryInterface $provisionRepository,
         private BudgetRepositoryInterface $budgetRepository,
-        private ShareUserRepositoryInterface $shareUserRepository,
         private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
         private BudgetExpenseRepositoryInterface $budgetExpenseRepository,
@@ -92,10 +90,7 @@ class BudgetService implements BudgetServiceInterface
 
         $fix_expenses = null;
         $provisions = null;
-        $has_share_fix_expense = false;
-        $has_share_provision = false;
         $date = Carbon::parse($year . '-' . $month . '-01');
-        $shareUser = $this->shareUserRepository->getOne(['user_id' => $userId]);
 
         // Verificar se existem faturas ja criadas para o mes/ano do orçamento
         $credit_card_invoices = $this->creditCardInvoiceRepository->get(
@@ -127,6 +122,7 @@ class BudgetService implements BudgetServiceInterface
                         $expense->description,
                         $new_date->day($expense->due_date)->format('y-m-d'),
                         $expense->value,
+                        'MONTHLY',
                         $expense->remarks,
                         false,
                         $expense->share_value,
@@ -135,8 +131,6 @@ class BudgetService implements BudgetServiceInterface
                         $expense->tags
                     );
                 }
-
-                $has_share_fix_expense = $fix_expenses->whereNotNull('share_user_id')->count() > 0 ? true : false;
             }
         }
 
@@ -155,17 +149,6 @@ class BudgetService implements BudgetServiceInterface
                         $provision->share_user_id,
                         $provision->tags
                     );
-                }
-            }
-
-            $has_share_provision = $provisions->whereNotNull('share_user_id')->count() > 0 ? true : false;
-        }
-
-        if ($has_share_fix_expense || $has_share_provision) {
-            if ($shareUser) {
-                try {
-                    $this->create($shareUser->share_user_id, $year, $month);
-                } catch (Exception $e) {
                 }
             }
         }
@@ -214,6 +197,7 @@ class BudgetService implements BudgetServiceInterface
                                 $expense->description,
                                 $due_date,
                                 $expense->value,
+                                'MONTHLY',
                                 $expense->remarks,
                                 false,
                                 $expense->share_value,
@@ -242,14 +226,14 @@ class BudgetService implements BudgetServiceInterface
 
                 $this->budgetCalculate->recalculate($new_budget->id);
 
-                if ($has_share_fix_expense || $has_share_provision) {
-                    if ($shareUser) {
-                        try {
-                            $this->create($shareUser->share_user_id, $year, $new_date->month);
-                        } catch (Exception $e) {
-                        }
-                    }
-                }
+                // if ($has_share_fix_expense || $has_share_provision) {
+                //     if ($shareUser) {
+                //         try {
+                //             $this->create($shareUser->share_user_id, $year, $new_date->month);
+                //         } catch (Exception $e) {
+                //         }
+                //     }
+                // }
 
                 $new_date->addMonth();
             }
@@ -380,6 +364,7 @@ class BudgetService implements BudgetServiceInterface
                     $expense->description,
                     $expense->date,
                     $expense->value,
+                    $expense->group,
                     $expense->remarks,
                     $new_budget->id,
                     $expense->share_value,
@@ -499,5 +484,86 @@ class BudgetService implements BudgetServiceInterface
     {
         $data = $this->budgetShowData->dataShow($id);
         return $data;
+    }
+
+    /**
+     * Include in Budget all the Fix Expenses
+     * @param integer $id
+     * @return boolean
+     */
+    public function includeFixExpenses(int $id): bool
+    {
+        $budget = $this->budgetRepository->show($id);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $date = Carbon::parse($budget->year . '-' . $budget->month . '-01');
+
+        $fix_expenses = $this->fixExpenseRepository->get(['user_id' => $budget->user_id], [], [], ['tags']);
+
+        if (!$fix_expenses || !$fix_expenses->count()) {
+            throw new Exception('budget-show.all-fix-expenses-not-found');
+        }
+
+        if ($fix_expenses && $fix_expenses->count()) {
+            $new_date = $date->copy();
+
+            foreach ($fix_expenses as $expense) {
+                $this->budgetExpenseService->create(
+                    $budget->id,
+                    $expense->description,
+                    $new_date->day($expense->due_date)->format('y-m-d'),
+                    $expense->value,
+                    'MONTHLY',
+                    $expense->remarks,
+                    false,
+                    $expense->share_value,
+                    $expense->share_user_id,
+                    null,
+                    $expense->tags
+                );
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Include in Budget all the default Provisions
+     * @param integer $id
+     * @return boolean
+     */
+    public function includeProvisions(int $id): bool
+    {
+        $budget = $this->budgetRepository->show($id, ['provisions']);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $provisions = $this->provisionRepository->get(['user_id' => $budget->user_id], [], [], ['tags']);
+
+        if (!$provisions || !$provisions->count()) {
+            throw new Exception('budget-show.all-provision-not-found');
+        }
+
+        if ($provisions && $provisions->count()) {
+            foreach ($provisions as $provision) {
+                $this->budgetProvisionService->create(
+                    $budget->id,
+                    $provision->description,
+                    $provision->value,
+                    $provision->group,
+                    $provision->remarks,
+                    $provision->share_value,
+                    $provision->share_user_id,
+                    $provision->tags
+                );
+            }
+        }
+
+        return true;
     }
 }

@@ -32,6 +32,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
      * @param string $description
      * @param string $date
      * @param float $value
+     * @param string $group
      * @param string|null $remarks
      * @param bool|false $paid
      * @param float|null $shareValue
@@ -45,6 +46,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         string $description,
         string $date,
         float $value,
+        string $group,
         string $remarks = null,
         bool $paid = false,
         float $shareValue = null,
@@ -63,6 +65,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             'date' => $date,
             'value' => $value,
             'remarks' => $remarks,
+            'group' => $group,
             'paid' => $paid,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
@@ -100,6 +103,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
      * @param string $description
      * @param string $date
      * @param float $value
+     * @param string $group
      * @param string|null $remarks
      * @param bool|false $paid
      * @param float|null $shareValue
@@ -113,6 +117,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         string $description,
         string $date,
         float $value,
+        string $group,
         string $remarks = null,
         bool $paid = false,
         float $shareValue = null,
@@ -156,6 +161,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             'description' => $description,
             'date' => $date,
             'value' => $value,
+            'group' => $group,
             'remarks' => $remarks,
             'paid' => $paid,
             'share_value' => $shareValue,

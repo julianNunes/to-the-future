@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BudgetExpenseService;
-use App\Services\Interfaces\BudgetExpenseServiceInterface;
 use App\Services\Interfaces\BudgetGoalServiceInterface;
 use Illuminate\Http\Request;
 
@@ -23,18 +21,18 @@ class BudgetGoalController extends Controller
         $this->validate($request, [
             'description' => ['required'],
             'value' => ['required'],
-            'group' => ['required'],
-            'count_only_share' => ['required'],
+            'tags' => ['required'],
+            'count_share' => ['required'],
             'budget_id' => ['required'],
         ]);
 
         $this->budgetGoalService->create(
+            intval($request->budget_id),
             $request->description,
             floatval($request->value),
-            $request->group,
-            $request->count_only_share == 1 ? true : false,
-            intval($request->budget_id),
-            collect($request->tags)
+            collect($request->tags),
+            $request->count_share == 1 ? true : false,
+            $request->group
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -50,8 +48,8 @@ class BudgetGoalController extends Controller
         $this->validate($request, [
             'description' => ['required'],
             'value' => ['required'],
-            'group' => ['required'],
-            'count_only_share' => ['required'],
+            'tags' => ['required'],
+            'count_share' => ['required'],
             'budget_id' => ['required'],
         ]);
 
@@ -59,9 +57,9 @@ class BudgetGoalController extends Controller
             $id,
             $request->description,
             floatval($request->value),
-            $request->group,
-            $request->count_only_share == 1 ? true : false,
-            collect($request->tags)
+            collect($request->tags),
+            $request->count_share == 1 ? true : false,
+            $request->group
         );
 
         return redirect()->back()->with('success', 'default.sucess-update');

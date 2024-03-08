@@ -47,6 +47,7 @@
         "total": "Total",
         "portion-total": "Total Parcela",
         "tags": "Tags",
+        "tag": "Tag",
         "group": "Grupo",
         "in-installments": "Parcelado",
         "monthly": "Mensal",
@@ -55,6 +56,7 @@
         "week-2": "Semana 2",
         "week-3": "Semana 3",
         "week-4": "Semana 4",
+        "individual": "Avulsa",
         "share": "Compartilhar",
         "share-percentage": "Porcentagem Compartilhada",
         "share-value": "Valor Compartilhado",
@@ -65,7 +67,9 @@
         "closed": "Fechada",
         "credit-card": "Cartão de Crédito",
         "open": "Em aberto",
-        "paid": "Pago"
+        "paid": "Pago",
+        "data": "Dados",
+        "charts": "Graficos"
     },
     "rules": {
         "required-text-field": "E necessario preencher o campo",
@@ -192,7 +196,11 @@
         "title": "Visualização Orçamento",
         "my-budget": "Meu Orçamento",
         "include-fix-expense": "Incluir Despesas Fixas",
-        "include-provision": "Incluir Provisionamento"
+        "confirm-include-fix-expense": "Deseja realmente incluir todas as Despesas Fixas?",
+        "all-fix-expense-not-found": "Não foram encontrados Despesas Fixas para adicionar",
+        "include-provision": "Incluir Provisionamento",
+        "confirm-include-provision": "Deseja realmente incluir todos os Provisionamentos?",
+        "all-provision-not-found": "Não foram encontrados Provisionamentos para adicionar"
     },
     "budget-expense": {
         "title": "Despesas",
@@ -225,6 +233,7 @@
         "receive-share": "Receber do usuário compartilhado",
         "resume-credit-card": "Resumo dos cartões de credito",
         "total-portion": "Total Parcelado",
+        "total-provisions": "Total Provisionamento",
         "total-cash": "Total a vista",
         "total-week-1": "Total Semana 1",
         "total-week-2": "Total Semana 2",
@@ -233,5 +242,15 @@
     },
     "budget-expense-tags": {
         "title": "Despesas por Tag"
+    },
+    "budget-goal": {
+        "title": "Metas",
+        "new-item": "Nova Meta",
+        "edit-item": "Editar Meta",
+        "not-found": "Meta não encontrada",
+        "count-share": "Contabiliza Despesas Compartilhadas",
+        "limit-expenses": "Limite de Gastos",
+        "expenses": "Gastos",
+        "limit": "Limite"
     }
 }

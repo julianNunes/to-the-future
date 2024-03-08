@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class BudgetProvisionController extends Controller
 {
 
-    public function __construct(private BudgetProvisionServiceInterface $budgetProvisionSevice)
+    public function __construct(private BudgetProvisionServiceInterface $budgetProvisionService)
     {
     }
 
@@ -27,11 +27,11 @@ class BudgetProvisionController extends Controller
             'budget_id' => ['required'],
         ]);
 
-        $this->budgetProvisionSevice->create(
+        $this->budgetProvisionService->create(
             intval($request->budget_id),
             $request->description,
-            $request->date,
             floatval($request->value),
+            $request->group,
             $request->remarks,
             $request->share_value ? floatval($request->share_value) : null,
             $request->share_user_id,
@@ -54,11 +54,11 @@ class BudgetProvisionController extends Controller
             'group' => ['required'],
         ]);
 
-        $this->budgetProvisionSevice->update(
+        $this->budgetProvisionService->update(
             $id,
             $request->description,
-            $request->date,
             floatval($request->value),
+            $request->group,
             $request->remarks,
             intval($request->budget_id),
             $request->share_value ? floatval($request->share_value) : null,
@@ -75,7 +75,7 @@ class BudgetProvisionController extends Controller
      */
     public function delete(int $id)
     {
-        $this->budgetProvisionSevice->delete($id);
+        $this->budgetProvisionService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }
