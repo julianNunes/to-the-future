@@ -3,7 +3,10 @@ LISTA DE TAREFAS PENDENTES - TO DO
 ==================================================
 - Adicionar o "ConfirmDialog" nos lugares onde tem DELETE
 
+- Revisao do <script setup>"
 
+- Credit-card-invoice
+    - a coluna "Group" nao fica 100%
 
 - CRUD para "prepaid_card"
     - "prepaid_card_invoices"
@@ -14,8 +17,13 @@ LISTA DE TAREFAS PENDENTES - TO DO
         - o valor que sobrar da diferença do compartilhado entra como RECEITA para o dono do cartao
 
 
+- Fatura do cartão de credito
+    - Importar excel de despesas
+
+
 - CArtao de credito
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
+
 
 - Orçamento
     - TEstar novamente o "Create"
@@ -23,19 +31,16 @@ LISTA DE TAREFAS PENDENTES - TO DO
 
 - RETESTAR TUDO
 
+
 - Revisar todas as controllers e documentar corretamente
 
-- Mudar como os menu é montado e fazer ele agrupado
+- Mudar como os menu é montado e fazer ele agrupado e remover os icones
 
 - Alterar o formato das datas do timestamp do Laravel
     - verificar como deixar o created_at e o updated_at automaticos
 
 - Criar classe customizavel do Exception para poder devolver valores
 
-- Fatura do cartão de credito
-    - Importar excel de despesas
-    ? Upload do pdf da fatura
-    ? Botão para visualizar o arquivo pdf da fatura
 
 
 - CArtao de credito
@@ -49,13 +54,14 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - https://lokalise.com/blog/vue-i18n/
 
 
-- Credit-card-invoice
-    - a coluna "Group" nao fica 100%
+
 
 
 
 0ecea533
 
+=============================================================================================================
+TO-DO - PARTE 2
 =============================================================================================================
 
 In all my carrer i worked like a fullstack developer.

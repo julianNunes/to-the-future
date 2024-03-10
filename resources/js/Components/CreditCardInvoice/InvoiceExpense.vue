@@ -716,7 +716,7 @@ export default {
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
                 { title: this.$t('default.tags'), key: 'tags' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', width: '100', sortable: false },
+                { title: this.$t('default.action'), align: 'center', key: 'action', width: '100', sortable: false },
             ],
             headersDivision: [
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
@@ -725,7 +725,7 @@ export default {
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
                 { title: this.$t('default.tags'), key: 'tags' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', width: '100', sortable: false },
+                { title: this.$t('default.action'), align: 'center', key: 'action', width: '100', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],

@@ -241,7 +241,7 @@ export default {
                 { title: this.$t('default.group'), align: 'end', key: 'group' },
                 { title: this.$t('budget-goal.count-share'), key: 'count_share' },
                 { title: this.$t('default.tag'), key: 'tags' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],

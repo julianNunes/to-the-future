@@ -69,6 +69,14 @@ class BudgetService implements BudgetServiceInterface
      * @param integer $userId
      * @param string $year
      * @param string $month
+     * @param string|null $startWeek1
+     * @param string|null $endWeek1
+     * @param string|null $startWeek2
+     * @param string|null $endWeek2
+     * @param string|null $startWeek3
+     * @param string|null $endWeek3
+     * @param string|null $startWeek4
+     * @param string|null $endWeek4
      * @param boolean $automaticGenerateYear
      * @param boolean $includeFixExpense
      * @param boolean $includeProvision
@@ -78,6 +86,14 @@ class BudgetService implements BudgetServiceInterface
         int $userId,
         string $year,
         string $month,
+        string $startWeek1 = null,
+        string $endWeek1 = null,
+        string $startWeek2 = null,
+        string $endWeek2 = null,
+        string $startWeek3 = null,
+        string $endWeek3 = null,
+        string $startWeek4 = null,
+        string $endWeek4 = null,
         bool $automaticGenerateYear = false,
         bool $includeFixExpense = false,
         bool $includeProvision = false
@@ -85,7 +101,15 @@ class BudgetService implements BudgetServiceInterface
         $budget = $this->create(
             $userId,
             $year,
-            $month
+            $month,
+            $startWeek1,
+            $endWeek1,
+            $startWeek2,
+            $endWeek2,
+            $startWeek3,
+            $endWeek3,
+            $startWeek4,
+            $endWeek4
         );
 
         $fix_expenses = null;
@@ -249,12 +273,28 @@ class BudgetService implements BudgetServiceInterface
      * @param integer $userId
      * @param string $year
      * @param string $month
+     * @param string|null $startWeek1
+     * @param string|null $endWeek1
+     * @param string|null $startWeek2
+     * @param string|null $endWeek2
+     * @param string|null $startWeek3
+     * @param string|null $endWeek3
+     * @param string|null $startWeek4
+     * @param string|null $endWeek4
      * @return Budget
      */
     public function create(
         int $userId,
         string $year,
-        string $month
+        string $month,
+        string $startWeek1 = null,
+        string $endWeek1 = null,
+        string $startWeek2 = null,
+        string $endWeek2 = null,
+        string $startWeek3 = null,
+        string $endWeek3 = null,
+        string $startWeek4 = null,
+        string $endWeek4 = null
     ): Budget {
         $budget = $this->budgetRepository->getOne(['year' => $year, 'month' => $month, 'user_id' => $userId]);
 
@@ -265,7 +305,15 @@ class BudgetService implements BudgetServiceInterface
         return $this->budgetRepository->store([
             'year' => $year,
             'month' => $month,
-            'user_id' => $userId
+            'user_id' => $userId,
+            'start_week_1' => $startWeek1,
+            'end_week_1' => $endWeek1,
+            'start_week_2' => $startWeek2,
+            'end_week_2' => $endWeek2,
+            'start_week_3' => $startWeek3,
+            'end_week_3' => $endWeek3,
+            'start_week_4' => $startWeek4,
+            'end_week_4' => $endWeek4,
         ]);
     }
 
@@ -406,12 +454,28 @@ class BudgetService implements BudgetServiceInterface
     /**
      * Update a Budget
      * @param integer $id
+     * @param string|null $startWeek1
+     * @param string|null $endWeek1
+     * @param string|null $startWeek2
+     * @param string|null $endWeek2
+     * @param string|null $startWeek3
+     * @param string|null $endWeek3
+     * @param string|null $startWeek4
+     * @param string|null $endWeek4
      * @param boolean $closed
      * @return boolean
      */
     public function update(
         int $id,
-        bool $closed
+        string $startWeek1 = null,
+        string $endWeek1 = null,
+        string $startWeek2 = null,
+        string $endWeek2 = null,
+        string $startWeek3 = null,
+        string $endWeek3 = null,
+        string $startWeek4 = null,
+        string $endWeek4 = null,
+        bool $closed = false
     ): Budget {
         $budget = $this->budgetRepository->show($id);
 

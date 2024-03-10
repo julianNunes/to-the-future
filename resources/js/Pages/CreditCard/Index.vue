@@ -233,7 +233,7 @@ export default {
                 { title: this.$t('credit-card.due-date'), key: 'due_date' },
                 { title: this.$t('credit-card.closing-date'), key: 'closing_date' },
                 { title: this.$t('default.active'), key: 'is_active' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
@@ -345,10 +345,6 @@ export default {
             setTimeout(() => {
                 this.$refs.txtName.focus()
             })
-        },
-
-        closeItem() {
-            this.editDialog = false
         },
 
         async save() {

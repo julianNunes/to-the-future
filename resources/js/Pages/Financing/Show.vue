@@ -312,7 +312,7 @@ export default {
                 { title: this.$t('financing-installment.paid-value'), align: 'end', key: 'paid_value' },
                 { title: this.$t('financing-installment.payment-date'), align: 'center', key: 'payment_date' },
                 { title: 'Status', align: 'start', key: 'paid' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],

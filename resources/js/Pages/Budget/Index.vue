@@ -59,46 +59,79 @@
                             <template #[`item.closed`]="{ item }">{{
                                 item.closed ? $t('default.yes') : $t('default.no')
                             }}</template>
+                            <template #[`item.start_week_1`]="{ item }">{{
+                                item.start_week_1 ? moment(item.start_week_1).format('DD/MM/YYYY') : null
+                            }}</template>
+                            <template #[`item.end_week_1`]="{ item }">{{
+                                item.end_week_1 ? moment(item.end_week_1).format('DD/MM/YYYY') : null
+                            }}</template>
+                            <template #[`item.start_week_2`]="{ item }">{{
+                                item.start_week_2 ? moment(item.start_week_2).format('DD/MM/YYYY') : null
+                            }}</template>
+                            <template #[`item.end_week_2`]="{ item }">{{
+                                item.end_week_2 ? moment(item.end_week_2).format('DD/MM/YYYY') : null
+                            }}</template>
+                            <template #[`item.start_week_3`]="{ item }">{{
+                                item.start_week_3 ? moment(item.start_week_3).format('DD/MM/YYYY') : null
+                            }}</template>
+                            <template #[`item.end_week_3`]="{ item }">{{
+                                item.end_week_3 ? moment(item.end_week_3).format('DD/MM/YYYY') : null
+                            }}</template>
+                            <template #[`item.start_week_4`]="{ item }">{{
+                                item.start_week_4 ? moment(item.start_week_4).format('DD/MM/YYYY') : null
+                            }}</template>
+                            <template #[`item.end_week_4`]="{ item }">{{
+                                item.end_week_4 ? moment(item.end_week_4).format('DD/MM/YYYY') : null
+                            }}</template>
                             <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('default.show')" location="top">
-                                    <template #activator="{ props }">
-                                        <Link :href="hrefBudgetShow(item)" class="v-breadcrumbs-item--link">
+                                <div style="width: 90px">
+                                    <v-tooltip :text="$t('default.show')" location="top">
+                                        <template #activator="{ props }">
+                                            <Link :href="hrefBudgetShow(item)" class="v-breadcrumbs-item--link">
+                                                <v-icon v-bind="props" color="light-blue" icon="mdi-eye" size="small">
+                                                </v-icon>
+                                            </Link>
+                                        </template>
+                                    </v-tooltip>
+                                    <v-tooltip :text="$t('default.edit')" location="top">
+                                        <template #activator="{ props }">
                                             <v-icon
                                                 v-bind="props"
-                                                color="light-blue"
-                                                icon="mdi-eye"
+                                                color="warning"
+                                                icon="mdi-pencil"
                                                 size="small"
-                                                class="me-2"
+                                                class="ml-1"
+                                                @click="editItem(item)"
                                             >
                                             </v-icon>
-                                        </Link>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('budget.clone')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            color="green"
-                                            icon="mdi-content-copy"
-                                            size="small"
-                                            class="ml-1"
-                                            @click="cloneItem(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('default.delete')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            class="ml-1"
-                                            color="error"
-                                            icon="mdi-delete"
-                                            size="small"
-                                            @click="openDelete(item)"
-                                        ></v-icon>
-                                    </template>
-                                </v-tooltip>
+                                        </template>
+                                    </v-tooltip>
+                                    <v-tooltip :text="$t('budget.clone')" location="top">
+                                        <template #activator="{ props }">
+                                            <v-icon
+                                                v-bind="props"
+                                                color="green"
+                                                icon="mdi-content-copy"
+                                                size="small"
+                                                class="ml-1"
+                                                @click="cloneItem(item)"
+                                            >
+                                            </v-icon>
+                                        </template>
+                                    </v-tooltip>
+                                    <v-tooltip :text="$t('default.delete')" location="top">
+                                        <template #activator="{ props }">
+                                            <v-icon
+                                                v-bind="props"
+                                                class="ml-1"
+                                                color="error"
+                                                icon="mdi-delete"
+                                                size="small"
+                                                @click="openDelete(item)"
+                                            ></v-icon>
+                                        </template>
+                                    </v-tooltip>
+                                </div>
                             </template>
 
                             <template #top>
@@ -135,8 +168,9 @@
                         <v-row dense>
                             <v-col cols="12" md="4">
                                 <v-text-field
+                                    v-show="!budget.id"
                                     ref="selectMonthYear"
-                                    v-model="createBudget.yearMonth"
+                                    v-model="budget.yearMonth"
                                     type="month"
                                     :label="$t('default.year-month')"
                                     clearable
@@ -144,23 +178,165 @@
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" md="12">
+                            <v-col offset="8" />
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    ref="txtStartWeek1"
+                                    v-model="budget.start_week_1"
+                                    type="date"
+                                    :label="$t('budget.start_week_1')"
+                                    required
+                                    :rules="[
+                                        (value) => {
+                                            if (budget.end_week_1) {
+                                                if (!value) return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                    @change="budget.end_week_1 = budget.start_week_1"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="budget.end_week_1"
+                                    type="date"
+                                    :label="$t('budget.end_week_1')"
+                                    required
+                                    :rules="[
+                                        (value) => {
+                                            if (budget.start_week_1) {
+                                                if (!value) return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="budget.start_week_2"
+                                    type="date"
+                                    :label="$t('budget.start_week_2')"
+                                    required
+                                    :rules="[
+                                        (value) => {
+                                            if (budget.end_week_2) {
+                                                if (!value) return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                    @change="budget.end_week_2 = budget.start_week_2"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="budget.end_week_2"
+                                    type="date"
+                                    :label="$t('budget.end_week_2')"
+                                    required
+                                    :rules="[
+                                        (value) => {
+                                            if (budget.start_week_2) {
+                                                if (!value) return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="budget.start_week_3"
+                                    type="date"
+                                    :label="$t('budget.start_week_3')"
+                                    required
+                                    :rules="[
+                                        (value) => {
+                                            if (budget.end_week_3) {
+                                                if (!value) return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                    @change="budget.end_week_3 = budget.start_week_3"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="budget.end_week_3"
+                                    type="date"
+                                    :label="$t('budget.end_week_3')"
+                                    required
+                                    :rules="[
+                                        (value) => {
+                                            if (budget.start_week_3) {
+                                                if (!value) return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="budget.start_week_4"
+                                    type="date"
+                                    :label="$t('budget.start_week_4')"
+                                    required
+                                    :rules="[
+                                        (value) => {
+                                            if (budget.end_week_4) {
+                                                if (!value) return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                    @change="budget.end_week_4 = budget.start_week_4"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                    v-model="budget.end_week_4"
+                                    type="date"
+                                    :label="$t('budget.end_week_4')"
+                                    required
+                                    :rules="[
+                                        (value) => {
+                                            if (budget.start_week_4) {
+                                                if (!value) return $t('rules.required-text-field')
+                                            }
+                                            return true
+                                        },
+                                    ]"
+                                    density="comfortable"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col v-show="!budget.id" cols="12" md="12">
                                 <v-checkbox
-                                    v-model="createBudget.automaticGenerateYear"
+                                    v-model="budget.automaticGenerateYear"
                                     :label="$t('budget.automatic-generate')"
                                     density="comfortable"
                                 ></v-checkbox>
                             </v-col>
-                            <v-col cols="12" md="12">
+                            <v-col v-show="!budget.id" cols="12" md="12">
                                 <v-checkbox
-                                    v-model="createBudget.includeFixExpense"
+                                    v-model="budget.includeFixExpenses"
                                     :label="$t('budget.include-fix-expense')"
                                     density="comfortable"
                                 ></v-checkbox>
                             </v-col>
-                            <v-col cols="12" md="12">
+                            <v-col v-show="!budget.id" cols="12" md="12">
                                 <v-checkbox
-                                    v-model="createBudget.includeProvision"
+                                    v-model="budget.includeProvisions"
                                     :label="$t('budget.include-provision')"
                                     density="comfortable"
                                 ></v-checkbox>
@@ -173,7 +349,7 @@
                     <v-btn color="error" flat :loading="isLoading" @click="createDialog = false">
                         {{ $t('default.cancel') }}
                     </v-btn>
-                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="create">
+                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
                         {{ $t('default.save') }}
                     </v-btn>
                 </v-card-actions>
@@ -192,7 +368,7 @@
                             <v-col cols="12" md="4">
                                 <v-text-field
                                     ref="selectMonthYearClone"
-                                    v-model="createBudget.yearMonth"
+                                    v-model="cloneBudget.yearMonth"
                                     type="month"
                                     :label="$t('budget.year-month')"
                                     clearable
@@ -202,8 +378,26 @@
                             </v-col>
                             <v-col cols="12" md="12">
                                 <v-checkbox
-                                    v-model="createBudget.automaticGenerate"
-                                    :label="$t('budget.automatic-generate')"
+                                    v-model="cloneBudget.includeProvisions"
+                                    :label="$t('budget.include-provision')"
+                                ></v-checkbox>
+                            </v-col>
+                            <v-col cols="12" md="12">
+                                <v-checkbox
+                                    v-model="cloneBudget.cloneBugdetExpenses"
+                                    :label="$t('budget.clone-expense')"
+                                ></v-checkbox>
+                            </v-col>
+                            <v-col cols="12" md="12">
+                                <v-checkbox
+                                    v-model="cloneBudget.cloneBugdetIncomes"
+                                    :label="$t('budget.clone-income')"
+                                ></v-checkbox>
+                            </v-col>
+                            <v-col cols="12" md="12">
+                                <v-checkbox
+                                    v-model="cloneBudget.cloneBugdetGoals"
+                                    :label="$t('budget.clone-goals')"
                                 ></v-checkbox>
                             </v-col>
                         </v-row>
@@ -246,6 +440,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import { currencyField } from '../../utils/utils.js'
+import moment from 'moment'
 </script>
 
 <script>
@@ -277,8 +472,16 @@ export default {
                 { title: this.$t('default.year-month'), key: 'year_month' },
                 { title: this.$t('budget.total-expense'), key: 'total_expense', align: 'end' },
                 { title: this.$t('budget.total-income'), key: 'total_income', align: 'end' },
-                { title: this.$t('default.closed'), key: 'closed' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
+                // { title: this.$t('default.closed'), key: 'closed', align: 'center' },
+                { title: this.$t('budget.start_week_1'), key: 'start_week_1', align: 'center' },
+                { title: this.$t('budget.end_week_1'), key: 'end_week_1', align: 'center' },
+                { title: this.$t('budget.start_week_2'), key: 'start_week_2', align: 'center' },
+                { title: this.$t('budget.end_week_2'), key: 'end_week_2', align: 'center' },
+                { title: this.$t('budget.start_week_3'), key: 'start_week_3', align: 'center' },
+                { title: this.$t('budget.end_week_3'), key: 'end_week_3', align: 'center' },
+                { title: this.$t('budget.start_week_4'), key: 'start_week_4', align: 'center' },
+                { title: this.$t('budget.end_week_4'), key: 'end_week_4', align: 'center' },
+                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
@@ -289,18 +492,26 @@ export default {
             removeDialog: false,
             isLoading: false,
             deleteId: null,
-            createBudget: {
+            budget: {
                 yearMonth: null,
+                start_week_1: null,
+                end_week_1: null,
+                start_week_2: null,
+                end_week_2: null,
+                start_week_3: null,
+                end_week_3: null,
+                start_week_4: null,
+                end_week_4: null,
                 automaticGenerateYear: false,
-                includeFixExpense: false,
-                includeProvision: false,
+                includeFixExpenses: false,
+                includeProvisions: false,
             },
             cloneBudget: {
                 id: null,
                 yearMonth: null,
-                includeProvision: false,
-                cloneBugdetExpense: false,
-                cloneBugdetIncome: false,
+                includeProvisions: false,
+                cloneBugdetExpenses: false,
+                cloneBugdetIncomes: false,
                 cloneBugdetGoals: false,
             },
         }
@@ -328,40 +539,108 @@ export default {
         newItem() {
             this.titleModal = this.$t('budget.new-item')
             this.createDialog = true
-            this.createBudget = {
+            this.budget = {
                 yearMonth: null,
+                start_week_1: null,
+                end_week_1: null,
+                start_week_2: null,
+                end_week_2: null,
+                start_week_3: null,
+                end_week_3: null,
+                start_week_4: null,
+                end_week_4: null,
                 automaticGenerateYear: false,
-                includeFixExpense: false,
-                includeProvision: false,
+                includeFixExpenses: false,
+                includeProvisions: false,
             }
             setTimeout(() => {
                 this.$refs.selectMonthYear.focus()
             })
         },
 
-        async create() {
+        editItem(item) {
+            this.titleModal = this.$t('budget.edit-item')
+            this.createDialog = true
+            this.budget = {
+                id: item.id,
+                start_week_1: item.start_week_1,
+                end_week_1: item.end_week_1,
+                start_week_2: item.start_week_2,
+                end_week_2: item.end_week_2,
+                start_week_3: item.start_week_3,
+                end_week_3: item.end_week_3,
+                start_week_4: item.start_week_4,
+                end_week_4: item.end_week_4,
+            }
+            setTimeout(() => {
+                this.$refs.txtStartWeek1.focus()
+            })
+        },
+
+        async save() {
             let validate = await this.$refs.formCreate.validate()
             if (validate.valid) {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/budget',
-                    {
-                        year: this.createBudget.yearMonth.substring(0, 4),
-                        month: this.createBudget.yearMonth.substring(5, 7),
-                        automaticGenerateYear: this.createBudget.automaticGenerateYear,
-                        includeFixExpense: this.createBudget.includeFixExpense,
-                        includeProvision: this.createBudget.includeProvision,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.createDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
+                if (this.budget.id) {
+                    await this.update()
+                } else {
+                    await this.create()
+                }
             }
+        },
+
+        async create() {
+            this.isLoading = true
+            this.$inertia.post(
+                '/budget',
+                {
+                    year: this.budget.yearMonth.substring(0, 4),
+                    month: this.budget.yearMonth.substring(5, 7),
+                    start_week_1: this.budget.start_week_1,
+                    end_week_1: this.budget.end_week_1,
+                    start_week_2: this.budget.start_week_2,
+                    end_week_2: this.budget.end_week_2,
+                    start_week_3: this.budget.start_week_3,
+                    end_week_3: this.budget.end_week_3,
+                    start_week_4: this.budget.start_week_4,
+                    end_week_4: this.budget.end_week_4,
+                    automaticGenerateYear: this.budget.automaticGenerateYear,
+                    includeFixExpenses: this.budget.includeFixExpenses,
+                    includeProvisions: this.budget.includeProvisions,
+                },
+                {
+                    onSuccess: () => {
+                        this.createDialog = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
+        },
+
+        async update() {
+            this.isLoading = true
+            this.$inertia.put(
+                '/budget/' + this.budget.id,
+                {
+                    start_week_1: this.budget.start_week_1,
+                    end_week_1: this.budget.end_week_1,
+                    start_week_2: this.budget.start_week_2,
+                    end_week_2: this.budget.end_week_2,
+                    start_week_3: this.budget.start_week_3,
+                    end_week_3: this.budget.end_week_3,
+                    start_week_4: this.budget.start_week_4,
+                    end_week_4: this.budget.end_week_4,
+                },
+                {
+                    onSuccess: () => {
+                        this.editDialog = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
         },
 
         cloneItem(item) {
@@ -370,9 +649,9 @@ export default {
             this.cloneBudget = {
                 id: item.id,
                 yearMonth: null,
-                includeProvision: false,
-                cloneBugdetExpense: false,
-                cloneBugdetIncome: false,
+                includeProvisions: false,
+                cloneBugdetExpenses: false,
+                cloneBugdetIncomes: false,
                 cloneBugdetGoals: false,
             }
             setTimeout(() => {
@@ -387,12 +666,12 @@ export default {
                 this.$inertia.put(
                     '/budget/' + this.budget.id + '/clone',
                     {
-                        year: this.createBudget.yearMonth.substring(0, 4),
-                        month: this.createBudget.yearMonth.substring(5, 7),
-                        includeProvision: this.createBudget.includeProvision,
-                        cloneBugdetExpense: this.createBudget.cloneBugdetExpense,
-                        cloneBugdetIncome: this.createBudget.cloneBugdetIncome,
-                        cloneBugdetGoals: this.createBudget.cloneBugdetGoals,
+                        year: this.cloneBudget.yearMonth.substring(0, 4),
+                        month: this.cloneBudget.yearMonth.substring(5, 7),
+                        includeProvisions: this.cloneBudget.includeProvisions,
+                        cloneBugdetExpenses: this.cloneBudget.cloneBugdetExpenses,
+                        cloneBugdetIncomes: this.cloneBudget.cloneBugdetIncomes,
+                        cloneBugdetGoals: this.cloneBudget.cloneBugdetGoals,
                     },
                     {
                         onSuccess: () => {

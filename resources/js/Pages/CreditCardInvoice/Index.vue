@@ -261,7 +261,7 @@ export default {
                 { title: this.$t('default.total-paid'), key: 'total_paid' },
                 { title: this.$t('credit-card-invoice.closed'), key: 'closed' },
                 // { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],

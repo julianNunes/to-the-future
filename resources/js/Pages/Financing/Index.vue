@@ -264,7 +264,7 @@ export default {
                 { title: this.$t('financing.portion-total'), align: 'end', key: 'portion_total' },
                 { title: this.$t('default.total'), align: 'end', key: 'total' },
                 { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.action'), align: 'end', key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],

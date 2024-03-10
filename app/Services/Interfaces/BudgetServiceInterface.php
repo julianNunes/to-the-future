@@ -14,11 +14,20 @@ interface BudgetServiceInterface
      */
     public function index(string $year): array;
 
+
     /**
      * Create Budget with your relations
      * @param integer $userId
      * @param string $year
      * @param string $month
+     * @param string|null $startWeek1
+     * @param string|null $endWeek1
+     * @param string|null $startWeek2
+     * @param string|null $endWeek2
+     * @param string|null $startWeek3
+     * @param string|null $endWeek3
+     * @param string|null $startWeek4
+     * @param string|null $endWeek4
      * @param boolean $automaticGenerateYear
      * @param boolean $includeFixExpense
      * @param boolean $includeProvision
@@ -28,6 +37,14 @@ interface BudgetServiceInterface
         int $userId,
         string $year,
         string $month,
+        string $startWeek1 = null,
+        string $endWeek1 = null,
+        string $startWeek2 = null,
+        string $endWeek2 = null,
+        string $startWeek3 = null,
+        string $endWeek3 = null,
+        string $startWeek4 = null,
+        string $endWeek4 = null,
         bool $automaticGenerateYear = false,
         bool $includeFixExpense = false,
         bool $includeProvision = false
@@ -38,12 +55,28 @@ interface BudgetServiceInterface
      * @param integer $userId
      * @param string $year
      * @param string $month
+     * @param string|null $startWeek1
+     * @param string|null $endWeek1
+     * @param string|null $startWeek2
+     * @param string|null $endWeek2
+     * @param string|null $startWeek3
+     * @param string|null $endWeek3
+     * @param string|null $startWeek4
+     * @param string|null $endWeek4
      * @return Budget
      */
     public function create(
         int $userId,
         string $year,
-        string $month
+        string $month,
+        string $startWeek1 = null,
+        string $endWeek1 = null,
+        string $startWeek2 = null,
+        string $endWeek2 = null,
+        string $startWeek3 = null,
+        string $endWeek3 = null,
+        string $startWeek4 = null,
+        string $endWeek4 = null
     ): Budget;
 
     /**
@@ -70,12 +103,28 @@ interface BudgetServiceInterface
     /**
      * Update a Budget
      * @param integer $id
+     * @param string|null $startWeek1
+     * @param string|null $endWeek1
+     * @param string|null $startWeek2
+     * @param string|null $endWeek2
+     * @param string|null $startWeek3
+     * @param string|null $endWeek3
+     * @param string|null $startWeek4
+     * @param string|null $endWeek4
      * @param boolean $closed
      * @return boolean
      */
     public function update(
         int $id,
-        bool $closed
+        string $startWeek1 = null,
+        string $endWeek1 = null,
+        string $startWeek2 = null,
+        string $endWeek2 = null,
+        string $startWeek3 = null,
+        string $endWeek3 = null,
+        string $startWeek4 = null,
+        string $endWeek4 = null,
+        bool $closed = false
     ): Budget;
 
     /**

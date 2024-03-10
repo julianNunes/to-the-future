@@ -36,9 +36,17 @@ class BudgetController extends Controller
             auth()->user()->id,
             $request->year,
             $request->month,
+            $request->start_week_1,
+            $request->end_week_1,
+            $request->start_week_2,
+            $request->end_week_2,
+            $request->start_week_3,
+            $request->end_week_3,
+            $request->start_week_4,
+            $request->end_week_4,
             $request->automaticGenerateYear,
-            $request->includeFixExpense,
-            $request->includeProvision
+            $request->includeFixExpenses,
+            $request->includeProvisions
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -59,9 +67,9 @@ class BudgetController extends Controller
             $id,
             $request->year,
             $request->month,
-            $request->includeProvision,
-            $request->cloneBugdetExpense,
-            $request->cloneBugdetIncome,
+            $request->includeProvisions,
+            $request->cloneBugdetExpenses,
+            $request->cloneBugdetIncomes,
             $request->cloneBugdetGoals
         );
 
@@ -74,11 +82,19 @@ class BudgetController extends Controller
     public function update(Request $request, int $id)
     {
         $this->validate($request, [
-            'closed' => ['closed'],
+            // 'closed' => ['closed'],
         ]);
 
         $this->budgetService->update(
             $id,
+            $request->start_week_1,
+            $request->end_week_1,
+            $request->start_week_2,
+            $request->end_week_2,
+            $request->start_week_3,
+            $request->end_week_3,
+            $request->start_week_4,
+            $request->end_week_4,
             $request->closed
         );
         return redirect()->back()->with('success', 'default.sucess-update');

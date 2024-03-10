@@ -159,7 +159,7 @@ export default {
         return {
             headers: [
                 { title: this.$t('default.name'), align: 'start', key: 'name', groupable: false },
-                { title: this.$t('default.action'), align: 'end', width: '100', key: 'action', sortable: false },
+                { title: this.$t('default.action'), align: 'center', width: '100', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
