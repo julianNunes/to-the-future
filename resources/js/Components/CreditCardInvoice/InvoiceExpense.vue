@@ -150,7 +150,7 @@
                                             icon="mdi-delete"
                                             size="small"
                                             :disabled="viewOnly"
-                                            @click="openDelete(item)"
+                                            @click="confirmDelete(item)"
                                         >
                                         </v-icon>
                                     </template>
@@ -1040,7 +1040,7 @@ export default {
             )
         },
 
-        openDelete(item) {
+        async confirmDelete(item) {
             this.deleteId = item.id
             this.deleteAllPortions = false
             this.expense = item

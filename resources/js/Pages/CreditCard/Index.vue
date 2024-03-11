@@ -72,7 +72,7 @@
                                             color="error"
                                             icon="mdi-delete"
                                             size="small"
-                                            @click="openDelete(item)"
+                                            @click="confirmDelete(item)"
                                         >
                                         </v-icon>
                                     </template>
@@ -179,23 +179,7 @@
             </v-card>
         </v-dialog>
 
-        <!-- Dialog delete -->
-        <v-row justify="center">
-            <v-dialog v-model="removeDialog" persistent width="auto">
-                <v-card>
-                    <v-card-text>{{ $t('default.confirm-delete-item') }}</v-card-text>
-                    <v-card-actions>
-                        <v-spacer />
-                        <v-btn color="error" elevated :loading="isLoading" @click="removeDialog = false">
-                            {{ $t('default.cancel') }}</v-btn
-                        >
-                        <v-btn color="primary" elevated :loading="isLoading" text @click="remove()">
-                            {{ $t('default.delete') }}</v-btn
-                        >
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-        </v-row>
+        <ConfirmDialog ref="confirm" />
     </AuthenticatedLayout>
 </template>
 
@@ -249,7 +233,6 @@ export default {
             },
             search: null,
             editDialog: false,
-            removeDialog: false,
             isLoading: false,
             deleteId: null,
             creditCard: {
@@ -402,9 +385,11 @@ export default {
             )
         },
 
-        openDelete(item) {
+        async confirmDelete(item) {
             this.deleteId = item.id
-            this.removeDialog = true
+            if (await this.$refs.confirm.open(this.$t('credit-card.item'), this.$t('default.confirm-delete-item'))) {
+                this.remove()
+            }
         },
 
         remove() {
@@ -412,10 +397,7 @@ export default {
             this.$inertia.delete(`/credit-card/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
-                onSuccess: () => {
-                    this.removeDialog = false
-                    this.editDialog = false
-                },
+                onSuccess: () => {},
                 onError: () => {
                     this.isLoading = false
                 },

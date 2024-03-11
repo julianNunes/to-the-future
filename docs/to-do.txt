@@ -3,6 +3,15 @@ LISTA DE TAREFAS PENDENTES - TO DO
 ==================================================
 - Adicionar o "ConfirmDialog" nos lugares onde tem DELETE
 
+
+
+        async confirmDelete(item) {
+            this.deleteId = item.id
+            if (await this.$refs.confirm.open(this.$t('.item'), this.$t('default.confirm-delete-item'))) {
+                this.remove()
+            }
+        },
+
 - Revisao do <script setup>"
 
 - Credit-card-invoice

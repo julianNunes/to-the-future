@@ -90,12 +90,14 @@
         "title": "Provisionamentos Padrão",
         "new-item": "Novo Provisionamento",
         "edit-item": "Editar Provisionamento",
+        "item": "Provisionamento",
         "not-found": "Provisionamento não encontrado"
     },
     "tag": {
         "title": "Gerenciamento de Tags",
         "new-item": "Nova Tag",
         "edit-item": "Editar Tag",
+        "item": "Tag",
         "not-found": "Tag não encontrado",
         "already-exists": "Tag já existe"
     },
@@ -103,6 +105,7 @@
         "title": "Gerenciamento de Cartões de Crédito",
         "new-item": "Novo Cartão de Credito",
         "edit-item": "Editar Cartão de Crédito",
+        "item": "Cartão de Credito",
         "not-found": "Cartão de Crédito não encontrado",
         "already-exists": "Cartão de Crédito já existe",
         "digits": "Digitos",
@@ -154,6 +157,7 @@
         "title": "Gerenciamento de Financiamentos",
         "new-item": "Nova Financiamento",
         "edit-item": "Editar Financiamento",
+        "item": "Financiamento",
         "not-found": "Financiamento não encontrado",
         "installments-show": "Ver Parcelas",
         "start-date": "Data de Início",
@@ -175,6 +179,7 @@
         "title": "Gerenciamento de Despesas Fixas",
         "new-item": "Nova Despesa Fixa",
         "edit-item": "Editar Despesa Fixa",
+        "item": "Despesa Fixa",
         "not-found": "Despesa Fixa não encontrada",
         "due-date": "Dia de Vencimento"
     },
@@ -182,6 +187,7 @@
         "title": "Gerenciamento de Orçamentos",
         "new-item": "Novo Orçamento",
         "edit-item": "Editar Orçamento",
+        "budget": "Orçamento",
         "clone": "Clonar",
         "automatic-generate": "Deseja gerar os Orçamentos para os proximos meses subsequentes do ano?",
         "include-fix-expense": "Incluir Despesas Fixas?",
@@ -220,6 +226,7 @@
     },
     "budget-expense": {
         "title": "Despesas",
+        "budget-expense": "Despesa",
         "finaning-installment": "Parcela Financimaneto",
         "due-date": "Vencimento",
         "new-item": "Nova Despesa do Orçamento",
@@ -228,6 +235,7 @@
     },
     "budget-income": {
         "title": "Receitas",
+        "item": "Receita",
         "date": "Recebimento",
         "new-item": "Nova Receita do Orçamento",
         "edit-item": "Editar Receita do Orçamento",
@@ -235,6 +243,7 @@
     },
     "budget-provision": {
         "title": "Provisionamentos",
+        "item": "Provisionamento",
         "date": "Recebimento",
         "new-item": "Novo Provisionamento do Orçamento",
         "edit-item": "Editar Provisionamento do Orçamento",
@@ -261,6 +270,7 @@
     },
     "budget-goal": {
         "title": "Metas",
+        "item": "Meta",
         "new-item": "Nova Meta",
         "edit-item": "Editar Meta",
         "not-found": "Meta não encontrada",
