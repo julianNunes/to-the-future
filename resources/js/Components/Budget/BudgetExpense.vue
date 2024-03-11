@@ -327,6 +327,7 @@ export default {
         },
         expenses: {
             type: Array,
+            default: new Array(),
         },
         shareUsers: {
             type: Array,

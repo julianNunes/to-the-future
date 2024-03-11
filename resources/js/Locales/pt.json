@@ -205,7 +205,8 @@
         "period_week_1": "Periodo Semana 1",
         "period_week_2": "Periodo Semana 2",
         "period_week_3": "Periodo Semana 3",
-        "period_week_4": "Periodo Semana 4"
+        "period_week_4": "Periodo Semana 4",
+        "range-week": "{start} até {end}"
     },
     "budget-show" : {
         "title": "Visualização Orçamento",

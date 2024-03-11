@@ -29,6 +29,38 @@
                     }}</v-btn>
                 </v-col>
                 <v-col md="3" class="mt-2"> </v-col>
+                <v-col cols="3" sm="3" md="3">
+                    <v-text-field
+                        v-model="budgetWeek1"
+                        :label="$t('default.week-1')"
+                        density="comfortable"
+                        :readonly="true"
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="3" sm="3" md="3">
+                    <v-text-field
+                        v-model="budgetWeek2"
+                        :label="$t('default.week-2')"
+                        density="comfortable"
+                        :readonly="true"
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="3" sm="3" md="3">
+                    <v-text-field
+                        v-model="budgetWeek3"
+                        :label="$t('default.week-3')"
+                        density="comfortable"
+                        :readonly="true"
+                    ></v-text-field>
+                </v-col>
+                <v-col cols="3" sm="3" md="3">
+                    <v-text-field
+                        v-model="budgetWeek4"
+                        :label="$t('default.week-4')"
+                        density="comfortable"
+                        :readonly="true"
+                    ></v-text-field>
+                </v-col>
             </v-row>
         </v-card>
 
@@ -62,23 +94,20 @@
                         :share-users="shareUsers"
                         :title-card="true"
                         :year-month="yearMonthModel"
+                        :budget-weeks="budgetWeeks"
                     />
                     <BudgetProvision
                         :budget-id="budgetId"
                         :year-month="yearMonthModel"
                         :provisions="budgetProvisions"
                         :share-users="shareUsers"
+                        :budget-weeks="budgetWeeks"
                     />
                 </v-window-item>
-                <v-window-item v-if="shareUser" value="two">
+                <v-window-item v-if="shareUser && budgetShareId" value="two">
                     <BudgetResume :resume="budgetShareResume" />
                     <BudgetExpenseTags :expense-to-tags="budgetShareExpanseToTags" />
-                    <BudgetGoal
-                        :budget-id="budgetId"
-                        :goals="budgetShareGoals"
-                        :goals-charts="budgetShareGoalsCharts"
-                        :view-only="true"
-                    />
+                    <BudgetGoal :goals="budgetShareGoals" :goals-charts="budgetShareGoalsCharts" :view-only="true" />
                     <BudgetExpense :expenses="budgetShareExpenses" :view-only="true" />
                     <BudgetIncome :year-month="yearMonthModel" :incomes="budgetShareIncomes" :view-only="true" />
                     <InvoiceExpense
@@ -86,12 +115,14 @@
                         :key="invoice.id"
                         :invoice="invoice"
                         :share-users="shareUsers"
+                        :budget-weeks="budgetShareWeeks"
                         :title-card="true"
                         :view-only="true"
                     />
                     <BudgetProvision
                         :year-month="yearMonthModel"
                         :provisions="budgetShareProvisions"
+                        :budget-weeks="budgetShareWeeks"
                         :view-only="true"
                     />
                 </v-window-item>
@@ -183,6 +214,91 @@ export default {
         budgetId() {
             return this.owner.budget.id
         },
+        budgetWeeks() {
+            let weeks = []
+
+            if (this.owner.budget.start_week_1 && this.owner.budget.end_week_1) {
+                weeks.push({
+                    text: this.$t('budget.range-week', {
+                        start: moment(this.owner.budget.start_week_1).format('DD/MM/YYYY'),
+                        end: moment(this.owner.budget.end_week_1).format('DD/MM/YYYY'),
+                    }),
+                    value: 'WEEK_1',
+                })
+            }
+
+            if (this.owner.budget.start_week_2 && this.owner.budget.end_week_2) {
+                weeks.push({
+                    text: this.$t('budget.range-week', {
+                        start: moment(this.owner.budget.start_week_2).format('DD/MM/YYYY'),
+                        end: moment(this.owner.budget.end_week_2).format('DD/MM/YYYY'),
+                    }),
+                    value: 'WEEK_2',
+                })
+            }
+
+            if (this.owner.budget.start_week_3 && this.owner.budget.end_week_3) {
+                weeks.push({
+                    text: this.$t('budget.range-week', {
+                        start: moment(this.owner.budget.start_week_3).format('DD/MM/YYYY'),
+                        end: moment(this.owner.budget.end_week_3).format('DD/MM/YYYY'),
+                    }),
+                    value: 'WEEK_3',
+                })
+            }
+
+            if (this.owner.budget.start_week_4 && this.owner.budget.end_week_4) {
+                weeks.push({
+                    text: this.$t('budget.range-week', {
+                        start: moment(this.owner.budget.start_week_4).format('DD/MM/YYYY'),
+                        end: moment(this.owner.budget.end_week_4).format('DD/MM/YYYY'),
+                    }),
+                    value: 'WEEK_4',
+                })
+            }
+
+            return weeks
+        },
+        budgetWeek1() {
+            if (this.owner.budget.start_week_1 && this.owner.budget.end_week_1) {
+                return this.$t('budget.range-week', {
+                    start: moment(this.owner.budget.start_week_1).format('DD/MM/YYYY'),
+                    end: moment(this.owner.budget.end_week_1).format('DD/MM/YYYY'),
+                })
+            }
+
+            return null
+        },
+        budgetWeek2() {
+            if (this.owner.budget.start_week_2 && this.owner.budget.end_week_2) {
+                return this.$t('budget.range-week', {
+                    start: moment(this.owner.budget.start_week_2).format('DD/MM/YYYY'),
+                    end: moment(this.owner.budget.end_week_2).format('DD/MM/YYYY'),
+                })
+            }
+
+            return null
+        },
+        budgetWeek3() {
+            if (this.owner.budget.start_week_3 && this.owner.budget.end_week_3) {
+                return this.$t('budget.range-week', {
+                    start: moment(this.owner.budget.start_week_3).format('DD/MM/YYYY'),
+                    end: moment(this.owner.budget.end_week_3).format('DD/MM/YYYY'),
+                })
+            }
+
+            return null
+        },
+        budgetWeek4() {
+            if (this.owner.budget.start_week_4 && this.owner.budget.end_week_4) {
+                return this.$t('budget.range-week', {
+                    start: moment(this.owner.budget.start_week_4).format('DD/MM/YYYY'),
+                    end: moment(this.owner.budget.end_week_4).format('DD/MM/YYYY'),
+                })
+            }
+
+            return null
+        },
         budgetResume() {
             return this.owner.resume
         },
@@ -207,6 +323,55 @@ export default {
         budgetGoalsCharts() {
             return this.owner.goalsCharts
         },
+        budgetShareId() {
+            return this.share.budget?.id
+        },
+        // Para usuario compartilhado
+        budgetShareWeeks() {
+            let weeks = []
+
+            if (this.share.budget?.start_week_1 && this.share.budget?.end_week_1) {
+                weeks.push({
+                    text: this.$t('budget.range-week', {
+                        start: moment(this.share.budget?.start_week_1).format('DD/MM/YYYY'),
+                        end: moment(this.share.budget?.end_week_1).format('DD/MM/YYYY'),
+                    }),
+                    value: 'WEEK_1',
+                })
+            }
+
+            if (this.share.budget?.start_week_2 && this.share.budget?.end_week_2) {
+                weeks.push({
+                    text: this.$t('budget.range-week', {
+                        start: moment(this.share.budget?.start_week_2).format('DD/MM/YYYY'),
+                        end: moment(this.share.budget?.end_week_2).format('DD/MM/YYYY'),
+                    }),
+                    value: 'WEEK_2',
+                })
+            }
+
+            if (this.share.budget?.start_week_3 && this.share.budget?.end_week_3) {
+                weeks.push({
+                    text: this.$t('budget.range-week', {
+                        start: moment(this.share.budget?.start_week_3).format('DD/MM/YYYY'),
+                        end: moment(this.share.budget?.end_week_3).format('DD/MM/YYYY'),
+                    }),
+                    value: 'WEEK_3',
+                })
+            }
+
+            if (this.share.budget?.start_week_4 && this.share.budget?.end_week_4) {
+                weeks.push({
+                    text: this.$t('budget.range-week', {
+                        start: moment(this.share.budget?.start_week_4).format('DD/MM/YYYY'),
+                        end: moment(this.share.budget?.end_week_4).format('DD/MM/YYYY'),
+                    }),
+                    value: 'WEEK_4',
+                })
+            }
+
+            return weeks
+        },
         budgetShareResume() {
             return this.share.resume
         },
@@ -214,19 +379,19 @@ export default {
             return this.share.expenseToTags
         },
         budgetShareExpenses() {
-            return this.share.budget.expenses
+            return this.share.budget?.expenses
         },
         budgetShareIncomes() {
-            return this.share.budget.incomes
+            return this.share.budget?.incomes
         },
         budgetShareProvisions() {
-            return this.share.budget.provisions
+            return this.share.budget?.provisions
         },
         budgetShareInvoices() {
-            return this.share.budget.invoices
+            return this.share.budget?.invoices
         },
         budgetShareGoals() {
-            return this.share.budget.goals
+            return this.share.budget?.goals
         },
         budgetShareGoalsCharts() {
             return this.share.goalsCharts

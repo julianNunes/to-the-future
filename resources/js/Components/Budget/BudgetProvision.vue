@@ -280,11 +280,15 @@ export default {
         },
         provisions: {
             type: Array,
+            default: new Array(),
         },
         yearMonth: {
             type: String,
         },
         shareUsers: {
+            type: Array,
+        },
+        budgetWeeks: {
             type: Array,
         },
         viewOnly: {
@@ -385,6 +389,17 @@ export default {
 
     methods: {
         convertGroup(group) {
+            console.log('this.budgetWeeks', this.budgetWeeks)
+
+            if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
+                return (
+                    this.groupList.find((x) => x.value === group).name +
+                    ' (' +
+                    this.budgetWeeks.find((x) => x.value === group).text +
+                    ')'
+                )
+            }
+
             return this.groupList.find((x) => x.value === group).name
         },
 

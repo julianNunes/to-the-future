@@ -228,6 +228,7 @@ export default {
         },
         incomes: {
             type: Array,
+            default: new Array(),
         },
         viewOnly: {
             type: Boolean,

@@ -120,7 +120,7 @@
                             <template #[`item.tags`]="{ item }">{{
                                 item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
                             }}</template>
-                            <template #[`item.potion`]="{ item }">{{
+                            <template #[`item.portion`]="{ item }">{{
                                 item.portion ? item.portion + '/' + item.portion_total : ''
                             }}</template>
                             <template #[`item.share_user_id`]="{ item }">{{
@@ -692,6 +692,9 @@ export default {
         shareUsers: {
             type: Array,
         },
+        budgetWeeks: {
+            type: Array,
+        },
         titleCard: {
             type: Boolean,
             default: false,
@@ -859,6 +862,16 @@ export default {
 
     methods: {
         convertGroup(group) {
+            console.log('this.budgetWeeks', this.budgetWeeks)
+            if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
+                return (
+                    this.groupList.find((x) => x.value === group).name +
+                    ' (' +
+                    this.budgetWeeks.find((x) => x.value === group).text +
+                    ')'
+                )
+            }
+
             return this.groupList.find((x) => x.value === group).name
         },
 

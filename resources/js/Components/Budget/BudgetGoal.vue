@@ -223,6 +223,7 @@ export default {
         },
         goals: {
             type: Array,
+            default: new Array(),
         },
         goalsCharts: {
             type: Array,
