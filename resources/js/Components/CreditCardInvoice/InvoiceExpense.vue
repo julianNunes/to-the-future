@@ -150,7 +150,7 @@
                                             icon="mdi-delete"
                                             size="small"
                                             :disabled="viewOnly"
-                                            @click="confirmDelete(item)"
+                                            @click="confirmRemove(item)"
                                         >
                                         </v-icon>
                                     </template>
@@ -437,7 +437,7 @@
                                             color="error"
                                             icon="mdi-delete"
                                             size="small"
-                                            @click="openDivisionDelete(item)"
+                                            @click="confirmDivisionRemove(item)"
                                         >
                                         </v-icon>
                                     </template>
@@ -509,35 +509,7 @@
         </v-card>
     </v-dialog>
 
-    <!-- Dialog delete -->
-    <v-row v-if="deleteDialog" justify="center">
-        <v-dialog v-model="deleteDialog" persistent width="800">
-            <v-card>
-                <v-card-text>
-                    <v-row>
-                        <v-col md="12">
-                            <span class="text-h6">{{ $t('default.confirm-delete-item') }}</span>
-                        </v-col>
-                        <v-col v-show="expense.portion_total > 0" md="12">
-                            <v-checkbox
-                                v-model="deleteAllPortions"
-                                :label="$t('credit-card-invoice-expense.delete-all-portions')"
-                            ></v-checkbox>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer />
-                    <v-btn color="error" elevated :loading="isLoading" @click="deleteDialog = false">
-                        {{ $t('default.cancel') }}</v-btn
-                    >
-                    <v-btn color="primary" elevated :loading="isLoading" text @click="this.delete()">
-                        {{ $t('default.delete') }}</v-btn
-                    >
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-    </v-row>
+    <ConfirmDialog ref="confirm" />
 
     <!-- Dialog Criacao/Edicao de Divisão -->
     <v-dialog v-model="editDivisionDialog" persistent :fullscreen="true" class="ma-4">
@@ -1040,20 +1012,27 @@ export default {
             )
         },
 
-        async confirmDelete(item) {
+        async confirmRemove(item) {
             this.deleteId = item.id
             this.deleteAllPortions = false
             this.expense = item
             this.deleteDialog = true
+            if (
+                await this.$refs.confirm.open(
+                    this.$t('credit-card-invoice-expense.item'),
+                    this.$t('default.confirm-delete-item')
+                )
+            ) {
+                this.remove()
+            }
         },
 
-        delete() {
+        remove() {
             this.isLoading = true
 
             if (this.deleteAllPortions) {
                 this.$inertia.delete('/credit-card/invoice/expense/' + this.deleteId + '/delete-all-portions', {
                     onSuccess: () => {
-                        this.deleteDialog = false
                         this.editDialog = false
                     },
                     onError: () => {
@@ -1066,7 +1045,6 @@ export default {
             } else {
                 this.$inertia.delete('/credit-card/invoice/expense/' + this.deleteId, {
                     onSuccess: () => {
-                        this.deleteDialog = false
                         this.editDialog = false
                     },
                     onError: () => {
@@ -1291,9 +1269,16 @@ export default {
             }
         },
 
-        openDivisionDelete(item) {
+        async confirmDivisionRemove(item) {
             this.editedIndex = this.expense.divisions.indexOf(item)
-            this.deleteDivisionDialog = true
+            if (
+                await this.$refs.confirm.open(
+                    this.$t('credit-card-invoice-expense.item'),
+                    this.$t('default.confirm-delete-item')
+                )
+            ) {
+                this.deleteeDivision()
+            }
         },
 
         deleteeDivision() {

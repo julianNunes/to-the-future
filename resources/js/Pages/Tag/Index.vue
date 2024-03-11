@@ -54,7 +54,7 @@
                                             color="error"
                                             icon="mdi-delete"
                                             size="small"
-                                            @click="confirmDelete(item)"
+                                            @click="confirmRemove(item)"
                                         >
                                         </v-icon>
                                     </template>
@@ -251,7 +251,7 @@ export default {
             )
         },
 
-        async confirmDelete(item) {
+        async confirmRemove(item) {
             this.deleteId = item.id
             if (await this.$refs.confirm.open(this.$t('tag.item'), this.$t('default.confirm-delete-item'))) {
                 this.remove()

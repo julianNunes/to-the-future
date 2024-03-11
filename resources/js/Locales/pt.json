@@ -136,6 +136,7 @@
         "new-item": "Nova Despesa",
         "new-item-division": "Nova Divisão de Despesa",
         "edit-item": "Editar Despesa",
+        "item": "Despesa",
         "edit-item-division": "Editar Divisão de Despesa",
         "not-found": "Despesa não encontrada",
         "delete-all-portions": "Deseja remover as outras parcelas referentes ?",
