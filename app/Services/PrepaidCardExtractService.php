@@ -13,12 +13,11 @@ use App\Repositories\Interfaces\{
 };
 use App\Services\Interfaces\PrepaidCardExtractServiceInterface;
 use Exception;
-use Illuminate\Support\Carbon;
 
 class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
 {
     public function __construct(
-        private CreditCardRepositoryInterface $creditCardRepository,
+        private CreditCardRepositoryInterface $prepaidCardRepository,
         private PrepaidCardExtractRepositoryInterface $prepaidCardExtractRepository,
         private PrepaidCardExtractExpenseRepositoryInterface $prepaidCardExtractExpenseRepository,
         private TagRepositoryInterface $tagRepository,
@@ -28,157 +27,121 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
     }
 
     /**
-     * Returns data for Credit Card Invoice Management
+     * Returns data for Prepaid Card Extract Management
      * @return Array
      */
-    public function index(int $creditCardId): array
+    public function index(int $prepaidCardId): array
     {
-        $creditCard = $this->creditCardRepository->show($creditCardId, ['invoices']);
+        $prepaidCard = $this->prepaidCardRepository->show($prepaidCardId, ['extracts']);
         return [
-            'creditCard' => $creditCard,
-            'invoices' => $creditCard->invoices,
+            'prepaidCard' => $prepaidCard,
+            'extracts' => $prepaidCard->extracts,
         ];
     }
 
     /**
-     * Create a new Invoices at to end of year
-     * @param string $dueDate
-     * @param string $closingDate
+     * Create a new Extract
+     * @param integer $prepaidCardId
      * @param string $year
      * @param string $month
-     * @param integer $creditCardId
-     * @param boolean $creditCardId
-     * @return PrepaidCardExtract
-     */
-    public function createAutomatic(
-        string $dueDate,
-        string $closingDate,
-        string $year,
-        string $month,
-        int $creditCardId,
-        bool $automaticGenerate
-    ): bool {
-        $invoice = $this->create($dueDate, $closingDate, $year, $month, $creditCardId);
-
-        // Verifico se existe Budget
-        $budget = $this->budgetRepository->getOne(['month' => $month, 'year' => $year, 'user_id' => auth()->user()->id]);
-
-        if ($budget) {
-            $this->prepaidCardExtractRepository->store(['budget_id' => $budget->id], $invoice);
-        }
-
-        if ($automaticGenerate) {
-            $due_date = Carbon::parse($dueDate);
-            $closing_date = Carbon::parse($closingDate);
-
-            $new_due_date = $due_date->copy()->addMonth();
-            $new_closing_date = $closing_date->copy()->addMonth();
-
-            for ($i = $new_due_date->month; $i <= 12; $i++) {
-                $invoice = $this->create($new_due_date, $new_closing_date, $year, $new_due_date->month, $creditCardId);
-                // Verifico se existe Budget
-                $budget = $this->budgetRepository->getOne(['month' => $new_due_date->month, 'year' => $year, 'user_id' => auth()->user()->id]);
-
-                if ($budget) {
-                    $this->prepaidCardExtractRepository->store(['budget_id' => $budget->id], $invoice);
-                }
-
-                $new_due_date->addMonth();
-                $new_closing_date->addMonth();
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Create a new Invoice
-     * @param string $dueDate
-     * @param string $closingDate
-     * @param string $year
-     * @param string $month
-     * @param integer $creditCardId
+     * @param float $balance
+     * @param string|null $remarks
      * @return PrepaidCardExtract
      */
     public function create(
-        string $dueDate,
-        string $closingDate,
+        int $prepaidCardId,
         string $year,
         string $month,
-        int $creditCardId,
+        float $balance,
+        string $remarks = null,
     ): PrepaidCardExtract {
-        $credit_card = $this->creditCardRepository->show($creditCardId);
+        $prepaid_card = $this->prepaidCardRepository->show($prepaidCardId);
 
-        if (!$credit_card) {
-            throw new Exception('credit-card.not-found');
+        if (!$prepaid_card) {
+            throw new Exception('prepaid-card.not-found');
         }
 
-        $credit_card_invoice = $this->prepaidCardExtractRepository->getOne(['year' => $year, 'month' => $month, 'credit_card_id' => $creditCardId]);
+        $prepaid_card_extract = $this->prepaidCardExtractRepository->getOne(['year' => $year, 'month' => $month, 'credit_card_id' => $prepaidCardId]);
 
-        if ($credit_card_invoice) {
-            throw new Exception('credit-card-invoice.already-exists');
+        if ($prepaid_card_extract) {
+            throw new Exception('prepaid-card-extract.already-exists');
         }
 
         return $this->prepaidCardExtractRepository->store([
-            'due_date' => $dueDate,
-            'closing_date' => $closingDate,
             'year' => $year,
             'month' => $month,
-            'credit_card_id' => $creditCardId,
+            'balance' => $balance,
+            'remarks' => $remarks,
+            'prepaid_card_id' => $prepaidCardId,
         ]);
     }
 
     /**
-     * Delete a Invoice
+     * Update a  Extract
+     * @param integer $id
+     * @param float $balance
+     * @param string|null $remarks
+     * @return bool
+     */
+    public function update(
+        int $id,
+        float $balance,
+        string $remarks = null
+    ): PrepaidCardExtract {
+        $prepaid_card_extract = $this->prepaidCardExtractRepository->show($id);
+
+        if (!$prepaid_card_extract) {
+            throw new Exception('prepaid-card-extract.not-found');
+        }
+
+        return $this->prepaidCardExtractRepository->store([
+            'balance' => $balance,
+            'remarks' => $remarks,
+        ], $prepaid_card_extract);
+    }
+
+    /**
+     * Delete a Extract
      * @param int $id
      */
     public function delete(int $id): bool
     {
-        $credit_card_invoice = $this->prepaidCardExtractRepository->show($id, [
-            'file',
+        $prepaid_card_extract = $this->prepaidCardExtractRepository->show($id, [
             'expenses' => [
-                'divisions' => [
-                    'tags'
-                ],
                 'tags'
             ]
         ]);
 
-        if (!$credit_card_invoice) {
-            throw new Exception('credit-card-invoice.not-found');
+        if (!$prepaid_card_extract) {
+            throw new Exception('prepaid-card-extract.not-found');
         }
 
         // Remove todos os vinculos
-        foreach ($credit_card_invoice->expenses as $expense) {
+        foreach ($prepaid_card_extract->expenses as $expense) {
             $this->tagRepository->saveTagsToModel($expense, $expense->tags);
             $this->prepaidCardExtractExpenseRepository->delete($expense->id);
         }
 
-        return $this->prepaidCardExtractRepository->delete($credit_card_invoice->id);
+        return $this->prepaidCardExtractRepository->delete($prepaid_card_extract->id);
     }
 
     /**
-     * Returns data for viewing/editing a Credit Card Invoice
+     * Returns data for viewing/editing a Prepaid Card Extract
      * @param int $id
      * @return Array
      */
     public function show(int $id): array
     {
-        $credit_card_invoice = $this->prepaidCardExtractRepository->show($id, [
-            'creditCard',
-            'file',
+        $prepaid_card_extract = $this->prepaidCardExtractRepository->show($id, [
+            'prepaidCard',
             'expenses' => [
                 'tags',
                 'shareUser',
-                'divisions' => [
-                    'tags',
-                    'shareUser'
-                ]
             ]
         ]);
 
-        if (!$credit_card_invoice) {
-            throw new Exception('credit-card-inovice.not-found');
+        if (!$prepaid_card_extract) {
+            throw new Exception('prepaid-card-extract.not-found');
         }
 
         $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
@@ -193,7 +156,7 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
         }
 
         return [
-            'invoice' => $credit_card_invoice,
+            'extract' => $prepaid_card_extract,
             'shareUsers' => $shareUsers,
         ];
     }

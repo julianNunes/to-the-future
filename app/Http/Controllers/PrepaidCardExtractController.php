@@ -15,41 +15,59 @@ class PrepaidCardExtractController extends Controller
     }
 
     /**
-     * Retorna os dados para o index de Faturas de um Cartão de Credito
-     * @param integer $creditCardId
+     * Returns data for Prepaid Card Extract Management
+     * @param integer $prepaidCardId
      * @return void
      */
-    public function index(int $creditCardId)
+    public function index(int $prepaidCardId)
     {
-        $data = $this->prepaidCardExtractService->index($creditCardId);
+        $data = $this->prepaidCardExtractService->index($prepaidCardId);
         return Inertia::render('PrepaidCardExtract/Index', $data);
     }
 
     /**
-     * Cria uma nova Fatura
+     * Create a new Extract
      * @param Request $request
      * @return void
      */
     public function store(Request $request)
     {
         $this->validate($request, [
-            'due_date' => ['required'],
-            'closing_date' => ['required'],
             'year' => ['required'],
             'month' => ['required'],
-            'credit_card_id' => ['required'],
+            'balance' => ['required'],
+            'prepaid_card_id' => ['required'],
         ]);
 
-        $this->prepaidCardExtractService->createAutomatic(
-            $request->due_date,
-            $request->closing_date,
+        $this->prepaidCardExtractService->create(
+            $request->prepaid_card_id,
             $request->year,
             $request->month,
-            $request->credit_card_id,
-            $request->automatic_generate
+            floatval($request->balance),
+            $request->remarks
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
+    }
+
+    /**
+     * Update a Extract
+     * @param Request $request
+     * @param integer $id
+     */
+    public function update(Request $request, int $id)
+    {
+        $this->validate($request, [
+            'balance' => ['required'],
+            'prepaid_card_id' => ['required'],
+        ]);
+
+        $this->prepaidCardExtractService->update(
+            $id,
+            floatval($request->balance),
+            $request->remarks,
+        );
+        return redirect()->back()->with('success', 'default.sucess-update');
     }
 
     /**
@@ -65,7 +83,7 @@ class PrepaidCardExtractController extends Controller
 
     /**
      * Mostrar os dados de uma fatura
-     * @param integer $creditCardId
+     * @param integer $prepaidCardId
      * @param integer $id
      * @return void
      */

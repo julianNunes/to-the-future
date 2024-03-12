@@ -3,6 +3,9 @@ LISTA DE TAREFAS PENDENTES - TO DO
 ==================================================
 
 - CRUD para "prepaid_card"
+    - fazer a tradução
+    - no create do Budget, fazer o include do "budget_id" em "prepaid_card_extract"
+
     - "prepaid_card_invoices"
         - "valor_creditado"
         - "dia do creditado"
@@ -16,6 +19,7 @@ LISTA DE TAREFAS PENDENTES - TO DO
 
 
 - CArtao de credito
+    - Conferir se o "remkars" esta sendo usado
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
 
 
@@ -23,12 +27,12 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - TEstar novamente o "Create"
     - Testar o Clone
 
+
 - RETESTAR TUDO
-
-
-- Revisar todas as controllers e documentar corretamente
+    - Revisar todas as controllers e documentar corretamente
 
 - Mudar como os menu é montado e fazer ele agrupado e remover os icones
+
 
 - Alterar o formato das datas do timestamp do Laravel
     - verificar como deixar o created_at e o updated_at automaticos

@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\PrepaidCard;
 use App\Repositories\Interfaces\{
-    PrepaidCardInvoiceExpenseRepositoryInterface,
-    PrepaidCardInvoiceRepositoryInterface,
+    PrepaidCardExtractExpenseRepositoryInterface,
+    PrepaidCardExtractRepositoryInterface,
     PrepaidCardRepositoryInterface,
     TagRepositoryInterface
 };
@@ -17,14 +17,14 @@ class PrepaidCardService implements PrepaidCardServiceInterface
 {
     public function __construct(
         private PrepaidCardRepositoryInterface $prepaidCardRepository,
-        private PrepaidCardInvoiceRepositoryInterface $prepaidCardInvoiceRepository,
-        private PrepaidCardInvoiceExpenseRepositoryInterface $prepaidCardInvoiceExpenseRepository,
+        private PrepaidCardExtractRepositoryInterface $prepaidCardExtractRepository,
+        private PrepaidCardExtractExpenseRepositoryInterface $prepaidCardExtractExpenseRepository,
         private TagRepositoryInterface $tagRepository
     ) {
     }
 
     /**
-     * Returns data to Credit Card Management
+     * Returns data to Prepaid Card Management
      * @return Array
      */
     public function index(): array
@@ -36,19 +36,15 @@ class PrepaidCardService implements PrepaidCardServiceInterface
     }
 
     /**
-     * Create new Credit Card
+     * Create new Prepaid Card
      * @param string $name
      * @param string $digits
-     * @param string $dueDate
-     * @param string $closingDate
      * @param boolean $isActive
      * @return PrepaidCard
      */
     public function create(
         string $name,
         string $digits,
-        string $dueDate,
-        string $closingDate,
         bool $isActive
     ): PrepaidCard {
         $prepaid_card = $this->prepaidCardRepository->getOne(['name' => $name]);
@@ -60,8 +56,6 @@ class PrepaidCardService implements PrepaidCardServiceInterface
         $prepaid_card = $this->prepaidCardRepository->store([
             'name' => $name,
             'digits' => $digits,
-            'due_date' => $dueDate,
-            'closing_date' => $closingDate,
             'is_active' => $isActive,
             'user_id' => auth()->user()->id
         ]);
@@ -70,12 +64,10 @@ class PrepaidCardService implements PrepaidCardServiceInterface
     }
 
     /**
-     * Update a Credit Card
+     * Update a Prepaid Card
      * @param integer $id
      * @param string $name
      * @param string $digits
-     * @param string $due_date
-     * @param string $closing_date
      * @param boolean $is_active
      * @return boolean
      */
@@ -83,8 +75,6 @@ class PrepaidCardService implements PrepaidCardServiceInterface
         int $id,
         string $name,
         string $digits,
-        string $dueDate,
-        string $closingDate,
         bool $isActive
     ): PrepaidCard {
         $prepaid_card = $this->prepaidCardRepository->getOne(function (Builder $query) use ($id, $name) {
@@ -104,21 +94,19 @@ class PrepaidCardService implements PrepaidCardServiceInterface
         return $this->prepaidCardRepository->store([
             'name' => $name,
             'digits' => $digits,
-            'due_date' => $dueDate,
-            'closing_date' => $closingDate,
             'is_active' => $isActive,
             'user_id' => auth()->user()->id
         ], $prepaid_card);
     }
 
     /**
-     * Deleta a Credit Card
+     * Deleta a Prepaid Card
      * @param int $id
      */
     public function delete(int $id): bool
     {
         $prepaid_card = $this->prepaidCardRepository->show($id, [
-            'invoices' => [
+            'extracts' => [
                 'expenses' => [
                     'tags'
                 ]
@@ -130,13 +118,13 @@ class PrepaidCardService implements PrepaidCardServiceInterface
         }
 
         // Remove todos os vinculos
-        foreach ($prepaid_card->invoices as $invoice) {
+        foreach ($prepaid_card->extracts as $invoice) {
             foreach ($invoice->expenses as $expense) {
                 $this->tagRepository->saveTagsToModel($expense, $expense->tags);
-                $this->prepaidCardInvoiceExpenseRepository->delete($expense->id);
+                $this->prepaidCardExtractExpenseRepository->delete($expense->id);
             }
 
-            $this->prepaidCardInvoiceRepository->delete($invoice->id);
+            $this->prepaidCardExtractRepository->delete($invoice->id);
         }
 
         return $this->prepaidCardRepository->delete($prepaid_card->id);

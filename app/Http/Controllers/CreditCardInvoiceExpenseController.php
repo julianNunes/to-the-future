@@ -77,8 +77,6 @@ class CreditCardInvoiceExpenseController extends Controller
             'value' => ['required'],
         ]);
 
-        DB::beginTransaction();
-
         $this->creditCardInvoiceExpenseService->update(
             $id,
             $request->credit_card_id,
@@ -95,8 +93,6 @@ class CreditCardInvoiceExpenseController extends Controller
             collect($request->tags),
             collect($request->divisions)
         );
-
-        DB::commit();
 
         return redirect()->back()->with('success', 'default.sucess-save');
     }

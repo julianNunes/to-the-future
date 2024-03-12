@@ -16,6 +16,9 @@ use App\Http\Controllers\{
     FinancingController,
     FinancingInstallmentController,
     FixExpenseController,
+    PrepaidCardController,
+    PrepaidCardExtractController,
+    PrepaidCardExtractExpenseController,
 };
 
 use Illuminate\Foundation\Application;
@@ -81,6 +84,30 @@ Route::controller(CreditCardInvoiceExpenseController::class)->group(function () 
     Route::delete('/credit-card/invoice/expense/{id}', 'delete');
     Route::delete('/credit-card/invoice/expense/{id}/delete-all-portions', 'deletePortions');
     Route::post('/credit-card/invoice/expense-import-excel', 'storeImportExcel');
+});
+
+// PrepaidCard
+Route::controller(PrepaidCardController::class)->group(function () {
+    Route::get('/prepaid-card', 'index');
+    Route::post('/prepaid-card', 'store');
+    Route::put('/prepaid-card/{id}', 'update');
+    Route::delete('/prepaid-card/{id}', 'delete');
+});
+
+// PrepaidCardExtract
+Route::controller(PrepaidCardExtractController::class)->group(function () {
+    Route::get('/prepaid-card/{prepaidCardId}/extract', 'index');
+    Route::post('/prepaid-card/extract', 'store');
+    Route::delete('/prepaid-card/extract/{id}', 'delete');
+    Route::get('/prepaid-card/extract/{id}', 'show');
+    Route::delete('/prepaid-card/extract/{id}', 'delete');
+});
+
+// PrepaidCardExtractExpense
+Route::controller(PrepaidCardExtractExpenseController::class)->group(function () {
+    Route::post('/prepaid-card/extract/expense', 'store');
+    Route::put('/prepaid-card/extract/expense/{id}', 'update');
+    Route::delete('/prepaid-card/extract/expense/{id}', 'delete');
 });
 
 // Financing
