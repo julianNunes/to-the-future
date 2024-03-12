@@ -144,11 +144,10 @@ import BudgetIncome from '../../Components/Budget/BudgetIncome.vue'
 import BudgetProvision from '../../Components/Budget/BudgetProvision.vue'
 import InvoiceExpense from '../../Components/CreditCardInvoice/InvoiceExpense.vue'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import moment from 'moment'
 </script>
 
 <script>
-import moment from 'moment'
-
 export default {
     name: 'BudgetShow',
 

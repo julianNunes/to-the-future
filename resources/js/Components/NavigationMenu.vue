@@ -20,11 +20,10 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3'
+import moment from 'moment'
 </script>
 
 <script>
-import moment from 'moment'
-
 export default {
     data() {
         return {

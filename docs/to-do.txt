@@ -1,21 +1,6 @@
 ==================================================
 LISTA DE TAREFAS PENDENTES - TO DO
 ==================================================
-- Adicionar o "ConfirmDialog" nos lugares onde tem DELETE
-
-
-
-        async confirmDelete(item) {
-            this.deleteId = item.id
-            if (await this.$refs.confirm.open(this.$t('.item'), this.$t('default.confirm-delete-item'))) {
-                this.remove()
-            }
-        },
-
-- Revisao do <script setup>"
-
-- Credit-card-invoice
-    - a coluna "Group" nao fica 100%
 
 - CRUD para "prepaid_card"
     - "prepaid_card_invoices"
@@ -63,6 +48,8 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - https://lokalise.com/blog/vue-i18n/
 
 
+- Credit-card-invoice
+    - a coluna "Group" nao fica 100%
 
 
 
@@ -73,19 +60,4 @@ LISTA DE TAREFAS PENDENTES - TO DO
 TO-DO - PARTE 2
 =============================================================================================================
 
-In all my carrer i worked like a fullstack developer.
-I started work with Laravel 4.2 in 2016 for an education platform, focused on users' interaction in real time, which is the great differential.
-The next job worked developing ERP projects in a small company and the next job, Solistica a logistic company, i worked  with Laravel 5 Developing ERP project for internal use in the company and WMS also used by external customers.
-Now i working in one personal project with Inertia and Laravel 10 to update my skills with Laravel and new technologies.
-
-
-I had almost 1 year of experience managing the educational project alone and during that time I had to deal with AWS S3.
-I no longer had contact with him.
-
-
-Unfortunately in all companies how i worked i never used automated testing. I have start studing in my personal project about automated testing with PHPUnit
-
-
-I love working with PHP/Laravel and mainly because I'm a musician and I would love to work in the music industry.
-I had my first child and I'm looking for my first international job and I want to provide more comfort for my family.
 

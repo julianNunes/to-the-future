@@ -468,7 +468,7 @@
 
                             <template v-if="expense.divisions.length" #tfoot>
                                 <tr class="green--text">
-                                    <th class="title font-weight-bold text-right">Total</th>
+                                    <th :colspan="2" class="title font-weight-bold text-right">Total</th>
                                     <th class="title text-right">{{ sumField(expense.divisions, 'value') }}</th>
                                     <th class="title text-right">
                                         {{ sumField(expense.divisions, 'share_value') }}
@@ -646,15 +646,13 @@
 </template>
 
 <script setup>
-// import { Link } from '@inertiajs/vue3'
-</script>
-
-<script>
 import moment from 'moment'
 import { useToast } from 'vue-toastification'
 import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
 import readXlsxFile from 'read-excel-file'
+</script>
 
+<script>
 export default {
     name: 'InvoiceExpenses',
     props: {
@@ -834,7 +832,6 @@ export default {
 
     methods: {
         convertGroup(group) {
-            console.log('this.budgetWeeks', this.budgetWeeks)
             if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
                 return (
                     this.groupList.find((x) => x.value === group).name +

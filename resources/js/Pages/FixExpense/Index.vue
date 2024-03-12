@@ -232,11 +232,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import { sumField, currencyField } from '../../utils/utils.js'
 </script>
 
 <script>
-import { sumField, currencyField } from '../../utils/utils.js'
-
 export default {
     name: 'FixExpenseIndex',
     props: {

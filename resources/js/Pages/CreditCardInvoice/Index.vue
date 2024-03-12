@@ -203,12 +203,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import moment from 'moment'
+import { currencyField, MONTHS } from '../../utils/utils.js'
 </script>
 
 <script>
-import moment from 'moment'
-import { currencyField, MONTHS } from '../../utils/utils.js'
-
 export default {
     name: 'CreditCardInvoiceIndex',
     props: {

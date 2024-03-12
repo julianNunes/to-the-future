@@ -215,11 +215,10 @@ import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import { Head } from '@inertiajs/vue3'
 import { Link } from '@inertiajs/vue3'
 import moment from 'moment'
+import { currencyField, percentField } from '../../utils/utils.js'
 </script>
 
 <script>
-import { currencyField, percentField } from '../../utils/utils.js'
-
 export default {
     name: 'FinancingIndex',
     props: {

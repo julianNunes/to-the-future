@@ -271,11 +271,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import moment from 'moment'
+import { sumField, currencyField, percentField } from '../../utils/utils.js'
 </script>
 
 <script>
-import { sumField, currencyField, percentField } from '../../utils/utils.js'
-
 export default {
     name: 'FinancingShow',
     props: {

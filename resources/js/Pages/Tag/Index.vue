@@ -125,12 +125,11 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
+import { upperCase } from '../../utils/utils.js'
+import writeXlsxFile from 'write-excel-file'
 </script>
 
 <script>
-import { upperCase } from '../../utils/utils.js'
-import writeXlsxFile from 'write-excel-file'
-
 export default {
     name: 'TagIndex',
     props: {

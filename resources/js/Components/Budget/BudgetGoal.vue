@@ -194,11 +194,10 @@
 
 <script setup>
 import { currencyField } from '../../utils/utils.js'
+import BarChart from '../../Components/BarChart.vue'
 </script>
 
 <script>
-import BarChart from '../../Components/BarChart.vue'
-
 export default {
     name: 'BudgetGoal',
     props: {
