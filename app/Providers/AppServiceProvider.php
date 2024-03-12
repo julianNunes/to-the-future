@@ -55,6 +55,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CreditCardInvoiceServiceInterface::class, CreditCardInvoiceService::class);
         $this->app->bind(CreditCardInvoiceExpenseServiceInterface::class, CreditCardInvoiceExpenseService::class);
         $this->app->bind(CreditCardServiceInterface::class, CreditCardService::class);
+
+
         $this->app->bind(FinancingServiceInterface::class, FinancingService::class);
         $this->app->bind(FinancingInstallmentServiceInterface::class, FinancingInstallmentService::class);
         $this->app->bind(FixExpenseServiceInterface::class, FixExpenseService::class);

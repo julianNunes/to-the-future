@@ -17,6 +17,9 @@ use App\Repositories\{
     FinancingInstallmentRepository,
     FinancingRepository,
     FixExpenseRepository,
+    PrepaidCardExtractExpenseRepository,
+    PrepaidCardExtractRepository,
+    PrepaidCardRepository,
     ProvisionRepository,
     ShareUserRepository,
     TagRepository
@@ -36,6 +39,9 @@ use App\Repositories\Interfaces\{
     FinancingInstallmentRepositoryInterface,
     FinancingRepositoryInterface,
     FixExpenseRepositoryInterface,
+    PrepaidCardExtractExpenseRepositoryInterface,
+    PrepaidCardExtractRepositoryInterface,
+    PrepaidCardRepositoryInterface,
     ProvisionRepositoryInterface,
     ShareUserRepositoryInterface,
     TagRepositoryInterface
@@ -60,6 +66,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CreditCardInvoiceFileRepositoryInterface::class, CreditCardInvoiceFileRepository::class);
         $this->app->bind(CreditCardInvoiceRepositoryInterface::class, CreditCardInvoiceRepository::class);
         $this->app->bind(CreditCardRepositoryInterface::class, CreditCardRepository::class);
+        $this->app->bind(PrepaidCardRepositoryInterface::class, PrepaidCardRepository::class);
+        $this->app->bind(PrepaidCardExtractRepositoryInterface::class, PrepaidCardExtractRepository::class);
+        $this->app->bind(PrepaidCardExtractExpenseRepositoryInterface::class, PrepaidCardExtractExpenseRepository::class);
         $this->app->bind(FinancingInstallmentRepositoryInterface::class, FinancingInstallmentRepository::class);
         $this->app->bind(FinancingRepositoryInterface::class, FinancingRepository::class);
         $this->app->bind(FixExpenseRepositoryInterface::class, FixExpenseRepository::class);
