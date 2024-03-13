@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\PrepaidCardExtractExpenseService;
 use App\Services\Interfaces\PrepaidCardExtractExpenseServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class PrepaidCardExtractExpenseController extends Controller
 {
@@ -15,7 +13,7 @@ class PrepaidCardExtractExpenseController extends Controller
     }
 
     /**
-     * Cria uma Despesa para uma Fatura do cartão de credito
+     * Create a new Expense Prepaid Card
      */
     public function store(Request $request)
     {
@@ -44,7 +42,7 @@ class PrepaidCardExtractExpenseController extends Controller
     }
 
     /**
-     * Atualiza uma Despesa para uma Fatura do cartão de credito
+     * Update a Expense Prepaid Card
      */
     public function update(Request $request, int $id)
     {
@@ -74,7 +72,7 @@ class PrepaidCardExtractExpenseController extends Controller
     }
 
     /**
-     * Deleta uma Despesa de uma Fatura do cartão de credito
+     * Deleta a Expense Prepaid Card
      */
     public function delete(int $id)
     {

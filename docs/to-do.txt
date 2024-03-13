@@ -13,13 +13,15 @@ LISTA DE TAREFAS PENDENTES - TO DO
         - Quando houver despesas compartilhada sera somado como despesa para o usuario compartilhado
         - o valor que sobrar da diferença do compartilhado entra como RECEITA para o dono do cartao
 
+- Fazer revisão de todos os campos "remarks"
+    - Cartao de credito: Conferir se o "remkars" esta sendo usado
+
 
 - Fatura do cartão de credito
     - Importar excel de despesas
 
 
 - CArtao de credito
-    - Conferir se o "remkars" esta sendo usado
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
 
 

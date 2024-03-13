@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 
 interface PrepaidCardExtractExpenseServiceInterface
 {
-
     /**
      * Create new Expense to Extract
      * @param integer $prepaidCardId

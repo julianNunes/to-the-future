@@ -96,6 +96,15 @@
                         :year-month="yearMonthModel"
                         :budget-weeks="budgetWeeks"
                     />
+                    <ExtractExpense
+                        v-for="extract in budgetExtracts"
+                        :key="extract.id"
+                        :invoice="extract"
+                        :share-users="shareUsers"
+                        :title-card="true"
+                        :year-month="yearMonthModel"
+                        :budget-weeks="budgetWeeks"
+                    />
                     <BudgetProvision
                         :budget-id="budgetId"
                         :year-month="yearMonthModel"
@@ -114,6 +123,15 @@
                         v-for="invoice in budgetShareInvoices"
                         :key="invoice.id"
                         :invoice="invoice"
+                        :share-users="shareUsers"
+                        :budget-weeks="budgetShareWeeks"
+                        :title-card="true"
+                        :view-only="true"
+                    />
+                    <ExtractExpense
+                        v-for="extract in budgetShareExtracts"
+                        :key="extract.id"
+                        :invoice="extract"
                         :share-users="shareUsers"
                         :budget-weeks="budgetShareWeeks"
                         :title-card="true"
@@ -143,6 +161,7 @@ import BudgetExpense from '../../Components/Budget/BudgetExpense.vue'
 import BudgetIncome from '../../Components/Budget/BudgetIncome.vue'
 import BudgetProvision from '../../Components/Budget/BudgetProvision.vue'
 import InvoiceExpense from '../../Components/CreditCardInvoice/InvoiceExpense.vue'
+import ExtractExpense from '../../Components/PrepaidCardExtract/ExtractExpense.vue'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import moment from 'moment'
 </script>
@@ -159,6 +178,7 @@ export default {
         BudgetIncome,
         BudgetProvision,
         InvoiceExpense,
+        ExtractExpense,
     },
 
     props: {
@@ -316,6 +336,9 @@ export default {
         budgetInvoices() {
             return this.owner.budget.invoices
         },
+        budgetExtracts() {
+            return this.owner.budget.extracts
+        },
         budgetGoals() {
             return this.owner.budget.goals
         },
@@ -388,6 +411,9 @@ export default {
         },
         budgetShareInvoices() {
             return this.share.budget?.invoices
+        },
+        budgetShareExtracts() {
+            return this.share.budget?.extracts
         },
         budgetShareGoals() {
             return this.share.budget?.goals

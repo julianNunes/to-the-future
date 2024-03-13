@@ -23,6 +23,14 @@
                             density="comfortable"
                         ></v-text-field>
                     </v-col>
+                    <v-col cols="12" md="2">
+                        <v-text-field
+                            v-model="extractYearMonth"
+                            :label="$t('prepaid-card-extract.year-month')"
+                            :readonly="true"
+                            density="comfortable"
+                        ></v-text-field>
+                    </v-col>
                     <v-col cols="12" sm="6" md="2">
                         <v-text-field
                             v-model="extractCreditDate"
@@ -166,7 +174,7 @@
     </v-expansion-panels>
 
     <!-- Dialog Criacao/Edicao -->
-    <v-dialog v-model="editDialog" persistent :fullscreen="true" class="ma-4">
+    <v-dialog v-model="editDialog" persistent width="800" class="ma-4">
         <v-card>
             <v-card-title>
                 <span class="text-h5">{{ titleModal }}</span>
@@ -269,7 +277,6 @@
                                 :loading="loadingData"
                                 item-title="name"
                                 item-value="name"
-                                :disabled="hasDivisions"
                                 clearable
                                 multiple
                                 chips
@@ -411,10 +418,13 @@ export default {
             return this.extract.expenses
         },
         extractCreditDate() {
-            return moment(this.extract.due_date).format('DD/MM/YYYY')
+            return moment(this.extract.credit_date).format('DD/MM/YYYY')
         },
         extractCredit() {
-            return currencyField(this.extract.total)
+            return currencyField(this.extract.credit)
+        },
+        extractYearMonth() {
+            return this.extract.year_month
         },
     },
 
@@ -497,7 +507,6 @@ export default {
                 extract_id: null,
                 share_user_id: null,
                 tags: [],
-                divisions: [],
             }
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
@@ -519,7 +528,6 @@ export default {
                 share_user_id: item.share_user_id,
                 tags: item.tags,
             }
-            this.hasDivisions = this.expense.divisions && this.expense.divisions.length ? true : false
             setTimeout(() => {
                 this.$refs.txtDescription.focus()
             })
@@ -528,12 +536,10 @@ export default {
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                if (this.validateDivisions()) {
-                    if (this.expense.id) {
-                        await this.update()
-                    } else {
-                        await this.create()
-                    }
+                if (this.expense.id) {
+                    await this.update()
+                } else {
+                    await this.create()
                 }
             }
         },
@@ -553,7 +559,6 @@ export default {
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
                     tags: this.expense.tags,
-                    divisions: this.expense.divisions,
                 },
                 {
                     onSuccess: () => {

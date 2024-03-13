@@ -39,14 +39,14 @@ export default {
                     href: '/dashboard',
                 },
                 {
-                    title: this.$t('menus.credit-card'),
+                    title: this.$t('menus.prepaid-card'),
                     disabled: false,
-                    href: '/credit-card',
+                    href: '/prepaid-card',
                 },
                 {
                     title: this.$t('prepaid-card-extract.title-index'),
                     disabled: false,
-                    href: '/credit-card/' + this.invoice.credit_card_id + '/invoice',
+                    href: '/prepaid-card/' + this.extract.prepaid_card_id + '/extract',
                 },
                 {
                     title: this.$t('prepaid-card-extract-expense.title'),
