@@ -7,7 +7,7 @@ use App\Repositories\Interfaces\{
     BudgetRepositoryInterface,
     PrepaidCardExtractExpenseRepositoryInterface,
     PrepaidCardExtractRepositoryInterface,
-    CreditCardRepositoryInterface,
+    PrepaidCardRepositoryInterface,
     ShareUserRepositoryInterface,
     TagRepositoryInterface
 };
@@ -17,7 +17,7 @@ use Exception;
 class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
 {
     public function __construct(
-        private CreditCardRepositoryInterface $prepaidCardRepository,
+        private PrepaidCardRepositoryInterface $prepaidCardRepository,
         private PrepaidCardExtractRepositoryInterface $prepaidCardExtractRepository,
         private PrepaidCardExtractExpenseRepositoryInterface $prepaidCardExtractExpenseRepository,
         private TagRepositoryInterface $tagRepository,
@@ -44,7 +44,8 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
      * @param integer $prepaidCardId
      * @param string $year
      * @param string $month
-     * @param float $balance
+     * @param float $credit
+     * @param string $creditDate
      * @param string|null $remarks
      * @return PrepaidCardExtract
      */
@@ -52,7 +53,8 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
         int $prepaidCardId,
         string $year,
         string $month,
-        float $balance,
+        float $credit,
+        string $creditDate,
         string $remarks = null,
     ): PrepaidCardExtract {
         $prepaid_card = $this->prepaidCardRepository->show($prepaidCardId);
@@ -61,31 +63,42 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
             throw new Exception('prepaid-card.not-found');
         }
 
-        $prepaid_card_extract = $this->prepaidCardExtractRepository->getOne(['year' => $year, 'month' => $month, 'credit_card_id' => $prepaidCardId]);
+        $prepaid_card_extract = $this->prepaidCardExtractRepository->getOne(['year' => $year, 'month' => $month, 'prepaid_card_id' => $prepaidCardId]);
 
         if ($prepaid_card_extract) {
             throw new Exception('prepaid-card-extract.already-exists');
         }
 
-        return $this->prepaidCardExtractRepository->store([
+        $extract = $this->prepaidCardExtractRepository->store([
             'year' => $year,
             'month' => $month,
-            'balance' => $balance,
+            'credit' => $credit,
+            'credit_date' => $creditDate,
             'remarks' => $remarks,
             'prepaid_card_id' => $prepaidCardId,
         ]);
+
+        // Verifico se existe Budget
+        $budget = $this->budgetRepository->getOne(['month' => $month, 'year' => $year, 'user_id' => auth()->user()->id]);
+
+        if ($budget) {
+            $this->prepaidCardExtractRepository->store(['budget_id' => $budget->id], $extract);
+        }
+
+        return $extract;
     }
 
     /**
      * Update a  Extract
      * @param integer $id
-     * @param float $balance
+     * @param float $credit
      * @param string|null $remarks
      * @return bool
      */
     public function update(
         int $id,
-        float $balance,
+        float $credit,
+        string $creditDate,
         string $remarks = null
     ): PrepaidCardExtract {
         $prepaid_card_extract = $this->prepaidCardExtractRepository->show($id);
@@ -95,7 +108,8 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
         }
 
         return $this->prepaidCardExtractRepository->store([
-            'balance' => $balance,
+            'credit' => $credit,
+            'credit_date' => $creditDate,
             'remarks' => $remarks,
         ], $prepaid_card_extract);
     }

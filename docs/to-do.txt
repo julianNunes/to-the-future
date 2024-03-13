@@ -6,7 +6,7 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - fazer a tradução
     - no create do Budget, fazer o include do "budget_id" em "prepaid_card_extract"
 
-    - "prepaid_card_invoices"
+    - "prepaid_card_extracts"
         - "valor_creditado"
         - "dia do creditado"
     - "prepaid_card_invoice_expenses"

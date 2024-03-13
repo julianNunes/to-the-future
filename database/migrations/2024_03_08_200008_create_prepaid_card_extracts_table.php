@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->char('year', 4)->comment('Ano do extrato');
             $table->char('month', 2)->comment('Mês do Extrato');
-            $table->decimal('balance')->default(0);
+            $table->decimal('credit')->default(0);
+            $table->date('credit_date')->comment('Data do Crédito');
             $table->string('remarks')->nullable()->comment('Observações');
             $table->unsignedBigInteger('prepaid_card_id');
             $table->foreign('prepaid_card_id')->references('id')->on('prepaid_cards');
             $table->unsignedBigInteger('budget_id')->nullable();
-            $table->foreign('budget=_id')->references('id')->on('budgets');
+            $table->foreign('budget_id')->references('id')->on('budgets');
             $table->timestamps();
             $table->engine = 'InnoDB';
         });

@@ -14,6 +14,7 @@ use App\Repositories\Interfaces\{
     CreditCardInvoiceRepositoryInterface,
     FinancingInstallmentRepositoryInterface,
     FixExpenseRepositoryInterface,
+    PrepaidCardExtractRepositoryInterface,
     ProvisionRepositoryInterface,
 };
 use App\Services\Interfaces\{
@@ -42,6 +43,7 @@ class BudgetService implements BudgetServiceInterface
         private ProvisionRepositoryInterface $provisionRepository,
         private BudgetRepositoryInterface $budgetRepository,
         private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
+        private PrepaidCardExtractRepositoryInterface $prepaidCardExtractRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
         private BudgetExpenseRepositoryInterface $budgetExpenseRepository,
         private BudgetProvisionRepositoryInterface $budgetProvisionRepository,
@@ -132,6 +134,24 @@ class BudgetService implements BudgetServiceInterface
 
         foreach ($credit_card_invoices as $invoice) {
             $this->creditCardInvoiceRepository->store(['budget_id' => $budget->id], $invoice);
+        }
+
+        // Verificar se existem extratos de cartão pre pago ja criadas para o mes/ano do orçamento
+        $prepaid_card_extracts = $this->prepaidCardExtractRepository->get(
+            function (Builder $query) use ($budget) {
+                $query
+                    ->where(['year' => $budget->year, 'month' => $budget->month, 'budget_id' => null])
+                    ->whereHas('prepaidCard', function (Builder $query) use ($budget) {
+                        $query->where('user_id', $budget->user_id)->where('is_active', true);
+                    });
+            },
+            [],
+            [],
+            []
+        );
+
+        foreach ($prepaid_card_extracts as $extract) {
+            $this->prepaidCardExtractRepository->store(['budget_id' => $budget->id], $extract);
         }
 
         if ($includeFixExpense) {

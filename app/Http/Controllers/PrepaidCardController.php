@@ -53,8 +53,6 @@ class PrepaidCardController extends Controller
         $this->validate($request, [
             'name' => ['required'],
             'digits' => ['required'],
-            'due_date' => ['required'],
-            'closing_date' => ['required'],
             'is_active' => ['required'],
         ]);
 
@@ -62,8 +60,6 @@ class PrepaidCardController extends Controller
             $id,
             $request->name,
             $request->digits,
-            $request->due_date,
-            $request->closing_date,
             $request->is_active == '1'
         );
         return redirect()->back()->with('success', 'default.sucess-update');

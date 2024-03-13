@@ -82,6 +82,7 @@
         "provision": "Provisionamentos",
         "tags": "Tags",
         "credit-card": "Cartões de Crédito",
+        "prepaid-card": "Cartões Pré-Pago",
         "fix-expense": "Despesas Fixas",
         "financing": "Financiamentos",
         "budget": "Orçamentos"
@@ -153,6 +154,41 @@
             "share-value": "É necessário informar o Valor Compartilhado quando houver o nome de um usuario em Compartilhado com. Linha {key}",
             "share-user": "É necessário informar o nome do usuário que será compartilhado o valor quando houver Valor Compartilhado. Linha {key}"
         }
+    },
+    "prepaid-card": {
+        "title": "Gerenciamento de Cartões Pré-Pago",
+        "new-item": "Novo Cartão Pré-Pago",
+        "edit-item": "Editar Cartão Pré-Pago",
+        "item": "Cartão Pré-Pago",
+        "not-found": "Cartão Pré-Pago não encontrado",
+        "already-exists": "Cartão Pré-Pago já existe",
+        "digits": "Digitos",
+        "4-digits": "4 ultimos digitos",
+        "due-date": "Dia do vencimento da fatura",
+        "closing-date": "Dia do fechamento da fatura",
+        "extracts": "Extratos"
+    },
+    "prepaid-card-extract": {
+        "title-index": "Gerenciamento de Extratos",
+        "title-show": "Extrato do Cartão Pré-Pago",
+        "title-extracts": "Extratos",
+        "new-item": "Novo Extrato",
+        "edit-item": "Editar Extrato",
+        "balance": "Balanço",
+        "prepaid-card-title": "Dados do Cartão",
+        "year-month": "Mês/Ano",
+        "credit-date": "Data do Crédito",
+        "credit": "Valor do Crédito",
+        "already-exists": "Extrato ja existe",
+        "data-extract": "Dados do Extrato"
+    },
+    "prepaid-card-extract-expense": {
+        "title": "Despesas",
+        "new-item": "Nova Despesa",
+        "edit-item": "Editar Despesa",
+        "item": "Despesa",
+        "edit-item-division": "Editar Divisão de Despesa",
+        "not-found": "Despesa não encontrada"
     },
     "financing": {
         "title": "Gerenciamento de Financiamentos",

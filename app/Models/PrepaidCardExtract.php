@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,11 +17,29 @@ class PrepaidCardExtract extends Model
     protected $fillable = [
         'year',
         'month',
-        'balance',
+        'credit',
+        'credit_date',
         'remarks',
         'prepaid_card_id',
         'budget_id'
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     * @var array
+     */
+    protected $appends = ['year_month'];
+
+    /**
+     * Accessors
+     */
+    protected function yearMonth(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) => $attributes['month'] . '/' . $attributes['year'],
+
+        );
+    }
 
     public function prepaidCard(): BelongsTo
     {

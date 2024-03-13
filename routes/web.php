@@ -98,6 +98,7 @@ Route::controller(PrepaidCardController::class)->group(function () {
 Route::controller(PrepaidCardExtractController::class)->group(function () {
     Route::get('/prepaid-card/{prepaidCardId}/extract', 'index');
     Route::post('/prepaid-card/extract', 'store');
+    Route::put('/prepaid-card/extract/{id}', 'update');
     Route::delete('/prepaid-card/extract/{id}', 'delete');
     Route::get('/prepaid-card/extract/{id}', 'show');
     Route::delete('/prepaid-card/extract/{id}', 'delete');

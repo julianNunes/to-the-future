@@ -18,7 +18,8 @@ interface PrepaidCardExtractServiceInterface
      * @param integer $prepaidCardId
      * @param string $year
      * @param string $month
-     * @param float $balance
+     * @param float $credit
+     * @param string $creditDate
      * @param string|null $remarks
      * @return PrepaidCardExtract
      */
@@ -26,20 +27,22 @@ interface PrepaidCardExtractServiceInterface
         int $prepaidCardId,
         string $year,
         string $month,
-        float $balance,
+        float $credit,
+        string $creditDate,
         string $remarks = null,
     ): PrepaidCardExtract;
 
     /**
      * Update a  Extract
      * @param integer $id
-     * @param float $balance
+     * @param float $credit
      * @param string|null $remarks
      * @return bool
      */
     public function update(
         int $id,
-        float $balance,
+        float $credit,
+        string $creditDate,
         string $remarks = null
     ): PrepaidCardExtract;
 

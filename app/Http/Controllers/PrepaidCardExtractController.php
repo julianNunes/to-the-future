@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Services\Interfaces\PrepaidCardExtractServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class PrepaidCardExtractController extends Controller
@@ -35,7 +34,8 @@ class PrepaidCardExtractController extends Controller
         $this->validate($request, [
             'year' => ['required'],
             'month' => ['required'],
-            'balance' => ['required'],
+            'credit' => ['required'],
+            'credit_date' => ['required'],
             'prepaid_card_id' => ['required'],
         ]);
 
@@ -43,7 +43,8 @@ class PrepaidCardExtractController extends Controller
             $request->prepaid_card_id,
             $request->year,
             $request->month,
-            floatval($request->balance),
+            floatval($request->credit),
+            $request->credit_date,
             $request->remarks
         );
 
@@ -58,13 +59,14 @@ class PrepaidCardExtractController extends Controller
     public function update(Request $request, int $id)
     {
         $this->validate($request, [
-            'balance' => ['required'],
-            'prepaid_card_id' => ['required'],
+            'credit' => ['required'],
+            'credit_date' => ['required'],
         ]);
 
         $this->prepaidCardExtractService->update(
             $id,
-            floatval($request->balance),
+            floatval($request->credit),
+            $request->credit_date,
             $request->remarks,
         );
         return redirect()->back()->with('success', 'default.sucess-update');

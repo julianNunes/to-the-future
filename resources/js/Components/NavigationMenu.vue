@@ -60,6 +60,11 @@ export default {
                     to: '/credit-card',
                 },
                 {
+                    title: this.$t('menus.prepaid-card'),
+                    icon: 'mdi-credit-card',
+                    to: '/prepaid-card',
+                },
+                {
                     title: this.$t('menus.budget'),
                     icon: 'mdi-credit-card',
                     to: '/budget/' + moment().format('YYYY'),

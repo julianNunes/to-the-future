@@ -1,8 +1,8 @@
 <template>
-    <Head title="Financing" />
+    <Head title="Credit Card" />
     <AuthenticatedLayout>
         <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('financing.title') }}</h5>
+            <h5 class="text-h5 font-weight-bold">{{ $t('prepaid-card.title') }}</h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
 
@@ -16,14 +16,14 @@
                     <v-col md="12">
                         <v-data-table
                             :headers="headers"
-                            :items="financings"
+                            :items="prepaidCards"
                             :sort-by="[{ key: 'created_at', order: 'asc' }]"
                             :search="search"
                             :loading="isLoading"
                             :loading-text="$t('default.loading-text-table')"
                             class="elevation-3"
                             density="compact"
-                            :total-items="financings.length"
+                            :total-items="prepaidCards.length"
                             :no-data-text="$t('default.no-data-text')"
                             :no-results-text="$t('default.no-data-text')"
                             :footer-props="{
@@ -35,18 +35,19 @@
                             }"
                             fixed-header
                         >
-                            <template #[`item.start_date`]="{ item }">{{
-                                moment(item.start_date).format('DD/MM/YYYY')
+                            <template #[`item.is_active`]="{ item }">{{
+                                item.is_active ? $t('default.yes') : $t('default.no')
                             }}</template>
-                            <template #[`item.total`]="{ item }">{{ currencyField(item.total) }}</template>
-                            <template #[`item.fees_monthly`]="{ item }">{{ percentField(item.fees_monthly) }}</template>
-
                             <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('financing.installments-show')" location="top">
+                                <v-tooltip :text="$t('prepaid-card.extracts')" location="top">
                                     <template #activator="{ props }">
-                                        <Link :href="hrefInstalmment(item)" class="v-breadcrumbs-item--link">
-                                            <v-icon v-bind="props" color="warning" icon="mdi-checkbook" size="small">
-                                            </v-icon>
+                                        <Link :href="hrefExtract(item)" class="v-breadcrumbs-item--link">
+                                            <v-icon
+                                                v-bind="props"
+                                                color="warning"
+                                                icon="mdi-checkbook"
+                                                size="small"
+                                            ></v-icon>
                                         </Link>
                                     </template>
                                 </v-tooltip>
@@ -54,10 +55,10 @@
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
-                                            class="ml-1"
                                             color="warning"
                                             icon="mdi-pencil"
                                             size="small"
+                                            class="ml-1"
                                             @click="editItem(item)"
                                         >
                                         </v-icon>
@@ -110,11 +111,11 @@
                 <v-card-text>
                     <v-form ref="form" @submit.prevent>
                         <v-row dense>
-                            <v-col cols="12" sm="12" md="12">
+                            <v-col cols="12" sm="12" md="6">
                                 <v-text-field
-                                    ref="txtDescription"
-                                    v-model="financing.description"
-                                    :label="$t('default.description')"
+                                    ref="txtName"
+                                    v-model="prepaidCard.name"
+                                    :label="$t('default.name')"
                                     :rules="rules.textFieldRules"
                                     required
                                     density="comfortable"
@@ -122,74 +123,26 @@
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <v-text-field
-                                    v-model="financing.start_date"
-                                    :label="$t('financing.start-date')"
-                                    type="date"
+                                    v-model="prepaidCard.digits"
+                                    :label="$t('prepaid-card.4-digits')"
+                                    :counter="4"
+                                    :maxlength="4"
                                     required
-                                    :rules="rules.textFieldRules"
+                                    :rules="rules.digitsFieldRules"
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
-                                    v-model="financing.total"
-                                    type="number"
-                                    :label="$t('default.total')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
+                                <v-select
+                                    v-model="prepaidCard.is_active"
+                                    :label="$t('default.active')"
+                                    :items="isActiveOptions"
+                                    item-title="name"
+                                    item-value="value"
+                                    clearable
+                                    :rules="rules.booleanFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="3">
-                                <v-text-field
-                                    v-model="financing.fees_monthly"
-                                    type="number"
-                                    :label="$t('financing.fees-monthly')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
-                                <v-text-field
-                                    v-model="financing.portion_total"
-                                    type="number"
-                                    :label="$t('financing.portion-total')"
-                                    min="2"
-                                    required
-                                    :rules="rules.currencyFieldRules"
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
-                                <v-text-field
-                                    v-model="financing.start_date_installment"
-                                    :label="$t('financing.installment-first-date')"
-                                    type="date"
-                                    required
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
-                                <v-text-field
-                                    v-model="financing.value_installment"
-                                    type="number"
-                                    :label="$t('financing.installment-value')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="12">
-                                <v-textarea
-                                    v-model="financing.remarks"
-                                    :label="$t('default.remarks')"
-                                    density="comfortable"
-                                ></v-textarea>
+                                ></v-select>
                             </v-col>
                         </v-row>
                     </v-form>
@@ -212,18 +165,15 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { Head, Link } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import { Head } from '@inertiajs/vue3'
-import { Link } from '@inertiajs/vue3'
-import moment from 'moment'
-import { currencyField, percentField } from '../../utils/utils.js'
 </script>
 
 <script>
 export default {
-    name: 'FinancingIndex',
+    name: 'PrepaidCardIndex',
     props: {
-        financings: {
+        prepaidCards: {
             type: Array,
         },
     },
@@ -237,25 +187,24 @@ export default {
                     href: '/dashboard',
                 },
                 {
-                    title: this.$t('menus.financing'),
+                    title: this.$t('menus.prepaid-card'),
                     disabled: true,
                 },
             ],
             headers: [
-                { title: this.$t('default.description'), align: 'start', key: 'description' },
-                { title: this.$t('financing.start-date'), align: 'center', key: 'start_date' },
-                { title: this.$t('financing.fees-monthly'), align: 'end', key: 'fees_monthly' },
-                { title: this.$t('financing.portion-total'), align: 'end', key: 'portion_total' },
-                { title: this.$t('default.total'), align: 'end', key: 'total' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
+                { title: this.$t('default.name'), key: 'name', groupable: false },
+                { title: this.$t('prepaid-card.digits'), key: 'digits' },
+                { title: this.$t('default.active'), key: 'is_active' },
                 { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                currencyFieldRules: [
+                booleanFieldRules: [(v) => v !== null || this.$t('rules.required-text-field')],
+                digitsFieldRules: [
                     (value) => {
                         if (!value) return this.$t('rules.required-text-field')
-                        if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+                        if (!/^\d+$/.test(value)) return this.$t('rules.only-numbers')
+
                         return true
                     },
                 ],
@@ -264,17 +213,22 @@ export default {
             editDialog: false,
             isLoading: false,
             deleteId: null,
-            financing: {
+            prepaidCard: {
                 id: null,
-                description: null,
-                start_date: null,
-                total: 0,
-                fees_monthly: 0,
-                portion_total: 0,
-                remarks: null,
-                start_date_installment: null,
-                value_installment: 0,
+                name: null,
+                digits: null,
+                is_active: null,
             },
+            isActiveOptions: [
+                {
+                    name: this.$t('default.no'),
+                    value: 0,
+                },
+                {
+                    name: this.$t('default.yes'),
+                    value: 1,
+                },
+            ],
         }
     },
 
@@ -283,50 +237,42 @@ export default {
     async mounted() {},
 
     methods: {
-        hrefInstalmment(item) {
-            return '/financing/' + item.id + '/installment'
+        hrefExtract(item) {
+            return '/prepaid-card/' + item.id + '/extract'
         },
 
         newItem() {
-            this.titleModal = this.$t('financing.new-item')
+            this.titleModal = this.$t('prepaid-card.new-item')
             this.editDialog = true
-            this.financing = {
+            this.prepaidCard = {
                 id: null,
-                description: null,
-                start_date: null,
-                total: 0,
-                fees_monthly: 0,
-                portion_total: 0,
-                remarks: null,
-                start_date_installment: null,
-                value_installment: 0,
+                name: null,
+                digits: null,
+                is_active: null,
             }
             setTimeout(() => {
-                this.$refs.txtDescription.focus()
+                this.$refs.txtName.focus()
             })
         },
 
         editItem(item) {
-            this.titleModal = this.$t('financing.edit-item')
+            this.titleModal = this.$t('prepaid-card.edit-item')
             this.editDialog = true
-            this.financing = {
+            this.prepaidCard = {
                 id: item.id,
-                description: item.description,
-                start_date: item.start_date,
-                total: Number(item.total),
-                fees_monthly: item.fees_monthly ? Number(item.fees_monthly) : 0,
-                portion_total: Number(item.portion_total),
-                remarks: item.remarks,
+                name: item.name,
+                digits: item.digits,
+                is_active: item.is_active,
             }
             setTimeout(() => {
-                this.$refs.txtDescription.focus()
+                this.$refs.txtName.focus()
             })
         },
 
         async save() {
             let validate = await this.$refs.form.validate()
             if (validate.valid) {
-                if (this.financing.id) {
+                if (this.prepaidCard.id) {
                     await this.update()
                 } else {
                     await this.create()
@@ -337,16 +283,11 @@ export default {
         async create() {
             this.isLoading = true
             this.$inertia.post(
-                '/financing',
+                '/prepaid-card',
                 {
-                    description: this.financing.description,
-                    start_date: this.financing.start_date,
-                    total: this.financing.total,
-                    fees_monthly: this.financing.fees_monthly,
-                    portion_total: this.financing.portion_total,
-                    remarks: this.financing.remarks,
-                    start_date_installment: this.financing.start_date_installment,
-                    value_installment: this.financing.value_installment,
+                    name: this.prepaidCard.name,
+                    digits: this.prepaidCard.digits,
+                    is_active: this.prepaidCard.is_active,
                 },
                 {
                     onSuccess: () => {
@@ -362,13 +303,11 @@ export default {
         async update() {
             this.isLoading = true
             this.$inertia.put(
-                '/financing/' + this.financing.id,
+                '/prepaid-card/' + this.prepaidCard.id,
                 {
-                    description: this.financing.description,
-                    start_date: this.financing.start_date,
-                    total: this.financing.total,
-                    fees_monthly: this.financing.fees_monthly,
-                    remarks: this.financing.remarks,
+                    name: this.prepaidCard.name,
+                    digits: this.prepaidCard.digits,
+                    is_active: this.prepaidCard.is_active,
                 },
                 {
                     onSuccess: () => {
@@ -383,14 +322,14 @@ export default {
 
         async confirmRemove(item) {
             this.deleteId = item.id
-            if (await this.$refs.confirm.open(this.$t('financing.item'), this.$t('default.confirm-delete-item'))) {
+            if (await this.$refs.confirm.open(this.$t('prepaid-card.item'), this.$t('default.confirm-delete-item'))) {
                 this.remove()
             }
         },
 
         remove() {
             this.isLoading = true
-            this.$inertia.delete(`/financing/${this.deleteId}`, {
+            this.$inertia.delete(`/prepaid-card/${this.deleteId}`, {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {},
