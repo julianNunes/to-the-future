@@ -127,4 +127,12 @@ interface CreditCardInvoiceExpenseServiceInterface
      * @return void
      */
     public function recalculateTotalInvoice(int $invoiceId);
+
+    /**
+     *
+     * @param integer $id
+     * @param Collection $data
+     * @return boolean
+     */
+    public function storeImportExcel(int $id, Collection $data): bool;
 }

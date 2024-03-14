@@ -492,6 +492,7 @@ export default {
                     onFinish: () => {
                         this.isLoading = false
                     },
+                    preserveScroll: true,
                 }
             )
         },
@@ -516,6 +517,7 @@ export default {
                     onFinish: () => {
                         this.isLoading = false
                     },
+                    preserveScroll: true,
                 }
             )
         },
@@ -530,7 +532,6 @@ export default {
         remove() {
             this.isLoading = true
             this.$inertia.delete(`/budget-goal/${this.deleteId}`, {
-                preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {},
                 onError: () => {

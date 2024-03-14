@@ -113,4 +113,17 @@ class CreditCardInvoiceExpenseController extends Controller
         $this->creditCardInvoiceExpenseService->deletePortions($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
+
+    /**
+     */
+    public function storeImportExcel(Request $request)
+    {
+        $this->validate($request, [
+            'data' => ['required'],
+            'invoice_id' => ['required'],
+        ]);
+
+        $this->creditCardInvoiceExpenseService->storeImportExcel(intval($request->invoice_id), collect($request->data));
+        return redirect()->back()->with('success', 'default.sucess-save');
+    }
 }

@@ -435,4 +435,55 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
             $this->creditCardInvoiceRepository->store(['total' => $total], $credit_card_invoice);
         }
     }
+
+    /**
+     *
+     * @param integer $id
+     * @param Collection $data
+     * @return boolean
+     */
+    public function storeImportExcel(int $invoiceId, Collection $data): bool
+    {
+        $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
+
+        if (!$credit_card_invoice) {
+            throw new Exception('credit-card-inovice.not-found');
+        }
+
+        foreach ($data as $expense) {
+            if ($expense['portion'] && intval($expense['portion']) > 0) {
+                $this->createWithPortions(
+                    $credit_card_invoice->credit_card_id,
+                    $credit_card_invoice->id,
+                    $expense['description'],
+                    $expense['date'],
+                    floatval($expense['value']),
+                    $expense['group'],
+                    intval($expense['portion']),
+                    intval($expense['portion_total']),
+                    $expense['remarks'],
+                    $expense['share_value'] ? floatval($expense['share_value']) : null,
+                    $expense['share_user_id'] ? intval($expense['share_user_id']) : null,
+                    collect($expense['tags'])
+                );
+            } else {
+                $this->create(
+                    $credit_card_invoice->credit_card_id,
+                    $credit_card_invoice->id,
+                    $expense['description'],
+                    $expense['date'],
+                    floatval($expense['value']),
+                    $expense['group'],
+                    intval($expense['portion']),
+                    intval($expense['portion_total']),
+                    $expense['remarks'],
+                    $expense['share_value'] ? floatval($expense['share_value']) : null,
+                    $expense['share_user_id'] ? intval($expense['share_user_id']) : null,
+                    collect($expense['tags'])
+                );
+            }
+        }
+
+        return true;
+    }
 }

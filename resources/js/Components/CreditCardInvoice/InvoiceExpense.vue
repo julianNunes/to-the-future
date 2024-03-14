@@ -1038,6 +1038,7 @@ export default {
                     onFinish: () => {
                         this.isLoading = false
                     },
+                    preserveScroll: true,
                 })
             } else {
                 this.$inertia.delete('/credit-card/invoice/expense/' + this.deleteId, {
@@ -1050,6 +1051,7 @@ export default {
                     onFinish: () => {
                         this.isLoading = false
                     },
+                    preserveScroll: true,
                 })
             }
         },
@@ -1071,32 +1073,35 @@ export default {
 
         async selectFile(event) {
             const file = event.target.files[0]
+            console.log('file', file)
             if (file) {
                 let data_excel = []
 
                 await readXlsxFile(file).then(async (rows) => {
                     rows.forEach((element, key) => {
-                        console.log('element', element)
                         if (key > 0) {
                             data_excel.push({
-                                description: element[0],
-                                date: element[1],
+                                date: moment(element[0]).format('YYYY-MM-DD'),
+                                description: element[1],
                                 value: element[2],
-                                group: this.convertGroupToExcel(element[3]),
-                                portion: element[4],
-                                portion_total: element[5],
-                                share_value: element[6],
-                                share_user_name: element[7],
-                                remarks: element[8],
-                                tags: element[9] ? element[9].split(',') : null,
+                                share_value: element[3],
+                                remarks: element[4],
+                                group: this.convertGroupToExcel(element[5]),
+                                portion: element[6],
+                                portion_total: element[7],
+                                share_user_id: element[8],
+                                tags: element[9]
+                                    ? element[9].split(',').map((x) => {
+                                          return { name: x.toUpperCase() }
+                                      })
+                                    : null,
                             })
                         }
                     })
                 })
 
                 if (this.validateImportExcel(data_excel)) {
-                    console.log('data_excel', data_excel)
-                    this.importExcel(data_excel)
+                    await this.importExcel(data_excel)
                 }
             }
         },
@@ -1106,14 +1111,14 @@ export default {
                 if (group === 'PARCELADO') return 'PORTION'
                 else if (group === 'SEMANA 1') return 'WEEK_1'
                 else if (group === 'SEMANA 2') return 'WEEK_2'
-                else if (group === 'SEMANA 3') return 'WEEK_4'
-                else if (group === 'SEMANA 4') return 'WEEK_5'
+                else if (group === 'SEMANA 3') return 'WEEK_3'
+                else if (group === 'SEMANA 4') return 'WEEK_4'
             }
             return ''
         },
 
         validateImportExcel(data_excel) {
-            data_excel.forEach((element, key) => {
+            for (const [key, element] of Object.entries(data_excel)) {
                 // Description
                 if (!element.description) {
                     this.toast.error(this.$tc('credit-card-invoice-expense.excel.description', { key: key + 1 }))
@@ -1151,41 +1156,43 @@ export default {
                     }
                 }
 
-                // share_value and share_user_name
-                if (element.share_value || element.share_user_name) {
-                    if (!element.share_value || element.share_value <= 0) {
+                // share_value and share_user_id
+                if (element.share_value || element.share_user_id) {
+                    if (!element.share_value) {
                         this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-value', { key: key + 1 }))
                         return false
                     }
 
-                    if (!element.share_user_name) {
+                    if (!element.share_user_id) {
+                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-user', { key: key + 1 }))
+                        return false
+                    }
+
+                    if (!this.shareUsers.find((x) => x.share_user_id == element.share_user_id)) {
                         this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-user', { key: key + 1 }))
                         return false
                     }
                 }
-            })
+            }
 
             return true
         },
 
         async importExcel(data_excel) {
-            console.log('data_excel', data_excel)
-            // this.isLoading = true
-            // this.$inertia.post(
-            //     '/credit-card/invoice/expense-import-excel',
-            //     {
-            //         data: data_excel,
-            //         invoice_id: this.invoice.id,
-            //     },
-            //     {
-            //         onSuccess: () => {
-            //             this.editDialog = false
-            //         },
-            //         onFinish: () => {
-            //             this.isLoading = false
-            //         },
-            //     }
-            // )
+            this.isLoading = true
+            this.$inertia.post(
+                '/credit-card/invoice/expense/import-excel',
+                {
+                    data: data_excel,
+                    invoice_id: this.invoice.id,
+                },
+                {
+                    onSuccess: () => {},
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
         },
 
         // Metodos para validação da divisão da despesa

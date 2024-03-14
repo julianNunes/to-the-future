@@ -567,6 +567,7 @@ export default {
                     onFinish: () => {
                         this.isLoading = false
                     },
+                    preserveScroll: true,
                 }
             )
         },
@@ -597,6 +598,7 @@ export default {
                     onFinish: () => {
                         this.isLoading = false
                     },
+                    preserveScroll: true,
                 }
             )
         },
@@ -623,6 +625,7 @@ export default {
                 onFinish: () => {
                     this.isLoading = false
                 },
+                preserveScroll: true,
             })
         },
     },
