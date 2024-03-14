@@ -99,7 +99,7 @@
                     <ExtractExpense
                         v-for="extract in budgetExtracts"
                         :key="extract.id"
-                        :invoice="extract"
+                        :extract="extract"
                         :share-users="shareUsers"
                         :title-card="true"
                         :year-month="yearMonthModel"
@@ -131,7 +131,7 @@
                     <ExtractExpense
                         v-for="extract in budgetShareExtracts"
                         :key="extract.id"
-                        :invoice="extract"
+                        :extract="extract"
                         :share-users="shareUsers"
                         :budget-weeks="budgetShareWeeks"
                         :title-card="true"

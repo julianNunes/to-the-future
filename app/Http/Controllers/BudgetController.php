@@ -95,7 +95,7 @@ class BudgetController extends Controller
             $request->end_week_3,
             $request->start_week_4,
             $request->end_week_4,
-            $request->closed
+            // $request->closed
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }

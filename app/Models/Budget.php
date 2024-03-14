@@ -77,4 +77,9 @@ class Budget extends Model
     {
         return $this->hasMany(CreditCardInvoice::class, 'budget_id', 'id');
     }
+
+    public function extracts(): HasMany
+    {
+        return $this->hasMany(PrepaidCardExtract::class, 'budget_id', 'id');
+    }
 }

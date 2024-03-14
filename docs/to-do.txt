@@ -1,21 +1,12 @@
+
+https://www.facebook.com/marketplace/item/430140782822716/
+https://www.facebook.com/marketplace/item/1058801061851401/
+
+
+
 ==================================================
 LISTA DE TAREFAS PENDENTES - TO DO
 ==================================================
-
-- CRUD para "prepaid_card"
-    - fazer a tradução
-    - no create do Budget, fazer o include do "budget_id" em "prepaid_card_extract"
-
-    - "prepaid_card_extracts"
-        - "valor_creditado"
-        - "dia do creditado"
-    - "prepaid_card_invoice_expenses"
-        - Quando houver despesas compartilhada sera somado como despesa para o usuario compartilhado
-        - o valor que sobrar da diferença do compartilhado entra como RECEITA para o dono do cartao
-
-- Fazer revisão de todos os campos "remarks"
-    - Cartao de credito: Conferir se o "remkars" esta sendo usado
-
 
 - Fatura do cartão de credito
     - Importar excel de despesas
@@ -23,6 +14,10 @@ LISTA DE TAREFAS PENDENTES - TO DO
 
 - CArtao de credito
     - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
+
+- Fazer revisão de todos os campos "remarks"
+    - Cartao de credito: Conferir se o "remkars" esta sendo usado
+
 
 
 - Orçamento

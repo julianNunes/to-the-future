@@ -503,7 +503,17 @@ class BudgetService implements BudgetServiceInterface
             throw new Exception('budget.not-found');
         }
 
-        return $this->budgetRepository->store(['closed' => $closed], $budget);
+        return $this->budgetRepository->store([
+            'start_week_1' => $startWeek1,
+            'end_week_1' => $endWeek1,
+            'start_week_2' => $startWeek2,
+            'end_week_2' => $endWeek2,
+            'start_week_3' => $startWeek3,
+            'end_week_3' => $endWeek3,
+            'start_week_4' => $startWeek4,
+            'end_week_4' => $endWeek4,
+            'closed' => $closed
+        ], $budget);
     }
 
     /**

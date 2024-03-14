@@ -168,12 +168,12 @@
                         <v-row dense>
                             <v-col cols="12" md="4">
                                 <v-text-field
-                                    v-show="!budget.id"
                                     ref="selectMonthYear"
                                     v-model="budget.yearMonth"
                                     type="month"
                                     :label="$t('default.year-month')"
-                                    clearable
+                                    :readonly="budget.id ? true : false"
+                                    :clearable="budget.id ? false : true"
                                     :rules="rules.textFieldRules"
                                     density="comfortable"
                                 ></v-text-field>
@@ -546,6 +546,7 @@ export default {
             this.createDialog = true
             this.budget = {
                 id: item.id,
+                yearMonth: item.year + '-' + item.month,
                 start_week_1: item.start_week_1,
                 end_week_1: item.end_week_1,
                 start_week_2: item.start_week_2,
@@ -617,7 +618,7 @@ export default {
                 },
                 {
                     onSuccess: () => {
-                        this.editDialog = false
+                        this.createDialog = false
                     },
                     onFinish: () => {
                         this.isLoading = false

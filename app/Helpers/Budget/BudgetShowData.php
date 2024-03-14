@@ -62,6 +62,13 @@ class BudgetShowData implements BudgetShowDataInterface
                         'shareUser'
                     ]
                 ]
+            ],
+            'extracts' => [
+                'prepaidCard',
+                'expenses' => [
+                    'tags',
+                    'shareUser',
+                ]
             ]
         ]);
 
@@ -128,6 +135,13 @@ class BudgetShowData implements BudgetShowDataInterface
                                 'tags',
                                 'shareUser'
                             ]
+                        ]
+                    ],
+                    'extracts' => [
+                        'prepaidCard',
+                        'expenses' => [
+                            'tags',
+                            'shareUser',
                         ]
                     ]
                 ]
@@ -242,6 +256,26 @@ class BudgetShowData implements BudgetShowDataInterface
             }
         }
 
+        // Receitas - Cartao Pre Pago
+        if ($budget->extracts && $budget->extracts->count()) {
+            foreach ($budget->extracts as $extract) {
+                if ($extract->expenses && $extract->expenses->count()) {
+                    $filtered = $extract->expenses->where('share_user_id', '!=', null)->where('id', '!=', null);
+
+                    if ($filtered && $filtered->count()) {
+                        $budget->incomes->push(new BudgetIncome([
+                            'id' => null,
+                            'description' => 'Total ' . $extract->prepaidCard->name,
+                            'date' => null,
+                            'value' => $filtered->sum('share_value'),
+                            'remarks' => 'budget.credit-prepaid-card',
+                            'tags' => collect()
+                        ]));
+                    }
+                }
+            }
+        }
+
         // Despesas - Totalizador do Provisionamento
         if ($budget->provisions && $budget->provisions->count()) {
             $share_value = $budget->provisions->sum('share_value');
@@ -300,10 +334,6 @@ class BudgetShowData implements BudgetShowDataInterface
             }
         }
 
-        /**
-         * @todo INSERIR POSTERIOR O CARTAO PRE PAGO
-         */
-
         if ($budgetShare) {
             // Despesas - Compartilhado com owner Totalizador dos cartoes
             if ($budgetShare && $budgetShare->expenses && $budgetShare->expenses->count() && $budgetShare->expenses->where('share_user_id', $budget->user_id)->count()) {
@@ -317,7 +347,7 @@ class BudgetShowData implements BudgetShowDataInterface
                         'description' => $expense['description'],
                         'date' => $expense['date'],
                         'value' => $expense['share_value'],
-                        'remarks' => 'budget.share-expense-owner',
+                        'remarks' => 'budget.share-expense',
                         'paid' => null,
                         'share_value' => null,
                         'share_user_id' => null,
@@ -337,7 +367,7 @@ class BudgetShowData implements BudgetShowDataInterface
                     'description' => 'budget.total-provision',
                     'date' => null,
                     'value' => $filtered->sum('share_value'),
-                    'remarks' => 'budget.share-expense-owner',
+                    'remarks' => 'budget.share-expense',
                     'paid' => null,
                     'share_value' => null,
                     'share_user_id' => null,
@@ -358,12 +388,35 @@ class BudgetShowData implements BudgetShowDataInterface
                             'description' => 'Total: ' . $invoice->creditCard->name,
                             'date' => $invoice->due_date,
                             'value' => $filtered->sum('share_value'),
-                            'remarks' => 'budget.share-expense-owner',
+                            'remarks' => 'budget.share-expense',
                             'paid' => null,
                             'share_value' => null,
                             'share_user_id' => null,
                             'tags' => collect()
                         ]));
+                    }
+                }
+            }
+
+            // Despesas - Compartilhado com owner Totalizador dos cartoes pre-pago
+            if ($budgetShare->extracts && $budgetShare->extracts->count()) {
+                foreach ($budgetShare->extracts as $extract) {
+                    if ($extract->expenses && $extract->expenses->count()) {
+                        $filtered = $extract->expenses->where('share_user_id', '!=', null)->where('id', '!=', null);
+
+                        if ($filtered && $filtered->count()) {
+                            $budget->expenses->push(new BudgetExpense([
+                                'id' => null,
+                                'description' => 'Total ' . $extract->prepaidCard->name,
+                                'date' => null,
+                                'value' => $filtered->sum('share_value'),
+                                'remarks' => 'budget.share-expense',
+                                'paid' => null,
+                                'share_value' => null,
+                                'share_user_id' => null,
+                                'tags' => collect()
+                            ]));
+                        }
                     }
                 }
             }
@@ -473,6 +526,17 @@ class BudgetShowData implements BudgetShowDataInterface
             }
         }
 
+        foreach ($budget->extracts as $extract) {
+            if ($extract->expenses && $extract->expenses->count()) {
+                $filtered = $extract->expenses->where('group', '=', 'WEEK_1');
+
+                if ($filtered && $filtered->count()) {
+                    $total_value += $filtered->sum('value');
+                    $total_share_value += $filtered->sum('share_value');
+                }
+            }
+        }
+
         $resume_credit_card->push([
             'name' => 'budget-resume.total-week-1',
             'total_value' => $total_value,
@@ -486,6 +550,17 @@ class BudgetShowData implements BudgetShowDataInterface
         foreach ($budget->invoices as $invoice) {
             if ($invoice->expenses && $invoice->expenses->count()) {
                 $filtered = $invoice->expenses->where('group', '=', 'WEEK_2');
+
+                if ($filtered && $filtered->count()) {
+                    $total_value += $filtered->sum('value');
+                    $total_share_value += $filtered->sum('share_value');
+                }
+            }
+        }
+
+        foreach ($budget->extracts as $extract) {
+            if ($extract->expenses && $extract->expenses->count()) {
+                $filtered = $extract->expenses->where('group', '=', 'WEEK_2');
 
                 if ($filtered && $filtered->count()) {
                     $total_value += $filtered->sum('value');
@@ -515,6 +590,17 @@ class BudgetShowData implements BudgetShowDataInterface
             }
         }
 
+        foreach ($budget->extracts as $extract) {
+            if ($extract->expenses && $extract->expenses->count()) {
+                $filtered = $extract->expenses->where('group', '=', 'WEEK_3');
+
+                if ($filtered && $filtered->count()) {
+                    $total_value += $filtered->sum('value');
+                    $total_share_value += $filtered->sum('share_value');
+                }
+            }
+        }
+
         $resume_credit_card->push([
             'name' => 'budget-resume.total-week-3',
             'total_value' => $total_value,
@@ -528,6 +614,17 @@ class BudgetShowData implements BudgetShowDataInterface
         foreach ($budget->invoices as $invoice) {
             if ($invoice->expenses && $invoice->expenses->count()) {
                 $filtered = $invoice->expenses->where('group', '=', 'WEEK_4');
+
+                if ($filtered && $filtered->count()) {
+                    $total_value += $filtered->sum('value');
+                    $total_share_value += $filtered->sum('share_value');
+                }
+            }
+        }
+
+        foreach ($budget->extracts as $extract) {
+            if ($extract->expenses && $extract->expenses->count()) {
+                $filtered = $extract->expenses->where('group', '=', 'WEEK_4');
 
                 if ($filtered && $filtered->count()) {
                     $total_value += $filtered->sum('value');
@@ -569,7 +666,6 @@ class BudgetShowData implements BudgetShowDataInterface
     }
 
     /**
-     * Undocumented function
      *
      * @param Budget $budget
      * @param Budget|null $budgetShare
@@ -623,6 +719,17 @@ class BudgetShowData implements BudgetShowDataInterface
                         }
                     }
 
+                    // Procuro em Cartões Pre-Pago
+                    if ($budget->extracts && $budget->extracts->count()) {
+                        foreach ($budget->extracts as $extract) {
+                            foreach ($extract->expenses as $expense) {
+                                if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name)) {
+                                    $total_expense += $expense->value;
+                                }
+                            }
+                        }
+                    }
+
                     if ($goal->count_share && $budgetShare) {
                         // Procuro em Provisionamento
                         if ($budgetShare->provisions && $budgetShare->provisions->count()) {
@@ -658,6 +765,17 @@ class BudgetShowData implements BudgetShowDataInterface
                                                 $total_expense += $expense->value;
                                             }
                                         }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Procuro em Cartões Pre-Pago
+                        if ($budgetShare->extracts && $budgetShare->extracts->count()) {
+                            foreach ($budgetShare->extracts as $extract) {
+                                foreach ($extract->expenses as $expense) {
+                                    if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name)) {
+                                        $total_expense += $expense->value;
                                     }
                                 }
                             }
@@ -736,6 +854,25 @@ class BudgetShowData implements BudgetShowDataInterface
                                 }
                             }
                         } else if ($expense->tags && $expense->tags->count()) {
+                            foreach ($expense->tags as $tag) {
+                                if (!isset($expense_to_tags[$tag->name])) {
+                                    $expense_to_tags[$tag->name] = 0;
+                                }
+
+                                $expense_to_tags[$tag->name] += $expense->value;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Procuro em Cartões PrePago
+        if ($budget->extracts && $budget->extracts->count()) {
+            foreach ($budget->extracts as $extract) {
+                if ($extract->expenses && $extract->expenses->count()) {
+                    foreach ($extract->expenses as $expense) {
+                        if ($expense->tags && $expense->tags->count()) {
                             foreach ($expense->tags as $tag) {
                                 if (!isset($expense_to_tags[$tag->name])) {
                                     $expense_to_tags[$tag->name] = 0;
