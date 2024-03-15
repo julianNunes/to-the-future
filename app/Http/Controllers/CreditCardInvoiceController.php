@@ -15,7 +15,7 @@ class CreditCardInvoiceController extends Controller
     }
 
     /**
-     * Retorna os dados para o index de Faturas de um Cartão de Credito
+     * Returns data for Credit Card Invoice Management
      * @param integer $creditCardId
      * @return void
      */
@@ -26,7 +26,7 @@ class CreditCardInvoiceController extends Controller
     }
 
     /**
-     * Cria uma nova Fatura
+     * Create a new Invoice
      * @param Request $request
      * @return void
      */
@@ -50,6 +50,25 @@ class CreditCardInvoiceController extends Controller
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
+    }
+
+    /**
+     * Update a Invoice
+     * @param Request $request
+     * @return void
+     */
+    public function update(Request $request, int $id)
+    {
+        $this->validate($request, [
+            'closed' => ['required'],
+        ]);
+
+        $this->creditCardInvoiceService->update(
+            $id,
+            $request->closed,
+        );
+
+        return redirect()->back()->with('success', 'default.sucess-update');
     }
 
     /**
@@ -81,7 +100,6 @@ class CreditCardInvoiceController extends Controller
      */
     public function downloadTemplate()
     {
-        Log::info('downloadtemplate');
         return response()->download(public_path('storage/template/template-despesas.xlsx'), 'template-despesas.xlsx');
     }
 

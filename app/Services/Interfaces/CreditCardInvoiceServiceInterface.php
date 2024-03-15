@@ -48,6 +48,13 @@ interface CreditCardInvoiceServiceInterface
     ): CreditCardInvoice;
 
     /**
+     * Update a Invoice
+     * @param int $id
+     * @return CreditCardInvoice
+     */
+    public function update(int $id, bool $closed): CreditCardInvoice;
+
+    /**
      * Delete a Invoice
      * @param int $id
      */

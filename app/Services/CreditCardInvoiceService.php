@@ -133,6 +133,22 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
     }
 
     /**
+     * Update a Invoice
+     * @param int $id
+     * @return CreditCardInvoice
+     */
+    public function update(int $id, bool $closed): CreditCardInvoice
+    {
+        $credit_card_invoice = $this->creditCardInvoiceRepository->show($id);
+
+        if (!$credit_card_invoice) {
+            throw new Exception('credit-card-invoice.not-found');
+        }
+
+        return $this->creditCardInvoiceRepository->store(['closed' => $closed], $credit_card_invoice);
+    }
+
+    /**
      * Delete a Invoice
      * @param int $id
      */

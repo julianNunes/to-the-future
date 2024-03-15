@@ -33,17 +33,6 @@ PRESENTE
 LISTA DE TAREFAS PENDENTES - TO DO
 ==================================================
 
-- Fatura do cartão de credito
-    - Importar excel de despesas
-
-
-- CArtao de credito
-    - No update da data de vencimento e fechamento, fazer a troca do dia das faturas em aberto
-
-- Fazer revisão de todos os campos "remarks"
-    - Cartao de credito: Conferir se o "remkars" esta sendo usado
-
-
 
 - Orçamento
     - TEstar novamente o "Create"

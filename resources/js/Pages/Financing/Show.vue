@@ -54,12 +54,12 @@
                         ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="12">
-                        <v-textarea
+                        <v-text-field
                             v-model="financingRemarks"
                             :label="$t('default.remarks')"
                             :readonly="true"
                             density="comfortable"
-                        ></v-textarea>
+                        ></v-text-field>
                     </v-col>
                 </v-row>
             </v-card-text>

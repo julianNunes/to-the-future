@@ -185,11 +185,11 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" md="12">
-                                <v-textarea
+                                <v-text-field
                                     v-model="financing.remarks"
                                     :label="$t('default.remarks')"
                                     density="comfortable"
-                                ></v-textarea>
+                                ></v-text-field>
                             </v-col>
                         </v-row>
                     </v-form>

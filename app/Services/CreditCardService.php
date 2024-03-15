@@ -14,6 +14,7 @@ use App\Repositories\Interfaces\{
 use App\Services\Interfaces\CreditCardServiceInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class CreditCardService implements CreditCardServiceInterface
 {
@@ -103,6 +104,32 @@ class CreditCardService implements CreditCardServiceInterface
 
         if (!$credit_card) {
             throw new Exception('credit-card.not-found');
+        }
+
+        if ($credit_card->due_date != $dueDate || $credit_card->closing_date != $closingDate) {
+            \Log::info('sao datas diferentes');
+            $invoices = $this->creditCardInvoiceRepository->get(['closed' => false, 'credit_card_id' => $credit_card->id]);
+
+            if ($invoices && $invoices->count()) {
+                foreach ($invoices as $invoice) {
+                    // $update = [];
+
+                    // if ($credit_card->due_date != $dueDate) {
+                    //     $update[] = (object) ['due_date' => Carbon::parse($invoice->due_date)->day($dueDate)->format('y-m-d')];
+                    // }
+
+                    // if ($credit_card->closing_date != $closingDate) {
+                    //     $update[] = (object) ['closing_date' => Carbon::parse($invoice->closing_date)->day($closingDate)->format('y-m-d')];
+                    // }
+
+                    // \Log::info($update);
+
+                    $this->creditCardInvoiceRepository->store([
+                        'due_date' => Carbon::parse($invoice->due_date)->day($dueDate)->format('y-m-d'),
+                        'closing_date' => Carbon::parse($invoice->closing_date)->day($closingDate)->format('y-m-d')
+                    ], $invoice);
+                }
+            }
         }
 
         return $this->creditCardRepository->store([

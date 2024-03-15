@@ -69,6 +69,7 @@ Route::controller(CreditCardController::class)->group(function () {
 Route::controller(CreditCardInvoiceController::class)->group(function () {
     Route::get('/credit-card/{creditCardId}/invoice', 'index');
     Route::post('/credit-card/invoice', 'store');
+    Route::put('/credit-card/invoice/{id}', 'update');
     Route::delete('/credit-card/invoice/{id}', 'delete');
     Route::get('/credit-card/invoice/{id}', 'show');
     Route::delete('/credit-card/invoice/{id}', 'delete');

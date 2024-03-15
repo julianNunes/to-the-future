@@ -57,7 +57,7 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
                         <v-text-field
-                            v-model="isClosed"
+                            v-model="isClosedName"
                             :label="$t('default.closed')"
                             :readonly="true"
                             density="comfortable"
@@ -71,22 +71,28 @@
                         <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
                     </v-col>
                 </v-row> -->
-                <v-row dense>
+                <v-row v-show="!viewOnly" dense>
                     <v-col md="12">
-                        <v-btn color="primary" :disabled="viewOnly" @click="newItem">{{ $t('default.new') }}</v-btn>
+                        <v-btn color="primary" :disabled="isClosed" @click="newItem">{{ $t('default.new') }}</v-btn>
                         <v-btn
                             color="info"
                             class="ml-1"
                             href="/storage/template/template-despesas.xlsx"
                             download
-                            :disabled="viewOnly"
+                            :disabled="viewOnly || isClosed"
                         >
                             {{ $t('credit-card-invoice.download-template') }}
                         </v-btn>
-                        <v-btn color="info" class="ml-1" :disabled="viewOnly" @click="clickImportFile">{{
+                        <v-btn color="info" class="ml-1" :disabled="isClosed" @click="clickImportFile">{{
                             $t('credit-card-invoice.import-excel')
                         }}</v-btn>
                         <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
+                        <v-btn v-if="isClosed" color="warning" class="ml-1" @click="updateInvoice(false)">
+                            {{ $t('credit-card-invoice.open-invoice') }}
+                        </v-btn>
+                        <v-btn v-else color="warning" class="ml-1" @click="updateInvoice(true)">{{
+                            $t('credit-card-invoice.close-invoice')
+                        }}</v-btn>
                     </v-col>
                 </v-row>
                 <v-row dense>
@@ -789,6 +795,9 @@ export default {
 
     computed: {
         isClosed() {
+            return this.invoice.closed ? true : false
+        },
+        isClosedName() {
             return this.invoice.closed ? this.$t('default.yes') : this.$t('default.no')
         },
         itemsTags() {
@@ -885,6 +894,22 @@ export default {
                 this.listTags = searchFieldsData
                 this.loadingData = false
             }, 300)
+        },
+
+        async updateInvoice(closed) {
+            this.isLoading = true
+            this.$inertia.put(
+                '/credit-card/invoice/' + this.invoice.id,
+                {
+                    closed: closed,
+                },
+                {
+                    onSuccess: () => {},
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
         },
 
         newItem() {
@@ -1056,6 +1081,102 @@ export default {
             }
         },
 
+        // Metodos para validação da divisão da despesa
+        validateDivisions() {
+            if (this.expense.divisions && this.expense.divisions.length) {
+                let total = 0
+
+                this.expense.divisions.forEach((item) => {
+                    total += parseFloat(item.value)
+                })
+
+                if (this.expense.value != total) {
+                    this.toast.warning(this.$t('credit-card-invoice-expense.error-total-division'))
+                    return false
+                }
+
+                if (this.expense.share_total) {
+                    let share_total = 0
+
+                    this.expense.divisions.forEach((item) => {
+                        share_total += parseFloat(item.share_value)
+                    })
+
+                    if (this.expense.share_total != share_total) {
+                        this.toast.warning(this.$t('credit-card-invoice-expense.error-total-share-division'))
+                        return false
+                    }
+                }
+            }
+
+            return true
+        },
+
+        newItemDivision() {
+            this.titleDivisionModal = this.$t('credit-card-invoice-expense.new-item-division')
+            this.division = {
+                id: null,
+                description: null,
+                value: null,
+                remarks: null,
+                share_value: null,
+                share_user_id: null,
+                expense_id: null,
+                tags: [],
+            }
+            this.editedIndex = -1
+            this.editDivisionDialog = true
+            setTimeout(() => {
+                this.$refs.txtDescriptionDivision.focus()
+            })
+        },
+
+        editDivisionItem(item) {
+            this.titleDivisionModal = this.$t('credit-card-invoice-expense.edit-item-division')
+            this.division = {
+                id: item.id,
+                description: item.description,
+                value: item.value,
+                remarks: item.remarks,
+                share_value: item.share_value,
+                share_user_id: item.share_user_id,
+                expense_id: item.expense_id,
+                tags: item.tags,
+            }
+            this.editedIndex = this.expense.divisions.indexOf(item)
+            this.editDivisionDialog = true
+        },
+
+        async saveDivison() {
+            let validate = await this.$refs.formDivision.validate()
+            if (validate.valid) {
+                if (this.editedIndex > -1) {
+                    Object.assign(this.expense.divisions[this.editedIndex], this.division)
+                } else {
+                    this.expense.divisions.push(this.division)
+                }
+                this.editDivisionDialog = false
+            }
+        },
+
+        async confirmDivisionRemove(item) {
+            this.editedIndex = this.expense.divisions.indexOf(item)
+            if (
+                await this.$refs.confirm.open(
+                    this.$t('credit-card-invoice-expense.item'),
+                    this.$t('default.confirm-delete-item')
+                )
+            ) {
+                this.deleteeDivision()
+            }
+        },
+
+        deleteeDivision() {
+            this.expense.divisions.splice(this.editedIndex, 1)
+            this.deleteDivisionDialog = false
+        },
+
+        // Referentes ao arquivos
         downloadTemplate() {
             fetch('/credit-card/invoice/download-template')
                 .then((res) => res.blob())
@@ -1193,101 +1314,6 @@ export default {
                     },
                 }
             )
-        },
-
-        // Metodos para validação da divisão da despesa
-        validateDivisions() {
-            if (this.expense.divisions && this.expense.divisions.length) {
-                let total = 0
-
-                this.expense.divisions.forEach((item) => {
-                    total += parseFloat(item.value)
-                })
-
-                if (this.expense.value != total) {
-                    this.toast.warning(this.$t('credit-card-invoice-expense.error-total-division'))
-                    return false
-                }
-
-                if (this.expense.share_total) {
-                    let share_total = 0
-
-                    this.expense.divisions.forEach((item) => {
-                        share_total += parseFloat(item.share_value)
-                    })
-
-                    if (this.expense.share_total != share_total) {
-                        this.toast.warning(this.$t('credit-card-invoice-expense.error-total-share-division'))
-                        return false
-                    }
-                }
-            }
-
-            return true
-        },
-
-        newItemDivision() {
-            this.titleDivisionModal = this.$t('credit-card-invoice-expense.new-item-division')
-            this.division = {
-                id: null,
-                description: null,
-                value: null,
-                remarks: null,
-                share_value: null,
-                share_user_id: null,
-                expense_id: null,
-                tags: [],
-            }
-            this.editedIndex = -1
-            this.editDivisionDialog = true
-            setTimeout(() => {
-                this.$refs.txtDescriptionDivision.focus()
-            })
-        },
-
-        editDivisionItem(item) {
-            this.titleDivisionModal = this.$t('credit-card-invoice-expense.edit-item-division')
-            this.division = {
-                id: item.id,
-                description: item.description,
-                value: item.value,
-                remarks: item.remarks,
-                share_value: item.share_value,
-                share_user_id: item.share_user_id,
-                expense_id: item.expense_id,
-                tags: item.tags,
-            }
-            this.editedIndex = this.expense.divisions.indexOf(item)
-            this.editDivisionDialog = true
-        },
-
-        async saveDivison() {
-            let validate = await this.$refs.formDivision.validate()
-            if (validate.valid) {
-                if (this.editedIndex > -1) {
-                    Object.assign(this.expense.divisions[this.editedIndex], this.division)
-                } else {
-                    this.expense.divisions.push(this.division)
-                }
-                this.editDivisionDialog = false
-            }
-        },
-
-        async confirmDivisionRemove(item) {
-            this.editedIndex = this.expense.divisions.indexOf(item)
-            if (
-                await this.$refs.confirm.open(
-                    this.$t('credit-card-invoice-expense.item'),
-                    this.$t('default.confirm-delete-item')
-                )
-            ) {
-                this.deleteeDivision()
-            }
-        },
-
-        deleteeDivision() {
-            this.expense.divisions.splice(this.editedIndex, 1)
-            this.deleteDivisionDialog = false
         },
     },
 }

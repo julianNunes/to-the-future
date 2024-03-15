@@ -129,7 +129,9 @@
         "already-exists": "Fatura ja existe",
         "data-invoice": "Dados da Fatura",
         "import-excel": "Importar Excel",
-        "download-template": "Download Template"
+        "download-template": "Download Template",
+        "close-invoice": "Fechar Fatura",
+        "open-invoice": "Editar Fatura"
     },
     "credit-card-invoice-expense": {
         "title": "Despesas",
