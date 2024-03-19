@@ -370,7 +370,7 @@
                                     ref="selectMonthYearClone"
                                     v-model="cloneBudget.yearMonth"
                                     type="month"
-                                    :label="$t('budget.year-month')"
+                                    :label="$t('default.year-month')"
                                     clearable
                                     :rules="rules.textFieldRules"
                                     density="comfortable"
@@ -380,24 +380,22 @@
                                 <v-checkbox
                                     v-model="cloneBudget.includeProvisions"
                                     :label="$t('budget.include-provision')"
+                                    density="comfortable"
                                 ></v-checkbox>
-                            </v-col>
-                            <v-col cols="12" md="12">
                                 <v-checkbox
                                     v-model="cloneBudget.cloneBugdetExpenses"
                                     :label="$t('budget.clone-expense')"
+                                    density="comfortable"
                                 ></v-checkbox>
-                            </v-col>
-                            <v-col cols="12" md="12">
                                 <v-checkbox
                                     v-model="cloneBudget.cloneBugdetIncomes"
                                     :label="$t('budget.clone-income')"
+                                    density="comfortable"
                                 ></v-checkbox>
-                            </v-col>
-                            <v-col cols="12" md="12">
                                 <v-checkbox
                                     v-model="cloneBudget.cloneBugdetGoals"
                                     :label="$t('budget.clone-goals')"
+                                    density="comfortable"
                                 ></v-checkbox>
                             </v-col>
                         </v-row>
@@ -408,7 +406,7 @@
                     <v-btn color="error" flat :loading="isLoading" @click="cloneDialog = false">
                         {{ $t('default.cancel') }}
                     </v-btn>
-                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
+                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="clone">
                         {{ $t('default.save') }}
                     </v-btn>
                 </v-card-actions>
@@ -648,7 +646,7 @@ export default {
             if (validate.valid) {
                 this.isLoading = true
                 this.$inertia.put(
-                    '/budget/' + this.budget.id + '/clone',
+                    '/budget/clone/' + this.cloneBudget.id,
                     {
                         year: this.cloneBudget.yearMonth.substring(0, 4),
                         month: this.cloneBudget.yearMonth.substring(5, 7),

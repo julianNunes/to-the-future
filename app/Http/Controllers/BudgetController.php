@@ -14,16 +14,17 @@ class BudgetController extends Controller
     }
 
     /**
-     * Retorna os dados para o index de Orçamento
+     * Return data to view Budget
      */
-    public function index(Request $request, string $year)
+    public function index(string $year)
     {
         $data = $this->budgetService->index($year);
         return Inertia::render('Budget/Index', $data);
     }
 
     /**
-     * Cria um novo Orçamento
+     * Create Budget with your relations
+     * @param Request $request
      */
     public function store(Request $request)
     {
@@ -53,12 +54,13 @@ class BudgetController extends Controller
     }
 
     /**
-     * Clona um Orçamento
+     * Clone a Budget with your relations
+     * @param Request $request
+     * @param integer $id
      */
     public function clone(Request $request, int $id)
     {
         $this->validate($request, [
-            'id' => ['required'],
             'year' => ['required'],
             'month' => ['required'],
         ]);
@@ -77,7 +79,9 @@ class BudgetController extends Controller
     }
 
     /**
-     * Atualiza um Orçamento
+     * Update a Budget
+     * @param Request $request
+     * @param integer $id
      */
     public function update(Request $request, int $id)
     {
@@ -101,7 +105,8 @@ class BudgetController extends Controller
     }
 
     /**
-     * Deleta um Orçamento
+     * Delete a Budget
+     * @param integer $id
      */
     public function delete(int $id)
     {
@@ -110,7 +115,9 @@ class BudgetController extends Controller
     }
 
     /**
-     * Mostra um Orçamento
+     * Find a Budget by year and month
+     * @param string $year
+     * @param string $month
      */
     public function findByYearMonth(string $year, string $month)
     {
@@ -123,7 +130,8 @@ class BudgetController extends Controller
     }
 
     /**
-     * Mostra um Orçamento com seus detalhamentos
+     * Show data to the view
+     * @param integer $id
      */
     public function show(int $id)
     {

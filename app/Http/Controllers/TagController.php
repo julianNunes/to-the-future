@@ -14,7 +14,7 @@ class TagController extends Controller
     }
 
     /**
-     * Retorna os dados para o index de Tag
+     * Returns data to Tag Management
      */
     public function index()
     {
@@ -23,7 +23,8 @@ class TagController extends Controller
     }
 
     /**
-     * Cria um novo Tag
+     * Create a new Tag
+     * @param Request $request
      */
     public function store(Request $request)
     {
@@ -39,7 +40,10 @@ class TagController extends Controller
     }
 
     /**
-     * Atualiza uma Tag
+     * Update a Tag
+     * @param Request $request
+     * @param integer $id
+     * @return void
      */
     public function update(Request $request, int $id)
     {
@@ -55,7 +59,8 @@ class TagController extends Controller
     }
 
     /**
-     * Deleta uma Tag
+     * Deleta a Tag
+     * @param integer $id
      */
     public function delete(int $id)
     {
@@ -64,9 +69,11 @@ class TagController extends Controller
     }
 
     /**
-     * Busca por nome das Tags. Utilizado no componente "v-auto-complete"
+     * Search by Tag name. Used in the "v-auto-complete" component
+     * @param string $name
+     * @return void
      */
-    public function search(Request $request, string $name)
+    public function search(string $name)
     {
         $data = $this->tagService->search($name);
         return response()->json($data);

@@ -99,7 +99,7 @@ class AppRepository implements AppRepositoryInterface
      * @param int $id
      * @return Model
      */
-    public function show(int $id, array $withs = []): Model
+    public function show(int $id, array $withs = []): ?Model
     {
         return $this->queryGet(['id' => $id], [], [], $withs)->first();
     }

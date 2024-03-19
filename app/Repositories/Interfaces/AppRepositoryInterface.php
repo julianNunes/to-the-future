@@ -49,7 +49,7 @@ interface AppRepositoryInterface
      * @param int $id
      * @return Model
      */
-    public function show(int $id, array $withs = []): Model;
+    public function show(int $id, array $withs = []): ?Model;
 
     /**
      * Create or Update a model with id or Model

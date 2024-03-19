@@ -146,7 +146,7 @@ Route::controller(ProvisionController::class)->group(function () {
 Route::controller(BudgetController::class)->group(function () {
     Route::get('/budget/{year}', 'index');
     Route::post('/budget', 'store');
-    Route::put('/budget/{id}/clone', 'clone');
+    Route::put('/budget/clone/{id}', 'clone');
     Route::put('/budget/{id}', 'update');
     Route::delete('/budget/{id}', 'delete');
     Route::get('/budget/find/{year}/{month}', 'findByYearMonth');

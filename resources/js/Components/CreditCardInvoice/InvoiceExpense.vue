@@ -117,6 +117,7 @@
                             :header-props="{
                                 sortByText: $t('default.sort-by'),
                             }"
+                            :items-per-page="50"
                             fixed-header
                         >
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
@@ -1187,14 +1188,11 @@ export default {
         },
 
         clickImportFile() {
-            console.log('clickImportFile')
-            console.log(this.$refs.fileInput)
             this.$refs.fileInput.click()
         },
 
         async selectFile(event) {
             const file = event.target.files[0]
-            console.log('file', file)
             if (file) {
                 let data_excel = []
 

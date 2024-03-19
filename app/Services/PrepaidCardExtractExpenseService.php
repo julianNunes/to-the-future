@@ -7,7 +7,7 @@ use App\Models\PrepaidCardExtractExpense;
 use App\Repositories\Interfaces\{
     PrepaidCardExtractExpenseRepositoryInterface,
     PrepaidCardExtractRepositoryInterface,
-    CreditCardRepositoryInterface,
+    PrepaidCardRepositoryInterface,
     ShareUserRepositoryInterface,
     TagRepositoryInterface
 };
@@ -19,7 +19,7 @@ use Illuminate\Support\Collection;
 class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServiceInterface
 {
     public function __construct(
-        private CreditCardRepositoryInterface $prepaidCardRepository,
+        private PrepaidCardRepositoryInterface $prepaidCardRepository,
         private PrepaidCardExtractRepositoryInterface $prepaidCardExtractRepository,
         private PrepaidCardExtractExpenseRepositoryInterface $prepaidCardExtractExpenseRepository,
         private TagRepositoryInterface $tagRepository,

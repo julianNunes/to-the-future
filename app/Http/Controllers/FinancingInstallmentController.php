@@ -15,7 +15,8 @@ class FinancingInstallmentController extends Controller
     }
 
     /**
-     * Retorna os dados para o index das Parcelas do Financiamento
+     * Returns data for Financing Installment Management
+     * @param integer $financingId
      */
     public function index(int $financingId)
     {
@@ -24,7 +25,9 @@ class FinancingInstallmentController extends Controller
     }
 
     /**
-     * Atualiza um Parcela do Financiamento
+     * Update a Installment of Financing
+     * @param Request $request
+     * @param integer $id
      */
     public function update(Request $request, int $id)
     {

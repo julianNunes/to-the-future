@@ -87,6 +87,7 @@
                             :header-props="{
                                 sortByText: $t('default.sort-by'),
                             }"
+                            :items-per-page="50"
                             fixed-header
                         >
                             <template #[`item.closing_date`]="{ item }">{{

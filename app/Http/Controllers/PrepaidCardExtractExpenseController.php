@@ -14,6 +14,7 @@ class PrepaidCardExtractExpenseController extends Controller
 
     /**
      * Create a new Expense Prepaid Card
+     * @param Request $request
      */
     public function store(Request $request)
     {
@@ -43,6 +44,8 @@ class PrepaidCardExtractExpenseController extends Controller
 
     /**
      * Update a Expense Prepaid Card
+     * @param Request $request
+     * @param integer $id
      */
     public function update(Request $request, int $id)
     {
@@ -73,6 +76,7 @@ class PrepaidCardExtractExpenseController extends Controller
 
     /**
      * Deleta a Expense Prepaid Card
+     * @param integer $id
      */
     public function delete(int $id)
     {

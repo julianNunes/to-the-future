@@ -55,7 +55,7 @@ class CreditCardInvoiceController extends Controller
     /**
      * Update a Invoice
      * @param Request $request
-     * @return void
+     * @param integer $id
      */
     public function update(Request $request, int $id)
     {
@@ -72,9 +72,8 @@ class CreditCardInvoiceController extends Controller
     }
 
     /**
-     * Deleta uma Fatura
+     * Deleta a Invoice
      * @param integer $id
-     * @return void
      */
     public function delete(int $id)
     {
@@ -86,7 +85,6 @@ class CreditCardInvoiceController extends Controller
      * Mostrar os dados de uma fatura
      * @param integer $creditCardId
      * @param integer $id
-     * @return void
      */
     public function show(int $id)
     {
@@ -101,27 +99,5 @@ class CreditCardInvoiceController extends Controller
     public function downloadTemplate()
     {
         return response()->download(public_path('storage/template/template-despesas.xlsx'), 'template-despesas.xlsx');
-    }
-
-    /**
-     * Salva o arquivo referente a fatura
-     * @param integer $fileId
-     * @return void
-     */
-    public function storeFile(Request $request)
-    {
-        // $this->creditCardInvoiceService->delete($id);
-        return redirect()->back()->with('success', 'default.sucess-delete');
-    }
-
-    /**
-     * Remove o arquivo referente a fatura
-     * @param integer $fileId
-     * @return void
-     */
-    public function deleteFile(int $fileId)
-    {
-        // $this->creditCardInvoiceService->delete($id);
-        return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

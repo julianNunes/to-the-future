@@ -24,7 +24,11 @@ class FinancingController extends Controller
     }
 
     /**
-     * Cria um novo Financiamento
+     */
+
+    /**
+     * Create a new Financing amd your installments
+     * @param Request $request
      */
     public function store(Request $request)
     {
@@ -53,7 +57,10 @@ class FinancingController extends Controller
     }
 
     /**
-     * Atualiza um Financiamento
+     * Edit a Financing. Only some data are available.
+     * Updating of installments will only occur in installments that are open
+     * @param Request $request
+     * @param integer $id
      */
     public function update(Request $request, int $id)
     {
@@ -78,7 +85,8 @@ class FinancingController extends Controller
     }
 
     /**
-     * Deleta um Financiamento
+     * Deleta a Financing
+     * @param integer $id
      */
     public function delete(int $id)
     {

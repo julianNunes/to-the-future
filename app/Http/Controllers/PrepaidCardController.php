@@ -14,7 +14,7 @@ class PrepaidCardController extends Controller
     }
 
     /**
-     * Returns data to Credit Card Management
+     * Returns data to Prepiad Card Management
      */
     public function index()
     {
@@ -23,7 +23,7 @@ class PrepaidCardController extends Controller
     }
 
     /**
-     * Create new Credit Card
+     * Create new Prepaid Card
      * @param Request $request
      */
     public function store(Request $request)
@@ -44,7 +44,7 @@ class PrepaidCardController extends Controller
     }
 
     /**
-     * Update a Credit Card
+     * Update a Prepaid Card
      * @param Request $request
      * @param integer $id
      */
@@ -66,7 +66,7 @@ class PrepaidCardController extends Controller
     }
 
     /**
-     * Deleta a Credit Card
+     * Deleta a Prepaid Card
      * @param integer $id
      */
     public function delete(int $id)

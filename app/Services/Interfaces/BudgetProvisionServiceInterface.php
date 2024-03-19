@@ -31,7 +31,7 @@ interface BudgetProvisionServiceInterface
     ): BudgetProvision;
 
     /**
-     * Update a new Provision to Budget
+     * Update a Provision to Budget
      * @param integer $id
      * @param string $description
      * @param float $value
@@ -54,7 +54,7 @@ interface BudgetProvisionServiceInterface
     ): bool;
 
     /**
-     * Delete a new Provision to Budget
+     * Delete a Provision to Budget
      * @param int $id
      */
     public function delete(int $id): bool;

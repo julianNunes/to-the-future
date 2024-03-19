@@ -15,7 +15,7 @@ class ProvisionController extends Controller
     }
 
     /**
-     * Retorna os dados para o index de Provisionamento
+     * Returns data to Provision Management
      */
     public function index()
     {
@@ -24,7 +24,8 @@ class ProvisionController extends Controller
     }
 
     /**
-     * Cria um novo Provisionamento
+     * Create a new Provision
+     * @param Request $request
      */
     public function store(Request $request)
     {
@@ -48,7 +49,9 @@ class ProvisionController extends Controller
     }
 
     /**
-     * Atualiza um Provisionamento
+     * Update a Provision
+     * @param Request $request
+     * @param integer $id
      */
     public function update(Request $request, int $id)
     {
@@ -72,7 +75,9 @@ class ProvisionController extends Controller
     }
 
     /**
-     * Deleta um Provisionamento
+     * Delete a Provision
+     * @param integer $id
+     * @return void
      */
     public function delete(int $id)
     {

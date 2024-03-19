@@ -372,8 +372,6 @@ export default {
 
     methods: {
         convertGroup(group) {
-            console.log('this.budgetWeeks', this.budgetWeeks)
-
             if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
                 return (
                     this.groupList.find((x) => x.value === group).name +

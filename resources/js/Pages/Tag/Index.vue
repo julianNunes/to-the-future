@@ -31,6 +31,7 @@
                             :header-props="{
                                 sortByText: $t('default.sort-by'),
                             }"
+                            :items-per-page="50"
                             fixed-header
                         >
                             <template #[`item.action`]="{ item }">
@@ -263,6 +264,12 @@ export default {
                 preserveState: true,
                 preserveScroll: true,
                 onSuccess: () => {},
+                onError: () => {
+                    this.isLoading = false
+                },
+                onFinish: () => {
+                    this.isLoading = false
+                },
             })
         },
 

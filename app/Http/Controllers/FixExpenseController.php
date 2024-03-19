@@ -23,8 +23,8 @@ class FixExpenseController extends Controller
     }
 
     /**
-     *  Create a new Fix Expense
-     *  @param Request $request
+     * Create a new Fix Expense
+     * @param Request $request
      */
     public function store(Request $request)
     {

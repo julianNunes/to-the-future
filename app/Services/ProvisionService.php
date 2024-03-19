@@ -19,7 +19,7 @@ class ProvisionService implements ProvisionServiceInterface
     }
 
     /**
-     * Retorna os dados para o index de Provisionamento
+     * Returns data to Provision Management
      * @return Array
      */
     public function index(): array
@@ -43,7 +43,7 @@ class ProvisionService implements ProvisionServiceInterface
     }
 
     /**
-     * Cria um novo Provisionamento
+     * Create a new Provision
      * @param string $description
      * @param float $value
      * @param string $group
@@ -78,7 +78,7 @@ class ProvisionService implements ProvisionServiceInterface
     }
 
     /**
-     * Atualiza um Provisionamento
+     * Update a Provision
      * @param int $id
      * @param string $description
      * @param float $value
@@ -120,7 +120,7 @@ class ProvisionService implements ProvisionServiceInterface
     }
 
     /**
-     * Deleta um Provisionamento
+     * Delete a Provision
      * @param int $id
      */
     public function delete(int $id): bool

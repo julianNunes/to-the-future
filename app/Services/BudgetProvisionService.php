@@ -70,7 +70,7 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
     }
 
     /**
-     * Update a new Provision to Budget
+     * Update a Provision to Budget
      * @param integer $id
      * @param string $description
      * @param float $value
@@ -124,7 +124,7 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
     }
 
     /**
-     * Delete a new Provision to Budget
+     * Delete a Provision to Budget
      * @param int $id
      */
     public function delete(int $id): bool

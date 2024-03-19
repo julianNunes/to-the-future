@@ -42,7 +42,7 @@ class BudgetProvisionController extends Controller
     }
 
     /**
-     * Update a new Provision to Budget
+     * Update a Provision to Budget
      * @param Request $request
      * @param int $id
      */
@@ -70,7 +70,7 @@ class BudgetProvisionController extends Controller
     }
 
     /**
-     * Delete a new Provision to Budget
+     * Delete a Provision to Budget
      * @param int $id
      */
     public function delete(int $id)

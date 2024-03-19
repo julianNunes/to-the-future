@@ -8,13 +8,13 @@ use Illuminate\Support\Collection;
 interface ProvisionServiceInterface
 {
     /**
-     * Retorna os dados para o index de Provisionamento
+     * Returns data to Provision Management
      * @return Array
      */
     public function index(): array;
 
     /**
-     * Cria um novo Provisionamento
+     * Create a new Provision
      * @param string $description
      * @param float $value
      * @param string $group
@@ -35,7 +35,7 @@ interface ProvisionServiceInterface
     ): Provision;
 
     /**
-     * Atualiza um Provisionamento
+     * Update a Provision
      * @param int $id
      * @param string $description
      * @param float $value
@@ -58,7 +58,7 @@ interface ProvisionServiceInterface
     ): Provision;
 
     /**
-     * Deleta um Provisionamento
+     * Delete a Provision
      * @param int $id
      */
     public function delete(int $id): bool;

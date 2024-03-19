@@ -15,7 +15,8 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
-     * Cria uma Despesa para uma Fatura do cartão de credito
+     * Create new Expense to Invoice and your portions
+     * @param Request $request
      */
     public function store(Request $request)
     {
@@ -65,7 +66,12 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
-     * Atualiza uma Despesa para uma Fatura do cartão de credito
+     */
+
+    /**
+     * Update a Expense
+     * @param Request $request
+     * @param integer $id
      */
     public function update(Request $request, int $id)
     {
@@ -98,7 +104,8 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
-     * Deleta uma Despesa de uma Fatura do cartão de credito
+     * Delete a Expense
+     * @param integer $id
      */
     public function delete(int $id)
     {
@@ -107,6 +114,8 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
+     * Delete all Expense portions of a Invoice Credit Card
+     * @param integer $id
      */
     public function deletePortions(int $id)
     {
@@ -115,6 +124,8 @@ class CreditCardInvoiceExpenseController extends Controller
     }
 
     /**
+     * Read data from Excel and save the Expenses
+     * @param Request $request
      */
     public function storeImportExcel(Request $request)
     {

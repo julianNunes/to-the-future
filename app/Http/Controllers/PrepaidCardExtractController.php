@@ -73,7 +73,7 @@ class PrepaidCardExtractController extends Controller
     }
 
     /**
-     * Deleta uma Fatura
+     * Deleta a Extract
      * @param integer $id
      * @return void
      */
@@ -84,10 +84,8 @@ class PrepaidCardExtractController extends Controller
     }
 
     /**
-     * Mostrar os dados de uma fatura
-     * @param integer $prepaidCardId
+     * Returns data for viewing/editing a Prepaid Card Extract
      * @param integer $id
-     * @return void
      */
     public function show(int $id)
     {

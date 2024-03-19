@@ -75,6 +75,7 @@
                             :header-props="{
                                 sortByText: $t('default.sort-by'),
                             }"
+                            :items-per-page="50"
                             fixed-header
                         >
                             <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>

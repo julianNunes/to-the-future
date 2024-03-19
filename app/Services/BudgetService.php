@@ -201,7 +201,7 @@ class BudgetService implements BudgetServiceInterface
             $new_date = $date->copy()->addMonth();
 
             for ($i = $new_date->month; $i <= 12; $i++) {
-                $new_budget = $this->budgetRepository->getOne(['year' => $year, 'month' => $new_date->month, 'user_id' => $userId]);
+                $new_budget = $this->budgetRepository->getOne(['year' => $year, 'month' => $new_date->format('m'), 'user_id' => $userId]);
 
                 if (!$new_budget) {
                     $new_budget = $this->budgetRepository->store([
@@ -225,11 +225,25 @@ class BudgetService implements BudgetServiceInterface
                     );
 
                     foreach ($credit_card_invoices as $invoice) {
-                        $this->creditCardInvoiceRepository->store(['budget_id' => $budget->id], $invoice);
+                        $this->creditCardInvoiceRepository->store(['budget_id' => $new_budget->id], $invoice);
                     }
 
-                    foreach ($credit_card_invoices as $invoice) {
-                        $this->creditCardInvoiceRepository->store(['budget_id' => $budget->id], $invoice);
+                    // Verificar se existem extratos de cartão pre pago ja criadas para o mes/ano do orçamento
+                    $prepaid_card_extracts = $this->prepaidCardExtractRepository->get(
+                        function (Builder $query) use ($new_budget) {
+                            $query
+                                ->where(['year' => $new_budget->year, 'month' => $new_budget->month, 'budget_id' => null])
+                                ->whereHas('prepaidCard', function (Builder $query) use ($new_budget) {
+                                    $query->where('user_id', $new_budget->user_id)->where('is_active', true);
+                                });
+                        },
+                        [],
+                        [],
+                        []
+                    );
+
+                    foreach ($prepaid_card_extracts as $extract) {
+                        $this->prepaidCardExtractRepository->store(['budget_id' => $new_budget->id], $extract);
                     }
 
                     if ($includeFixExpense && $fix_expenses && $fix_expenses->count()) {
@@ -269,16 +283,6 @@ class BudgetService implements BudgetServiceInterface
                 }
 
                 $this->budgetCalculate->recalculate($new_budget->id);
-
-                // if ($has_share_fix_expense || $has_share_provision) {
-                //     if ($shareUser) {
-                //         try {
-                //             $this->create($shareUser->share_user_id, $year, $new_date->month);
-                //         } catch (Exception $e) {
-                //         }
-                //     }
-                // }
-
                 $new_date->addMonth();
             }
         }
@@ -357,7 +361,7 @@ class BudgetService implements BudgetServiceInterface
         bool $cloneBugdetIncome = false,
         bool $cloneBugdetGoals = false
     ): Budget {
-        $budget = $this->budgetRepository->getOne(['year', $year, 'month' => $month, 'user_id', auth()->user()->id]);
+        $budget = $this->budgetRepository->getOne(['year' => $year, 'month' => $month, 'user_id' => auth()->user()->id]);
 
         if ($budget) {
             throw new Exception('budget.already-exists');
@@ -366,9 +370,7 @@ class BudgetService implements BudgetServiceInterface
         $with = collect();
 
         if ($cloneBugdetExpense) {
-            $with->push(['expenses' => function (Builder $query2) {
-                $query2->whereNull('financing_installment_id')->with(['tags']);
-            }]);
+            $with->push('expenses.tags');
         }
 
         if ($cloneBugdetIncome) {
@@ -376,35 +378,27 @@ class BudgetService implements BudgetServiceInterface
         }
 
         if ($cloneBugdetGoals) {
-            $with->push('goals.tag');
+            $with->push('goals.tags');
         }
 
-        $budget = $this->budgetRepository->show($id, $with->toArray());
+        if ($with->count()) {
+            $budget = $this->budgetRepository->show($id, $with->toArray());
+        } else {
+            $budget = $this->budgetRepository->show($id);
+        }
 
-        // $budget = Budget::when($cloneBugdetExpense, function (Builder $query) {
-        //     $query->with([
-        //         'expenses' => function (Builder $query2) {
-        //             $query2->whereNull('financing_installment_id')->with(['tags']);
-        //         }
-        //     ]);
-        // })
-        //     ->when($cloneBugdetIncome, function (Builder $query) {
-        //         $query->with(['incomes.tags']);
-        //     })
-        //     ->when($cloneBugdetGoals, function (Builder $query) {
-        //         $query->with(['goals.tags']);
-        //     })
-        //     ->find($id);
 
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
 
+        // \Log::info($budget->dd());
+
         $provisions = null;
         $new_budget = $this->create(
+            auth()->user()->id,
             $year,
-            $month,
-            auth()->user()->id
+            $month
         );
 
         if ($includeProvision) {
@@ -413,11 +407,11 @@ class BudgetService implements BudgetServiceInterface
             if ($provisions && $provisions->count()) {
                 foreach ($provisions as $provision) {
                     $this->budgetProvisionService->create(
+                        $new_budget->id,
                         $provision->description,
                         $provision->value,
                         $provision->group,
                         $provision->remarks,
-                        $new_budget->id,
                         $provision->share_value,
                         $provision->share_user_id,
                         $provision->tags
@@ -429,14 +423,16 @@ class BudgetService implements BudgetServiceInterface
         if ($cloneBugdetExpense && $budget->expenses && $budget->expenses->count()) {
             foreach ($budget->expenses as $expense) {
                 $this->budgetExpenseService->create(
+                    $new_budget->id,
                     $expense->description,
-                    $expense->date,
+                    Carbon::parse($expense->date)->month($month)->format('y-m-d'),
                     $expense->value,
                     $expense->group,
                     $expense->remarks,
-                    $new_budget->id,
+                    false,
                     $expense->share_value,
                     $expense->share_user_id,
+                    null,
                     $expense->tags
                 );
             }
@@ -446,7 +442,7 @@ class BudgetService implements BudgetServiceInterface
             foreach ($budget->incomes as $income) {
                 $this->budgetIncomeService->create(
                     $income->description,
-                    $income->date,
+                    Carbon::parse($income->date)->month($month)->format('y-m-d'),
                     $income->value,
                     $income->remarks,
                     $new_budget->id,
@@ -458,12 +454,12 @@ class BudgetService implements BudgetServiceInterface
         if ($cloneBugdetGoals && $budget->goals && $budget->goals->count()) {
             foreach ($budget->goals as $goal) {
                 $this->budgetGoalService->create(
+                    $new_budget->id,
                     $goal->description,
                     $goal->value,
+                    $goal->tags,
+                    $goal->count_share,
                     $goal->group,
-                    $goal->count_only_share,
-                    $budget->id,
-                    $goal->tags
                 );
             }
         }
@@ -524,10 +520,12 @@ class BudgetService implements BudgetServiceInterface
     public function delete(int $id): bool
     {
         $budget = $this->budgetRepository->show($id, [
-            'expenses.tags',
-            'incomes.tags',
-            'provisions.tags',
-            'goals'
+            'expenses',
+            'incomes',
+            'provisions',
+            'goals',
+            'invoices',
+            'extracts',
         ]);
 
         if (!$budget) {
@@ -544,9 +542,24 @@ class BudgetService implements BudgetServiceInterface
             $this->budgetIncomeService->delete($income->id);
         }
 
+        // Provisions
+        foreach ($budget->provisions as $provision) {
+            $this->budgetProvisionService->delete($provision->id);
+        }
+
         // Metas
         foreach ($budget->goals as $goal) {
             $this->budgetGoalService->delete($goal->id);
+        }
+
+        // Remove relation with Invoices
+        foreach ($budget->invoices as $invoice) {
+            $this->creditCardInvoiceRepository->store(['budget_id' => null], $invoice);
+        }
+
+        // Remove relation with Extracts Prepaid Card
+        foreach ($budget->extracts as $extract) {
+            $this->prepaidCardExtractRepository->store(['budget_id' => null], $extract);
         }
 
         return $this->budgetRepository->delete($id);

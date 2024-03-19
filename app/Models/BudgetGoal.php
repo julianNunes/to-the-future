@@ -13,7 +13,7 @@ class BudgetGoal extends Model
 {
     use HasFactory;
 
-    protected $table = 'buget_goals';
+    protected $table = 'budget_goals';
 
     protected $fillable = [
         'description',

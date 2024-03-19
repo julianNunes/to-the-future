@@ -17,7 +17,7 @@ class TagService implements TagServiceInterface
     }
 
     /**
-     * Retorna os dados para o index de Tag
+     * Returns data to Tag Management
      * @return Array
      */
     public function index(): array
@@ -29,7 +29,7 @@ class TagService implements TagServiceInterface
     }
 
     /**
-     * Cria um novo Tag
+     * Create a new Tag
      * @param string $name
      * @return Tag
      */
@@ -50,7 +50,7 @@ class TagService implements TagServiceInterface
     }
 
     /**
-     * Atualiza uma Tag
+     * Update a Tag
      * @param int $id
      * @param string $name
      * @return Tag
@@ -78,7 +78,7 @@ class TagService implements TagServiceInterface
     }
 
     /**
-     * Deleta uma Tag
+     * Deleta a Tag
      * @param int $id
      * @return bool
      */
@@ -94,7 +94,7 @@ class TagService implements TagServiceInterface
     }
 
     /**
-     * Busca tags atraves do nome
+     * Search by Tag name. Used in the "v-auto-complete" component
      * @param string $name
      * @return Collection
      */
@@ -104,7 +104,7 @@ class TagService implements TagServiceInterface
     }
 
     /**
-     * Metodo generico responsavel por salvar/atualizar as tagas para um determinado Model
+     * Generic method responsible for saving/updating rates for a given Model
      * @param Model $model
      * @param Collection|null $tags
      * @return void

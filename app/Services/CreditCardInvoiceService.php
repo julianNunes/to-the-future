@@ -79,9 +79,9 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
             $new_closing_date = $closing_date->copy()->addMonth();
 
             for ($i = $new_due_date->month; $i <= 12; $i++) {
-                $invoice = $this->create($new_due_date, $new_closing_date, $year, $new_due_date->month, $creditCardId);
+                $invoice = $this->create($new_due_date, $new_closing_date, $year, $new_due_date->format('m'), $creditCardId);
                 // Verifico se existe Budget
-                $budget = $this->budgetRepository->getOne(['month' => $new_due_date->month, 'year' => $year, 'user_id' => auth()->user()->id]);
+                $budget = $this->budgetRepository->getOne(['month' => $new_due_date->format('m'), 'year' => $year, 'user_id' => auth()->user()->id]);
 
                 if ($budget) {
                     $this->creditCardInvoiceRepository->store(['budget_id' => $budget->id], $invoice);

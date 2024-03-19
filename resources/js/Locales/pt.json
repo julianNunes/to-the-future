@@ -228,6 +228,7 @@
         "edit-item": "Editar Orçamento",
         "budget": "Orçamento",
         "clone": "Clonar",
+        "clone-item": "Clonar Orçamento",
         "automatic-generate": "Deseja gerar os Orçamentos para os proximos meses subsequentes do ano?",
         "include-fix-expense": "Incluir Despesas Fixas?",
         "include-provision": "Incluir Provisionamento?",
