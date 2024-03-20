@@ -42,7 +42,7 @@
                         ></v-text-field>
                         <v-text-field
                             v-model="resumeBalanceShare"
-                            :label="$t('budget-resume.balance')"
+                            :label="resumeBalanceShareLabel"
                             :readonly="true"
                             density="comfortable"
                         ></v-text-field>
@@ -109,6 +109,11 @@ export default {
         },
         resumeBalanceShare() {
             return currencyField(this.resume.balance_share)
+        },
+        resumeBalanceShareLabel() {
+            return this.resume.balance_share < 0
+                ? this.$t('budget-resume.value-to-pay')
+                : this.$t('budget-resume.value-to-receive')
         },
         itemsResumeCreditCard() {
             return this.resume.resume_credit_card

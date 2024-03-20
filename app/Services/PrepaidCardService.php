@@ -47,7 +47,7 @@ class PrepaidCardService implements PrepaidCardServiceInterface
         string $digits,
         bool $isActive
     ): PrepaidCard {
-        $prepaid_card = $this->prepaidCardRepository->getOne(['name' => $name]);
+        $prepaid_card = $this->prepaidCardRepository->getOne(['name' => $name, 'user_id' => auth()->user()->id]);
 
         if ($prepaid_card) {
             throw new Exception('prepaid-card.already-exists');
@@ -78,7 +78,7 @@ class PrepaidCardService implements PrepaidCardServiceInterface
         bool $isActive
     ): PrepaidCard {
         $prepaid_card = $this->prepaidCardRepository->getOne(function (Builder $query) use ($id, $name) {
-            $query->where('name', $name)->where('id', '!=', $id);
+            $query->where('name', $name)->where('user_id', auth()->user()->id)->where('id', '!=', $id);
         });
 
         if ($prepaid_card) {

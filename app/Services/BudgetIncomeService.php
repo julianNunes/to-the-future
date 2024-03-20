@@ -35,11 +35,11 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
      * @return BudgetIncome
      */
     public function create(
+        int $budgetId,
         string $description,
         string $date,
         float $value,
-        string $remarks,
-        int $budgetId,
+        string $remarks = null,
         Collection $tags = null
     ): BudgetIncome {
         $budget = $this->budgetRepository->show($budgetId);
@@ -79,7 +79,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         string $description,
         string $date,
         float $value,
-        string $remarks,
+        string $remarks = null,
         Collection $tags = null
     ): bool {
         $income = $this->budgetIncomeRepository->show($id);

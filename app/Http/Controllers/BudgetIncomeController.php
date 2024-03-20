@@ -28,11 +28,11 @@ class BudgetIncomeController extends Controller
         ]);
 
         $this->budgetIncomeSevice->create(
+            intval($request->budget_id),
             $request->description,
             $request->date,
             floatval($request->value),
             $request->remarks,
-            intval($request->budget_id),
             collect($request->tags)
         );
 

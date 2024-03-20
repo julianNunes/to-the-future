@@ -304,7 +304,9 @@
         "total-week-1": "Total Semana 1",
         "total-week-2": "Total Semana 2",
         "total-week-3": "Total Semana 3",
-        "total-week-4": "Total Semana 4"
+        "total-week-4": "Total Semana 4",
+        "value-to-receive": "Valor a receber",
+        "value-to-pay": "Valor a pagar"
     },
     "budget-expense-tags": {
         "title": "Despesas por Tag"

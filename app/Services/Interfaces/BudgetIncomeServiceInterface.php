@@ -18,11 +18,11 @@ interface BudgetIncomeServiceInterface
      * @return BudgetIncome
      */
     public function create(
+        int $budgetId,
         string $description,
         string $date,
         float $value,
-        string $remarks,
-        int $budgetId,
+        string $remarks = null,
         Collection $tags = null
     ): BudgetIncome;
 
@@ -41,7 +41,7 @@ interface BudgetIncomeServiceInterface
         string $description,
         string $date,
         float $value,
-        string $remarks,
+        string $remarks = null,
         Collection $tags = null
     ): bool;
 

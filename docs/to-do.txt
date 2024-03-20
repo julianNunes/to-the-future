@@ -36,22 +36,37 @@ Latest Tracking Number: NM184482483BR
 
 ==================================================
 LISTA DE TAREFAS PENDENTES - TO DO
-==================================================
-- CArtao de credito
-    - TESTAR O DELETE
-        - Apos fazer a tela das despesas do cartão junto com as tags
+=================================================
+- Orçamento Testes
+    - Despesas
+        - Individual
+        - Compartilhada comigo
+            - Despesas
+            - Cartoes de credito
+            - Provisionamento
+            - Cartao pre pago
+        - Total dos cartões
+        - Total do Provisionamento
+        - Total do Cartao PrePago
 
-- Orçamento
-    - TEstar novamente o "Create"
-    - Testar o Clone
+    - Receitas
+        - Individual
+        - Compartilhado com outro usuario
+            - Despesas
+            - Total dos cartões
+            - Total do Provisionamento
+            - Total do Cartao PrePago
 
-- RETESTAR TUDO
-    - Revisar todas as controllers e documentar corretamente
+    - Metas
+        - Individual
+        - Compartilhada
 
 
+    - Resumo do Orçamento
+        - COnferir os totalizadores ao final
 
-
-
+- Cartao Pre pago
+    - Criar Template e metodo de insert com EXCEL
 
 - Mudar como os menu é montado e fazer ele agrupado e remover os icones
 
@@ -59,7 +74,6 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - verificar como deixar o created_at e o updated_at automaticos
 
 - Criar classe customizavel do Exception para poder devolver valores
-
 
 - Orçamento
     - Decidir se vou ter o "closed" no Budget

@@ -56,7 +56,7 @@ class CreditCardService implements CreditCardServiceInterface
         string $closingDate,
         bool $isActive
     ): CreditCard {
-        $credit_card = $this->creditCardRepository->getOne(['name' => $name]);
+        $credit_card = $this->creditCardRepository->getOne(['name' => $name, 'user_id' => auth()->user()->id]);
 
         if ($credit_card) {
             throw new Exception('credit-card.already-exists');
@@ -93,7 +93,7 @@ class CreditCardService implements CreditCardServiceInterface
         bool $isActive
     ): CreditCard {
         $credit_card = $this->creditCardRepository->getOne(function (Builder $query) use ($id, $name) {
-            $query->where('name', $name)->where('id', '!=', $id);
+            $query->where('name', $name)->where('user_id', auth()->user()->id)->where('id', '!=', $id);
         });
 
         if ($credit_card) {

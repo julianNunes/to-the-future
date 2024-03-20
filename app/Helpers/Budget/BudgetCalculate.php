@@ -99,15 +99,15 @@ class BudgetCalculate implements BudgetCalculateInterface
                 [],
                 [],
                 [
-                    'expenses' => function (Builder $query) use ($budget) {
+                    'expenses' => function ($query) use ($budget) {
                         $query->where('share_user_id', $budget->user_id);
                     },
-                    'provisions' => function (Builder $query) use ($budget) {
+                    'provisions' => function ($query) use ($budget) {
                         $query->where('share_user_id', $budget->user_id);
                     },
-                    'invoices.expenses' => function (Builder $query) use ($budget) {
+                    'invoices.expenses' => function ($query) use ($budget) {
                         $query->where('share_user_id', $budget->user_id)
-                            ->orWhereHas('divisions', function (Builder $query2) use ($budget) {
+                            ->orWhereHas('divisions', function ($query2) use ($budget) {
                                 $query2->where('share_user_id', $budget->user_id);
                             });
                     },

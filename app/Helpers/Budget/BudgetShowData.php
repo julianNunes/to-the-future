@@ -240,7 +240,7 @@ class BudgetShowData implements BudgetShowDataInterface
 
         // Receitas - Compartilhado Receitas
         if ($budget->expenses->count()) {
-            $filtered = $budget->expenses->where('share_user_id', '!=', null)->where('id', '=', null);
+            $filtered = $budget->expenses->where('share_user_id', '!=', null)->where('id', '!=', null);
 
             if ($filtered && $filtered->count()) {
                 foreach ($filtered as $expense) {
