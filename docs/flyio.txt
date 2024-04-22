@@ -1,0 +1,2 @@
+# rodar o banco e acessar localmente
+flyctl proxy 13306:3306 -a mysql-laravel

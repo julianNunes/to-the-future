@@ -1,0 +1,27 @@
+# fly.toml app configuration file generated for mysql-laravel on 2024-04-22T08:57:44-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'mysql-laravel'
+primary_region = 'gru'
+
+[build]
+  image = 'mysql:8'
+
+[[vm]]
+  memory = '2gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[processes]
+  app = """--datadir /data/mysql \
+    --default-authentication-plugin mysql_native_password"""
+
+[mounts]
+  source = "mysqldata"
+  destination = "/data"
+
+[env]
+  MYSQL_DATABASE = "laravel"
+  MYSQL_USER = "laravel"
