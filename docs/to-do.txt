@@ -68,6 +68,8 @@ LISTA DE TAREFAS PENDENTES - TO DO
 - Cartao Pre pago
     - Criar Template e metodo de insert com EXCEL
 
+
+
 - Mudar como os menu é montado e fazer ele agrupado e remover os icones
 
 - Alterar o formato das datas do timestamp do Laravel
