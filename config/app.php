@@ -176,9 +176,9 @@ return [
         App\Providers\HelperServiceProvider::class,
 
         /**
-         * Others Providers
-         */
-        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+     * Others Providers
+     */
+        // Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
 
     ])->toArray(),
 

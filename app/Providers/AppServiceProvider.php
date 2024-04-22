@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
         // if ($this->app->isLocal()) {
         //     $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
         // }
-        $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
+        // $this->app->register(\Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
 
         // Apps Services
         $this->app->bind(BudgetExpenseServiceInterface::class, BudgetExpenseService::class);
