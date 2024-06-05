@@ -51,6 +51,22 @@
                 <v-row dense>
                     <v-col md="12">
                         <v-btn color="primary" :disabled="viewOnly" @click="newItem">{{ $t('default.new') }}</v-btn>
+                        <v-btn
+                            color="info"
+                            class="ml-1"
+                            href="/storage/template/template-prepaid-card.xlsx"
+                            download
+                            :disabled="viewOnly"
+                        >
+                            {{ $t('credit-card-invoice.download-template') }}
+                        </v-btn>
+                        <v-btn color="info" class="ml-1" :disabled="viewOnly" @click="clickImportFile">{{
+                            $t('credit-card-invoice.import-excel')
+                        }}</v-btn>
+                        <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
+                        <v-btn v-if="viewOnly" color="warning" class="ml-1" @click="updateInvoice(false)">
+                            {{ $t('credit-card-invoice.open-invoice') }}
+                        </v-btn>
                     </v-col>
                 </v-row>
                 <v-row dense>
@@ -227,6 +243,15 @@
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
                             <v-text-field
+                                v-model="percentage"
+                                type="number"
+                                :label="$t('default.percentage-share')"
+                                density="comfortable"
+                                @blur="calculeShareValue"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <v-text-field
                                 v-model="expense.share_value"
                                 :label="$t('default.share-value')"
                                 type="number"
@@ -312,6 +337,7 @@
 import moment from 'moment'
 import { useToast } from 'vue-toastification'
 import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
+import readXlsxFile from 'read-excel-file'
 </script>
 
 <script>
@@ -393,6 +419,7 @@ export default {
             editedIndex: -1,
             listTags: [],
             searchFieldsData: [],
+            percentage: null,
             expense: {
                 id: null,
                 description: null,
@@ -438,6 +465,12 @@ export default {
     },
 
     methods: {
+        calculeShareValue(evt) {
+            if (this.expense.value) {
+                this.expense.share_value = parseFloat((this.expense.value * evt.target.value) / 100).toFixed(2)
+            }
+        },
+
         convertGroup(group) {
             if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
                 return (
@@ -628,6 +661,127 @@ export default {
                 },
                 preserveScroll: true,
             })
+        },
+
+        // Referentes ao arquivos
+        downloadTemplate() {
+            fetch('/prepaid-card/extract/download-template')
+                .then((res) => res.blob())
+                .then((blob) => {
+                    const file = window.URL.createObjectURL(blob)
+                    window.location.assign(file)
+                })
+        },
+
+        clickImportFile() {
+            this.$refs.fileInput.click()
+        },
+
+        async selectFile(event) {
+            const file = event.target.files[0]
+            if (file) {
+                let data_excel = []
+
+                await readXlsxFile(file).then(async (rows) => {
+                    rows.forEach((element, key) => {
+                        if (key > 0) {
+                            data_excel.push({
+                                date: moment(element[0]).format('YYYY-MM-DD'),
+                                description: element[1],
+                                value: element[2],
+                                share_value: element[3],
+                                remarks: element[4],
+                                group: this.convertGroupToExcel(element[5]),
+                                share_user_id: element[6],
+                                tags: element[7]
+                                    ? element[7].split(',').map((x) => {
+                                          return { name: x.toUpperCase() }
+                                      })
+                                    : null,
+                            })
+                        }
+                    })
+                })
+
+                if (this.validateImportExcel(data_excel)) {
+                    await this.importExcel(data_excel)
+                }
+            }
+        },
+
+        convertGroupToExcel(group) {
+            if (group) {
+                if (group === 'SEMANA 1') return 'WEEK_1'
+                else if (group === 'SEMANA 2') return 'WEEK_2'
+                else if (group === 'SEMANA 3') return 'WEEK_3'
+                else if (group === 'SEMANA 4') return 'WEEK_4'
+            }
+            return ''
+        },
+
+        validateImportExcel(data_excel) {
+            for (const [key, element] of Object.entries(data_excel)) {
+                // Description
+                if (!element.description) {
+                    this.toast.error(this.$tc('prepaid-card-extract-expense.excel.description', { key: key + 1 }))
+                    return false
+                }
+
+                // Date
+                if (!element.date) {
+                    this.toast.error(this.$tc('prepaid-card-extract-expense.excel.date', { key: key + 1 }))
+                    return false
+                }
+
+                // Value
+                if (!element.value) {
+                    this.toast.error(this.$tc('prepaid-card-extract-expense.excel.date', { key: key + 1 }))
+                    return false
+                }
+
+                // group
+                if (!element.group) {
+                    this.toast.error(this.$tc('prepaid-card-extract-expense.excel.group', { key: key + 1 }))
+                    return false
+                }
+
+                // share_value and share_user_id
+                if (element.share_value || element.share_user_id) {
+                    if (!element.share_value) {
+                        this.toast.error(this.$tc('prepaid-card-extract-expense.excel.share-value', { key: key + 1 }))
+                        return false
+                    }
+
+                    if (!element.share_user_id) {
+                        this.toast.error(this.$tc('prepaid-card-extract-expense.excel.share-user', { key: key + 1 }))
+                        return false
+                    }
+
+                    if (!this.shareUsers.find((x) => x.share_user_id == element.share_user_id)) {
+                        this.toast.error(this.$tc('prepaid-card-extract-expense.excel.share-user', { key: key + 1 }))
+                        return false
+                    }
+                }
+            }
+
+            return true
+        },
+
+        async importExcel(data_excel) {
+            this.isLoading = true
+            this.$inertia.post(
+                '/prepaid-card/extract/expense/import-excel',
+                {
+                    data: data_excel,
+                    extract_id: this.extract.id,
+                },
+                {
+                    onSuccess: () => {},
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                }
+            )
         },
     },
 }

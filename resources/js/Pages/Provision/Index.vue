@@ -146,7 +146,7 @@
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="6" md="3">
                                 <v-text-field
                                     v-model="provision.value"
                                     type="number"
@@ -157,7 +157,7 @@
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="6" md="3">
                                 <v-select
                                     v-model="provision.group"
                                     :label="$t('default.group')"
@@ -169,7 +169,16 @@
                                     density="comfortable"
                                 ></v-select>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="6" md="3">
+                                <v-text-field
+                                    v-model="percentage"
+                                    type="number"
+                                    :label="$t('default.percentage-share')"
+                                    density="comfortable"
+                                    @blur="calculeShareValue"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="3">
                                 <v-text-field
                                     v-model="provision.share_value"
                                     :label="$t('default.share-value')"
@@ -310,6 +319,7 @@ export default {
             editDialog: false,
             isLoading: false,
             deleteId: null,
+            percentage: null,
             provision: {
                 id: null,
                 description: null,
@@ -360,6 +370,12 @@ export default {
     async mounted() {},
 
     methods: {
+        calculeShareValue(evt) {
+            if (this.provision.value) {
+                this.provision.share_value = parseFloat((this.provision.value * evt.target.value) / 100).toFixed(2)
+            }
+        },
+
         convertGroup(group) {
             return this.groupList.find((x) => x.value === group).name
         },

@@ -185,4 +185,36 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
 
         return true;
     }
+
+    /**
+     * Read data from Excel and save the Expenses
+     * @param integer $extractId
+     * @param Collection $data
+     * @return boolean
+     */
+    public function storeImportExcel(int $extractId, Collection $data): bool
+    {
+        $prepaid_card_extract = $this->prepaidCardExtractRepository->show($extractId);
+
+        if (!$prepaid_card_extract) {
+            throw new Exception('prepaid-card-extract.not-found');
+        }
+
+        foreach ($data as $expense) {
+            $this->create(
+                $prepaid_card_extract->prepaid_card_id,
+                $prepaid_card_extract->id,
+                $expense['description'],
+                $expense['date'],
+                floatval($expense['value']),
+                $expense['group'],
+                $expense['remarks'],
+                $expense['share_value'] ? floatval($expense['share_value']) : null,
+                $expense['share_user_id'] ? intval($expense['share_user_id']) : null,
+                collect($expense['tags'])
+            );
+        }
+
+        return true;
+    }
 }

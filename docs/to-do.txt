@@ -37,6 +37,12 @@ Latest Tracking Number: NM184482483BR
 ==================================================
 LISTA DE TAREFAS PENDENTES - TO DO
 =================================================
+
+- Cartao Pre pago
+    - Criar Template e metodo de insert com EXCEL
+
+- Mudar como os menu é montado e fazer ele agrupado e remover os icones
+
 - Orçamento Testes
     - Despesas
         - Individual
@@ -61,35 +67,47 @@ LISTA DE TAREFAS PENDENTES - TO DO
         - Individual
         - Compartilhada
 
-
     - Resumo do Orçamento
         - COnferir os totalizadores ao final
 
-- Cartao Pre pago
-    - Criar Template e metodo de insert com EXCEL
 
-
-
-- Mudar como os menu é montado e fazer ele agrupado e remover os icones
-
-- Alterar o formato das datas do timestamp do Laravel
-    - verificar como deixar o created_at e o updated_at automaticos
-
-- Criar classe customizavel do Exception para poder devolver valores
-
-- Orçamento
-    - Decidir se vou ter o "closed" no Budget
-
-- Criar componente para mudar dinamicamente a linguagem do sistema
-    - https://lokalise.com/blog/vue-i18n/
-
-
-
-0ecea533
 
 =============================================================================================================
 TO-DO - PARTE 2
 =============================================================================================================
 
 
+- Alterar o formato das datas do timestamp do Laravel
+    - verificar como deixar o created_at e o updated_at automaticos
+
+- Criar classe customizavel do Exception para poder devolver valores
+
+- Criar componente para mudar dinamicamente a linguagem do sistema
+    - https://lokalise.com/blog/vue-i18n/
+
+=============================================================================================================
+
+
 fo1_BtKlzvFztw0MOhlLgTdsfPgDFiwM2jJjQXXy6I2pjuQ
+fly deploy
+flyctl proxy 3306 -a mysql-laravel
+
+
+
+                            <v-col cols="12" sm="6" md="3">
+                                <v-text-field
+                                    v-model="percentage"
+                                    type="number"
+                                    :label="$t('default.percentage-share')"
+                                    density="comfortable"
+                                    @blur="calculeShareValue"
+                                ></v-text-field>
+                            </v-col>
+
+
+
+        calculeShareValue(evt) {
+            if (this.provision.value) {
+                this.provision.share_value = parseFloat((this.provision.value * evt.target.value) / 100).toFixed(2)
+            }
+        },

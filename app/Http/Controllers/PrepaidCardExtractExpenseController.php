@@ -83,4 +83,19 @@ class PrepaidCardExtractExpenseController extends Controller
         $this->prepaidCardExtractExpenseService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
+
+    /**
+     * Read data from Excel and save the Expenses
+     * @param Request $request
+     */
+    public function storeImportExcel(Request $request)
+    {
+        $this->validate($request, [
+            'data' => ['required'],
+            'extract_id' => ['required'],
+        ]);
+
+        $this->prepaidCardExtractExpenseService->storeImportExcel(intval($request->extract_id), collect($request->data));
+        return redirect()->back()->with('success', 'default.sucess-save');
+    }
 }
