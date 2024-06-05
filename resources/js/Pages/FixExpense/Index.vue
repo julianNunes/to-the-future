@@ -123,7 +123,7 @@
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="6" md="3">
                                 <v-text-field
                                     v-model="expense.value"
                                     type="number"
@@ -134,7 +134,7 @@
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="6" md="3">
                                 <v-select
                                     v-model="expense.due_date"
                                     :label="$t('fix-expense.due-date')"
@@ -144,7 +144,16 @@
                                     density="comfortable"
                                 ></v-select>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4">
+                            <v-col cols="12" sm="6" md="3">
+                                <v-text-field
+                                    v-model="percentage"
+                                    type="number"
+                                    :label="$t('default.percentage-share')"
+                                    density="comfortable"
+                                    @blur="calculeShareValue"
+                                ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="3">
                                 <v-text-field
                                     v-model="expense.share_value"
                                     :label="$t('default.share-value')"
@@ -287,6 +296,7 @@ export default {
             isLoading: false,
             deleteId: null,
             modalEntryDateStart: false,
+            percentage: null,
             expense: {
                 id: null,
                 description: null,
@@ -349,6 +359,12 @@ export default {
     async mounted() {},
 
     methods: {
+        calculeShareValue(evt) {
+            if (this.expense.value) {
+                this.expense.share_value = parseFloat((this.expense.value * evt.target.value) / 100).toFixed(2)
+            }
+        },
+
         async searchTags(val) {
             if (this.loadingData) return
 

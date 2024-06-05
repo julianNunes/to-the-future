@@ -43,6 +43,7 @@
         "description": "Descrição",
         "date": "Data",
         "value": "Valor",
+        "percentage-share": "Compartilhar (%)",
         "portion": "Parcela",
         "total": "Total",
         "portion-total": "Total Parcela",
@@ -190,7 +191,15 @@
         "edit-item": "Editar Despesa",
         "item": "Despesa",
         "edit-item-division": "Editar Divisão de Despesa",
-        "not-found": "Despesa não encontrada"
+        "not-found": "Despesa não encontrada",
+        "excel": {
+            "description": "É necessário informar a Descrição. Linha {key}",
+            "value": "É necessário informar o Valor. Linha {key}",
+            "date": "É necessário informar a Data. Linha {key}",
+            "group": "É necessário informar o Grupo. Linha {key}",
+            "share-value": "É necessário informar o Valor Compartilhado quando houver o nome de um usuario em Compartilhado com. Linha {key}",
+            "share-user": "É necessário informar o nome do usuário que será compartilhado o valor quando houver Valor Compartilhado. Linha {key}"
+        }
     },
     "financing": {
         "title": "Gerenciamento de Financiamentos",

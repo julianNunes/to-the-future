@@ -103,6 +103,7 @@ Route::controller(PrepaidCardExtractController::class)->group(function () {
     Route::delete('/prepaid-card/extract/{id}', 'delete');
     Route::get('/prepaid-card/extract/{id}', 'show');
     Route::delete('/prepaid-card/extract/{id}', 'delete');
+    Route::post('/prepaid-card/extract/download-template', 'downloadTemplate');
 });
 
 // PrepaidCardExtractExpense
@@ -110,6 +111,7 @@ Route::controller(PrepaidCardExtractExpenseController::class)->group(function ()
     Route::post('/prepaid-card/extract/expense', 'store');
     Route::put('/prepaid-card/extract/expense/{id}', 'update');
     Route::delete('/prepaid-card/extract/expense/{id}', 'delete');
+    Route::post('/prepaid-card/extract/expense/import-excel', 'storeImportExcel');
 });
 
 // Financing

@@ -306,6 +306,15 @@
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
                             <v-text-field
+                                v-model="percentage"
+                                type="number"
+                                :label="$t('default.percentage-share')"
+                                density="comfortable"
+                                @blur="calculeShareValue"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <v-text-field
                                 v-model="expense.share_value"
                                 :label="$t('default.share-value')"
                                 type="number"
@@ -549,6 +558,15 @@
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
                             <v-text-field
+                                v-model="percentage_division"
+                                type="number"
+                                :label="$t('default.percentage-share')"
+                                density="comfortable"
+                                @blur="calculeShareValueDivision"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <v-text-field
                                 v-model="division.share_value"
                                 :label="$t('default.share-value')"
                                 type="number"
@@ -766,6 +784,8 @@ export default {
             searchFieldsData: [],
             deleteAllPortions: false,
             hasDivisions: false,
+            percentage: null,
+            percentage_division: null,
             expense: {
                 id: null,
                 description: null,
@@ -841,6 +861,18 @@ export default {
     },
 
     methods: {
+        calculeShareValue(evt) {
+            if (this.expense.value) {
+                this.expense.share_value = parseFloat((this.expense.value * evt.target.value) / 100).toFixed(2)
+            }
+        },
+
+        calculeShareValueDivision(evt) {
+            if (this.division.value) {
+                this.division.share_value = parseFloat((this.division.value * evt.target.value) / 100).toFixed(2)
+            }
+        },
+
         convertGroup(group) {
             if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
                 return (

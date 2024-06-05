@@ -92,4 +92,13 @@ class PrepaidCardExtractController extends Controller
         $data = $this->prepaidCardExtractService->show($id);
         return Inertia::render('PrepaidCardExtract/Show', $data);
     }
+
+    /**
+     * Download xlxs file template
+     * @return void
+     */
+    public function downloadTemplate()
+    {
+        return response()->download(public_path('storage/template/template-prepaid-card.xlsx'), 'template-prepaid-card.xlsx');
+    }
 }

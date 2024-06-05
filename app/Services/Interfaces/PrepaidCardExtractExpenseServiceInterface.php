@@ -69,4 +69,12 @@ interface PrepaidCardExtractExpenseServiceInterface
      * @param int $id
      */
     public function delete(int $id): bool;
+
+    /**
+     * Read data from Excel and save the Expenses
+     * @param integer $id
+     * @param Collection $data
+     * @return boolean
+     */
+    public function storeImportExcel(int $invoiceId, Collection $data): bool;
 }
