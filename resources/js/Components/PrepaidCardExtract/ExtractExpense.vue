@@ -210,14 +210,20 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-text-field
+                            <v-date-input
+                                ref="inputDate"
                                 v-model="expense.date"
-                                type="date"
                                 :label="$t('default.date')"
+                                prepend-icon=""
+                                prepend-inner-icon="$calendar"
                                 required
                                 :rules="rules.textFieldRules"
                                 density="comfortable"
-                            ></v-text-field>
+                                :show-adjacent-months="true"
+                                :show-week="true"
+                                :year="yearToDateInput"
+                                :month="monthToDateInput"
+                            ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
                             <v-text-field
@@ -454,6 +460,12 @@ export default {
         extractYearMonth() {
             return this.extract.year_month
         },
+        monthToDateInput() {
+            return moment(this.yearMonth + '-01').month()
+        },
+        yearToDateInput() {
+            return moment(this.yearMonth + '-01').year()
+        },
     },
 
     watch: {},
@@ -533,7 +545,7 @@ export default {
             this.expense = {
                 id: null,
                 description: null,
-                date: this.yearMonth ? this.yearMonth + '-01' : null,
+                date: moment(this.yearMonth + '-01').toDate(),
                 value: null,
                 group: null,
                 remarks: null,
@@ -553,7 +565,7 @@ export default {
             this.expense = {
                 id: item.id,
                 description: item.description,
-                date: item.date,
+                date: moment(item.date).toDate(),
                 value: item.value,
                 group: item.group,
                 remarks: item.remarks,

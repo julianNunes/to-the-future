@@ -239,14 +239,19 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-text-field
+                            <v-date-input
                                 v-model="expense.date"
-                                type="date"
                                 :label="$t('default.date')"
+                                prepend-icon=""
+                                prepend-inner-icon="$calendar"
                                 required
                                 :rules="rules.textFieldRules"
                                 density="comfortable"
-                            ></v-text-field>
+                                :show-adjacent-months="true"
+                                :show-week="true"
+                                :year="yearToDateInput"
+                                :month="monthToDateInput"
+                            ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
                             <v-text-field
@@ -842,6 +847,12 @@ export default {
         invoiceTotalPaid() {
             return currencyField(this.invoice.total_paid)
         },
+        monthToDateInput() {
+            return moment(this.invoice.closing_date).subtract('40', 'days').month()
+        },
+        yearToDateInput() {
+            return moment(this.invoice.closing_date).subtract('40', 'days').year()
+        },
     },
 
     watch: {
@@ -951,7 +962,7 @@ export default {
             this.expense = {
                 id: null,
                 description: null,
-                date: this.yearMonth ? this.yearMonth + '-01' : null,
+                date: null,
                 value: null,
                 group: null,
                 portion: null,
@@ -975,7 +986,7 @@ export default {
             this.expense = {
                 id: item.id,
                 description: item.description,
-                date: item.date,
+                date: moment(item.date).toDate(),
                 value: item.value,
                 group: item.group,
                 portion: item.portion,
@@ -1007,6 +1018,7 @@ export default {
         },
 
         async create() {
+            console.log('this.expense', this.expense)
             this.isLoading = true
             this.$inertia.post(
                 '/credit-card/invoice/expense',

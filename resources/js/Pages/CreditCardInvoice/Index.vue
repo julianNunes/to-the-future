@@ -71,7 +71,7 @@
                         <v-data-table
                             :headers="headers"
                             :items="invoices"
-                            :sort-by="[{ key: 'due_date', order: 'asc' }]"
+                            :sort-by="[{ key: 'due_date', order: 'desc' }]"
                             :search="search"
                             :loading="isLoading"
                             :loading-text="$t('default.loading-text-table')"

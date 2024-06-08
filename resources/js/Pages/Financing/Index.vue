@@ -121,14 +121,17 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
+                                <v-date-input
                                     v-model="financing.start_date"
                                     :label="$t('financing.start-date')"
-                                    type="date"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="rules.textFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <v-text-field
@@ -164,14 +167,17 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col v-if="!financing.id" cols="12" sm="6" md="3">
-                                <v-text-field
+                                <v-date-input
                                     v-model="financing.start_date_installment"
-                                    :label="$t('financing.installment-first-date')"
-                                    type="date"
+                                    :label="$t('financing.start-date')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="rules.textFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col v-if="!financing.id" cols="12" sm="6" md="3">
                                 <v-text-field
@@ -312,7 +318,7 @@ export default {
             this.financing = {
                 id: item.id,
                 description: item.description,
-                start_date: item.start_date,
+                start_date: moment(item.start_date).toDate(),
                 total: Number(item.total),
                 fees_monthly: item.fees_monthly ? Number(item.fees_monthly) : 0,
                 portion_total: Number(item.portion_total),

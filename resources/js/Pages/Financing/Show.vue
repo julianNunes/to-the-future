@@ -174,15 +174,17 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
-                                    ref="inputDate"
+                                <v-date-input
                                     v-model="installment.date"
                                     :label="$t('default.date')"
-                                    type="date"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="rules.textFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <v-text-field
@@ -215,11 +217,13 @@
                                 ></v-select>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
+                                <v-date-input
                                     v-model="installment.payment_date"
                                     :label="$t('financing-installment.payment-date')"
-                                    type="date"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
+                                    density="comfortable"
                                     :rules="[
                                         (value) => {
                                             if (installment.paid == 1) {
@@ -228,8 +232,9 @@
                                             return true
                                         },
                                     ]"
-                                    density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <v-text-field

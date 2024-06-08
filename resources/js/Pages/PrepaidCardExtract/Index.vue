@@ -170,14 +170,17 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
-                                <v-text-field
+                                <v-date-input
                                     v-model="extract.credit_date"
                                     :label="$t('financing.start-date')"
-                                    type="date"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="rules.textFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="12" md="12">
                                 <v-textarea
@@ -317,7 +320,7 @@ export default {
                 id: item.id,
                 year_month: item.year + '-' + item.month,
                 credit: item.credit,
-                credit_date: item.credit_date,
+                credit_date: moment(item.credit_date).toDate(),
                 remarks: item.remarks,
                 prepaid_card_id: item.prepaid_card_id,
             }

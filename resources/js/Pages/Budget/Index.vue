@@ -180,11 +180,12 @@
                             </v-col>
                             <v-col offset="8" />
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
+                                <v-date-input
                                     ref="txtStartWeek1"
                                     v-model="budget.start_week_1"
-                                    type="date"
                                     :label="$t('budget.start_week_1')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="[
                                         (value) => {
@@ -195,14 +196,18 @@
                                         },
                                     ]"
                                     density="comfortable"
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
                                     @change="budget.end_week_1 = budget.start_week_1"
-                                ></v-text-field>
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
+                                <v-date-input
+                                    ref="txtStartWeek1"
                                     v-model="budget.end_week_1"
-                                    type="date"
                                     :label="$t('budget.end_week_1')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="[
                                         (value) => {
@@ -213,13 +218,16 @@
                                         },
                                     ]"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
+                                <v-date-input
                                     v-model="budget.start_week_2"
-                                    type="date"
                                     :label="$t('budget.start_week_2')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="[
                                         (value) => {
@@ -230,14 +238,17 @@
                                         },
                                     ]"
                                     density="comfortable"
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
                                     @change="budget.end_week_2 = budget.start_week_2"
-                                ></v-text-field>
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
+                                <v-date-input
                                     v-model="budget.end_week_2"
-                                    type="date"
                                     :label="$t('budget.end_week_2')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="[
                                         (value) => {
@@ -248,13 +259,16 @@
                                         },
                                     ]"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
+                                <v-date-input
                                     v-model="budget.start_week_3"
-                                    type="date"
                                     :label="$t('budget.start_week_3')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="[
                                         (value) => {
@@ -265,14 +279,17 @@
                                         },
                                     ]"
                                     density="comfortable"
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
                                     @change="budget.end_week_3 = budget.start_week_3"
-                                ></v-text-field>
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
+                                <v-date-input
                                     v-model="budget.end_week_3"
-                                    type="date"
                                     :label="$t('budget.end_week_3')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="[
                                         (value) => {
@@ -283,13 +300,16 @@
                                         },
                                     ]"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
+                                <v-date-input
                                     v-model="budget.start_week_4"
-                                    type="date"
                                     :label="$t('budget.start_week_4')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="[
                                         (value) => {
@@ -300,14 +320,17 @@
                                         },
                                     ]"
                                     density="comfortable"
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
                                     @change="budget.end_week_4 = budget.start_week_4"
-                                ></v-text-field>
+                                ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
-                                <v-text-field
+                                <v-date-input
                                     v-model="budget.end_week_4"
-                                    type="date"
                                     :label="$t('budget.end_week_4')"
+                                    prepend-icon=""
+                                    prepend-inner-icon="$calendar"
                                     required
                                     :rules="[
                                         (value) => {
@@ -318,7 +341,9 @@
                                         },
                                     ]"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :show-adjacent-months="true"
+                                    :show-week="true"
+                                ></v-date-input>
                             </v-col>
                             <v-col v-show="!budget.id" cols="12" md="12">
                                 <v-checkbox

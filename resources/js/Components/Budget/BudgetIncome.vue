@@ -127,15 +127,20 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="3" md="4">
-                            <v-text-field
+                            <v-date-input
                                 ref="inputDate"
                                 v-model="income.date"
                                 :label="$t('default.date')"
-                                type="date"
+                                prepend-icon=""
+                                prepend-inner-icon="$calendar"
                                 required
                                 :rules="rules.textFieldRules"
                                 density="comfortable"
-                            ></v-text-field>
+                                :show-adjacent-months="true"
+                                :show-week="true"
+                                :year="yearToDateInput"
+                                :month="monthToDateInput"
+                            ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="4" md="4">
                             <v-text-field
@@ -278,6 +283,12 @@ export default {
 
             return headers
         },
+        monthToDateInput() {
+            return moment(this.yearMonth + '-01').month()
+        },
+        yearToDateInput() {
+            return moment(this.yearMonth + '-01').year()
+        },
     },
 
     async created() {},
@@ -339,7 +350,7 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
-                date: this.yearMonth + '-01',
+                date: moment(this.yearMonth + '-01').toDate(),
                 remarks: null,
                 tags: [],
                 budget_id: this.budgetId,
@@ -357,7 +368,7 @@ export default {
                 id: item.id,
                 description: item.description,
                 value: Number(item.value),
-                date: item.date,
+                date: moment(item.date).toDate(),
                 remarks: item.remarks,
                 tags: item.tags,
                 budget_id: item.budget_id,
