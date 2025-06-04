@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface
 };
 use App\Services\Interfaces\PrepaidCardExtractServiceInterface;
+use Carbon\Carbon;
 use Exception;
 
 class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
@@ -23,8 +24,7 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
         private TagRepositoryInterface $tagRepository,
         private ShareUserRepositoryInterface $shareUserRepository,
         private BudgetRepositoryInterface $budgetRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Returns data for Prepaid Card Extract Management
@@ -73,7 +73,7 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
             'year' => $year,
             'month' => $month,
             'credit' => $credit,
-            'credit_date' => $creditDate,
+            'credit_date' => Carbon::parse($creditDate)->format('y-m-d'),
             'remarks' => $remarks,
             'prepaid_card_id' => $prepaidCardId,
         ]);
@@ -109,7 +109,7 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
 
         return $this->prepaidCardExtractRepository->store([
             'credit' => $credit,
-            'credit_date' => $creditDate,
+            'credit_date' => Carbon::parse($creditDate)->format('y-m-d'),
             'remarks' => $remarks,
         ], $prepaid_card_extract);
     }
