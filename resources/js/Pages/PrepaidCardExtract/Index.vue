@@ -180,6 +180,8 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="12" md="12">
@@ -213,7 +215,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import moment from 'moment'
-import { currencyField } from '../../utils/utils.js'
+import { currencyField, formatDate } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -320,7 +322,8 @@ export default {
                 id: item.id,
                 year_month: item.year + '-' + item.month,
                 credit: item.credit,
-                credit_date: moment(item.credit_date).toDate(),
+                credit_date: moment(item.credit_date, 'YYYY-MM-DD'),
+                // credit_date: item.credit_date,
                 remarks: item.remarks,
                 prepaid_card_id: item.prepaid_card_id,
             }
@@ -364,6 +367,7 @@ export default {
         },
 
         async update() {
+            console.log('this.extract.credit_date', this.extract.credit_date)
             this.isLoading = true
             this.$inertia.put(
                 '/prepaid-card/extract/' + this.extract.id,

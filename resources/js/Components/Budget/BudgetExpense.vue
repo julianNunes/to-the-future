@@ -168,6 +168,8 @@
                                 :show-week="true"
                                 :year="yearToDateInput"
                                 :month="monthToDateInput"
+                                :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                placeholder="DD/MM/YYYY"
                             ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="4" md="3">
@@ -310,7 +312,7 @@
 
 <script setup>
 import moment from 'moment'
-import { sumField, currencyField } from '../../utils/utils.js'
+import { sumField, currencyField, formatDate } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -554,7 +556,7 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
-                date: moment(this.yearMonth + '-01').toDate(),
+                date: moment(this.yearMonth + '-01'),
                 group: null,
                 remarks: null,
                 paid: 0,

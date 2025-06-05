@@ -5,6 +5,7 @@ import * as components from 'vuetify/components'
 import * as labsComponents from 'vuetify/labs/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import MomentAdapter from '@date-io/moment'
 
 const vuetify = createVuetify({
     components: {
@@ -21,6 +22,12 @@ const vuetify = createVuetify({
     },
     theme: {
         defaultTheme: 'light',
+    },
+    date: {
+        adapter: MomentAdapter,
+        locale: {
+            pt: 'pt',
+        },
     },
 })
 

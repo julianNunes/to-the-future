@@ -221,8 +221,8 @@
                                 density="comfortable"
                                 :show-adjacent-months="true"
                                 :show-week="true"
-                                :year="yearToDateInput"
-                                :month="monthToDateInput"
+                                :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                placeholder="DD/MM/YYYY"
                             ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
@@ -342,7 +342,7 @@
 <script setup>
 import moment from 'moment'
 import { useToast } from 'vue-toastification'
-import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
+import { sumField, sumGroup, currencyField, formatDate } from '../../utils/utils.js'
 import readXlsxFile from 'read-excel-file'
 </script>
 
@@ -460,12 +460,6 @@ export default {
         extractYearMonth() {
             return this.extract.year_month
         },
-        monthToDateInput() {
-            return moment(this.yearMonth + '-01').month()
-        },
-        yearToDateInput() {
-            return moment(this.yearMonth + '-01').year()
-        },
     },
 
     watch: {},
@@ -545,7 +539,7 @@ export default {
             this.expense = {
                 id: null,
                 description: null,
-                date: moment(this.yearMonth + '-01').toDate(),
+                date: moment(this.extract.year + '-' + this.extract.month + '-01', 'YYYY-MM-DD'),
                 value: null,
                 group: null,
                 remarks: null,
@@ -565,7 +559,7 @@ export default {
             this.expense = {
                 id: item.id,
                 description: item.description,
-                date: moment(item.date).toDate(),
+                date: moment(item.date),
                 value: item.value,
                 group: item.group,
                 remarks: item.remarks,
@@ -619,6 +613,7 @@ export default {
         },
 
         async update() {
+            console.log('this.expense.date', this.expense.date)
             this.isLoading = true
             this.$inertia.put(
                 '/prepaid-card/extract/expense/' + this.expense.id,

@@ -34,12 +34,33 @@ PRESENTE
 LISTA DE TAREFAS PENDENTES - TO DO
 =================================================
 
+    <v-col cols="12" sm="6" md="4">
+        <v-date-input
+            v-model="extract.credit_date"
+            :label="$t('financing.start-date')"
+            prepend-icon=""
+            prepend-inner-icon="$calendar"
+            required
+            :rules="rules.textFieldRules"
+            density="comfortable"
+            :show-adjacent-months="true"
+            :show-week="true"
+            :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+            placeholder="DD/MM/YYYY"
+        ></v-date-input>
+    </v-col>
 
 
+- Alteração do format da data para todos os v-date-input
+    - VErificar pq ao trocar a data o setter esta com problema
+    - remover "monthToDateInput"
+    - remover "yearToDateInput"
 
 - Cartao Pre pago
     - Criar Template e metodo de insert com EXCEL
     - Olhar template anterior para se basear
+
+
 
 - Dashboard
     - Blocos de resumo: (SEMPRE REFERENTE AO MES CORRENTE)

@@ -131,6 +131,8 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
@@ -177,6 +179,8 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
                                 ></v-date-input>
                             </v-col>
                             <v-col v-if="!financing.id" cols="12" sm="6" md="3">
@@ -222,7 +226,7 @@ import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import { Head } from '@inertiajs/vue3'
 import { Link } from '@inertiajs/vue3'
 import moment from 'moment'
-import { currencyField, percentField } from '../../utils/utils.js'
+import { currencyField, percentField, formatDate } from '../../utils/utils.js'
 </script>
 
 <script>

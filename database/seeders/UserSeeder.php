@@ -23,14 +23,11 @@ class UserSeeder extends Seeder
                 'email' => 'eu_dinovu@hotmail.com',
                 'password' => Hash::make('password')
             ],
-<<<<<<< HEAD
             [
                 'name' => 'Damares Alves dos Santos',
                 'email' => 'damaresa747@gmail.com',
                 'password' => Hash::make('password')
             ]
-=======
->>>>>>> a1911180ef3f04582ca89f94f1d132e5499a57ad
         ];
 
         collect($users)->each(function ($user) {

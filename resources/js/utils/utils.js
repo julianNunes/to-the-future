@@ -1,4 +1,5 @@
 import i18n from '@/Locales/i18n'
+// import moment from 'moment'
 
 const { t } = i18n.global
 /**
@@ -51,6 +52,13 @@ export function percentField(value) {
 
 export function upperCase(value) {
     return value ? value.toUpperCase() : ''
+}
+
+export function formatDate(date, format) {
+    console.log('formatDate date', date)
+    console.log('formatDateformat', format)
+    // return moment(date).format(format || 'DD/MM/YYYY')
+    return date.format(format)
 }
 
 export const MONTHS = [
