@@ -182,6 +182,7 @@
                                     :show-week="true"
                                     :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
                                     placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="12" md="12">
@@ -323,7 +324,6 @@ export default {
                 year_month: item.year + '-' + item.month,
                 credit: item.credit,
                 credit_date: moment(item.credit_date, 'YYYY-MM-DD'),
-                // credit_date: item.credit_date,
                 remarks: item.remarks,
                 prepaid_card_id: item.prepaid_card_id,
             }
@@ -351,7 +351,7 @@ export default {
                     year: this.extract.year_month.substring(0, 4),
                     month: this.extract.year_month.substring(5, 7),
                     credit: this.extract.credit,
-                    credit_date: this.extract.credit_date,
+                    credit_date: this.extract.credit_date.format('YYYY-MM-DD'),
                     remarks: this.extract.remarks,
                     prepaid_card_id: this.extract.prepaid_card_id,
                 },
@@ -367,13 +367,12 @@ export default {
         },
 
         async update() {
-            console.log('this.extract.credit_date', this.extract.credit_date)
             this.isLoading = true
             this.$inertia.put(
                 '/prepaid-card/extract/' + this.extract.id,
                 {
                     credit: this.extract.credit,
-                    credit_date: this.extract.credit_date,
+                    credit_date: this.extract.credit_date.format('YYYY-MM-DD'),
                     remarks: this.extract.remarks,
                 },
                 {

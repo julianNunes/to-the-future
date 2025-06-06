@@ -133,6 +133,7 @@
                                     :show-week="true"
                                     :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
                                     placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
@@ -181,6 +182,7 @@
                                     :show-week="true"
                                     :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
                                     placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col v-if="!financing.id" cols="12" sm="6" md="3">
@@ -322,7 +324,7 @@ export default {
             this.financing = {
                 id: item.id,
                 description: item.description,
-                start_date: moment(item.start_date).toDate(),
+                start_date: moment(item.start_date, 'YYYY-MM-DD'),
                 total: Number(item.total),
                 fees_monthly: item.fees_monthly ? Number(item.fees_monthly) : 0,
                 portion_total: Number(item.portion_total),
@@ -350,12 +352,12 @@ export default {
                 '/financing',
                 {
                     description: this.financing.description,
-                    start_date: this.financing.start_date,
+                    start_date: this.financing.start_date.format('YYYY-MM-DD'),
                     total: this.financing.total,
                     fees_monthly: this.financing.fees_monthly,
                     portion_total: this.financing.portion_total,
                     remarks: this.financing.remarks,
-                    start_date_installment: this.financing.start_date_installment,
+                    start_date_installment: this.financing.start_date_installment.format('YYYY-MM-DD'),
                     value_installment: this.financing.value_installment,
                 },
                 {
@@ -375,7 +377,7 @@ export default {
                 '/financing/' + this.financing.id,
                 {
                     description: this.financing.description,
-                    start_date: this.financing.start_date,
+                    start_date: this.financing.start_date.format('YYYY-MM-DD'),
                     total: this.financing.total,
                     fees_monthly: this.financing.fees_monthly,
                     remarks: this.financing.remarks,

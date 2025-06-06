@@ -55,9 +55,6 @@ export function upperCase(value) {
 }
 
 export function formatDate(date, format) {
-    console.log('formatDate date', date)
-    console.log('formatDateformat', format)
-    // return moment(date).format(format || 'DD/MM/YYYY')
     return date.format(format)
 }
 

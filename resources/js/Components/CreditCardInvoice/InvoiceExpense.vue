@@ -251,6 +251,9 @@
                                 :show-week="true"
                                 :year="yearToDateInput"
                                 :month="monthToDateInput"
+                                :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                placeholder="DD/MM/YYYY"
+                                :update-on="['enter']"
                             ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
@@ -678,7 +681,7 @@
 <script setup>
 import moment from 'moment'
 import { useToast } from 'vue-toastification'
-import { sumField, sumGroup, currencyField } from '../../utils/utils.js'
+import { sumField, sumGroup, currencyField, formatDate } from '../../utils/utils.js'
 import readXlsxFile from 'read-excel-file'
 </script>
 
@@ -986,7 +989,7 @@ export default {
             this.expense = {
                 id: item.id,
                 description: item.description,
-                date: moment(item.date).toDate(),
+                date: moment(item.date, 'YYYY-MM-DD'),
                 value: item.value,
                 group: item.group,
                 portion: item.portion,
@@ -1026,7 +1029,7 @@ export default {
                     credit_card_id: this.invoice.credit_card.id,
                     invoice_id: this.invoice.id,
                     description: this.expense.description,
-                    date: this.expense.date,
+                    date: this.expense.date.format('YYYY-MM-DD'),
                     value: this.expense.value,
                     group: this.expense.group,
                     portion: this.expense.portion,
@@ -1056,7 +1059,7 @@ export default {
                     credit_card_id: this.invoice.credit_card.id,
                     invoice_id: this.invoice.id,
                     description: this.expense.description,
-                    date: this.expense.date,
+                    date: this.expense.date.format('YYYY-MM-DD'),
                     value: this.expense.value,
                     group: this.expense.group,
                     portion: this.expense.portion,

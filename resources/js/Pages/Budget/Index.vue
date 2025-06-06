@@ -198,6 +198,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                     @change="budget.end_week_1 = budget.start_week_1"
                                 ></v-date-input>
                             </v-col>
@@ -220,6 +223,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
@@ -240,6 +246,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                     @change="budget.end_week_2 = budget.start_week_2"
                                 ></v-date-input>
                             </v-col>
@@ -261,6 +270,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
@@ -281,6 +293,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                     @change="budget.end_week_3 = budget.start_week_3"
                                 ></v-date-input>
                             </v-col>
@@ -302,6 +317,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
@@ -322,6 +340,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                     @change="budget.end_week_4 = budget.start_week_4"
                                 ></v-date-input>
                             </v-col>
@@ -343,6 +364,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col v-show="!budget.id" cols="12" md="12">
@@ -570,14 +594,14 @@ export default {
             this.budget = {
                 id: item.id,
                 yearMonth: item.year + '-' + item.month,
-                start_week_1: item.start_week_1,
-                end_week_1: item.end_week_1,
-                start_week_2: item.start_week_2,
-                end_week_2: item.end_week_2,
-                start_week_3: item.start_week_3,
-                end_week_3: item.end_week_3,
-                start_week_4: item.start_week_4,
-                end_week_4: item.end_week_4,
+                start_week_1: moment(item.start_week_1, 'YYYY-MM-DD'),
+                end_week_1: moment(item.end_week_1, 'YYYY-MM-DD'),
+                start_week_2: moment(item.start_week_2, 'YYYY-MM-DD'),
+                end_week_2: moment(item.end_week_2, 'YYYY-MM-DD'),
+                start_week_3: moment(item.start_week_3, 'YYYY-MM-DD'),
+                end_week_3: moment(item.end_week_3, 'YYYY-MM-DD'),
+                start_week_4: moment(item.start_week_4, 'YYYY-MM-DD'),
+                end_week_4: moment(item.end_week_4, 'YYYY-MM-DD'),
             }
             setTimeout(() => {
                 this.$refs.txtStartWeek1.focus()
@@ -602,14 +626,14 @@ export default {
                 {
                     year: this.budget.yearMonth.substring(0, 4),
                     month: this.budget.yearMonth.substring(5, 7),
-                    start_week_1: this.budget.start_week_1,
-                    end_week_1: this.budget.end_week_1,
-                    start_week_2: this.budget.start_week_2,
-                    end_week_2: this.budget.end_week_2,
-                    start_week_3: this.budget.start_week_3,
-                    end_week_3: this.budget.end_week_3,
-                    start_week_4: this.budget.start_week_4,
-                    end_week_4: this.budget.end_week_4,
+                    start_week_1: this.budget.start_week_1.format('YYYY-MM-DD'),
+                    end_week_1: this.budget.end_week_1.format('YYYY-MM-DD'),
+                    start_week_2: this.budget.start_week_2.format('YYYY-MM-DD'),
+                    end_week_2: this.budget.end_week_2.format('YYYY-MM-DD'),
+                    start_week_3: this.budget.start_week_3.format('YYYY-MM-DD'),
+                    end_week_3: this.budget.end_week_3.format('YYYY-MM-DD'),
+                    start_week_4: this.budget.start_week_4.format('YYYY-MM-DD'),
+                    end_week_4: this.budget.end_week_4.format('YYYY-MM-DD'),
                     automaticGenerateYear: this.budget.automaticGenerateYear,
                     includeFixExpenses: this.budget.includeFixExpenses,
                     includeProvisions: this.budget.includeProvisions,
@@ -630,14 +654,14 @@ export default {
             this.$inertia.put(
                 '/budget/' + this.budget.id,
                 {
-                    start_week_1: this.budget.start_week_1,
-                    end_week_1: this.budget.end_week_1,
-                    start_week_2: this.budget.start_week_2,
-                    end_week_2: this.budget.end_week_2,
-                    start_week_3: this.budget.start_week_3,
-                    end_week_3: this.budget.end_week_3,
-                    start_week_4: this.budget.start_week_4,
-                    end_week_4: this.budget.end_week_4,
+                    start_week_1: this.budget.start_week_1.format('YYYY-MM-DD'),
+                    end_week_1: this.budget.end_week_1.format('YYYY-MM-DD'),
+                    start_week_2: this.budget.start_week_2.format('YYYY-MM-DD'),
+                    end_week_2: this.budget.end_week_2.format('YYYY-MM-DD'),
+                    start_week_3: this.budget.start_week_3.format('YYYY-MM-DD'),
+                    end_week_3: this.budget.end_week_3.format('YYYY-MM-DD'),
+                    start_week_4: this.budget.start_week_4.format('YYYY-MM-DD'),
+                    end_week_4: this.budget.end_week_4.format('YYYY-MM-DD'),
                 },
                 {
                     onSuccess: () => {

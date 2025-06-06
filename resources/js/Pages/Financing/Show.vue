@@ -184,6 +184,9 @@
                                     density="comfortable"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
@@ -234,6 +237,9 @@
                                     ]"
                                     :show-adjacent-months="true"
                                     :show-week="true"
+                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                    placeholder="DD/MM/YYYY"
+                                    :update-on="['enter']"
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
@@ -277,7 +283,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import moment from 'moment'
-import { sumField, currencyField, percentField } from '../../utils/utils.js'
+import { sumField, currencyField, percentField, formatDate } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -386,11 +392,11 @@ export default {
             this.installment = {
                 id: item.id,
                 portion: Number(item.portion),
-                date: item.date,
+                date: moment(item.date, 'YYYY-MM-DD'),
                 value: Number(item.value),
                 paid: item.paid ? 1 : 0,
                 paid_value: item.paid_value ? Number(item.paid_value) : 0,
-                payment_date: item.payment_date,
+                payment_date: moment(item.payment_date, 'YYYY-MM-DD'),
             }
             setTimeout(() => {
                 this.$refs.inputDate.focus()
@@ -413,10 +419,10 @@ export default {
             this.$inertia.put(
                 `/financing/installment/${this.installment.id}`,
                 {
-                    date: this.installment.date,
+                    date: this.installment.date.format('YYYY-MM-DD'),
                     value: this.installment.value,
                     paid: this.installment.paid ? true : false,
-                    payment_date: this.installment.payment_date,
+                    payment_date: this.installment.payment_date.format('YYYY-MM-DD'),
                     paid_value: this.installment.paid_value,
                 },
                 {

@@ -170,6 +170,7 @@
                                 :month="monthToDateInput"
                                 :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
                                 placeholder="DD/MM/YYYY"
+                                :update-on="['enter']"
                             ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="4" md="3">
@@ -556,7 +557,7 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
-                date: moment(this.yearMonth + '-01'),
+                date: moment(this.yearMonth + '-01', 'YYYY-MM-DD'),
                 group: null,
                 remarks: null,
                 paid: 0,
@@ -586,7 +587,7 @@ export default {
                 id: item.id,
                 description: item.description,
                 value: Number(item.value),
-                date: moment(item.date).toDate(),
+                date: moment(item.date, 'YYYY-MM-DD'),
                 paid: item.paid ? 1 : 0,
                 group: item.group,
                 remarks: item.remarks,
@@ -622,7 +623,7 @@ export default {
                 '/budget-expense',
                 {
                     description: this.expense.description,
-                    date: this.expense.date,
+                    date: this.expense.date.format('YYYY-MM-DD'),
                     value: this.expense.value,
                     paid: this.expense.paid ? true : false,
                     group: this.expense.group,
@@ -652,7 +653,7 @@ export default {
                 {
                     description: this.expense.description,
                     value: this.expense.value,
-                    date: this.expense.date,
+                    date: this.expense.format('YYYY-MM-DD'),
                     paid: this.expense.paid ? true : false,
                     group: this.expense.group,
                     remarks: this.expense.remarks,

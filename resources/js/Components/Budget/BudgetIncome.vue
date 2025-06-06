@@ -140,6 +140,9 @@
                                 :show-week="true"
                                 :year="yearToDateInput"
                                 :month="monthToDateInput"
+                                :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
+                                placeholder="DD/MM/YYYY"
+                                :update-on="['enter']"
                             ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="4" md="4">
@@ -202,7 +205,7 @@
 
 <script setup>
 import moment from 'moment'
-import { sumField, currencyField } from '../../utils/utils.js'
+import { sumField, currencyField, formatDate } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -350,7 +353,7 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
-                date: moment(this.yearMonth + '-01').toDate(),
+                date: moment(this.yearMonth + '-01', 'YYYY-MM-DD'),
                 remarks: null,
                 tags: [],
                 budget_id: this.budgetId,
@@ -368,7 +371,7 @@ export default {
                 id: item.id,
                 description: item.description,
                 value: Number(item.value),
-                date: moment(item.date).toDate(),
+                date: moment(item.date, 'YYYY-MM-DD'),
                 remarks: item.remarks,
                 tags: item.tags,
                 budget_id: item.budget_id,
@@ -399,7 +402,7 @@ export default {
                 '/budget-income',
                 {
                     description: this.income.description,
-                    date: this.income.date,
+                    date: this.income.date.format('YYYY-MM-DD'),
                     value: this.income.value,
                     remarks: this.income.remarks,
                     budget_id: this.income.budget_id,
@@ -424,7 +427,7 @@ export default {
                 {
                     description: this.income.description,
                     value: this.income.value,
-                    date: this.income.date,
+                    date: this.income.date.format('YYYY-MM-DD'),
                     remarks: this.income.remarks,
                     tags: this.income.tags,
                 },

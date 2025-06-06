@@ -223,6 +223,7 @@
                                 :show-week="true"
                                 :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
                                 placeholder="DD/MM/YYYY"
+                                :update-on="['enter']"
                             ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
@@ -559,7 +560,7 @@ export default {
             this.expense = {
                 id: item.id,
                 description: item.description,
-                date: moment(item.date),
+                date: moment(item.date, 'YYYY-MM-DD'),
                 value: item.value,
                 group: item.group,
                 remarks: item.remarks,
@@ -592,7 +593,7 @@ export default {
                     prepaid_card_id: this.extract.prepaid_card.id,
                     extract_id: this.extract.id,
                     description: this.expense.description,
-                    date: this.expense.date,
+                    date: this.expense.date.format('YYYY-MM-DD'),
                     value: this.expense.value,
                     group: this.expense.group,
                     remarks: this.expense.remarks,
@@ -621,7 +622,7 @@ export default {
                     prepaid_card_id: this.extract.prepaid_card.id,
                     extract_id: this.extract.id,
                     description: this.expense.description,
-                    date: this.expense.date,
+                    date: this.expense.date.format('YYYY-MM-DD'),
                     value: this.expense.value,
                     group: this.expense.group,
                     portion: this.expense.portion,
