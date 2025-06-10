@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class CreditCardInvoiceExpenseController extends Controller
 {
-    public function __construct(private CreditCardInvoiceExpenseServiceInterface $creditCardInvoiceExpenseService)
-    {
-    }
+    public function __construct(private CreditCardInvoiceExpenseServiceInterface $creditCardInvoiceExpenseService) {}
 
     /**
      * Create new Expense to Invoice and your portions
@@ -136,5 +134,16 @@ class CreditCardInvoiceExpenseController extends Controller
 
         $this->creditCardInvoiceExpenseService->storeImportExcel(intval($request->invoice_id), collect($request->data));
         return redirect()->back()->with('success', 'default.sucess-save');
+    }
+
+    /**
+     * Search by description. Used in the "v-auto-complete" component
+     * @param string $description
+     * @return void
+     */
+    public function search(string $description)
+    {
+        $data = $this->creditCardInvoiceExpenseService->search($description);
+        return response()->json($data);
     }
 }

@@ -731,42 +731,42 @@ export default {
             for (const [key, element] of Object.entries(data_excel)) {
                 // Description
                 if (!element.description) {
-                    this.toast.error(this.$tc('prepaid-card-extract-expense.excel.description', { key: key + 1 }))
+                    this.toast.error(this.$t('prepaid-card-extract-expense.excel.description', { key: key + 1 }))
                     return false
                 }
 
                 // Date
                 if (!element.date) {
-                    this.toast.error(this.$tc('prepaid-card-extract-expense.excel.date', { key: key + 1 }))
+                    this.toast.error(this.$t('prepaid-card-extract-expense.excel.date', { key: key + 1 }))
                     return false
                 }
 
                 // Value
                 if (!element.value) {
-                    this.toast.error(this.$tc('prepaid-card-extract-expense.excel.date', { key: key + 1 }))
+                    this.toast.error(this.$t('prepaid-card-extract-expense.excel.date', { key: key + 1 }))
                     return false
                 }
 
                 // group
                 if (!element.group) {
-                    this.toast.error(this.$tc('prepaid-card-extract-expense.excel.group', { key: key + 1 }))
+                    this.toast.error(this.$t('prepaid-card-extract-expense.excel.group', { key: key + 1 }))
                     return false
                 }
 
                 // share_value and share_user_id
                 if (element.share_value || element.share_user_id) {
                     if (!element.share_value) {
-                        this.toast.error(this.$tc('prepaid-card-extract-expense.excel.share-value', { key: key + 1 }))
+                        this.toast.error(this.$t('prepaid-card-extract-expense.excel.share-value', { key: key + 1 }))
                         return false
                     }
 
                     if (!element.share_user_id) {
-                        this.toast.error(this.$tc('prepaid-card-extract-expense.excel.share-user', { key: key + 1 }))
+                        this.toast.error(this.$t('prepaid-card-extract-expense.excel.share-user', { key: key + 1 }))
                         return false
                     }
 
                     if (!this.shareUsers.find((x) => x.share_user_id == element.share_user_id)) {
-                        this.toast.error(this.$tc('prepaid-card-extract-expense.excel.share-user', { key: key + 1 }))
+                        this.toast.error(this.$t('prepaid-card-extract-expense.excel.share-user', { key: key + 1 }))
                         return false
                     }
                 }

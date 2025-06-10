@@ -30,8 +30,7 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         private TagRepositoryInterface $tagRepository,
         private ShareUserRepositoryInterface $shareUserRepository,
         private BudgetCalculateInterface $budgetCalculate
-    ) {
-    }
+    ) {}
 
     /**
      * Create new Expense to Invoice and your portions
@@ -485,5 +484,15 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         }
 
         return true;
+    }
+
+    /**
+     * Search by description. Used in the "v-auto-complete" component
+     * @param string $description
+     * @return Collection
+     */
+    public function search(string $description): Collection
+    {
+        return $this->creditCardInvoiceExpenseRepository->search($description);
     }
 }

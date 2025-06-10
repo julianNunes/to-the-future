@@ -229,14 +229,36 @@
                 <v-form ref="form" @submit.prevent>
                     <v-row dense>
                         <v-col cols="12" sm="12" md="12">
-                            <v-text-field
+                            <v-autocomplete
                                 ref="txtDescription"
                                 v-model="expense.description"
+                                v-model:search="searchDescription"
                                 :label="$t('default.description')"
                                 :rules="rules.textFieldRules"
                                 required
                                 density="comfortable"
-                            ></v-text-field>
+                                :items="itemsDescriptions"
+                                :loading="loadingData"
+                                item-title="description"
+                                item-value="description"
+                                clearable
+                                :closable-chips="true"
+                                return-object
+                                hide-no-data
+                                hide-selected
+                                placeholder="Start typing to Search"
+                                prepend-icon="mdi-database-search"
+                                @update:search="searchDescriptions"
+                                @change="onChangeDescription"
+                            >
+                                <template #item="{ props, item }">
+                                    <v-list-item
+                                        v-bind="props"
+                                        :subtitle="item.resume"
+                                        :title="item.description"
+                                    ></v-list-item>
+                                </template>
+                            </v-autocomplete>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
                             <v-date-input
@@ -780,6 +802,7 @@ export default {
             search: null,
             timeOut: null,
             searchTag: '',
+            searchDescription: '',
             editDialog: false,
             editDivisionDialog: false,
             deleteDialog: false,
@@ -789,6 +812,7 @@ export default {
             deleteId: null,
             editedIndex: -1,
             listTags: [],
+            listDescriptions: [],
             searchFieldsData: [],
             deleteAllPortions: false,
             hasDivisions: false,
@@ -831,6 +855,29 @@ export default {
         },
         itemsTags() {
             return this.listTags
+        },
+        itemsDescriptions() {
+            return this.listDescription.map((x) => {
+                let resume = ''
+                resume += this.$t('default.value') + ': ' + currencyField(x.value) + ' | '
+
+                if (x.share_value) {
+                    resume += this.$t('default.share-value') + ': ' + currencyField(x.share_value) + ' | '
+                }
+
+                if (x.tags && x.tags.length > 0) {
+                    resume += this.$t('default.tags') + ': ' + x.tags.map((tag) => tag.name).join(',') + ' | '
+                }
+
+                if (x.remarks) {
+                    resume += this.$t('default.remarks') + ': ' + x.remarks
+                }
+
+                return {
+                    description: x.name,
+                    resume: resume,
+                }
+            })
         },
         creditCardname() {
             return this.invoice.credit_card.name
@@ -943,6 +990,53 @@ export default {
             }, 300)
         },
 
+        async searchDescriptions(val) {
+            if (this.loadingData) return
+
+            if (!val || val.length <= 1) {
+                this.listDescription = []
+                clearTimeout(this.timeOut)
+                return
+            }
+
+            if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
+                return
+            }
+
+            clearTimeout(this.timeOut)
+            this.timeOut = setTimeout(async () => {
+                this.loadingData = true
+                let searchFieldsData = []
+                await window.axios
+                    .get('/tag/search/' + val)
+                    .then(function (response) {
+                        if (response.data && response.data.length > 0) {
+                            searchFieldsData = response.data
+                        }
+
+                        if (
+                            (searchFieldsData &&
+                                searchFieldsData.length > 0 &&
+                                !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                            !searchFieldsData ||
+                            searchFieldsData.length == 0
+                        ) {
+                            searchFieldsData.unshift({ name: val.toUpperCase() })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log('error', error)
+                    })
+
+                this.listDescription = searchFieldsData
+                this.loadingData = false
+            }, 300)
+        },
+
+        async onChangeDescription(item) {
+            console.log('onChangeDescription', item)
+        },
+
         async updateInvoice(closed) {
             this.isLoading = true
             this.$inertia.put(
@@ -1028,7 +1122,7 @@ export default {
                 {
                     credit_card_id: this.invoice.credit_card.id,
                     invoice_id: this.invoice.id,
-                    description: this.expense.description,
+                    description: this.expense.description.description,
                     date: this.expense.date.format('YYYY-MM-DD'),
                     value: this.expense.value,
                     group: this.expense.group,
@@ -1058,7 +1152,7 @@ export default {
                 {
                     credit_card_id: this.invoice.credit_card.id,
                     invoice_id: this.invoice.id,
-                    description: this.expense.description,
+                    description: this.expense.description.description,
                     date: this.expense.date.format('YYYY-MM-DD'),
                     value: this.expense.value,
                     group: this.expense.group,
@@ -1287,37 +1381,37 @@ export default {
             for (const [key, element] of Object.entries(data_excel)) {
                 // Description
                 if (!element.description) {
-                    this.toast.error(this.$tc('credit-card-invoice-expense.excel.description', { key: key + 1 }))
+                    this.toast.error(this.$t('credit-card-invoice-expense.excel.description', { key: key + 1 }))
                     return false
                 }
 
                 // Date
                 if (!element.date) {
-                    this.toast.error(this.$tc('credit-card-invoice-expense.excel.date', { key: key + 1 }))
+                    this.toast.error(this.$t('credit-card-invoice-expense.excel.date', { key: key + 1 }))
                     return false
                 }
 
                 // Value
                 if (!element.value) {
-                    this.toast.error(this.$tc('credit-card-invoice-expense.excel.date', { key: key + 1 }))
+                    this.toast.error(this.$t('credit-card-invoice-expense.excel.date', { key: key + 1 }))
                     return false
                 }
 
                 // group
                 if (!element.group) {
-                    this.toast.error(this.$tc('credit-card-invoice-expense.excel.group', { key: key + 1 }))
+                    this.toast.error(this.$t('credit-card-invoice-expense.excel.group', { key: key + 1 }))
                     return false
                 }
 
                 // portion and portion_total
                 if (element.portion || element.portion_total) {
                     if (!element.portion || element.portion <= 0) {
-                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.portion', { key: key + 1 }))
+                        this.toast.error(this.$t('credit-card-invoice-expense.excel.portion', { key: key + 1 }))
                         return false
                     }
 
                     if (!element.portion_total || element.portion_total <= 1) {
-                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.portion-total', { key: key + 1 }))
+                        this.toast.error(this.$t('credit-card-invoice-expense.excel.portion-total', { key: key + 1 }))
                         return false
                     }
                 }
@@ -1325,17 +1419,17 @@ export default {
                 // share_value and share_user_id
                 if (element.share_value || element.share_user_id) {
                     if (!element.share_value) {
-                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-value', { key: key + 1 }))
+                        this.toast.error(this.$t('credit-card-invoice-expense.excel.share-value', { key: key + 1 }))
                         return false
                     }
 
                     if (!element.share_user_id) {
-                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-user', { key: key + 1 }))
+                        this.toast.error(this.$t('credit-card-invoice-expense.excel.share-user', { key: key + 1 }))
                         return false
                     }
 
                     if (!this.shareUsers.find((x) => x.share_user_id == element.share_user_id)) {
-                        this.toast.error(this.$tc('credit-card-invoice-expense.excel.share-user', { key: key + 1 }))
+                        this.toast.error(this.$t('credit-card-invoice-expense.excel.share-user', { key: key + 1 }))
                         return false
                     }
                 }

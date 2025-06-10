@@ -452,6 +452,7 @@ export default {
                 this.expense.share_value = parseFloat((this.expense.value * evt.target.value) / 100).toFixed(2)
             }
         },
+
         convertGroup(group) {
             return this.groupList.find((x) => x.value == group).name
         },

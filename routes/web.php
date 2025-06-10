@@ -85,6 +85,7 @@ Route::controller(CreditCardInvoiceExpenseController::class)->group(function () 
     Route::delete('/credit-card/invoice/expense/{id}', 'delete');
     Route::delete('/credit-card/invoice/expense/{id}/delete-all-portions', 'deletePortions');
     Route::post('/credit-card/invoice/expense/import-excel', 'storeImportExcel');
+    Route::get('/credit-card/invoice/expense/{description}', 'search');
 });
 
 // PrepaidCard
