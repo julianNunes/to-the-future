@@ -9,6 +9,7 @@ import toast from './Plugins/toast'
 import i18n from './Locales/i18n'
 import ConfirmDialog from './Components/ConfirmDialog.vue'
 import { VDateInput } from 'vuetify/labs/VDateInput'
+import VuetifyMoney from 'vuetify-money-3'
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'To the Future'
 
@@ -22,6 +23,7 @@ createInertiaApp({
             .use(toast)
             .use(i18n)
             .use(VDateInput)
+            .use(VuetifyMoney)
             .component('ConfirmDialog', ConfirmDialog)
             .mount(el)
     },

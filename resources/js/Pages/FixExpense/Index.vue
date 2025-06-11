@@ -124,15 +124,19 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
+                                <vuetify-money
                                     v-model="expense.value"
-                                    type="number"
                                     :label="$t('default.value')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :rules="rules.currencyFieldRules"
+                                    :options="{
+                                        locale: 'pt-BR',
+                                        prefix: 'R$',
+                                        suffix: '',
+                                        length: 11,
+                                        precision: 2,
+                                    }"
+                                />
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <v-select
@@ -154,11 +158,10 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
+                                <vuetify-money
                                     v-model="expense.share_value"
                                     :label="$t('default.share-value')"
-                                    type="number"
-                                    min="0"
+                                    density="comfortable"
                                     :rules="[
                                         (value) => {
                                             if (expense.share_user_id) {
@@ -168,7 +171,13 @@
                                             return true
                                         },
                                     ]"
-                                    density="comfortable"
+                                    :options="{
+                                        locale: 'pt-BR',
+                                        prefix: 'R$',
+                                        suffix: '',
+                                        length: 11,
+                                        precision: 2,
+                                    }"
                                 />
                             </v-col>
                             <v-col cols="12" sm="6" md="8">
@@ -200,7 +209,7 @@
                             <v-col cols="12" md="12">
                                 <v-autocomplete
                                     v-model="expense.tags"
-                                    v-model:search="search_tag"
+                                    v-model:search="searchTag"
                                     :label="$t('default.tags')"
                                     :items="itemsTags"
                                     :loading="loadingData"
@@ -217,6 +226,7 @@
                                     placeholder="Start typing to Search"
                                     prepend-icon="mdi-database-search"
                                     @update:search="searchTags"
+                                    @update:model-value="searchTag = ''"
                                 ></v-autocomplete>
                             </v-col>
                         </v-row>
@@ -242,7 +252,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import { sumField, currencyField } from '../../utils/utils.js'
+import { sumField, currencyField, reverseFormatNumber } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -284,6 +294,7 @@ export default {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
                     (value) => {
+                        value = reverseFormatNumber(value)
                         if (!value) return this.$t('rules.required-text-field')
                         if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
@@ -343,7 +354,7 @@ export default {
             ],
             listTags: [],
             searchFieldsData: [],
-            search_tag: '',
+            searchTag: '',
             loadingData: false,
         }
     },

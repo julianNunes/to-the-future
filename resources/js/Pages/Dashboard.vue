@@ -12,7 +12,7 @@
         </v-card> -->
 
         <!-- Componente do Resumo para o Dashboard -->
-        <GroupResumes :itens="[]" />
+        <!-- <GroupResumes :itens="[]" /> -->
     </AuthenticatedLayout>
 </template>
 
@@ -20,7 +20,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import { Head } from '@inertiajs/vue3'
-import GroupResumes from '../Components/Dashboard/GroupResumes.vue'
+// import GroupResumes from '../Components/Dashboard/GroupResumes.vue'
 </script>
 
 <script>

@@ -54,6 +54,34 @@ export function upperCase(value) {
     return value ? value.toUpperCase() : ''
 }
 
+export function reverseFormatNumber(value, locale = 'pt-BR', currency = 'BRL') {
+    const separatorDecimal = new Intl.NumberFormat(locale, {
+        style: 'decimal',
+    })
+        .format(11.11)
+        .replace(/\d/g, '')
+
+    const separatorThousands = new Intl.NumberFormat(locale, {
+        style: 'decimal',
+    })
+        .format(1111)
+        .replace(/\d/g, '')
+
+    const symbolOnLeft = new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+    })
+        .format(1)
+        .replace(new RegExp(`\\d|[${separatorDecimal}${separatorThousands}]*`, 'g'), '')
+
+    const stringNumber = value
+        .replace(new RegExp(`[${separatorThousands}]`, 'g'), '')
+        .replace(separatorDecimal, '.')
+        .replace(new RegExp(`[${symbolOnLeft}]`, 'g'), '')
+
+    return parseFloat(stringNumber)
+}
+
 export function formatDate(date, format) {
     return date.format(format)
 }

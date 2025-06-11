@@ -43,17 +43,13 @@ LISTA DE TAREFAS PENDENTES - TO DO
 - fazer um autocomplete na descrição da despesas
     - descrição | Valor | valor compartilhado | tags
 
-- Dashboard
-    - Blocos de resumo: (SEMPRE REFERENTE AO MES CORRENTE)
-        - Bloco de Metas
-            - Copia das Metas definidas no orçamento
-        - Bloco com Resumo de Receitas e Despesas
-        - Relatorio de Despesas Personalizavel
-            - Definir grupos maiores (1 TAG) e partir dela pegar as subdiviões para gerar graficos
-            - Exemplo: Alimentação: Alimentação + Ifood, Alimentação + Marmita
-            - Bloco grande ocupando as 12 colunas
-    - Atualizar a tabela do usuario para fazer a verificação de quais itens deseja ver no dashboard
-    - Criar uma tela para opções do usuario posteriormente
+- Procurar todos os lugares que tem componente do tipo "type="number" e inserir o novo componente
+    - share_value
+
+
+
+- Procurar por todos os lugares que tem "descriptioN" e atualizar o componente para autocomplete
+
 
 - Orçamentos
     - Adicionar um aba de Relotorio
@@ -61,10 +57,19 @@ LISTA DE TAREFAS PENDENTES - TO DO
             - Criar componente que servira para 2 dois casos
             - Criar coluna nova na tabela de orçamento que sera um JSON com as configurações das tags
                 - Criar migration "report_config"
-                    - report: {
-                        expenses: {
-
-                        }
+                    report: {
+                        expenses_default: [
+                            {
+                                tags: [],
+                                total: 0
+                            }
+                        ],
+                        expenses: [
+                            {
+                                tags: [],
+                                total: 0
+                            }
+                        ]
                     }
 
             - Na tela de orçamento adicionar a opção de copiar "Configuração Relatorio"
@@ -80,6 +85,25 @@ LISTA DE TAREFAS PENDENTES - TO DO
                     - Nao olha TAG composta, olha apenas TAG SOZINHA para agrupamentos maiores
 
 
+
+- Dashboard
+    - Blocos de resumo: (SEMPRE REFERENTE AO MES CORRENTE)
+        - Bloco de Metas
+            - Copia das Metas definidas no orçamento
+        - Bloco com Resumo de Receitas e Despesas
+        - Relatorio de Despesas Personalizavel
+            - Definir grupos maiores (1 TAG) e partir dela pegar as subdiviões para gerar graficos
+            - Exemplo: Alimentação: Alimentação + Ifood, Alimentação + Marmita
+            - Bloco grande ocupando as 12 colunas
+    - Atualizar a tabela do usuario para fazer a verificação de quais itens deseja ver no dashboard
+    - Criar uma tela para opções do usuario posteriormente
+
+
+- DOckerfile
+    - Containizar
+        - Validar Laravel Octane
+        - Salvar comandos para rodar por dentro do docker
+
 - Relatorios
     - Orçamentos do Ano (Mês a Mês)
         -  Receitas e Despesas
@@ -87,6 +111,7 @@ LISTA DE TAREFAS PENDENTES - TO DO
         -  Gasto total por cartão
 
 
+- Futuramente verificar como fazer corretamente o "partial reload"
 
 ==================================================
 COMEÇAR A COMPLETAR COM DADOS
@@ -100,7 +125,12 @@ COMEÇAR A COMPLETAR COM DADOS
         - Pan
         - Itau
         - Magalu
+        - Meliuz
+        - Itau Personallite
+
     * Gerar todas as Faturas de (2022 - 2023 -2024) por Cartao
+
+
     - Cadastrar todas as TAGS
         -
     - Fazer lançamento de todos as despesas parceladas em todos os Cartoes a partir de 2022
@@ -176,3 +206,17 @@ flyctl proxy 13306:3306 -a mysql-laravel
         yearToDateInput() {
             return moment(this.invoice.closing_date).subtract('40', 'days').year()
         },
+
+
+
+
+                        <v-col cols="12" sm="12" md="12">
+                            <v-text-field
+                                ref="txtDescriptionDivision"
+                                v-model="division.description"
+                                :label="$t('default.description')"
+                                :rules="rules.textFieldRules"
+                                required
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>

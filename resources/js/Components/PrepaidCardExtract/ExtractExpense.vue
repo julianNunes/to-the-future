@@ -227,13 +227,18 @@
                             ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-text-field
+                            <vuetify-money
                                 v-model="expense.value"
                                 :label="$t('default.value')"
-                                type="number"
-                                min="0"
-                                :rules="rules.currencyFieldRules"
                                 density="comfortable"
+                                :rules="rules.currencyFieldRules"
+                                :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }"
                             />
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
@@ -258,21 +263,27 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-text-field
+                            <vuetify-money
                                 v-model="expense.share_value"
                                 :label="$t('default.share-value')"
-                                type="number"
-                                min="0"
+                                density="comfortable"
                                 :rules="[
                                     (value) => {
                                         if (expense.share_user_id) {
+                                            value = reverseFormatNumber(value)
                                             if (!value) return $t('rules.required-text-field')
                                             if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
                                         }
                                         return true
                                     },
                                 ]"
-                                density="comfortable"
+                                :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }"
                             />
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
@@ -320,6 +331,7 @@
                                 placeholder="Start typing to Search"
                                 prepend-icon="mdi-database-search"
                                 @update:search="searchTags"
+                                @update:model-value="searchTag = ''"
                             ></v-autocomplete>
                         </v-col>
                     </v-row>
@@ -343,7 +355,7 @@
 <script setup>
 import moment from 'moment'
 import { useToast } from 'vue-toastification'
-import { sumField, sumGroup, currencyField, formatDate } from '../../utils/utils.js'
+import { sumField, sumGroup, currencyField, formatDate, reverseFormatNumber } from '../../utils/utils.js'
 import readXlsxFile from 'read-excel-file'
 </script>
 
@@ -389,6 +401,7 @@ export default {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
                     (value) => {
+                        value = reverseFormatNumber(value)
                         if (!value) return this.$t('rules.required-text-field')
                         if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
@@ -431,7 +444,7 @@ export default {
                 id: null,
                 description: null,
                 date: null,
-                value: null,
+                value: 0,
                 group: null,
                 remarks: null,
                 share_value: null,
@@ -541,7 +554,7 @@ export default {
                 id: null,
                 description: null,
                 date: moment(this.extract.year + '-' + this.extract.month + '-01', 'YYYY-MM-DD'),
-                value: null,
+                value: 0,
                 group: null,
                 remarks: null,
                 share_value: null,

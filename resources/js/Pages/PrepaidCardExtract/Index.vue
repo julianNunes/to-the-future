@@ -159,15 +159,19 @@
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
-                                <v-text-field
+                                <vuetify-money
                                     v-model="extract.credit"
-                                    type="number"
                                     :label="$t('prepaid-card-extract.credit')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :rules="rules.currencyFieldRules"
+                                    :options="{
+                                        locale: 'pt-BR',
+                                        prefix: 'R$',
+                                        suffix: '',
+                                        length: 11,
+                                        precision: 2,
+                                    }"
+                                />
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                                 <v-date-input
@@ -216,7 +220,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import moment from 'moment'
-import { currencyField, formatDate } from '../../utils/utils.js'
+import { currencyField, formatDate, reverseFormatNumber } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -260,6 +264,7 @@ export default {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
                     (value) => {
+                        value = reverseFormatNumber(value)
                         if (!value) return this.$t('rules.required-text-field')
                         if (Number(value) <= 0) return this.$t('rules.required-currency-field')
                         return true
@@ -277,7 +282,7 @@ export default {
             extract: {
                 id: null,
                 year_month: null,
-                credit: null,
+                credit: 0,
                 credit_date: null,
                 remarks: null,
                 prepaid_card_id: null,
@@ -306,7 +311,7 @@ export default {
             this.extract = {
                 id: null,
                 year_month: null,
-                credit: null,
+                credit: 0,
                 credit_date: null,
                 remarks: null,
                 prepaid_card_id: this.prepaidCard.id,

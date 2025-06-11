@@ -128,20 +128,24 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="4" md="6">
-                            <v-text-field
+                            <vuetify-money
                                 v-model="goal.value"
-                                type="number"
-                                :label="$t('budget-goal.limit-expenses')"
-                                min="0"
-                                required
-                                :rules="rules.currencyFieldRules"
+                                :label="$t('default.value')"
                                 density="comfortable"
-                            ></v-text-field>
+                                :rules="rules.currencyFieldRules"
+                                :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }"
+                            />
                         </v-col>
                         <v-col cols="12" md="6">
                             <v-autocomplete
                                 v-model="goal.tags"
-                                v-model:search="search_tag"
+                                v-model:search="searchTag"
                                 :label="$t('default.tags')"
                                 :items="itemsTags"
                                 :loading="loadingData"
@@ -158,6 +162,7 @@
                                 placeholder="Start typing to Search"
                                 prepend-icon="mdi-database-search"
                                 @update:search="searchTags"
+                                @update:model-value="searchTag = ''"
                             ></v-autocomplete>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
@@ -193,7 +198,7 @@
 </template>
 
 <script setup>
-import { currencyField } from '../../utils/utils.js'
+import { currencyField, reverseFormatNumber } from '../../utils/utils.js'
 import BarChart from '../../Components/BarChart.vue'
 </script>
 
@@ -231,6 +236,7 @@ export default {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
                     (value) => {
+                        value = reverseFormatNumber(value)
                         if (!value) return this.$t('rules.required-text-field')
                         if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
@@ -281,7 +287,7 @@ export default {
             ],
             listTags: [],
             searchFieldsData: [],
-            search_tag: '',
+            searchTag: '',
             loadingData: false,
         }
     },

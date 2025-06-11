@@ -242,20 +242,20 @@
                                 item-title="description"
                                 item-value="description"
                                 clearable
-                                :closable-chips="true"
                                 return-object
                                 hide-no-data
                                 hide-selected
                                 placeholder="Start typing to Search"
                                 prepend-icon="mdi-database-search"
+                                auto-select-first
                                 @update:search="searchDescriptions"
-                                @change="onChangeDescription"
+                                @update:model-value="selectedDescription"
                             >
                                 <template #item="{ props, item }">
                                     <v-list-item
                                         v-bind="props"
-                                        :subtitle="item.resume"
-                                        :title="item.description"
+                                        :subtitle="item.raw.resume"
+                                        :title="item.raw.description"
                                     ></v-list-item>
                                 </template>
                             </v-autocomplete>
@@ -279,13 +279,18 @@
                             ></v-date-input>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-text-field
+                            <vuetify-money
                                 v-model="expense.value"
                                 :label="$t('default.value')"
-                                type="number"
-                                min="0"
-                                :rules="rules.currencyFieldRules"
                                 density="comfortable"
+                                :rules="rules.currencyFieldRules"
+                                :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }"
                             />
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
@@ -344,21 +349,27 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-text-field
+                            <vuetify-money
                                 v-model="expense.share_value"
                                 :label="$t('default.share-value')"
-                                type="number"
-                                min="0"
+                                density="comfortable"
                                 :rules="[
                                     (value) => {
                                         if (expense.share_user_id) {
+                                            value = reverseFormatNumber(value)
                                             if (!value) return $t('rules.required-text-field')
                                             if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
                                         }
                                         return true
                                     },
                                 ]"
-                                density="comfortable"
+                                :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }"
                             />
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
@@ -407,6 +418,7 @@
                                 placeholder="Start typing to Search"
                                 prepend-icon="mdi-database-search"
                                 @update:search="searchTags"
+                                @update:model-value="searchTag = ''"
                             ></v-autocomplete>
                         </v-col>
                     </v-row>
@@ -577,13 +589,18 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-text-field
+                            <vuetify-money
                                 v-model="division.value"
                                 :label="$t('default.value')"
-                                type="number"
-                                min="0"
-                                :rules="rules.currencyFieldRules"
                                 density="comfortable"
+                                :rules="rules.currencyFieldRules"
+                                :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }"
                             />
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
@@ -596,11 +613,10 @@
                             ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
-                            <v-text-field
+                            <vuetify-money
                                 v-model="division.share_value"
                                 :label="$t('default.share-value')"
-                                type="number"
-                                min="0"
+                                density="comfortable"
                                 :rules="[
                                     (value) => {
                                         if (division.share_user_id) {
@@ -610,7 +626,13 @@
                                         return true
                                     },
                                 ]"
-                                density="comfortable"
+                                :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }"
                             />
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
@@ -658,6 +680,7 @@
                                 placeholder="Start typing to Search"
                                 prepend-icon="mdi-database-search"
                                 @update:search="searchTags"
+                                @update:model-value="searchTag = ''"
                             ></v-autocomplete>
                         </v-col>
                     </v-row>
@@ -703,7 +726,7 @@
 <script setup>
 import moment from 'moment'
 import { useToast } from 'vue-toastification'
-import { sumField, sumGroup, currencyField, formatDate } from '../../utils/utils.js'
+import { sumField, sumGroup, currencyField, formatDate, reverseFormatNumber } from '../../utils/utils.js'
 import readXlsxFile from 'read-excel-file'
 </script>
 
@@ -768,6 +791,7 @@ export default {
                 ],
                 currencyFieldRules: [
                     (value) => {
+                        value = reverseFormatNumber(value)
                         if (!value) return this.$t('rules.required-text-field')
                         if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
@@ -822,7 +846,7 @@ export default {
                 id: null,
                 description: null,
                 date: null,
-                value: null,
+                value: 0,
                 group: null,
                 portion: null,
                 portion_total: null,
@@ -836,7 +860,7 @@ export default {
             division: {
                 id: null,
                 description: null,
-                value: null,
+                value: 0,
                 remarks: null,
                 share_value: null,
                 share_user_id: null,
@@ -857,27 +881,38 @@ export default {
             return this.listTags
         },
         itemsDescriptions() {
-            return this.listDescription.map((x) => {
-                let resume = ''
-                resume += this.$t('default.value') + ': ' + currencyField(x.value) + ' | '
+            let result = []
 
-                if (x.share_value) {
-                    resume += this.$t('default.share-value') + ': ' + currencyField(x.share_value) + ' | '
-                }
+            if (this.listDescriptions?.length) {
+                result = this.listDescriptions.map((x) => {
+                    let resume = ''
 
-                if (x.tags && x.tags.length > 0) {
-                    resume += this.$t('default.tags') + ': ' + x.tags.map((tag) => tag.name).join(',') + ' | '
-                }
+                    if (x.value) {
+                        resume += this.$t('default.value') + ': ' + currencyField(x.value)
+                    }
 
-                if (x.remarks) {
-                    resume += this.$t('default.remarks') + ': ' + x.remarks
-                }
+                    if (x.share_value) {
+                        resume += ' | ' + this.$t('default.share-value') + ': ' + currencyField(x.share_value)
+                    }
 
-                return {
-                    description: x.name,
-                    resume: resume,
-                }
-            })
+                    if (x.tags && x.tags.length > 0) {
+                        resume += ' | ' + this.$t('default.tags') + ': ' + x.tags.map((tag) => tag.name).join(', ')
+                    }
+
+                    if (x.remarks) {
+                        resume += ' | ' + this.$t('default.remarks') + ': ' + x.remarks
+                    }
+
+                    return {
+                        description: x.description,
+                        resume: resume,
+                        data: x,
+                    }
+                })
+            }
+
+            console.log('result', result)
+            return result
         },
         creditCardname() {
             return this.invoice.credit_card.name
@@ -993,13 +1028,13 @@ export default {
         async searchDescriptions(val) {
             if (this.loadingData) return
 
-            if (!val || val.length <= 1) {
-                this.listDescription = []
+            if (!val || val.length <= 0) {
+                this.listDescriptions = []
                 clearTimeout(this.timeOut)
                 return
             }
 
-            if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
+            if (this.expense.description && this.expense.description == val) {
                 return
             }
 
@@ -1008,8 +1043,9 @@ export default {
                 this.loadingData = true
                 let searchFieldsData = []
                 await window.axios
-                    .get('/tag/search/' + val)
+                    .get('/credit-card/invoice/expense/' + val)
                     .then(function (response) {
+                        console.log('response', response)
                         if (response.data && response.data.length > 0) {
                             searchFieldsData = response.data
                         }
@@ -1017,24 +1053,34 @@ export default {
                         if (
                             (searchFieldsData &&
                                 searchFieldsData.length > 0 &&
-                                !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                                !searchFieldsData.find((x) => x.description == val)) ||
                             !searchFieldsData ||
                             searchFieldsData.length == 0
                         ) {
-                            searchFieldsData.unshift({ name: val.toUpperCase() })
+                            searchFieldsData.unshift({ description: val, resume: '', data: null })
                         }
                     })
                     .catch(function (error) {
                         console.log('error', error)
                     })
 
-                this.listDescription = searchFieldsData
+                console.log('searchFieldsData', searchFieldsData)
+                this.listDescriptions = searchFieldsData
                 this.loadingData = false
-            }, 300)
+            }, 400)
         },
 
-        async onChangeDescription(item) {
-            console.log('onChangeDescription', item)
+        async selectedDescription(item) {
+            console.log('this.$refs.txtDescription', this.$refs.txtDescription)
+            console.log('item', item)
+
+            if (item?.data) {
+                this.expense.value = item.data.value
+                this.expense.share_value = item.data.share_value
+                this.expense.share_user_id = item.data.share_user_id
+                this.expense.remarks = item.data.remarks
+                this.expense.tags = item.data.tags
+            }
         },
 
         async updateInvoice(closed) {
@@ -1060,7 +1106,7 @@ export default {
                 id: null,
                 description: null,
                 date: null,
-                value: null,
+                value: 0,
                 group: null,
                 portion: null,
                 portion_total: null,
@@ -1259,7 +1305,7 @@ export default {
             this.division = {
                 id: null,
                 description: null,
-                value: null,
+                value: 0,
                 remarks: null,
                 share_value: null,
                 share_user_id: null,

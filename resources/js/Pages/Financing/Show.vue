@@ -190,15 +190,19 @@
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
+                                <vuetify-money
                                     v-model="installment.value"
-                                    type="number"
                                     :label="$t('default.value')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :rules="rules.currencyFieldRules"
+                                    :options="{
+                                        locale: 'pt-BR',
+                                        prefix: 'R$',
+                                        suffix: '',
+                                        length: 11,
+                                        precision: 2,
+                                    }"
+                                />
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <v-select
@@ -283,7 +287,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import moment from 'moment'
-import { sumField, currencyField, percentField, formatDate } from '../../utils/utils.js'
+import { sumField, currencyField, percentField, formatDate, reverseFormatNumber } from '../../utils/utils.js'
 </script>
 
 <script>
@@ -329,6 +333,7 @@ export default {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 currencyFieldRules: [
                     (value) => {
+                        value = reverseFormatNumber(value)
                         if (!value) return this.$t('rules.required-text-field')
                         if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 

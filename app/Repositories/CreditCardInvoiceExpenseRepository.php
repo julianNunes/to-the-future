@@ -21,15 +21,19 @@ class CreditCardInvoiceExpenseRepository extends AppRepository implements Credit
      */
     public function search(string $description): Collection
     {
-        return $this->model->select([
-            'description',
-            'value',
-            'share_value',
-            'share_user_id',
-            'remarks'
-        ])
+        return $this->model
+            ->select([
+                'id',
+                'description',
+                'value',
+                'share_value',
+                'share_user_id',
+                'remarks'
+            ])
             ->with(['tags'])
             ->where('description', 'LIKE', "%{$description}%")
-            ->get();
+            ->orderBy('created_at', 'DESC')
+            ->get()
+            ->unique('description');
     }
 }

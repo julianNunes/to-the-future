@@ -137,26 +137,34 @@
                                 ></v-date-input>
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
+                                <vuetify-money
                                     v-model="financing.total"
-                                    type="number"
                                     :label="$t('default.total')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :rules="rules.currencyFieldRules"
+                                    :options="{
+                                        locale: 'pt-BR',
+                                        prefix: 'R$',
+                                        suffix: '',
+                                        length: 11,
+                                        precision: 2,
+                                    }"
+                                />
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
-                                <v-text-field
+                                <vuetify-money
                                     v-model="financing.fees_monthly"
-                                    type="number"
                                     :label="$t('financing.fees-monthly')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :rules="rules.currencyFieldRules"
+                                    :options="{
+                                        locale: 'pt-BR',
+                                        prefix: '',
+                                        suffix: '%',
+                                        length: 11,
+                                        precision: 2,
+                                    }"
+                                />
                             </v-col>
                             <v-col v-if="!financing.id" cols="12" sm="6" md="3">
                                 <v-text-field
@@ -165,7 +173,7 @@
                                     :label="$t('financing.portion-total')"
                                     min="2"
                                     required
-                                    :rules="rules.currencyFieldRules"
+                                    :rules="rules.numberFieldRules"
                                     density="comfortable"
                                 ></v-text-field>
                             </v-col>
@@ -186,15 +194,19 @@
                                 ></v-date-input>
                             </v-col>
                             <v-col v-if="!financing.id" cols="12" sm="6" md="3">
-                                <v-text-field
+                                <vuetify-money
                                     v-model="financing.value_installment"
-                                    type="number"
                                     :label="$t('financing.installment-value')"
-                                    min="0"
-                                    required
-                                    :rules="rules.currencyFieldRules"
                                     density="comfortable"
-                                ></v-text-field>
+                                    :rules="rules.currencyFieldRules"
+                                    :options="{
+                                        locale: 'pt-BR',
+                                        prefix: 'R$',
+                                        suffix: '',
+                                        length: 11,
+                                        precision: 2,
+                                    }"
+                                />
                             </v-col>
                             <v-col cols="12" md="12">
                                 <v-text-field
@@ -264,6 +276,13 @@ export default {
             ],
             rules: {
                 textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+                numberFieldRules: [
+                    (value) => {
+                        if (!value) return this.$t('rules.required-text-field')
+                        if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+                        return true
+                    },
+                ],
                 currencyFieldRules: [
                     (value) => {
                         if (!value) return this.$t('rules.required-text-field')
