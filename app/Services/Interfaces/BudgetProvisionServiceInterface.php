@@ -58,4 +58,11 @@ interface BudgetProvisionServiceInterface
      * @param int $id
      */
     public function delete(int $id): bool;
+
+    /**
+     * Search by description. Used in the "v-auto-complete" component
+     * @param string $description
+     * @return Collection
+     */
+    public function search(string $description): Collection;
 }

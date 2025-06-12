@@ -135,14 +135,36 @@
                 <v-form ref="form" @submit.prevent>
                     <v-row dense>
                         <v-col cols="12" sm="12" md="12">
-                            <v-text-field
+                            <v-autocomplete
                                 ref="txtDescription"
                                 v-model="provision.description"
+                                v-model:search="searchDescription"
                                 :label="$t('default.description')"
                                 :rules="rules.textFieldRules"
                                 required
                                 density="comfortable"
-                            ></v-text-field>
+                                :items="itemsDescriptions"
+                                :loading="loadingData"
+                                item-title="description"
+                                item-value="description"
+                                clearable
+                                return-object
+                                hide-no-data
+                                hide-selected
+                                placeholder="Start typing to Search"
+                                prepend-icon="mdi-database-search"
+                                auto-select-first
+                                @update:search="searchDescriptions"
+                                @update:model-value="selectedDescription"
+                            >
+                                <template #item="{ props, item }">
+                                    <v-list-item
+                                        v-bind="props"
+                                        :subtitle="item.raw.resume"
+                                        :title="item.raw.description"
+                                    ></v-list-item>
+                                </template>
+                            </v-autocomplete>
                         </v-col>
                         <v-col cols="12" sm="4" md="3">
                             <vuetify-money
@@ -354,8 +376,10 @@ export default {
                 },
             ],
             listTags: [],
+            listDescriptions: [],
             searchFieldsData: [],
             searchTag: '',
+            searchDescription: '',
             loadingData: false,
         }
     },
@@ -363,6 +387,39 @@ export default {
     computed: {
         itemsTags() {
             return this.listTags
+        },
+        itemsDescriptions() {
+            let result = []
+
+            if (this.listDescriptions?.length) {
+                result = this.listDescriptions.map((x) => {
+                    let resume = ''
+
+                    if (x.value) {
+                        resume += this.$t('default.value') + ': ' + currencyField(x.value)
+                    }
+
+                    if (x.share_value) {
+                        resume += ' | ' + this.$t('default.share-value') + ': ' + currencyField(x.share_value)
+                    }
+
+                    if (x.tags && x.tags.length > 0) {
+                        resume += ' | ' + this.$t('default.tags') + ': ' + x.tags.map((tag) => tag.name).join(', ')
+                    }
+
+                    if (x.remarks) {
+                        resume += ' | ' + this.$t('default.remarks') + ': ' + x.remarks
+                    }
+
+                    return {
+                        description: x.description,
+                        resume: resume,
+                        data: x,
+                    }
+                })
+            }
+
+            return result
         },
         headers() {
             let headers = [
@@ -459,6 +516,59 @@ export default {
             }, 300)
         },
 
+        async searchDescriptions(val) {
+            if (this.loadingData) return
+
+            if (!val || val.length <= 0) {
+                this.listDescriptions = []
+                clearTimeout(this.timeOut)
+                return
+            }
+
+            if (this.provision.description && this.provision.description == val) {
+                return
+            }
+
+            clearTimeout(this.timeOut)
+            this.timeOut = setTimeout(async () => {
+                this.loadingData = true
+                let searchFieldsData = []
+                await window.axios
+                    .get('/budget-provision/search/' + val)
+                    .then(function (response) {
+                        if (response.data && response.data.length > 0) {
+                            searchFieldsData = response.data
+                        }
+
+                        if (
+                            (searchFieldsData &&
+                                searchFieldsData.length > 0 &&
+                                !searchFieldsData.find((x) => x.description == val)) ||
+                            !searchFieldsData ||
+                            searchFieldsData.length == 0
+                        ) {
+                            searchFieldsData.unshift({ description: val, resume: '', data: null })
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log('error', error)
+                    })
+
+                this.listDescriptions = searchFieldsData
+                this.loadingData = false
+            }, 400)
+        },
+
+        async selectedDescription(item) {
+            if (item?.data) {
+                this.provision.value = item.data.value
+                this.provision.share_value = item.data.share_value
+                this.provision.share_user_id = item.data.share_user_id
+                this.provision.remarks = item.data.remarks
+                this.provision.tags = item.data.tags
+            }
+        },
+
         newItem() {
             this.titleModal = this.$t('budget-provision.new-item')
             this.editDialog = true
@@ -483,7 +593,7 @@ export default {
             this.editDialog = true
             this.provision = {
                 id: item.id,
-                description: item.description,
+                description: item.description.description,
                 value: Number(item.value),
                 group: item.group,
                 remarks: item.remarks,
@@ -517,7 +627,7 @@ export default {
             this.$inertia.post(
                 '/budget-provision',
                 {
-                    description: this.provision.description,
+                    description: this.provision.description.description,
                     value: this.provision.value,
                     group: this.provision.group,
                     remarks: this.provision.remarks,
@@ -543,7 +653,7 @@ export default {
             this.$inertia.put(
                 '/budget-provision/' + this.provision.id,
                 {
-                    description: this.provision.description,
+                    description: this.provision.description.description,
                     value: this.provision.value,
                     group: this.provision.group,
                     remarks: this.provision.remarks,

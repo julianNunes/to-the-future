@@ -10,9 +10,7 @@ use Illuminate\Http\Request;
 class BudgetProvisionController extends Controller
 {
 
-    public function __construct(private BudgetProvisionServiceInterface $budgetProvisionService)
-    {
-    }
+    public function __construct(private BudgetProvisionServiceInterface $budgetProvisionService) {}
 
     /**
      * Create a new Provision to Budget
@@ -77,5 +75,16 @@ class BudgetProvisionController extends Controller
     {
         $this->budgetProvisionService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');
+    }
+
+    /**
+     * Search by description. Used in the "v-auto-complete" component
+     * @param string $description
+     * @return void
+     */
+    public function search(string $description)
+    {
+        $data = $this->budgetProvisionService->search($description);
+        return response()->json($data);
     }
 }

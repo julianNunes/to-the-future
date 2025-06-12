@@ -470,7 +470,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import { currencyField } from '../../utils/utils.js'
+import { currencyField, formatDate } from '../../utils/utils.js'
 import moment from 'moment'
 </script>
 

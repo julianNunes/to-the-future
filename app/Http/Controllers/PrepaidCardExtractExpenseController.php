@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 
 class PrepaidCardExtractExpenseController extends Controller
 {
-    public function __construct(private PrepaidCardExtractExpenseServiceInterface $prepaidCardExtractExpenseService)
-    {
-    }
+    public function __construct(private PrepaidCardExtractExpenseServiceInterface $prepaidCardExtractExpenseService) {}
 
     /**
      * Create a new Expense Prepaid Card
@@ -97,5 +95,16 @@ class PrepaidCardExtractExpenseController extends Controller
 
         $this->prepaidCardExtractExpenseService->storeImportExcel(intval($request->extract_id), collect($request->data));
         return redirect()->back()->with('success', 'default.sucess-save');
+    }
+
+    /**
+     * Search by description. Used in the "v-auto-complete" component
+     * @param string $description
+     * @return void
+     */
+    public function search(string $description)
+    {
+        $data = $this->prepaidCardExtractExpenseService->search($description);
+        return response()->json($data);
     }
 }

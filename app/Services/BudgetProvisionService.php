@@ -20,8 +20,7 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         private BudgetProvisionRepositoryInterface $budgetProvisionRepository,
         private TagRepositoryInterface $tagRepository,
         private BudgetCalculateInterface $budgetCalculate
-    ) {
-    }
+    ) {}
 
     /**
      * Create a new Provision to Budget
@@ -147,5 +146,15 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
 
         return true;
+    }
+
+    /**
+     * Search by description. Used in the "v-auto-complete" component
+     * @param string $description
+     * @return Collection
+     */
+    public function search(string $description): Collection
+    {
+        return $this->budgetProvisionRepository->search($description);
     }
 }

@@ -911,7 +911,6 @@ export default {
                 })
             }
 
-            console.log('result', result)
             return result
         },
         creditCardname() {
@@ -1043,9 +1042,8 @@ export default {
                 this.loadingData = true
                 let searchFieldsData = []
                 await window.axios
-                    .get('/credit-card/invoice/expense/' + val)
+                    .get('/credit-card/invoice/expense/search/' + val)
                     .then(function (response) {
-                        console.log('response', response)
                         if (response.data && response.data.length > 0) {
                             searchFieldsData = response.data
                         }
@@ -1064,16 +1062,12 @@ export default {
                         console.log('error', error)
                     })
 
-                console.log('searchFieldsData', searchFieldsData)
                 this.listDescriptions = searchFieldsData
                 this.loadingData = false
             }, 400)
         },
 
         async selectedDescription(item) {
-            console.log('this.$refs.txtDescription', this.$refs.txtDescription)
-            console.log('item', item)
-
             if (item?.data) {
                 this.expense.value = item.data.value
                 this.expense.share_value = item.data.share_value
@@ -1161,7 +1155,6 @@ export default {
         },
 
         async create() {
-            console.log('this.expense', this.expense)
             this.isLoading = true
             this.$inertia.post(
                 '/credit-card/invoice/expense',

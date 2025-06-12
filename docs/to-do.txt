@@ -39,16 +39,8 @@ DAMARES
 ==================================================
 LISTA DE TAREFAS PENDENTES - TO DO
 =================================================
-
-- fazer um autocomplete na descrição da despesas
+- Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
     - descrição | Valor | valor compartilhado | tags
-
-- Procurar todos os lugares que tem componente do tipo "type="number" e inserir o novo componente
-    - share_value
-
-
-
-- Procurar por todos os lugares que tem "descriptioN" e atualizar o componente para autocomplete
 
 
 - Orçamentos

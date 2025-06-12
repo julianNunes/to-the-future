@@ -25,8 +25,7 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
         private TagRepositoryInterface $tagRepository,
         private ShareUserRepositoryInterface $shareUserRepository,
         private BudgetCalculateInterface $budgetCalculate
-    ) {
-    }
+    ) {}
 
     /**
      * Create new Expense to Extract
@@ -216,5 +215,15 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
         }
 
         return true;
+    }
+
+    /**
+     * Search by description. Used in the "v-auto-complete" component
+     * @param string $description
+     * @return Collection
+     */
+    public function search(string $description): Collection
+    {
+        return $this->prepaidCardExtractExpenseRepository->search($description);
     }
 }

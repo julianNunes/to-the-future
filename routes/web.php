@@ -85,7 +85,7 @@ Route::controller(CreditCardInvoiceExpenseController::class)->group(function () 
     Route::delete('/credit-card/invoice/expense/{id}', 'delete');
     Route::delete('/credit-card/invoice/expense/{id}/delete-all-portions', 'deletePortions');
     Route::post('/credit-card/invoice/expense/import-excel', 'storeImportExcel');
-    Route::get('/credit-card/invoice/expense/{description}', 'search');
+    Route::get('/credit-card/invoice/expense/search/{description}', 'search');
 });
 
 // PrepaidCard
@@ -113,6 +113,7 @@ Route::controller(PrepaidCardExtractExpenseController::class)->group(function ()
     Route::put('/prepaid-card/extract/expense/{id}', 'update');
     Route::delete('/prepaid-card/extract/expense/{id}', 'delete');
     Route::post('/prepaid-card/extract/expense/import-excel', 'storeImportExcel');
+    Route::get('/prepaid-card/extract/expense/search/{description}', 'search');
 });
 
 // Financing
@@ -177,6 +178,7 @@ Route::controller(BudgetProvisionController::class)->group(function () {
     Route::post('/budget-provision', 'store');
     Route::put('/budget-provision/{id}', 'update');
     Route::delete('/budget-provision/{id}', 'delete');
+    Route::get('/budget-provision/search/{description}', 'search');
 });
 
 // Metas do Orçamento

@@ -77,4 +77,11 @@ interface PrepaidCardExtractExpenseServiceInterface
      * @return boolean
      */
     public function storeImportExcel(int $invoiceId, Collection $data): bool;
+
+    /**
+     * Search by description. Used in the "v-auto-complete" component
+     * @param string $description
+     * @return Collection
+     */
+    public function search(string $description): Collection;
 }
