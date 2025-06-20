@@ -28,12 +28,12 @@ interface BudgetExpenseServiceInterface
         string $date,
         float $value,
         string $group,
-        string $remarks = null,
-        bool $paid = false,
-        float $shareValue = null,
-        int $shareUserId = null,
-        int $financingInstallmentId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?bool $paid = false,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?int $financingInstallmentId = null,
+        ?Collection $tags = null
     ): BudgetExpense;
 
     /**
@@ -57,12 +57,12 @@ interface BudgetExpenseServiceInterface
         string $date,
         float $value,
         string $group,
-        string $remarks = null,
-        bool $paid = false,
-        float $shareValue = null,
-        int $shareUserId = null,
-        int $financingInstallmentId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?bool $paid = false,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?int $financingInstallmentId = null,
+        ?Collection $tags = null
     ): bool;
 
     /**

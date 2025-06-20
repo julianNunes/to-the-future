@@ -21,8 +21,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         private BudgetIncomeRepositoryInterface $budgetIncomeRepository,
         private TagRepositoryInterface $tagRepository,
         private BudgetCalculateInterface $budgetCalculate
-    ) {
-    }
+    ) {}
 
     /**
      * Create a new Income to Budget
@@ -39,8 +38,8 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         string $description,
         string $date,
         float $value,
-        string $remarks = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?Collection $tags = null
     ): BudgetIncome {
         $budget = $this->budgetRepository->show($budgetId);
 
@@ -79,8 +78,8 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         string $description,
         string $date,
         float $value,
-        string $remarks = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?Collection $tags = null
     ): bool {
         $income = $this->budgetIncomeRepository->show($id);
 

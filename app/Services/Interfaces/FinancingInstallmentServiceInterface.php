@@ -27,7 +27,7 @@ interface FinancingInstallmentServiceInterface
         string $date,
         float $value,
         bool $paid,
-        string $paymentDate = null,
-        float $paidValue = null,
+        ?string $paymentDate = null,
+        ?float $paidValue = null,
     ): FinancingInstallment;
 }

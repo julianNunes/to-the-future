@@ -39,10 +39,10 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         string $description,
         float $value,
         string $group,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null
     ): BudgetProvision {
         $budget = $this->budgetRepository->show($budgetId);
 
@@ -85,10 +85,10 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         string $description,
         float $value,
         string $group,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null
     ): bool {
         $provision = $this->budgetProvisionRepository->show($id);
 

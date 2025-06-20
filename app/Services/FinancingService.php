@@ -15,8 +15,7 @@ class FinancingService implements FinancingServiceInterface
     public function __construct(
         private FinancingRepositoryInterface $financingRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Returns data to Financial Management
@@ -50,7 +49,7 @@ class FinancingService implements FinancingServiceInterface
         int $portionTotal,
         string $startDateInstallment,
         float $valueInstallment,
-        string $remarks = null
+        ?string $remarks = null
     ): Financing {
         $financing = $this->financingRepository->store([
             'description' => $description,
@@ -96,8 +95,8 @@ class FinancingService implements FinancingServiceInterface
         string $startDate,
         float $total,
         float $feesMonthly,
-        float $valueInstallment = null,
-        string $remarks = null
+        ?float $valueInstallment = null,
+        ?string $remarks = null
     ): Financing {
         $financing = $this->financingRepository->show($id, ['installments']);
 

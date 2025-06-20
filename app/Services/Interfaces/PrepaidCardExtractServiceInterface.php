@@ -29,7 +29,7 @@ interface PrepaidCardExtractServiceInterface
         string $month,
         float $credit,
         string $creditDate,
-        string $remarks = null,
+        ?string $remarks = null,
     ): PrepaidCardExtract;
 
     /**
@@ -43,7 +43,7 @@ interface PrepaidCardExtractServiceInterface
         int $id,
         float $credit,
         string $creditDate,
-        string $remarks = null
+        ?string $remarks = null
     ): PrepaidCardExtract;
 
     /**

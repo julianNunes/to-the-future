@@ -330,5 +330,9 @@
         "limit-expenses": "Limite de Gastos",
         "expenses": "Gastos",
         "limit": "Limite"
+    },
+    "budget-expense-tag-options": {
+        "title": "Despesas por Tag - Personalização",
+        "count-share": "Contabiliza Despesas Compartilhadas"
     }
 }

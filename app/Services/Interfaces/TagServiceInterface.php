@@ -49,5 +49,5 @@ interface TagServiceInterface
      * @param Collection|null $tags
      * @return void
      */
-    public function saveTagsToModel(Model $model, Collection $tags = null);
+    public function saveTagsToModel(Model $model, ?Collection $tags = null);
 }

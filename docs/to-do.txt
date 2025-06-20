@@ -41,41 +41,28 @@ LISTA DE TAREFAS PENDENTES - TO DO
 =================================================
 - Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
     - descrição | Valor | valor compartilhado | tags
+    - TESTAR TUDO
+
+- V-date-input
+    - Inserir traducao no calendario
+
+- BudgetGoal
+    - retestar o calculo
+
+- Despsas por Tag Personalizavel
+    -  Fazer o teste completo do CRUD
+    - Metodo que faz o calculo para gerar o grafico
+
+- Despesas
+    - Adicoonar parcelamento
+
+- Receitas
+    - Adicionar o "autocomplete" no description
+    - adicionar Tags
 
 
-- Orçamentos
-    - Adicionar um aba de Relotorio
-        - Despesas
-            - Criar componente que servira para 2 dois casos
-            - Criar coluna nova na tabela de orçamento que sera um JSON com as configurações das tags
-                - Criar migration "report_config"
-                    report: {
-                        expenses_default: [
-                            {
-                                tags: [],
-                                total: 0
-                            }
-                        ],
-                        expenses: [
-                            {
-                                tags: [],
-                                total: 0
-                            }
-                        ]
-                    }
-
-            - Na tela de orçamento adicionar a opção de copiar "Configuração Relatorio"
-
-
-            - Adicionar um bloco de Despesas Personalizavel
-                - Ter opção de adicionar lista TAGS de forma personalizada, 1 ou +
-                - A cada inserção, gera o totalizador
-                - Componetizar para tratar os dados separados
-
-            - Adicionar um bloco de Despesas
-                - Gera totalizadores para todas as TAGS por padrão
-                    - Nao olha TAG composta, olha apenas TAG SOZINHA para agrupamentos maiores
-
+- Remover do menu a parte de "Financiamento"
+    - Comentar os trechos de codigo que fazem busca das relações
 
 
 - Dashboard

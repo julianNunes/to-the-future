@@ -34,7 +34,7 @@ interface FinancingServiceInterface
         int $portionTotal,
         string $startDateInstallment,
         float $valueInstallment,
-        string $remarks = null
+        ?string $remarks = null
     ): Financing;
 
     /**
@@ -55,8 +55,8 @@ interface FinancingServiceInterface
         string $startDate,
         float $total,
         float $feesMonthly,
-        float $valueInstallment = null,
-        string $remarks = null
+        ?float $valueInstallment = null,
+        ?string $remarks = null
     ): Financing;
 
     /**

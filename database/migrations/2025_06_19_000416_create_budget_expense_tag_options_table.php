@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('budget_goals', function (Blueprint $table) {
+        Schema::create('budget_expense_tag_options', function (Blueprint $table) {
             $table->id();
             $table->enum('group', ['PORTION', 'MONTHLY', 'WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4'])->nullable()->comment('Observacoes');
             $table->boolean('count_share')->default(false);
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('budget_goals');
+        Schema::dropIfExists('budget_expense_tag_options');
     }
 };

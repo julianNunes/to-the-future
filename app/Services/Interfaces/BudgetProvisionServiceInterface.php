@@ -24,10 +24,10 @@ interface BudgetProvisionServiceInterface
         string $description,
         float $value,
         string $group,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null
     ): BudgetProvision;
 
     /**
@@ -47,10 +47,10 @@ interface BudgetProvisionServiceInterface
         string $description,
         float $value,
         string $group,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null
     ): bool;
 
     /**

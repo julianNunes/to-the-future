@@ -55,7 +55,7 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
         string $month,
         float $credit,
         string $creditDate,
-        string $remarks = null,
+        ?string $remarks = null,
     ): PrepaidCardExtract {
         $prepaid_card = $this->prepaidCardRepository->show($prepaidCardId);
 
@@ -99,7 +99,7 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
         int $id,
         float $credit,
         string $creditDate,
-        string $remarks = null
+        ?string $remarks = null
     ): PrepaidCardExtract {
         $prepaid_card_extract = $this->prepaidCardExtractRepository->show($id);
 

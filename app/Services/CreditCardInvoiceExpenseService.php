@@ -58,11 +58,11 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         string $group,
         int $portion,
         int $portionTotal,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
-        Collection $divisions = null
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
+        ?Collection $divisions = null
     ): CreditCardInvoiceExpense {
         $credit_card = $this->creditCardRepository->show($creditCardId);
 
@@ -166,13 +166,13 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         string $date,
         float $value,
         string $group,
-        int $portion = null,
-        int $portionTotal = null,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
-        Collection $divisions = null
+        ?int $portion = null,
+        ?int $portionTotal = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
+        ?Collection $divisions = null
     ): CreditCardInvoiceExpense {
         $credit_card = $this->creditCardRepository->show($creditCardId);
 
@@ -259,13 +259,13 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         string $date,
         float $value,
         string $group,
-        int $portion = null,
-        int $portionTotal = null,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
-        Collection $divisions = null,
+        ?int $portion = null,
+        ?int $portionTotal = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
+        ?Collection $divisions = null,
     ): CreditCardInvoiceExpense {
         $credit_card = $this->creditCardRepository->show($creditCardId);
 

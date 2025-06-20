@@ -33,11 +33,11 @@ interface CreditCardInvoiceExpenseServiceInterface
         string $group,
         int $portion,
         int $portionTotal,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
-        Collection $divisions = null
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
+        ?Collection $divisions = null
     ): CreditCardInvoiceExpense;
 
     /**
@@ -64,13 +64,13 @@ interface CreditCardInvoiceExpenseServiceInterface
         string $date,
         float $value,
         string $group,
-        int $portion = null,
-        int $portionTotal = null,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
-        Collection $divisions = null
+        ?int $portion = null,
+        ?int $portionTotal = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
+        ?Collection $divisions = null
     ): CreditCardInvoiceExpense;
 
     /**
@@ -99,13 +99,13 @@ interface CreditCardInvoiceExpenseServiceInterface
         string $date,
         float $value,
         string $group,
-        int $portion = null,
-        int $portionTotal = null,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
-        Collection $divisions = null,
+        ?int $portion = null,
+        ?int $portionTotal = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
+        ?Collection $divisions = null,
     ): CreditCardInvoiceExpense;
 
     /**

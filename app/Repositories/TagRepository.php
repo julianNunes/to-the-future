@@ -46,7 +46,7 @@ class TagRepository extends AppRepository implements TagRepositoryInterface
      * @param Collection|null $tags
      * @return void
      */
-    public function saveTagsToModel(Model $model, Collection $tags = null)
+    public function saveTagsToModel(Model $model, ?Collection $tags = null)
     {
         if ($tags && $tags->count()) {
             $tags_sync = collect();

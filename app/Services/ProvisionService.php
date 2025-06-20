@@ -15,8 +15,7 @@ class ProvisionService implements ProvisionServiceInterface
     public function __construct(
         private ProvisionRepositoryInterface $provisionRepository,
         private ShareUserRepositoryInterface $shareUserRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Returns data to Provision Management
@@ -57,9 +56,9 @@ class ProvisionService implements ProvisionServiceInterface
         string $description,
         float $value,
         string $group,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
         Collection $tags
     ): Provision {
         $provision = $this->provisionRepository->store([
@@ -94,9 +93,9 @@ class ProvisionService implements ProvisionServiceInterface
         string $description,
         float $value,
         string $group,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
         Collection $tags
     ): Provision {
         $provision = $this->provisionRepository->show($id);

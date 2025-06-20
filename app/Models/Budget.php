@@ -43,7 +43,7 @@ class Budget extends Model
     protected function yearMonth(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes) => $attributes['month'] . '/' . $attributes['year'],
+            get: fn(mixed $value, array $attributes) => $attributes['month'] . '/' . $attributes['year'],
 
         );
     }
@@ -66,6 +66,11 @@ class Budget extends Model
     public function goals(): HasMany
     {
         return $this->hasMany(BudgetGoal::class, 'budget_id', 'id');
+    }
+
+    public function expenseTagOptions(): HasMany
+    {
+        return $this->hasMany(BudgetExpenseTagOption::class, 'budget_id', 'id');
     }
 
     public function provisions(): HasMany

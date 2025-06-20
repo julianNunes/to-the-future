@@ -15,8 +15,7 @@ class FixExpenseService implements FixExpenseServiceInterface
     public function __construct(
         private FixExpenseRepositoryInterface $fixExpenseRepository,
         private ShareUserRepositoryInterface $shareUserRepository
-    ) {
-    }
+    ) {}
 
     /**
      *  Returns data for the Fixed Expense index
@@ -57,10 +56,10 @@ class FixExpenseService implements FixExpenseServiceInterface
         string $description,
         string $dueDate,
         float $value,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
     ): FixExpense {
         $expense = $this->fixExpenseRepository->store([
             'description' => $description,
@@ -94,10 +93,10 @@ class FixExpenseService implements FixExpenseServiceInterface
         string $description,
         string $dueDate,
         float $value,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
     ): FixExpense {
         $expense = $this->fixExpenseRepository->show($id);
 

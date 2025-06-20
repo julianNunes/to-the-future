@@ -22,8 +22,8 @@ interface BudgetIncomeServiceInterface
         string $description,
         string $date,
         float $value,
-        string $remarks = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?Collection $tags = null
     ): BudgetIncome;
 
     /**
@@ -41,8 +41,8 @@ interface BudgetIncomeServiceInterface
         string $description,
         string $date,
         float $value,
-        string $remarks = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?Collection $tags = null
     ): bool;
 
     /**

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\Interfaces\{
     BudgetExpenseServiceInterface,
+    BudgetExpenseTagOptionServiceInterface,
     BudgetGoalServiceInterface,
     BudgetIncomeServiceInterface,
     BudgetProvisionServiceInterface,
@@ -22,6 +23,7 @@ use App\Services\Interfaces\{
 };
 use App\Services\{
     BudgetExpenseService,
+    BudgetExpenseTagOptionService,
     BudgetGoalService,
     BudgetIncomeService,
     BudgetProvisionService,
@@ -54,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Apps Services
         $this->app->bind(BudgetExpenseServiceInterface::class, BudgetExpenseService::class);
+        $this->app->bind(BudgetExpenseTagOptionServiceInterface::class, BudgetExpenseTagOptionService::class);
         $this->app->bind(BudgetGoalServiceInterface::class, BudgetGoalService::class);
         $this->app->bind(BudgetIncomeServiceInterface::class, BudgetIncomeService::class);
         $this->app->bind(BudgetProvisionServiceInterface::class, BudgetProvisionService::class);

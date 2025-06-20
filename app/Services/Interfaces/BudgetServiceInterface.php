@@ -37,17 +37,17 @@ interface BudgetServiceInterface
         int $userId,
         string $year,
         string $month,
-        string $startWeek1 = null,
-        string $endWeek1 = null,
-        string $startWeek2 = null,
-        string $endWeek2 = null,
-        string $startWeek3 = null,
-        string $endWeek3 = null,
-        string $startWeek4 = null,
-        string $endWeek4 = null,
-        bool $automaticGenerateYear = false,
-        bool $includeFixExpense = false,
-        bool $includeProvision = false
+        ?string $startWeek1 = null,
+        ?string $endWeek1 = null,
+        ?string $startWeek2 = null,
+        ?string $endWeek2 = null,
+        ?string $startWeek3 = null,
+        ?string $endWeek3 = null,
+        ?string $startWeek4 = null,
+        ?string $endWeek4 = null,
+        ?bool $automaticGenerateYear = false,
+        ?bool $includeFixExpense = false,
+        ?bool $includeProvision = false
     ): Budget;
 
     /**
@@ -69,14 +69,14 @@ interface BudgetServiceInterface
         int $userId,
         string $year,
         string $month,
-        string $startWeek1 = null,
-        string $endWeek1 = null,
-        string $startWeek2 = null,
-        string $endWeek2 = null,
-        string $startWeek3 = null,
-        string $endWeek3 = null,
-        string $startWeek4 = null,
-        string $endWeek4 = null
+        ?string $startWeek1 = null,
+        ?string $endWeek1 = null,
+        ?string $startWeek2 = null,
+        ?string $endWeek2 = null,
+        ?string $startWeek3 = null,
+        ?string $endWeek3 = null,
+        ?string $startWeek4 = null,
+        ?string $endWeek4 = null
     ): Budget;
 
     /**
@@ -116,15 +116,15 @@ interface BudgetServiceInterface
      */
     public function update(
         int $id,
-        string $startWeek1 = null,
-        string $endWeek1 = null,
-        string $startWeek2 = null,
-        string $endWeek2 = null,
-        string $startWeek3 = null,
-        string $endWeek3 = null,
-        string $startWeek4 = null,
-        string $endWeek4 = null,
-        bool $closed = false
+        ?string $startWeek1 = null,
+        ?string $endWeek1 = null,
+        ?string $startWeek2 = null,
+        ?string $endWeek2 = null,
+        ?string $startWeek3 = null,
+        ?string $endWeek3 = null,
+        ?string $startWeek4 = null,
+        ?string $endWeek4 = null,
+        ?bool $closed = false
     ): Budget;
 
     /**

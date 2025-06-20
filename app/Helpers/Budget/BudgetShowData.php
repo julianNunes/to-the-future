@@ -25,8 +25,7 @@ class BudgetShowData implements BudgetShowDataInterface
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
         private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
         private ShareUserRepositoryInterface $shareUserRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Show data to the view
@@ -51,6 +50,7 @@ class BudgetShowData implements BudgetShowDataInterface
                 'shareUser',
             ],
             'goals.tags',
+            'expenseTagOptions.tags',
             'invoices' => [
                 'creditCard',
                 'file',
@@ -125,6 +125,7 @@ class BudgetShowData implements BudgetShowDataInterface
                         'shareUser',
                     ],
                     'goals.tags',
+                    'expenseTagOptions.tags',
                     'invoices' => [
                         'creditCard',
                         'file',
@@ -196,6 +197,13 @@ class BudgetShowData implements BudgetShowDataInterface
             $expense_to_tags_share = $this->mountExpenseToTags($budgetShare);
         }
 
+        $expense_to_tag_options_charts = $this->mountExpenseTagOptions($budget, $budgetShare);
+        $expense_to_tag_options_charts_share = null;
+
+        if ($shareUser && $budgetShare) {
+            $expense_to_tag_options_charts_share = $this->mountExpenseTagOptions($budgetShare, $budget);
+        }
+
         return [
             'installments' => $installments,
             'shareUser' => $shareUser,
@@ -205,12 +213,14 @@ class BudgetShowData implements BudgetShowDataInterface
                 'resume' => $resume,
                 'goalsCharts' => $goals_charts,
                 'expenseToTags' => $expense_to_tags,
+                'expenseToTagOptionCharts' => $expense_to_tag_options_charts,
             ],
             'share' => [
                 'budget' => $budgetShare,
                 'resume' => $resume_share,
                 'goalsCharts' => $goals_charts_share,
                 'expenseToTags' => $expense_to_tags_share,
+                'expenseToTagOptionCharts' => $expense_to_tag_options_charts_share,
             ]
         ];
     }
@@ -221,7 +231,7 @@ class BudgetShowData implements BudgetShowDataInterface
      * @param User|null $shareUser
      * @return void
      */
-    private function mountExpensesIncomes(Budget &$budget, Budget &$budgetShare = null, User $shareUser = null)
+    private function mountExpensesIncomes(Budget &$budget, ?Budget &$budgetShare = null, ?User $shareUser = null)
     {
         // Despesas
         //      Totalizador do Provisionamento
@@ -428,7 +438,7 @@ class BudgetShowData implements BudgetShowDataInterface
      * @param Budget|null $budgetShare
      * @return array
      */
-    private function mountResume(Budget $budget, Budget $budgetShare = null): array
+    private function mountResume(Budget $budget, ?Budget $budgetShare = null): array
     {
         $balance = $budget->total_income - $budget->total_expense;
         $pay_share = 0;
@@ -671,7 +681,7 @@ class BudgetShowData implements BudgetShowDataInterface
      * @param Budget|null $budgetShare
      * @return array
      */
-    private function mountGoalsChart(Budget $budget, Budget $budgetShare = null): array
+    private function mountGoalsChart(Budget $budget, ?Budget $budgetShare = null): array
     {
         $goals_charts = collect();
         $total_expense = 0;
@@ -679,38 +689,164 @@ class BudgetShowData implements BudgetShowDataInterface
         if ($budget->goals && $budget->goals->count()) {
             foreach ($budget->goals as $goal) {
                 $total_expense = 0;
-                foreach ($goal->tags as $tag) {
+                // Procuro em Provisionamento
+                if ($budget->provisions && $budget->provisions->count()) {
+                    foreach ($budget->provisions as $provision) {
+                        if (
+                            $provision->tags
+                            && $provision->tags->count()
+                            && (!$goal->group || $provision->group === $goal->group)
+                            && $goal->tags->every(function ($item) use ($provision) {
+                                return $provision->tags->contains(function ($item2) use ($item) {
+                                    return $item2->name === $item->name;
+                                });
+                            })
+                        ) {
+                            $total_expense += $provision->value;
+                        }
+                    }
+                }
+
+                // Procuro em Despesas
+                if ($budget->expenses && $budget->expenses->count()) {
+                    foreach ($budget->expenses as $expense) {
+                        if (
+                            $expense->tags
+                            && $expense->tags->count()
+                            && (!$goal->group || $goal->group === 'MONTHLY')
+                            && $goal->tags->every(function ($item) use ($expense) {
+                                return $expense->tags->contains(function ($item2) use ($item) {
+                                    return $item2->name === $item->name;
+                                });
+                            })
+                        ) {
+                            $total_expense += $expense->value;
+                        }
+                    }
+                }
+
+                // Procuro em Cartoes de Credito
+                if ($budget->invoices && $budget->invoices->count()) {
+                    foreach ($budget->invoices as $invoice) {
+                        if ($invoice->expenses && $invoice->expenses->count()) {
+                            foreach ($invoice->expenses as $expense) {
+                                if (!$goal->group || $expense->group === $goal->group) {
+                                    if ($expense->divisions && $expense->divisions->count()) {
+                                        foreach ($expense->divisions as $division) {
+                                            if (
+                                                $division->tags
+                                                && $division->tags->count()
+                                                && $goal->tags->every(function ($item) use ($division) {
+                                                    return $division->tags->contains(function ($item2) use ($item) {
+                                                        return $item2->name === $item->name;
+                                                    });
+                                                })
+                                            ) {
+                                                $total_expense += $division->value;
+                                            }
+                                        }
+                                    } else if (
+                                        $expense->tags
+                                        && $expense->tags->count()
+                                        && $goal->tags->every(function ($item) use ($expense) {
+                                            return $expense->tags->contains(function ($item2) use ($item) {
+                                                return $item2->name === $item->name;
+                                            });
+                                        })
+                                    ) {
+                                        $total_expense += $expense->value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Procuro em Cartões Pre-Pago
+                if ($budget->extracts && $budget->extracts->count()) {
+                    foreach ($budget->extracts as $extract) {
+                        foreach ($extract->expenses as $expense) {
+                            if (
+                                $expense->tags
+                                && $expense->tags->count()
+                                && $goal->tags->every(function ($item) use ($expense) {
+                                    return $expense->tags->contains(function ($item2) use ($item) {
+                                        return $item2->name === $item->name;
+                                    });
+                                })
+                            ) {
+                                $total_expense += $expense->value;
+                            }
+                        }
+                    }
+                }
+
+                if ($goal->count_share && $budgetShare) {
                     // Procuro em Provisionamento
-                    if ($budget->provisions && $budget->provisions->count()) {
-                        foreach ($budget->provisions as $provision) {
-                            if ($provision->tags && $provision->tags->count() && $provision->tags->contains('name', $tag->name) && (!$goal->group || $provision->group === $goal->group)) {
+                    if ($budgetShare->provisions && $budgetShare->provisions->count()) {
+                        foreach ($budgetShare->provisions as $provision) {
+                            if (
+                                $provision->tags
+                                && $provision->tags->count()
+                                && (!$goal->group || $provision->group === 'MONTHLY')
+                                && $goal->tags->every(function ($item) use ($provision) {
+                                    return $provision->tags->contains(function ($item2) use ($item) {
+                                        return $item2->name === $item->name;
+                                    });
+                                })
+                            ) {
                                 $total_expense += $provision->value;
                             }
                         }
                     }
 
                     // Procuro em Despesas
-                    if ($budget->expenses && $budget->expenses->count()) {
-                        foreach ($budget->expenses as $expense) {
-                            if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name) && (!$goal->group || $goal->group === 'MONTHLY')) {
+                    if ($budgetShare->expenses && $budgetShare->expenses->count()) {
+                        foreach ($budgetShare->expenses as $expense) {
+                            if (
+                                $expense->tags
+                                && $expense->tags->count()
+                                && (!$goal->group || $goal->group === 'MONTHLY')
+                                && $goal->tags->every(function ($item) use ($expense) {
+                                    return $expense->tags->contains(function ($item2) use ($item) {
+                                        return $item2->name === $item->name;
+                                    });
+                                })
+                            ) {
                                 $total_expense += $expense->value;
                             }
                         }
                     }
 
                     // Procuro em Cartoes de Credito
-                    if ($budget->invoices && $budget->invoices->count()) {
-                        foreach ($budget->invoices as $invoice) {
+                    if ($budgetShare->invoices && $budgetShare->invoices->count()) {
+                        foreach ($budgetShare->invoices as $invoice) {
                             if ($invoice->expenses && $invoice->expenses->count()) {
                                 foreach ($invoice->expenses as $expense) {
                                     if (!$goal->group || $expense->group === $goal->group) {
                                         if ($expense->divisions && $expense->divisions->count()) {
                                             foreach ($expense->divisions as $division) {
-                                                if ($division->tags && $division->tags->count() && $division->tags->contains('name', $tag->name)) {
+                                                if (
+                                                    $division->tags
+                                                    && $division->tags->count()
+                                                    && $goal->tags->every(function ($item) use ($division) {
+                                                        return $division->tags->contains(function ($item2) use ($item) {
+                                                            return $item2->name === $item->name;
+                                                        });
+                                                    })
+                                                ) {
                                                     $total_expense += $division->value;
                                                 }
                                             }
-                                        } else if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name)) {
+                                        } else if (
+                                            $expense->tags
+                                            && $expense->tags->count()
+                                            && $goal->tags->every(function ($item) use ($expense) {
+                                                return $expense->tags->contains(function ($item2) use ($item) {
+                                                    return $item2->name === $item->name;
+                                                });
+                                            })
+                                        ) {
                                             $total_expense += $expense->value;
                                         }
                                     }
@@ -720,75 +856,29 @@ class BudgetShowData implements BudgetShowDataInterface
                     }
 
                     // Procuro em Cartões Pre-Pago
-                    if ($budget->extracts && $budget->extracts->count()) {
-                        foreach ($budget->extracts as $extract) {
+                    if ($budgetShare->extracts && $budgetShare->extracts->count()) {
+                        foreach ($budgetShare->extracts as $extract) {
                             foreach ($extract->expenses as $expense) {
-                                if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name)) {
+                                if (
+                                    $expense->tags
+                                    && $expense->tags->count()
+                                    && $goal->tags->every(function ($item) use ($expense) {
+                                        return $expense->tags->contains(function ($item2) use ($item) {
+                                            return $item2->name === $item->name;
+                                        });
+                                    })
+                                ) {
                                     $total_expense += $expense->value;
                                 }
                             }
                         }
                     }
-
-                    if ($goal->count_share && $budgetShare) {
-                        // Procuro em Provisionamento
-                        if ($budgetShare->provisions && $budgetShare->provisions->count()) {
-                            foreach ($budgetShare->provisions as $provision) {
-                                if ($provision->tags && $provision->tags->count() && $provision->tags->contains('name', $tag->name) && (!$goal->group || $provision->group === 'MONTHLY')) {
-                                    $total_expense += $provision->value;
-                                }
-                            }
-                        }
-
-                        // Procuro em Despesas
-                        if ($budgetShare->expenses && $budgetShare->expenses->count()) {
-                            foreach ($budgetShare->expenses as $expense) {
-                                if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name) && (!$goal->group || $goal->group === 'MONTHLY')) {
-                                    $total_expense += $expense->value;
-                                }
-                            }
-                        }
-
-                        // Procuro em Cartoes de Credito
-                        if ($budgetShare->invoices && $budgetShare->invoices->count()) {
-                            foreach ($budgetShare->invoices as $invoice) {
-                                if ($invoice->expenses && $invoice->expenses->count()) {
-                                    foreach ($invoice->expenses as $expense) {
-                                        if (!$goal->group || $expense->group === $goal->group) {
-                                            if ($expense->divisions && $expense->divisions->count()) {
-                                                foreach ($expense->divisions as $division) {
-                                                    if ($division->tags && $division->tags->count() && $division->tags->contains('name', $tag->name)) {
-                                                        $total_expense += $division->value;
-                                                    }
-                                                }
-                                            } else if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name)) {
-                                                $total_expense += $expense->value;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Procuro em Cartões Pre-Pago
-                        if ($budgetShare->extracts && $budgetShare->extracts->count()) {
-                            foreach ($budgetShare->extracts as $extract) {
-                                foreach ($extract->expenses as $expense) {
-                                    if ($expense->tags && $expense->tags->count() && $expense->tags->contains('name', $tag->name)) {
-                                        $total_expense += $expense->value;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    $goals_charts->push([
-                        'tag' => $tag->name,
-                        'description' => $goal->description,
-                        'value' => $goal->value,
-                        'total' => $total_expense
-                    ]);
                 }
+
+                $goals_charts->push([
+                    'tag' => $goal->tags->implode(' | ', 'name'),
+                    'total' => $total_expense
+                ]);
             }
         }
 
@@ -797,7 +887,6 @@ class BudgetShowData implements BudgetShowDataInterface
 
     /**
      * @param Budget $budget
-     * @param Budget|null $budgetShare
      * @return array
      */
     private function mountExpenseToTags(Budget $budget): array
@@ -895,6 +984,220 @@ class BudgetShowData implements BudgetShowDataInterface
             });
 
             $sorted = $return_data->sortBy('value');
+        }
+
+        return count($sorted) ? $sorted->values()->all() : $sorted;
+    }
+
+    /**
+     * @param Budget $budget
+     * @param Budget|null $budgetShare
+     * @return array
+     */
+    private function mountExpenseTagOptions(Budget $budget, ?Budget $budgetShare = null): array
+    {
+        $tags_charts = collect();
+        $sorted = collect();
+        $total_expense = 0;
+
+        if ($budget->expenseTagOptions && $budget->expenseTagOptions->count()) {
+            foreach ($budget->expenseTagOptions as $option) {
+                $total_expense = 0;
+                // Procuro em Provisionamento
+                if ($budget->provisions && $budget->provisions->count()) {
+                    foreach ($budget->provisions as $provision) {
+                        if (
+                            $provision->tags
+                            && $provision->tags->count()
+                            && (!$option->group || $provision->group === $option->group)
+                            && $option->tags->every(function ($item) use ($provision) {
+                                return $provision->tags->contains(function ($item2) use ($item) {
+                                    return $item2->name === $item->name;
+                                });
+                            })
+                        ) {
+                            $total_expense += $provision->value;
+                        }
+                    }
+                }
+
+                // Procuro em Despesas
+                if ($budget->expenses && $budget->expenses->count()) {
+                    foreach ($budget->expenses as $expense) {
+                        if (
+                            $expense->tags
+                            && $expense->tags->count()
+                            && (!$option->group || $option->group === 'MONTHLY')
+                            && $option->tags->every(function ($item) use ($expense) {
+                                return $expense->tags->contains(function ($item2) use ($item) {
+                                    return $item2->name === $item->name;
+                                });
+                            })
+                        ) {
+                            $total_expense += $expense->value;
+                        }
+                    }
+                }
+
+                // Procuro em Cartoes de Credito
+                if ($budget->invoices && $budget->invoices->count()) {
+                    foreach ($budget->invoices as $invoice) {
+                        if ($invoice->expenses && $invoice->expenses->count()) {
+                            foreach ($invoice->expenses as $expense) {
+                                if (!$option->group || $expense->group === $option->group) {
+                                    if ($expense->divisions && $expense->divisions->count()) {
+                                        foreach ($expense->divisions as $division) {
+                                            if (
+                                                $division->tags
+                                                && $division->tags->count()
+                                                && $option->tags->every(function ($item) use ($division) {
+                                                    return $division->tags->contains(function ($item2) use ($item) {
+                                                        return $item2->name === $item->name;
+                                                    });
+                                                })
+                                            ) {
+                                                $total_expense += $division->value;
+                                            }
+                                        }
+                                    } else if (
+                                        $expense->tags
+                                        && $expense->tags->count()
+                                        && $option->tags->every(function ($item) use ($expense) {
+                                            return $expense->tags->contains(function ($item2) use ($item) {
+                                                return $item2->name === $item->name;
+                                            });
+                                        })
+                                    ) {
+                                        $total_expense += $expense->value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Procuro em Cartões Pre-Pago
+                if ($budget->extracts && $budget->extracts->count()) {
+                    foreach ($budget->extracts as $extract) {
+                        foreach ($extract->expenses as $expense) {
+                            if (
+                                $expense->tags
+                                && $expense->tags->count()
+                                && $option->tags->every(function ($item) use ($expense) {
+                                    return $expense->tags->contains(function ($item2) use ($item) {
+                                        return $item2->name === $item->name;
+                                    });
+                                })
+                            ) {
+                                $total_expense += $expense->value;
+                            }
+                        }
+                    }
+                }
+
+                if ($option->count_share && $budgetShare) {
+                    // Procuro em Provisionamento
+                    if ($budgetShare->provisions && $budgetShare->provisions->count()) {
+                        foreach ($budgetShare->provisions as $provision) {
+                            if (
+                                $provision->tags
+                                && $provision->tags->count()
+                                && (!$option->group || $provision->group === 'MONTHLY')
+                                && $option->tags->every(function ($item) use ($provision) {
+                                    return $provision->tags->contains(function ($item2) use ($item) {
+                                        return $item2->name === $item->name;
+                                    });
+                                })
+                            ) {
+                                $total_expense += $provision->value;
+                            }
+                        }
+                    }
+
+                    // Procuro em Despesas
+                    if ($budgetShare->expenses && $budgetShare->expenses->count()) {
+                        foreach ($budgetShare->expenses as $expense) {
+                            if (
+                                $expense->tags
+                                && $expense->tags->count()
+                                && (!$option->group || $option->group === 'MONTHLY')
+                                && $option->tags->every(function ($item) use ($expense) {
+                                    return $expense->tags->contains(function ($item2) use ($item) {
+                                        return $item2->name === $item->name;
+                                    });
+                                })
+                            ) {
+                                $total_expense += $expense->value;
+                            }
+                        }
+                    }
+
+                    // Procuro em Cartoes de Credito
+                    if ($budgetShare->invoices && $budgetShare->invoices->count()) {
+                        foreach ($budgetShare->invoices as $invoice) {
+                            if ($invoice->expenses && $invoice->expenses->count()) {
+                                foreach ($invoice->expenses as $expense) {
+                                    if (!$option->group || $expense->group === $option->group) {
+                                        if ($expense->divisions && $expense->divisions->count()) {
+                                            foreach ($expense->divisions as $division) {
+                                                if (
+                                                    $division->tags
+                                                    && $division->tags->count()
+                                                    && $option->tags->every(function ($item) use ($division) {
+                                                        return $division->tags->contains(function ($item2) use ($item) {
+                                                            return $item2->name === $item->name;
+                                                        });
+                                                    })
+                                                ) {
+                                                    $total_expense += $division->value;
+                                                }
+                                            }
+                                        } else if (
+                                            $expense->tags
+                                            && $expense->tags->count()
+                                            && $option->tags->every(function ($item) use ($expense) {
+                                                return $expense->tags->contains(function ($item2) use ($item) {
+                                                    return $item2->name === $item->name;
+                                                });
+                                            })
+                                        ) {
+                                            $total_expense += $expense->value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Procuro em Cartões Pre-Pago
+                    if ($budgetShare->extracts && $budgetShare->extracts->count()) {
+                        foreach ($budgetShare->extracts as $extract) {
+                            foreach ($extract->expenses as $expense) {
+                                if (
+                                    $expense->tags
+                                    && $expense->tags->count()
+                                    && $option->tags->every(function ($item) use ($expense) {
+                                        return $expense->tags->contains(function ($item2) use ($item) {
+                                            return $item2->name === $item->name;
+                                        });
+                                    })
+                                ) {
+                                    $total_expense += $expense->value;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $tags_charts->push([
+                    'tag' => $option->tags->implode(' | ', 'name'),
+                    'total' => $total_expense
+                ]);
+            }
+        }
+
+        if (count($tags_charts) > 0) {
+            $sorted = $tags_charts->sortBy('value');
         }
 
         return count($sorted) ? $sorted->values()->all() : $sorted;

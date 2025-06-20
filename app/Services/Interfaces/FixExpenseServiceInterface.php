@@ -28,10 +28,10 @@ interface FixExpenseServiceInterface
         string $description,
         string $dueDate,
         float $value,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
     ): FixExpense;
 
     /**
@@ -51,10 +51,10 @@ interface FixExpenseServiceInterface
         string $description,
         string $dueDate,
         float $value,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null,
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null,
     ): FixExpense;
 
     /**

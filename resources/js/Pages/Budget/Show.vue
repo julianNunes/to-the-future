@@ -78,6 +78,12 @@
                 <v-window-item value="one">
                     <BudgetResume :resume="budgetResume" />
                     <BudgetExpenseTags :expense-to-tags="budgetExpanseToTags" />
+                    <BudgetExpenseTagOptions
+                        :budget-id="budgetId"
+                        :tags-options="budgetExpenseToTagOptions"
+                        :tags-options-chats="budgetExpenseToTagOptionCharts"
+                    />
+                    <BudgetExpenseTags :expense-to-tags="budgetExpanseToTags" />
                     <BudgetGoal :budget-id="budgetId" :goals="budgetGoals" :goals-charts="budgetGoalsCharts" />
                     <BudgetExpense
                         :budget-id="budgetId"
@@ -116,6 +122,11 @@
                 <v-window-item v-if="shareUser && budgetShareId" value="two">
                     <BudgetResume :resume="budgetShareResume" />
                     <BudgetExpenseTags :expense-to-tags="budgetShareExpanseToTags" />
+                    <BudgetExpenseTagOptions
+                        :tags-options="budgetShareExpenseToTagOptions"
+                        :tags-options-chats="budgetShareExpenseToTagOptionCharts"
+                        :view-only="true"
+                    />
                     <BudgetGoal :goals="budgetShareGoals" :goals-charts="budgetShareGoalsCharts" :view-only="true" />
                     <BudgetExpense :expenses="budgetShareExpenses" :view-only="true" />
                     <BudgetIncome :year-month="yearMonthModel" :incomes="budgetShareIncomes" :view-only="true" />
@@ -164,6 +175,7 @@ import InvoiceExpense from '../../Components/CreditCardInvoice/InvoiceExpense.vu
 import ExtractExpense from '../../Components/PrepaidCardExtract/ExtractExpense.vue'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import moment from 'moment'
+import BudgetExpenseTagOptions from '@/Components/Budget/BudgetExpenseTagOptions.vue'
 </script>
 
 <script>
@@ -179,6 +191,7 @@ export default {
         BudgetProvision,
         InvoiceExpense,
         ExtractExpense,
+        BudgetExpenseTagOptions,
     },
 
     props: {
@@ -324,6 +337,12 @@ export default {
         budgetExpanseToTags() {
             return this.owner.expenseToTags
         },
+        budgetExpenseToTagOptions() {
+            return this.owner.budget.expenseTagOptions
+        },
+        budgetExpenseToTagOptionCharts() {
+            return this.owner.expenseToTagOptionCharts
+        },
         budgetExpenses() {
             return this.owner.budget.expenses
         },
@@ -399,6 +418,12 @@ export default {
         },
         budgetShareExpanseToTags() {
             return this.share.expenseToTags
+        },
+        budgetShareExpenseToTagOptions() {
+            return this.share.budget.expenseTagOptions
+        },
+        budgetShareExpenseToTagOptionCharts() {
+            return this.share.expenseToTagOptionCharts
         },
         budgetShareExpenses() {
             return this.share.budget?.expenses

@@ -2,48 +2,40 @@
 
 namespace App\Services\Interfaces;
 
-use App\Models\BudgetGoal;
+use App\Models\BudgetExpenseTagOption;
 use Illuminate\Support\Collection;
 
-interface BudgetGoalServiceInterface
+interface BudgetExpenseTagOptionServiceInterface
 {
     /**
      * Create a new Goal to Budget
      * @param integer $budgetId
-     * @param string $description
-     * @param float $value
-     * @param Collection $tag
+     * @param Collection $tags
      * @param boolean $countShare
      * @param string|null $group
-     * @return BudgetGoal
+     * @return BudgetExpenseTagOption
      */
     public function create(
         int $budgetId,
-        string $description,
-        float $value,
-        Collection $tag,
+        Collection $tags,
         bool $countShare,
         ?string $group = null
-    ): BudgetGoal;
+    ): BudgetExpenseTagOption;
 
     /**
      * Update a new Goal to Budget
      * @param integer $id
-     * @param string $description
-     * @param float $value
+     * @param Collection $tags
      * @param boolean $countShare
-     * @param Collection $tag
      * @param string|null $group
-     * @return BudgetGoal
+     * @return BudgetExpenseTagOption
      */
     public function update(
         int $id,
-        string $description,
-        float $value,
-        Collection $tag,
+        Collection $tags,
         bool $countShare,
         ?string $group = null
-    ): BudgetGoal;
+    ): BudgetExpenseTagOption;
 
     /**
      * Delete a new Goal to Budget

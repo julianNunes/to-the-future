@@ -23,8 +23,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
         private TagRepositoryInterface $tagRepository,
         private BudgetCalculateInterface $budgetCalculate
-    ) {
-    }
+    ) {}
 
     /**
      * Create a new Expense to Budget
@@ -47,12 +46,12 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         string $date,
         float $value,
         string $group,
-        string $remarks = null,
-        bool $paid = false,
-        float $shareValue = null,
-        int $shareUserId = null,
-        int $financingInstallmentId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?bool $paid = false,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?int $financingInstallmentId = null,
+        ?Collection $tags = null
     ): BudgetExpense {
         $budget = $this->budgetRepository->show($budgetId);
 
@@ -118,12 +117,12 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         string $date,
         float $value,
         string $group,
-        string $remarks = null,
-        bool $paid = false,
-        float $shareValue = null,
-        int $shareUserId = null,
-        int $financingInstallmentId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?bool $paid = false,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?int $financingInstallmentId = null,
+        ?Collection $tags = null
     ): bool {
         $expense = $this->budgetExpenseRepository->show($id);
 

@@ -49,8 +49,7 @@ class BudgetService implements BudgetServiceInterface
         private BudgetProvisionRepositoryInterface $budgetProvisionRepository,
         private BudgetIncomeRepositoryInterface $budgetIncomeRepository,
         private BudgetGoalRepositoryInterface $budgetGoalRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Return data to view Budget
@@ -88,17 +87,17 @@ class BudgetService implements BudgetServiceInterface
         int $userId,
         string $year,
         string $month,
-        string $startWeek1 = null,
-        string $endWeek1 = null,
-        string $startWeek2 = null,
-        string $endWeek2 = null,
-        string $startWeek3 = null,
-        string $endWeek3 = null,
-        string $startWeek4 = null,
-        string $endWeek4 = null,
-        bool $automaticGenerateYear = false,
-        bool $includeFixExpense = false,
-        bool $includeProvision = false
+        ?string $startWeek1 = null,
+        ?string $endWeek1 = null,
+        ?string $startWeek2 = null,
+        ?string $endWeek2 = null,
+        ?string $startWeek3 = null,
+        ?string $endWeek3 = null,
+        ?string $startWeek4 = null,
+        ?string $endWeek4 = null,
+        ?bool $automaticGenerateYear = false,
+        ?bool $includeFixExpense = false,
+        ?bool $includeProvision = false
     ): Budget {
         $budget = $this->create(
             $userId,
@@ -311,14 +310,14 @@ class BudgetService implements BudgetServiceInterface
         int $userId,
         string $year,
         string $month,
-        string $startWeek1 = null,
-        string $endWeek1 = null,
-        string $startWeek2 = null,
-        string $endWeek2 = null,
-        string $startWeek3 = null,
-        string $endWeek3 = null,
-        string $startWeek4 = null,
-        string $endWeek4 = null
+        ?string $startWeek1 = null,
+        ?string $endWeek1 = null,
+        ?string $startWeek2 = null,
+        ?string $endWeek2 = null,
+        ?string $startWeek3 = null,
+        ?string $endWeek3 = null,
+        ?string $startWeek4 = null,
+        ?string $endWeek4 = null
     ): Budget {
         $budget = $this->budgetRepository->getOne(['year' => $year, 'month' => $month, 'user_id' => $userId]);
 
@@ -483,15 +482,15 @@ class BudgetService implements BudgetServiceInterface
      */
     public function update(
         int $id,
-        string $startWeek1 = null,
-        string $endWeek1 = null,
-        string $startWeek2 = null,
-        string $endWeek2 = null,
-        string $startWeek3 = null,
-        string $endWeek3 = null,
-        string $startWeek4 = null,
-        string $endWeek4 = null,
-        bool $closed = false
+        ?string $startWeek1 = null,
+        ?string $endWeek1 = null,
+        ?string $startWeek2 = null,
+        ?string $endWeek2 = null,
+        ?string $startWeek3 = null,
+        ?string $endWeek3 = null,
+        ?string $startWeek4 = null,
+        ?string $endWeek4 = null,
+        ?bool $closed = false
     ): Budget {
         $budget = $this->budgetRepository->show($id);
 

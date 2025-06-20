@@ -3,6 +3,7 @@
 use App\Http\Controllers\{
     BudgetController,
     BudgetExpenseController,
+    BudgetExpenseTagOptionController,
     BudgetGoalController,
     BudgetIncomeController,
     BudgetProvisionController,
@@ -186,6 +187,13 @@ Route::controller(BudgetGoalController::class)->group(function () {
     Route::post('/budget-goal', 'store');
     Route::put('/budget-goal/{id}', 'update');
     Route::delete('/budget-goal/{id}', 'delete');
+});
+
+// Metas do Orçamento
+Route::controller(BudgetExpenseTagOptionController::class)->group(function () {
+    Route::post('/budget-expense-tag-option', 'store');
+    Route::put('/budget-expense-tag-option/{id}', 'update');
+    Route::delete('/budget-expense-tag-option/{id}', 'delete');
 });
 
 require __DIR__ . '/auth.php';

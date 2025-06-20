@@ -20,13 +20,12 @@ class BudgetCalculate implements BudgetCalculateInterface
         private ShareUserRepositoryInterface $shareUserRepository,
         private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Recalculate budget
-     * @param integer $id
-     * @param boolean $calculateShareUser
+     * @param integer $id Id do Orçamento
+     * @param boolean $calculateShareUser Indicador se deve recalcular o orçamento do usuário compartilhado
      * @return boolean
      */
     public function recalculate(int $id, bool $calculateShareUser = false): bool

@@ -48,10 +48,10 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
         string $date,
         float $value,
         string $group,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null
     ): PrepaidCardExtractExpense {
         $prepaid_card = $this->prepaidCardRepository->show($prepaidCardId);
 
@@ -110,10 +110,10 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
         string $date,
         float $value,
         string $group,
-        string $remarks = null,
-        float $shareValue = null,
-        int $shareUserId = null,
-        Collection $tags = null
+        ?string $remarks = null,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null
     ): PrepaidCardExtractExpense {
         $prepaid_card = $this->prepaidCardRepository->show($prepaidCardId);
 

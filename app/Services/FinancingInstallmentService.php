@@ -14,8 +14,7 @@ class FinancingInstallmentService implements FinancingInstallmentServiceInterfac
     public function __construct(
         private FinancingRepositoryInterface $financingRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Returns data for Financing Installment Management
@@ -45,8 +44,8 @@ class FinancingInstallmentService implements FinancingInstallmentServiceInterfac
         string $date,
         float $value,
         bool $paid,
-        string $paymentDate = null,
-        float $paidValue = null,
+        ?string $paymentDate = null,
+        ?float $paidValue = null,
     ): FinancingInstallment {
         $installment = $this->financingInstallmentRepository->show($id);
 

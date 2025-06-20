@@ -12,9 +12,7 @@ use Illuminate\Support\Collection;
 
 class TagService implements TagServiceInterface
 {
-    public function __construct(private TagRepositoryInterface $tagRepository)
-    {
-    }
+    public function __construct(private TagRepositoryInterface $tagRepository) {}
 
     /**
      * Returns data to Tag Management
@@ -109,7 +107,7 @@ class TagService implements TagServiceInterface
      * @param Collection|null $tags
      * @return void
      */
-    public function saveTagsToModel(Model $model, Collection $tags = null)
+    public function saveTagsToModel(Model $model, ?Collection $tags = null)
     {
         $this->tagRepository->saveTagsToModel($model, $tags);
     }
