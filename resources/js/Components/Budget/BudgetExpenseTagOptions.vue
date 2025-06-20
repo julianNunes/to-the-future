@@ -206,7 +206,7 @@ export default {
             headers: [
                 { title: this.$t('default.group'), align: 'end', key: 'group' },
                 { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('budget-option.count-share'), key: 'count_share' },
+                { title: this.$t('budget-expense-tag-options.count-share'), key: 'count_share' },
                 { title: this.$t('default.tag'), key: 'tags' },
                 { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
             ],

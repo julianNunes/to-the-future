@@ -588,8 +588,7 @@ class BudgetService implements BudgetServiceInterface
      */
     public function show(int $id): array
     {
-        $data = $this->budgetShowData->dataShow($id);
-        return $data;
+        return $this->budgetShowData->dataShow($id);
     }
 
     /**

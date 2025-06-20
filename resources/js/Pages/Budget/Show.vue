@@ -338,9 +338,11 @@ export default {
             return this.owner.expenseToTags
         },
         budgetExpenseToTagOptions() {
+            console.log('budgetExpenseToTagOptions ', this.owner.budget.expenseTagOptions)
             return this.owner.budget.expenseTagOptions
         },
         budgetExpenseToTagOptionCharts() {
+            console.log('budgetExpenseToTagOptionCharts ', this.owner.budget.expenseToTagOptionCharts)
             return this.owner.expenseToTagOptionCharts
         },
         budgetExpenses() {
@@ -420,9 +422,11 @@ export default {
             return this.share.expenseToTags
         },
         budgetShareExpenseToTagOptions() {
+            console.log('budgetShareExpenseToTagOptions ', this.share.budget.expenseTagOptions)
             return this.share.budget.expenseTagOptions
         },
         budgetShareExpenseToTagOptionCharts() {
+            console.log('budgetShareExpenseToTagOptionCharts ', this.share.budget.expenseToTagOptionCharts)
             return this.share.expenseToTagOptionCharts
         },
         budgetShareExpenses() {

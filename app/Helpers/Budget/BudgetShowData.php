@@ -997,7 +997,7 @@ class BudgetShowData implements BudgetShowDataInterface
     private function mountExpenseTagOptions(Budget $budget, ?Budget $budgetShare = null): array
     {
         $tags_charts = collect();
-        $sorted = collect();
+        $sorted = [];
         $total_expense = 0;
 
         if ($budget->expenseTagOptions && $budget->expenseTagOptions->count()) {

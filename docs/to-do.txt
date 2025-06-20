@@ -1,7 +1,3 @@
-
-https://www.facebook.com/marketplace/item/430140782822716/
-https://www.facebook.com/marketplace/item/1058801061851401/
-
 CASA
 FESTA
 FARMACIA
@@ -42,9 +38,6 @@ LISTA DE TAREFAS PENDENTES - TO DO
 - Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
     - descrição | Valor | valor compartilhado | tags
     - TESTAR TUDO
-
-- V-date-input
-    - Inserir traducao no calendario
 
 - BudgetGoal
     - retestar o calculo
@@ -89,6 +82,9 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - Orçamentos do Ano (Mês a Mês)
         -  Gasto total por cartão
 
+
+- V-date-input
+    - Inserir traducao no calendario
 
 - Futuramente verificar como fazer corretamente o "partial reload"
 
