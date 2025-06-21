@@ -39,42 +39,40 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - descrição | Valor | valor compartilhado | tags
     - TESTAR TUDO
 
-- BudgetGoal
-    - retestar o calculo
-
 - Despsas por Tag Personalizavel
     -  Fazer o teste completo do CRUD
     - Metodo que faz o calculo para gerar o grafico
 
 - Despesas
     - Adicoonar parcelamento
+    - Verificar se ficou com o autocomplete para description
 
 - Receitas
     - Adicionar o "autocomplete" no description
     - adicionar Tags
 
+- Re-teste de calculo
+    - BudgetGoal
+    - TagToOptions
 
 - Remover do menu a parte de "Financiamento"
     - Comentar os trechos de codigo que fazem busca das relações
 
 
 - Dashboard
-    - Blocos de resumo: (SEMPRE REFERENTE AO MES CORRENTE)
-        - Bloco de Metas
-            - Copia das Metas definidas no orçamento
-        - Bloco com Resumo de Receitas e Despesas
-        - Relatorio de Despesas Personalizavel
-            - Definir grupos maiores (1 TAG) e partir dela pegar as subdiviões para gerar graficos
-            - Exemplo: Alimentação: Alimentação + Ifood, Alimentação + Marmita
-            - Bloco grande ocupando as 12 colunas
-    - Atualizar a tabela do usuario para fazer a verificação de quais itens deseja ver no dashboard
-    - Criar uma tela para opções do usuario posteriormente
+    - Bloco com Resumo de Receitas e Despesas (SEMPRE REFERENTE AO MES CORRENTE)
+    - Blocos de resumo:
+    - Bloco de Metas (BudgetGoal)
+        - apenas os graficos
+    - Relatorio de Despesas Personalizavel
+        - Definir grupos maiores (1 TAG) e partir dela pegar as subdiviões para gerar graficos
+        - Exemplo: Alimentação: Alimentação + Ifood, Alimentação + Marmita
+        - Bloco grande ocupando as 12 colunas
 
 
-- DOckerfile
-    - Containizar
-        - Validar Laravel Octane
-        - Salvar comandos para rodar por dentro do docker
+- Criar uma tela para alterar dados do usuario
+    - Senha
+    - Opções que deseja ver no dashboard
 
 - Relatorios
     - Orçamentos do Ano (Mês a Mês)

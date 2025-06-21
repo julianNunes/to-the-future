@@ -1,0 +1,45 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"     # Apache
+      - "5173:5173"   # (Opcional) Porta para o Vite, se precisar usar npm run dev
+    environment:
+      APP_ENV: development  # Altere para "production" no ambiente de deploy
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: laravel
+      DB_USERNAME: admin
+      DB_PASSWORD: root1234
+    # Volume de bind para desenvolvimento; REMOVA em produção para usar a imagem buildada.
+    volumes:
+      - .:/var/www/html:cached # :cached melhora o desempenho no Mac/Windows
+      # Volumes anônimos para persistir as dependências e não serem sobrescritas pelo bind mount
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+    depends_on:
+      db:
+        condition: service_healthy # Espera o serviço 'db' estar saudável
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: root1234
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck: # Adiciona um healthcheck para o serviço de banco de dados
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-proot1234"] # Comando para verificar a saúde do MySQL
+      interval: 5s # Frequência da verificação
+      timeout: 10s # Tempo limite para o comando de verificação
+      retries: 5 # Número de tentativas antes de considerar o serviço não saudável
+      start_period: 20s # Período inicial para o serviço iniciar antes de começar as verificações
+
+volumes:
+  db_data:

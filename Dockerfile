@@ -1,93 +1,99 @@
-# syntax = docker/dockerfile:experimental
+FROM php:8.2-apache as builder
 
-# Default to PHP 8.2, but we attempt to match
-# the PHP version from the user (wherever `flyctl launch` is run)
-# Valid version values are PHP 7.4+
-ARG PHP_VERSION=8.2
-ARG NODE_VERSION=18
-FROM fideloper/fly-laravel:${PHP_VERSION} as base
+# Instala dependências do sistema e extensões PHP necessárias
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    zip \
+    git \
+    unzip \
+    curl \
+    libonig-dev \
+    libzip-dev \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-configure zip \
+  && docker-php-ext-install pdo pdo_mysql gd mbstring zip
 
-# PHP_VERSION needs to be repeated here
-# See https://docs.docker.com/engine/reference/builder/#understand-how-arg-and-from-interact
-ARG PHP_VERSION
+# Instala Node.js e npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+  && apt-get install -y nodejs
 
-LABEL fly_launch_runtime="laravel"
+# Copia o Composer a partir da imagem oficial
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# copy application code, skipping files based on .dockerignore
-COPY . /var/www/html
+# Define o diretório de trabalho
+WORKDIR /var/www/html
 
-RUN composer install --optimize-autoloader --no-dev \
-    && mkdir -p storage/logs \
-    && php artisan optimize:clear \
-    && chown -R www-data:www-data /var/www/html \
-    && sed -i 's/protected \$proxies/protected \$proxies = "*"/g' app/Http/Middleware/TrustProxies.php \
-    && echo "MAILTO=\"\"\n* * * * * www-data /usr/bin/php /var/www/html/artisan schedule:run" > /etc/cron.d/laravel \
-    && cp .fly/entrypoint.sh /entrypoint \
-    && chmod +x /entrypoint
+# Copia os arquivos de manifesto de dependência (para cache)
+COPY composer.json composer.lock ./
 
-# If we're using Octane...
-RUN if grep -Fq "laravel/octane" /var/www/html/composer.json; then \
-        rm -rf /etc/supervisor/conf.d/fpm.conf; \
-        if grep -Fq "spiral/roadrunner" /var/www/html/composer.json; then \
-            mv /etc/supervisor/octane-rr.conf /etc/supervisor/conf.d/octane-rr.conf; \
-            if [ -f ./vendor/bin/rr ]; then ./vendor/bin/rr get-binary; fi; \
-            rm -f .rr.yaml; \
-        else \
-            mv .fly/octane-swoole /etc/services.d/octane; \
-            mv /etc/supervisor/octane-swoole.conf /etc/supervisor/conf.d/octane-swoole.conf; \
-        fi; \
-        rm /etc/nginx/sites-enabled/default; \
-        ln -sf /etc/nginx/sites-available/default-octane /etc/nginx/sites-enabled/default; \
-    fi
+# Instala as dependências do Composer, incluindo as de desenvolvimento, mas SEM executar os scripts do Laravel ainda.
+RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
-# Multi-stage build: Build static assets
-# This allows us to not include Node within the final container
-FROM node:${NODE_VERSION} as node_modules_go_brrr
+# Copia os arquivos de manifesto do NPM (para cache)
+COPY package.json package-lock.json ./
 
-RUN mkdir /app
+# Instala as dependências do NPM
+RUN npm install && npm cache clean --force
 
-RUN mkdir -p  /app
-WORKDIR /app
+# Copia TODO o código da aplicação. Agora o 'artisan' e o resto do Laravel estão presentes.
 COPY . .
-COPY --from=base /var/www/html/vendor /app/vendor
 
-# Use yarn or npm depending on what type of
-# lock file we might find. Defaults to
-# NPM if no lock file is found.
-# Note: We run "production" for Mix and "build" for Vite
-RUN if [ -f "vite.config.js" ]; then \
-        ASSET_CMD="build"; \
-    else \
-        ASSET_CMD="production"; \
-    fi; \
-    if [ -f "yarn.lock" ]; then \
-        yarn install --frozen-lockfile; \
-        yarn $ASSET_CMD; \
-    elif [ -f "pnpm-lock.yaml" ]; then \
-        corepack enable && corepack prepare pnpm@latest-7 --activate; \
-        pnpm install --frozen-lockfile; \
-        pnpm run $ASSET_CMD; \
-    elif [ -f "package-lock.json" ]; then \
-        npm ci --no-audit; \
-        npm run $ASSET_CMD; \
-    else \
-        npm install; \
-        npm run $ASSET_CMD; \
-    fi;
+# Agora que todos os arquivos estão presentes, podemos executar os scripts do Composer e compilar os assets.
+RUN composer dump-autoload --optimize
+RUN npm run build
 
-# From our base container created above, we
-# create our final image, adding in static
-# assets that we generated above
-FROM base
+# --------------------------
+# Stage 2: Imagem Final (para Produção)
+# --------------------------
+FROM php:8.2-apache
 
-# Packages like Laravel Nova may have added assets to the public directory
-# or maybe some custom assets were added manually! Either way, we merge
-# in the assets we generated above rather than overwrite them
-COPY --from=node_modules_go_brrr /app/public /var/www/html/public-npm
-RUN rsync -ar /var/www/html/public-npm/ /var/www/html/public/ \
-    && rm -rf /var/www/html/public-npm \
-    && chown -R www-data:www-data /var/www/html/public
+# Ajusta o ServerName do Apache para eliminar o aviso e habilita mod_rewrite
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
+    && a2enmod rewrite
 
-EXPOSE 8080
+# Instala as dependências de runtime e compila as extensões PHP.
+# Remove os pacotes de desenvolvimento após a compilação para manter a imagem leve.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Runtime libraries for PHP extensions
+    libpng16-16 \
+    libjpeg62-turbo \
+    libfreetype6 \
+    libonig5 \
+    libzip4 \
+    # Build dependencies (will be purged)
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libzip-dev \
+    # Runtime utilities
+    zip \
+    unzip \
+    curl \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-configure zip \
+  && docker-php-ext-install pdo pdo_mysql gd mbstring zip \
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    libpng-dev libjpeg-dev libfreetype6-dev libonig-dev libzip-dev git curl \
+  && rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["/entrypoint"]
+WORKDIR /var/www/html
+
+# Copia o código já compilado na etapa de builder para a imagem final
+COPY --from=builder /var/www/html ./
+
+# Ajusta as permissões para o usuário do Apache
+RUN chown -R www-data:www-data /var/www/html
+
+# Copia o script de entrypoint
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Exposição da porta do Apache
+EXPOSE 80
+
+# Define o entrypoint e o comando padrão
+ENTRYPOINT ["entrypoint.sh"]
+CMD ["apache2-foreground"]
