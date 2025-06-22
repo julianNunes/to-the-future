@@ -1,23 +1,31 @@
+# --------------------------
+# Stage 1: Builder
+# --------------------------
 FROM php:8.2-apache as builder
 
-# Instala dependências do sistema e extensões PHP necessárias
+# Instala dependências do sistema e extensões PHP necessárias para o BUILD
+# Inclui zlib1g-dev e default-libmysqlclient-dev para compilação de extensões
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libonig-dev \
+    libzip-dev \
+    zlib1g-dev \
+    default-libmysqlclient-dev \
     zip \
     git \
     unzip \
     curl \
-    libonig-dev \
-    libzip-dev \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-configure zip \
-  && docker-php-ext-install pdo pdo_mysql gd mbstring zip
+  && docker-php-ext-install pdo pdo_mysql gd mbstring zip \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instala Node.js e npm
+# Instala Node.js e npm no estágio de BUILD
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-  && apt-get install -y nodejs
+  && apt-get install -y nodejs \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copia o Composer a partir da imagem oficial
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -29,6 +37,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Instala as dependências do Composer, incluindo as de desenvolvimento, mas SEM executar os scripts do Laravel ainda.
+# Isso evita erros de "artisan not found" antes que todo o código esteja presente.
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
 # Copia os arquivos de manifesto do NPM (para cache)
@@ -45,7 +54,7 @@ RUN composer dump-autoload --optimize
 RUN npm run build
 
 # --------------------------
-# Stage 2: Imagem Final (para Produção)
+# Stage 2: Imagem Final (para Produção e Desenvolvimento em Runtime)
 # --------------------------
 FROM php:8.2-apache
 
@@ -53,31 +62,53 @@ FROM php:8.2-apache
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && a2enmod rewrite
 
-# Instala as dependências de runtime e compila as extensões PHP.
-# Remove os pacotes de desenvolvimento após a compilação para manter a imagem leve.
+# Copia a configuração do Virtual Host do Apache
+# Isso garante que o DocumentRoot aponte para /public e que as permissões estejam corretas.
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+
+# Instala dependências, compila extensões, instala Node.js e limpa em uma única camada
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Runtime libraries for PHP extensions
+    # Runtime libraries for PHP extensions (to keep them)
     libpng16-16 \
     libjpeg62-turbo \
     libfreetype6 \
     libonig5 \
     libzip4 \
-    # Build dependencies (will be purged)
+    # Build dependencies for PHP extensions & Node.js (serão purgadas)
+    gnupg \
+    ca-certificates \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
     libonig-dev \
     libzip-dev \
-    # Runtime utilities
+    zlib1g-dev \
+    default-libmysqlclient-dev \
+    git \
+    curl \
+    # Other runtime utilities
     zip \
     unzip \
-    curl \
+  # Compila extensões PHP
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-configure zip \
   && docker-php-ext-install pdo pdo_mysql gd mbstring zip \
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    libpng-dev libjpeg-dev libfreetype6-dev libonig-dev libzip-dev git curl \
-  && rm -rf /var/lib/apt/lists/*
+  # Instala Node.js e npm na imagem final
+  && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+  && apt-get install -y nodejs \
+  # Limpa as dependências de build para manter a imagem leve
+  && apt-get purge -y --auto-remove \
+    gnupg \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libzip-dev \
+    zlib1g-dev \
+    default-libmysqlclient-dev \
+    git \
+    curl \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
 
