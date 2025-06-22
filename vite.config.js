@@ -21,4 +21,15 @@ export default defineConfig({
         vuetify({ autoImport: true }),
         eslintPlugin(),
     ],
+    server: {
+        host: '0.0.0.0', // Isso faz com que o Vite escute em todas as interfaces
+        port: 5173, // Garante que a porta seja 5173
+        hmr: {
+            host: 'localhost', // Use 'localhost' para o HMR no navegador
+            clientPort: 5173,
+        },
+        watch: {
+            usePolling: true // Necessário para alguns sistemas de arquivos em Docker (ex: WSL2, macOS)
+        }
+    },
 })
