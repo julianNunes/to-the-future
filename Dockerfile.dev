@@ -1,0 +1,33 @@
+# Dockerfile.dev
+FROM php:8.2-fpm-alpine
+
+# 1. Instala dependências e extensões PHP
+RUN apk add --no-cache \
+      zip git curl \
+      libpng libjpeg-turbo freetype \
+      libzip-dev oniguruma-dev \
+      libpng-dev libjpeg-turbo-dev freetype-dev \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-configure zip \
+  && docker-php-ext-install pdo pdo_mysql gd mbstring zip \
+  && apk del --no-network libpng-dev libjpeg-turbo-dev freetype-dev
+
+# 2. Instala Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# 3. Copia os manifestos e instala dependências PHP (sem scripts!)
+COPY composer.json composer.lock ./
+RUN composer install --no-interaction --optimize-autoloader --no-scripts
+
+# 4. Copia o restante da aplicação
+COPY . .
+
+# 5. Executa scripts do Laravel agora que artisan existe
+RUN composer run-script post-autoload-dump || true
+
+# 6. Define permissões amigáveis para ambientes locais
+RUN chown -R www-data:www-data /var/www/html
+
+USER www-data

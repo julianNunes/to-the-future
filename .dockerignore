@@ -11,6 +11,7 @@ storage/logs/*
 rr
 
 # 2. Ignore common files/directories we don't need
+**/*vendor
 fly.toml
 .vscode
 .idea
