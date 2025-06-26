@@ -3,6 +3,9 @@ import laravel from 'laravel-vite-plugin'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import eslintPlugin from 'vite-plugin-eslint'
+import path from 'path'
+
+const isProduction = process.env.NODE_ENV === 'production'
 
 export default defineConfig({
     plugins: [
@@ -19,17 +22,27 @@ export default defineConfig({
             },
         }),
         vuetify({ autoImport: true }),
-        eslintPlugin(),
-    ],
+        !isProduction && eslintPlugin(),
+    ].filter(Boolean),
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'resources/js'),
+        },
+    },
     server: {
-        host: '0.0.0.0', // Isso faz com que o Vite escute em todas as interfaces
-        port: 5173, // Garante que a porta seja 5173
+        host: '0.0.0.0',
+        port: 5173,
         hmr: {
-            host: 'localhost', // Use 'localhost' para o HMR no navegador
+            host: 'localhost',
             clientPort: 5173,
         },
         watch: {
-            usePolling: true // Necessário para alguns sistemas de arquivos em Docker (ex: WSL2, macOS)
-        }
+            usePolling: true,
+        },
+    },
+    build: {
+        minify: 'esbuild',
+        target: 'es2015',
+        sourcemap: false,
     },
 })

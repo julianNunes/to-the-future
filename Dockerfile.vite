@@ -1,0 +1,7 @@
+# Dockerfile.vite
+FROM node:20-alpine
+
+WORKDIR /app
+
+# (Opcional) Atualiza o npm para a versão mais recente
+RUN npm install -g npm@latest
