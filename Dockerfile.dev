@@ -1,9 +1,9 @@
 # Dockerfile.dev
 FROM php:8.2-fpm-alpine
 
-# 1. Instala dependências e extensões PHP
+# 1. Instala dependências e extensões
 RUN apk add --no-cache \
-      zip git curl \
+      zip git curl bash \
       libpng libjpeg-turbo freetype \
       libzip-dev oniguruma-dev \
       libpng-dev libjpeg-turbo-dev freetype-dev \
@@ -17,17 +17,25 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# 3. Copia os manifestos e instala dependências PHP (sem scripts!)
+# 3. Copy manifestos e install (cache layer)
 COPY composer.json composer.lock ./
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
-# 4. Copia o restante da aplicação
+# 4. Copia código e dá permissão
 COPY . .
 
-# 5. Executa scripts do Laravel agora que artisan existe
-RUN composer run-script post-autoload-dump || true
+# 5. Configura safe.directory para www-data e roda post-autoload
+RUN git config --system --add safe.directory /var/www/html \
+ && composer dump-autoload --optimize
 
-# 6. Define permissões amigáveis para ambientes locais
+# 6. Ajusta ownership
 RUN chown -R www-data:www-data /var/www/html
 
+# 7. Instala o entrypoint-dev e dá permissão
+COPY entrypoint-dev.sh /usr/local/bin/entrypoint-dev.sh
+RUN chmod +x /usr/local/bin/entrypoint-dev.sh
+
 USER www-data
+
+ENTRYPOINT ["entrypoint-dev.sh"]
+# php-fpm é o CMD default
