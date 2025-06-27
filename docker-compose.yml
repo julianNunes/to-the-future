@@ -1,45 +1,73 @@
 services:
-  app:
-    build: .
-    ports:
-      - "8080:80"     # Apache
-      - "5173:5173"   # (Opcional) Porta para o Vite, se precisar usar npm run dev
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env
     environment:
-      APP_ENV: development  # Altere para "production" no ambiente de deploy
-      DB_CONNECTION: mysql
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: laravel
-      DB_USERNAME: admin
-      DB_PASSWORD: root1234
-    # Volume de bind para desenvolvimento; REMOVA em produção para usar a imagem buildada.
+      APP_ENV: development
     volumes:
-      - .:/var/www/html:cached # :cached melhora o desempenho no Mac/Windows
-      # Volumes anônimos para persistir as dependências e não serem sobrescritas pelo bind mount
-      - /var/www/html/vendor
-      - /var/www/html/node_modules
+      - ./:/var/www/html:cached
+      - vendor:/var/www/html/vendor:delegated
+    ports:
+      - "9000:9000"   # se quiser expor para debug
+    mem_limit: 800m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD","curl","-f","http://localhost/health-placeholder"] 
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
     depends_on:
-      db:
-        condition: service_healthy # Espera o serviço 'db' estar saudável
+      php:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    mem_limit: 200m
+    cpus: 0.2
+
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile.vite
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      CHOKIDAR_USEPOLLING: "false"
+    mem_limit: 300m
+    cpus: 0.2
 
   db:
     image: mysql:8.0
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: laravel
       MYSQL_USER: admin
       MYSQL_PASSWORD: root1234
-    ports:
-      - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
-    healthcheck: # Adiciona um healthcheck para o serviço de banco de dados
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "-proot1234"] # Comando para verificar a saúde do MySQL
-      interval: 5s # Frequência da verificação
-      timeout: 10s # Tempo limite para o comando de verificação
-      retries: 5 # Número de tentativas antes de considerar o serviço não saudável
-      start_period: 20s # Período inicial para o serviço iniciar antes de começar as verificações
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost","-u","admin","-proot1234"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    ports:
+      - "3307:3306"
 
 volumes:
+  vendor:
+  node_modules:
   db_data:

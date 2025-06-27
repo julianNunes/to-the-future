@@ -1,0 +1,41 @@
+# Dockerfile.dev
+FROM php:8.2-fpm-alpine
+
+# 1. Instala dependências e extensões
+RUN apk add --no-cache \
+      zip git curl bash \
+      libpng libjpeg-turbo freetype \
+      libzip-dev oniguruma-dev \
+      libpng-dev libjpeg-turbo-dev freetype-dev \
+  && docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-configure zip \
+  && docker-php-ext-install pdo pdo_mysql gd mbstring zip \
+  && apk del --no-network libpng-dev libjpeg-turbo-dev freetype-dev
+
+# 2. Instala Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# 3. Copy manifestos e install (cache layer)
+COPY composer.json composer.lock ./
+RUN composer install --no-interaction --optimize-autoloader --no-scripts
+
+# 4. Copia código e dá permissão
+COPY . .
+
+# 5. Configura safe.directory para www-data e roda post-autoload
+RUN git config --system --add safe.directory /var/www/html \
+ && composer dump-autoload --optimize
+
+# 6. Ajusta ownership
+RUN chown -R www-data:www-data /var/www/html
+
+# 7. Instala o entrypoint-dev e dá permissão
+COPY entrypoint-dev.sh /usr/local/bin/entrypoint-dev.sh
+RUN chmod +x /usr/local/bin/entrypoint-dev.sh
+
+USER www-data
+
+ENTRYPOINT ["entrypoint-dev.sh"]
+# php-fpm é o CMD default
