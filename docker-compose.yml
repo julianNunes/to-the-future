@@ -3,6 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        PUID: 1000 # Substitua pelo seu UID se for diferente
+        PGID: 1000 # Substitua pelo seu GID se for diferente
     env_file:
       - .env
     environment:
@@ -15,10 +18,10 @@ services:
     mem_limit: 800m
     cpus: 0.5
     healthcheck:
-      test: ["CMD","curl","-f","http://localhost/health-placeholder"] 
+      test: ["CMD-SHELL", "lsof -i tcp:9000 || exit 1"] # Ou netstat -tln | grep 9000
       interval: 10s
-      timeout: 3s
-      retries: 3
+      timeout: 5s
+      retries: 5
 
   nginx:
     image: nginx:alpine

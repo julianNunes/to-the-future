@@ -17,3 +17,11 @@ A laravel inertiajs vuetify
 -   SPA (Single Page Application)
 
 
+## Comands
+- docker-compose up -d --build
+- docker compose exec php bash
+    - php artisan migrate
+    - php artisan db:seed
+
+- docker logs to-the-future-vite-1 --follow
+

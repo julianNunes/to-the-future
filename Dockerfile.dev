@@ -1,6 +1,17 @@
 # Dockerfile.dev
 FROM php:8.2-fpm-alpine
 
+# Obtenha o UID e GID do usuário do host (por padrão, 1000)
+# Isso é para compatibilidade ao montar volumes do host
+ARG PUID=1000
+ARG PGID=1000
+
+# Atualiza o UID/GID do usuário www-data para corresponder ao host
+RUN apk add --no-cache shadow \
+    && if [ "$PUID" -ne "$(id -u www-data)" ]; then usermod -o -u "$PUID" www-data ; fi \
+    && if [ "$PGID" -ne "$(id -g www-data)" ]; then groupmod -o -g "$PGID" www-data ; fi \
+    && apk del shadow
+
 # 1. Instala dependências e extensões
 RUN apk add --no-cache \
       zip git curl bash \

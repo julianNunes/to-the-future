@@ -35,14 +35,6 @@ DAMARES
 ==================================================
 LISTA DE TAREFAS PENDENTES - TO DO
 =================================================
-- Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
-    - descrição | Valor | valor compartilhado | tags
-    - TESTAR TUDO
-
-- Despsas por Tag Personalizavel
-    -  Fazer o teste completo do CRUD
-    - Metodo que faz o calculo para gerar o grafico
-
 - Despesas
     - Adicoonar parcelamento
     - Verificar se ficou com o autocomplete para description
@@ -50,6 +42,14 @@ LISTA DE TAREFAS PENDENTES - TO DO
 - Receitas
     - Adicionar o "autocomplete" no description
     - adicionar Tags
+
+- Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
+    - descrição | Valor | valor compartilhado | tags
+    - TESTAR TUDO
+
+- Despsas por Tag Personalizavel
+    - Fazer o teste completo do CRUD
+    - Metodo que faz o calculo para gerar o grafico
 
 - Re-teste de calculo
     - BudgetGoal
@@ -80,11 +80,11 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - Orçamentos do Ano (Mês a Mês)
         -  Gasto total por cartão
 
+- Futuramente verificar como fazer corretamente o "partial reload"
 
 - V-date-input
     - Inserir traducao no calendario
 
-- Futuramente verificar como fazer corretamente o "partial reload"
 
 ==================================================
 COMEÇAR A COMPLETAR COM DADOS
