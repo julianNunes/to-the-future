@@ -31,21 +31,33 @@ PRESENTE
 DAMARES
 
 
+		"remote.containers.configFile": "./to-the-future/.devcontainer/devcontainer.json"
+
+
+==================================================
+COMANDOS DOCKER
+=================================================
+docker compose logs -f vite
+
 
 ==================================================
 LISTA DE TAREFAS PENDENTES - TO DO
 =================================================
-- Despesas
-    - Adicoonar parcelamento
+- Orçamento Despesas
+    ! Adicoonar parcelamento
+        - Falta fazer alteração no backend para reproduzir as parcelas em outros orçamentos.
     - Verificar se ficou com o autocomplete para description
 
-- Receitas
-    - Adicionar o "autocomplete" no description
-    - adicionar Tags
+- Adicionar o "autocomplete" no description
+    - Receitas
+        - adicionar Tags
+    - Orçamento provisionamento
+    - orçamento despesa
 
 - Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
     - descrição | Valor | valor compartilhado | tags
     - TESTAR TUDO
+
 
 - Despsas por Tag Personalizavel
     - Fazer o teste completo do CRUD

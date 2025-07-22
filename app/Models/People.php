@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|People wherePhone($value)
  * @method static \Illuminate\Database\Eloquent\Builder|People whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperPeople
  */
 class People extends Model
 {

@@ -16,9 +16,11 @@ return new class extends Migration
             $table->string('description')->comment('Descrição');
             $table->date('date')->comment('Data de Vencimento');
             $table->decimal('value');
-            $table->string('remarks')->nullable()->comment('Observacoes');;
+            $table->integer('portion')->nullable()->comment('Parcela atual');
+            $table->integer('portion_total')->nullable()->comment('Total de Parcelas');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
             $table->enum('group', ['MONTHLY', 'INDIVIDUAL'])->default('MONTHLY')->comment('Valor fixo demonstrar que os valores são RECORRENTES');
+            $table->string('remarks')->nullable()->comment('Observacoes');
             $table->boolean('paid')->default(false);
             $table->unsignedBigInteger('budget_id');
             $table->foreign('budget_id')->references('id')->on('budgets');

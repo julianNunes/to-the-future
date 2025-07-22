@@ -37,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCardInvoiceExpenseDivision whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCardInvoiceExpenseDivision whereValue($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperCreditCardInvoiceExpenseDivision
  */
 class CreditCardInvoiceExpenseDivision extends Model
 {

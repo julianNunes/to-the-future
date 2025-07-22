@@ -18,7 +18,7 @@ A laravel inertiajs vuetify
 
 
 ## Comands
-- docker-compose up -d --build
+- docker compose up -d --build
 - docker compose exec php bash
     - php artisan migrate
     - php artisan db:seed

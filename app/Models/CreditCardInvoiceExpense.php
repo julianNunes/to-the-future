@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+/**
+ * @mixin IdeHelperCreditCardInvoiceExpense
+ */
 class CreditCardInvoiceExpense extends Model
 {
     use HasFactory;

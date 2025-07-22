@@ -189,6 +189,40 @@
                             />
                         </v-col>
                         <v-col cols="12" sm="6" md="3">
+                            <v-text-field
+                                v-model="expense.portion"
+                                type="number"
+                                :label="$t('default.portion')"
+                                :disabled="expense.id ? true : false"
+                                min="0"
+                                step="1"
+                                required
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <v-text-field
+                                v-model="expense.portion_total"
+                                type="number"
+                                :label="$t('default.portion-total')"
+                                :disabled="expense.id ? true : false"
+                                min="0"
+                                step="1"
+                                required
+                                :rules="[
+                                    (value) => {
+                                        if (expense.portion) {
+                                            if (!value) return $t('rules.required-text-field')
+                                            if (parseFloat(value) <= 0) return $t('rules.required-currency-field')
+                                            if (parseFloat(value) === 1) return $t('rules.minimum-portion')
+                                        }
+                                        return true
+                                    },
+                                ]"
+                                density="comfortable"
+                            ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
                             <v-select
                                 v-model="expense.group"
                                 :label="$t('default.group')"
@@ -264,7 +298,7 @@
                                 density="comfortable"
                             ></v-select>
                         </v-col>
-                        <v-col cols="12" sm="12" md="12">
+                        <!-- <v-col cols="12" sm="12" md="12">
                             <v-select
                                 v-model="expense.financing_installment_id"
                                 :label="$t('budget-expense.finaning-installment')"
@@ -273,7 +307,7 @@
                                 clearable
                                 density="comfortable"
                             ></v-select>
-                        </v-col>
+                        </v-col> -->
                         <v-col cols="12" md="12">
                             <v-text-field
                                 v-model="expense.remarks"
@@ -374,10 +408,14 @@ export default {
             panel: 1,
             expanded: [],
             percentage: null,
+            deleteAllPortions: false,
+            deleteDialog: false,
             expense: {
                 id: null,
                 description: null,
                 value: 0,
+                portion: null,
+                portion_total: null,
                 group: null,
                 date: null,
                 paid: 0,
@@ -413,6 +451,7 @@ export default {
                     value: 'INDIVIDUAL',
                 },
             ],
+
         }
     },
 
@@ -425,6 +464,7 @@ export default {
                 { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
                 { title: this.$t('budget-expense.due-date'), align: 'center', key: 'date' },
                 { title: this.$t('default.value'), align: 'end', key: 'value' },
+                { title: this.$t('default.portion'), key: 'portion' },
                 { title: this.$t('default.group'), align: 'start', key: 'group' },
                 { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
                 { title: this.$t('default.share-user'), key: 'share_user_id' },
@@ -570,6 +610,8 @@ export default {
                 id: null,
                 description: null,
                 value: 0,
+                portion: null,
+                portion_total: null,
                 date: moment(this.yearMonth + '-01', 'YYYY-MM-DD'),
                 group: null,
                 remarks: null,
@@ -600,6 +642,8 @@ export default {
                 id: item.id,
                 description: item.description,
                 value: Number(item.value),
+                portion: item.portion,
+                portion_total: item.portion_total,
                 date: moment(item.date, 'YYYY-MM-DD'),
                 paid: item.paid ? 1 : 0,
                 group: item.group,
@@ -638,6 +682,8 @@ export default {
                     description: this.expense.description,
                     date: this.expense.date.format('YYYY-MM-DD'),
                     value: this.expense.value,
+                    portion: this.expense.portion,
+                    portion_total: this.expense.portion_total,
                     paid: this.expense.paid ? true : false,
                     group: this.expense.group,
                     remarks: this.expense.remarks,
@@ -666,7 +712,9 @@ export default {
                 {
                     description: this.expense.description,
                     value: this.expense.value,
-                    date: this.expense.format('YYYY-MM-DD'),
+                    portion: this.expense.portion,
+                    portion_total: this.expense.portion_total,
+                    date: this.expense.date.format('YYYY-MM-DD'),
                     paid: this.expense.paid ? true : false,
                     group: this.expense.group,
                     remarks: this.expense.remarks,
@@ -689,6 +737,9 @@ export default {
 
         async confirmRemove(item) {
             this.deleteId = item.id
+            this.deleteAllPortions = false
+            this.expense = item
+            this.deleteDialog = true
             if (
                 await this.$refs.confirm.open(
                     this.$t('budget-expense.budget-expense'),
@@ -701,16 +752,34 @@ export default {
 
         remove() {
             this.isLoading = true
-            this.$inertia.delete(`/budget-expense/${this.deleteId}`, {
-                onSuccess: () => {},
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-                preserveScroll: true,
-            })
+
+            if (this.deleteAllPortions) {
+                this.$inertia.delete(`/budget-expense/${this.deleteId}delete-all-portions`, {
+                    onSuccess: () => {
+                        this.editDialog = false
+                    },
+                    onError: () => {
+                        this.isLoading = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                    preserveScroll: true,
+                })
+            } else {
+                this.$inertia.delete(`/budget-expense/${this.deleteId}`, {
+                    onSuccess: () => {
+                        this.editDialog = false
+                    },
+                    onError: () => {
+                        this.isLoading = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                    preserveScroll: true,
+                })
+            }
         },
     },
 }

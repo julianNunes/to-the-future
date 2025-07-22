@@ -1,0 +1,54 @@
+{
+    // --- Associações de Arquivo ---
+    "files.associations": {
+        "*.module": "php"
+    },
+
+    // --- Formatação e Ações ao Salvar ---
+    // Formata o código automaticamente ao salvar
+    "editor.formatOnSave": true,
+    // Executa ações de correção do ESLint ao salvar
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+
+    // --- Formatadores Padrão por Linguagem ---
+
+    // Para PHP, use o Pint como formatador padrão
+    "[php]": {
+        "editor.defaultFormatter": "open-southeners.laravel-pint"
+    },
+
+    // Para JavaScript, Vue, e outros, use o Prettier
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[vue]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+
+    // Para HTML
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+
+    // --- Configurações do ESLint ---
+    // Diz ao ESLint para validar arquivos Vue também
+    "eslint.validate": ["javascript", "javascriptreact", "vue"],
+    "eslint.format.enable": true,
+
+    // --- Outras Configurações de Formatação ---
+    "html.format.wrapLineLength": 120
+}

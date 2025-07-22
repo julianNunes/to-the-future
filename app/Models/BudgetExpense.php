@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+/**
+ * @mixin IdeHelperBudgetExpense
+ */
 class BudgetExpense extends Model
 {
     use HasFactory;
@@ -18,8 +21,10 @@ class BudgetExpense extends Model
         'description',
         'date',
         'value',
-        'remarks',
         'group',
+        'portion',
+        'portion_total',
+        'remarks',
         'paid',
         'share_value',
         'share_user_id',

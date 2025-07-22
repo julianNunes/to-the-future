@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCard whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCard whereUserId($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperCreditCard
  */
 class CreditCard extends Model
 {

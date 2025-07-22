@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+/**
+ * @mixin IdeHelperBudgetGoal
+ */
 class BudgetGoal extends Model
 {
     use HasFactory;

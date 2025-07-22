@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+/**
+ * @mixin IdeHelperPrepaidCardExtractExpense
+ */
 class PrepaidCardExtractExpense extends Model
 {
     use HasFactory;

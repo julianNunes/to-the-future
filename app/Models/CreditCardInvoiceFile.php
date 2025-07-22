@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCardInvoiceFile wherePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CreditCardInvoiceFile whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperCreditCardInvoiceFile
  */
 class CreditCardInvoiceFile extends Model
 {

@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Tag whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Tag whereUserId($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperTag
  */
 class Tag extends Model
 {

@@ -40,9 +40,9 @@ class BudgetShowData implements BudgetShowDataInterface
             'expenses' => [
                 'tags',
                 'shareUser',
-                'financingInstallment' => [
-                    'financing:id,description'
-                ]
+                // 'financingInstallment' => [
+                //     'financing:id,description'
+                // ]
             ],
             'incomes.tags',
             'provisions' => [
@@ -77,18 +77,18 @@ class BudgetShowData implements BudgetShowDataInterface
         }
 
         // Busca as parcelas de Financiamento em aberto para mostrar no select em tela
-        $installments = $this->financingInstallmentRepository->get(
-            function (Builder $query) use ($budget) {
-                $query->whereHas('financing', function (Builder $query) use ($budget) {
-                    $query->where('user_id', $budget->user_id);
-                })
-                    ->doesntHave('budgetExpense')
-                    ->where('paid', false);
-            },
-            [],
-            [],
-            ['financing:id,description']
-        );
+        // $installments = $this->financingInstallmentRepository->get(
+        //     function (Builder $query) use ($budget) {
+        //         $query->whereHas('financing', function (Builder $query) use ($budget) {
+        //             $query->where('user_id', $budget->user_id);
+        //         })
+        //             ->doesntHave('budgetExpense')
+        //             ->where('paid', false);
+        //     },
+        //     [],
+        //     [],
+        //     ['financing:id,description']
+        // );
 
         $shareUsers = $this->shareUserRepository->get(['user_id' => $budget->user_id], [], [], ['shareUser', 'user']);
         $shareUser = null;
@@ -115,9 +115,9 @@ class BudgetShowData implements BudgetShowDataInterface
                     'expenses' => [
                         'tags',
                         'shareUser',
-                        'financingInstallment' => [
-                            'financing:id,description'
-                        ]
+                        // 'financingInstallment' => [
+                        //     'financing:id,description'
+                        // ]
                     ],
                     'incomes.tags',
                     'provisions' => [

@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{ "path": "." }
+	],
+	"settings": {
+		"workbench.colorTheme": "Dracula Theme",
+		"diffEditor.codeLens": true,
+		"explorer.confirmDelete": false,
+		"workbench.editor.enablePreview": false,
+		"terminal.integrated.enableMultiLinePasteWarning": "never"
+	}
+}

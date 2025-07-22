@@ -1236,7 +1236,7 @@ export default {
             if (this.deleteAllPortions) {
                 this.$inertia.delete('/credit-card/invoice/expense/' + this.deleteId + '/delete-all-portions', {
                     onSuccess: () => {
-                        this.editDialog = false
+                        this.deleteDialog = false
                     },
                     onError: () => {
                         this.isLoading = false
@@ -1249,7 +1249,7 @@ export default {
             } else {
                 this.$inertia.delete('/credit-card/invoice/expense/' + this.deleteId, {
                     onSuccess: () => {
-                        this.editDialog = false
+                        this.deleteDialog = false
                     },
                     onError: () => {
                         this.isLoading = false

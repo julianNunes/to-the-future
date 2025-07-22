@@ -1,0 +1,37 @@
+{
+    "name": "To The Future (Dev Container)",
+
+    // O caminho para o docker-compose.yml, relativo a este arquivo.
+    // ".." significa "subir um nível", saindo da pasta .devcontainer.
+    "dockerComposeFile": [
+        "../docker-compose.yml"
+    ],
+    "service": "php",
+    "workspaceFolder": "/var/www/html",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                // Essenciais para o desenvolvimento
+                "Google.gemini-code-assist", // Gemini Code Assist
+                "bmewburn.vscode-intelephense-client", // IntelliSense para PHP
+                "open-southeners.laravel-pint", // Formatador oficial do Laravel (Pint)
+                "esbenp.prettier-vscode", // Formatador para JS, Vue, CSS, etc.
+                "dbaeumer.vscode-eslint", // Linter para JS/Vue
+
+                // Específicas para Laravel/Vue
+                "amiralizadeh948.laravel-extra-intellisense", // Helpers para Laravel
+                "Vue.volar", // Suporte oficial e moderno para Vue 3
+
+                // Qualidade de vida
+                "eamodio.gitlens" // Melhora a integração com o Git dentro do container
+            ]
+        }
+    },
+    // Executa comandos após a criação do container.
+    // Isso garante que suas dependências e arquivos de ajuda do IDE estejam sempre atualizados.
+    // A flag --ignore-platform-reqs não é ideal em um container, pois o ambiente é controlado.
+    "postCreateCommand": "composer install && php artisan ide-helper:generate && php artisan ide-helper:meta && php artisan ide-helper:models --write-mixin",
+    // O usuário deve ser o mesmo criado dentro do seu Dockerfile.dev
+    "remoteUser": "www-data"
+}

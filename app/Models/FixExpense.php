@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|FixExpense whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|FixExpense whereValue($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperFixExpense
  */
 class FixExpense extends Model
 {

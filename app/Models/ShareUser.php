@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder|ShareUser whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShareUser whereUserId($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperShareUser
  */
 class ShareUser extends Model
 {

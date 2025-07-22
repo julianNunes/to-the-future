@@ -5,23 +5,35 @@ FROM php:8.2-fpm-alpine
 # Isso é para compatibilidade ao montar volumes do host
 ARG PUID=1000
 ARG PGID=1000
+ARG DOCKER_GID
 
-# Atualiza o UID/GID do usuário www-data para corresponder ao host
-RUN apk add --no-cache shadow \
+# 1. Instala dependências do sistema, Docker CLI, e configura o usuário em uma única camada
+RUN apk add --no-cache \
+    # Utilitários de sistema e para o Docker
+    sudo docker-cli docker-compose shadow \
+    # Dependências de runtime para extensões PHP
+    libpng libjpeg-turbo freetype libzip \
+    # Dependências de build para extensões PHP (serão removidas depois)
+    libzip-dev oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev \
+    zip git curl bash \
+    # Garante que um grupo com o GID do Docker do host exista.
+    # Se o GID já estiver em uso, usa o grupo existente. Caso contrário, cria um novo grupo 'docker'.
+    && DOCKER_GROUP_NAME=$(getent group $DOCKER_GID | cut -d: -f1) \
+    && if [ -z "$DOCKER_GROUP_NAME" ]; then \
+        DOCKER_GROUP_NAME=docker; \
+        addgroup -g $DOCKER_GID $DOCKER_GROUP_NAME; \
+    fi \
+    # Configura o usuário www-data
     && if [ "$PUID" -ne "$(id -u www-data)" ]; then usermod -o -u "$PUID" www-data ; fi \
     && if [ "$PGID" -ne "$(id -g www-data)" ]; then groupmod -o -g "$PGID" www-data ; fi \
-    && apk del shadow
-
-# 1. Instala dependências e extensões
-RUN apk add --no-cache \
-      zip git curl bash \
-      libpng libjpeg-turbo freetype \
-      libzip-dev oniguruma-dev \
-      libpng-dev libjpeg-turbo-dev freetype-dev \
-  && docker-php-ext-configure gd --with-freetype --with-jpeg \
-  && docker-php-ext-configure zip \
-  && docker-php-ext-install pdo pdo_mysql gd mbstring zip \
-  && apk del --no-network libpng-dev libjpeg-turbo-dev freetype-dev
+    && addgroup www-data $DOCKER_GROUP_NAME \
+    && echo "www-data ALL=(ALL) NOPASSWD: /usr/bin/docker" >> /etc/sudoers \
+    # Compila as extensões PHP
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install pdo pdo_mysql gd mbstring zip \
+    # Limpa as dependências de build para manter a imagem final menor
+    && apk del --no-network libzip-dev oniguruma-dev libpng-dev libjpeg-turbo-dev freetype-dev shadow
 
 # 2. Instala Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

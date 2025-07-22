@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Provision whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Provision whereValue($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperProvision
  */
 class Provision extends Model
 {
