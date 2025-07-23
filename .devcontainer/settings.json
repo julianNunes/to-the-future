@@ -1,0 +1,67 @@
+{
+    // Configurações específicas para Dev Container que complementam as configurações do host
+
+    // --- Docker ---
+    "docker.host": "unix:///var/run/docker.sock",
+    "docker.dockerPath": "docker",
+    "docker.machineNaming": "both",
+
+    // --- Terminal ---
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "/bin/bash"
+        }
+    },
+
+    // --- PHP/Laravel específico ---
+    "php.suggest.basic": false,
+    "php.validate.executablePath": "/usr/local/bin/php",
+    "intelephense.files.maxSize": 5000000,
+    "intelephense.environment.phpVersion": "8.2.0",
+    "intelephense.environment.includePaths": [
+        "/var/www/html/vendor"
+    ],
+
+    // --- Emmet para Vue ---
+    "emmet.includeLanguages": {
+        "vue": "html",
+        "vue-html": "html"
+    },
+
+    // --- Associações de arquivo ---
+    "files.associations": {
+        "*.vue": "vue",
+        "artisan": "php",
+        ".env*": "dotenv"
+    },
+
+    // --- Vue/JavaScript ---
+    "vetur.validation.template": false,
+    "vetur.validation.script": false,
+    "vetur.validation.style": false,
+    "typescript.preferences.quoteStyle": "single",
+    "javascript.preferences.quoteStyle": "single",
+
+    // --- Git ---
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+
+    // --- Paths ---
+    "path-intellisense.mappings": {
+        "@": "${workspaceFolder}/resources/js",
+        "~": "${workspaceFolder}/resources"
+    },
+
+    // --- Copilot ---
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": true,
+        "plaintext": false,
+        "markdown": true,
+        "php": true,
+        "javascript": true,
+        "vue": true
+    }
+}

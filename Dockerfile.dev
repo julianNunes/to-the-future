@@ -10,7 +10,9 @@ ARG DOCKER_GID
 # 1. Instala dependências do sistema, Docker CLI, e configura o usuário em uma única camada
 RUN apk add --no-cache \
     # Utilitários de sistema e para o Docker
-    sudo docker-cli docker-compose shadow \
+    sudo docker-cli docker-compose shadow netcat-openbsd \
+    # Dependências para Node.js e NPM, necessárias para as ferramentas de front-end
+    nodejs npm \
     # Dependências de runtime para extensões PHP
     libpng libjpeg-turbo freetype libzip \
     # Dependências de build para extensões PHP (serão removidas depois)
@@ -20,14 +22,16 @@ RUN apk add --no-cache \
     # Se o GID já estiver em uso, usa o grupo existente. Caso contrário, cria um novo grupo 'docker'.
     && DOCKER_GROUP_NAME=$(getent group $DOCKER_GID | cut -d: -f1) \
     && if [ -z "$DOCKER_GROUP_NAME" ]; then \
-        DOCKER_GROUP_NAME=docker; \
-        addgroup -g $DOCKER_GID $DOCKER_GROUP_NAME; \
+    DOCKER_GROUP_NAME=docker; \
+    addgroup -g $DOCKER_GID $DOCKER_GROUP_NAME; \
     fi \
     # Configura o usuário www-data
     && if [ "$PUID" -ne "$(id -u www-data)" ]; then usermod -o -u "$PUID" www-data ; fi \
     && if [ "$PGID" -ne "$(id -g www-data)" ]; then groupmod -o -g "$PGID" www-data ; fi \
+    && usermod -s /bin/bash www-data \
     && addgroup www-data $DOCKER_GROUP_NAME \
-    && echo "www-data ALL=(ALL) NOPASSWD: /usr/bin/docker" >> /etc/sudoers \
+    # Concede ao usuário www-data permissão para executar QUALQUER comando com sudo sem senha.
+    && echo "www-data ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     # Compila as extensões PHP
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-configure zip \
@@ -40,19 +44,20 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# 3. Copy manifestos e install (cache layer)
+# 3. Copia os manifestos de dependência para aproveitar o cache do Docker
 COPY composer.json composer.lock ./
-RUN composer install --no-interaction --optimize-autoloader --no-scripts
+# Instala as dependências sem gerar o autoloader ou rodar scripts, para otimizar o cache.
+RUN composer install --no-interaction --no-autoloader --no-scripts
 
-# 4. Copia código e dá permissão
+# 4. Copia o código da aplicação
 COPY . .
 
-# 5. Configura safe.directory para www-data e roda post-autoload
-RUN git config --system --add safe.directory /var/www/html \
- && composer dump-autoload --optimize
+# 5. Gera o autoloader e roda os scripts agora que o código completo está presente.
+RUN composer dump-autoload --optimize
 
-# 6. Ajusta ownership
-RUN chown -R www-data:www-data /var/www/html
+# 6. Configura git e ajusta as permissões.
+RUN git config --system --add safe.directory /var/www/html \
+    && chown -R www-data:www-data /var/www/html
 
 # 7. Instala o entrypoint-dev e dá permissão
 COPY entrypoint-dev.sh /usr/local/bin/entrypoint-dev.sh

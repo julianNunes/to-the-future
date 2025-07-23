@@ -1,9 +1,4 @@
 {
-    // --- Associações de Arquivo ---
-    "files.associations": {
-        "*.module": "php"
-    },
-
     // --- Formatação e Ações ao Salvar ---
     // Formata o código automaticamente ao salvar
     "editor.formatOnSave": true,

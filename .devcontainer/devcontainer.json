@@ -12,8 +12,11 @@
     "customizations": {
         "vscode": {
             "extensions": [
+                // GitHub Copilot
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+
                 // Essenciais para o desenvolvimento
-                "Google.gemini-code-assist", // Gemini Code Assist
                 "bmewburn.vscode-intelephense-client", // IntelliSense para PHP
                 "open-southeners.laravel-pint", // Formatador oficial do Laravel (Pint)
                 "esbenp.prettier-vscode", // Formatador para JS, Vue, CSS, etc.
@@ -22,16 +25,88 @@
                 // Específicas para Laravel/Vue
                 "amiralizadeh948.laravel-extra-intellisense", // Helpers para Laravel
                 "Vue.volar", // Suporte oficial e moderno para Vue 3
+                "Vue.vscode-typescript-vue-plugin", // TypeScript support para Vue
+
+                // Docker
+                "ms-azuretools.vscode-docker", // Suporte completo para Docker
+                "ms-vscode-remote.remote-containers", // Remote Containers
 
                 // Qualidade de vida
-                "eamodio.gitlens" // Melhora a integração com o Git dentro do container
-            ]
+                "eamodio.gitlens", // Melhora a integração com o Git dentro do container
+                "formulahendry.auto-rename-tag", // Auto rename HTML/Vue tags
+                "christian-kohler.path-intellisense", // Path autocomplete
+                "ms-vscode.vscode-json", // JSON support
+                "redhat.vscode-yaml", // YAML support
+
+                // Laravel específico
+                "codingyu.laravel-goto-view", // Go to view from controller
+                "ryannaddy.laravel-artisan", // Laravel Artisan commands
+
+                // Debugging
+                "xdebug.php-debug" // XDebug para PHP
+            ],
+            "settings": {
+                // Configurações específicas para o Dev Container
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "php.suggest.basic": false,
+                "intelephense.files.maxSize": 5000000,
+                "files.associations": {
+                    "*.vue": "vue"
+                },
+                "emmet.includeLanguages": {
+                    "vue": "html"
+                },
+                // Docker
+                "docker.host": "unix:///var/run/docker.sock",
+                "docker.dockerPath": "docker",
+                // Copilot
+                "github.copilot.enable": {
+                    "*": true,
+                    "php": true,
+                    "javascript": true,
+                    "vue": true
+                }
+            }
         }
     },
     // Executa comandos após a criação do container.
-    // Isso garante que suas dependências e arquivos de ajuda do IDE estejam sempre atualizados.
-    // A flag --ignore-platform-reqs não é ideal em um container, pois o ambiente é controlado.
-    "postCreateCommand": "composer install && php artisan ide-helper:generate && php artisan ide-helper:meta && php artisan ide-helper:models --write-mixin",
+    // Usa nosso script de setup personalizado para uma configuração mais robusta
+    "postCreateCommand": "/var/www/html/.devcontainer/setup.sh",
+
+    // Monta o socket do Docker para permitir uso de comandos Docker dentro do container
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ],
+
+    // Variáveis de ambiente específicas para o Dev Container
+    "containerEnv": {
+        "DOCKER_BUILDKIT": "1",
+        "COMPOSE_DOCKER_CLI_BUILD": "1"
+    },
+
+    // Configurações de features do Dev Container
+    "features": {
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+            "version": "latest",
+            "enableNonRootDocker": "true"
+        }
+    },
+
+    // Portas que devem ser encaminhadas
+    "forwardPorts": [8080, 5173, 3307],
+    "portsAttributes": {
+        "8080": {
+            "label": "Laravel App",
+            "protocol": "http"
+        },
+        "5173": {
+            "label": "Vite Dev Server",
+            "protocol": "http"
+        },
+        "3307": {
+            "label": "MySQL Database"
+        }
+    },
     // O usuário deve ser o mesmo criado dentro do seu Dockerfile.dev
     "remoteUser": "www-data"
 }
