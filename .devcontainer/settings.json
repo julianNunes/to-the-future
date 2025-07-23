@@ -3,7 +3,7 @@
 
     // --- Docker ---
     "docker.host": "unix:///var/run/docker.sock",
-    "docker.dockerPath": "docker",
+    "docker.dockerPath": "/usr/bin/docker",
     "docker.machineNaming": "both",
 
     // --- Terminal ---

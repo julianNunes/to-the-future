@@ -58,7 +58,7 @@
                 },
                 // Docker
                 "docker.host": "unix:///var/run/docker.sock",
-                "docker.dockerPath": "docker",
+                "docker.dockerPath": "/usr/bin/docker",
                 // Copilot
                 "github.copilot.enable": {
                     "*": true,
@@ -82,17 +82,7 @@
     "containerEnv": {
         "DOCKER_BUILDKIT": "1",
         "COMPOSE_DOCKER_CLI_BUILD": "1"
-    },
-
-    // Configurações de features do Dev Container
-    "features": {
-        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
-            "version": "latest",
-            "enableNonRootDocker": "true"
-        }
-    },
-
-    // Portas que devem ser encaminhadas
+    },    // Portas que devem ser encaminhadas
     "forwardPorts": [8080, 5173, 3307],
     "portsAttributes": {
         "8080": {

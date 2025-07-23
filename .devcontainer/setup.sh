@@ -61,6 +61,16 @@ else
 fi
 
 echo "✅ Dev Container configurado com sucesso!"
+
+# Testa a configuração do Docker
+echo ""
+echo "🐳 Testando configuração do Docker..."
+if /var/www/html/.devcontainer/test-docker.sh; then
+    echo "✅ Docker funcionando corretamente!"
+else
+    echo "⚠️ Docker com problemas - mas você pode usar os comandos Docker do host"
+fi
+
 echo ""
 echo "🌐 URLs disponíveis:"
 echo "  - Laravel App: http://localhost:8080"
