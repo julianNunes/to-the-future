@@ -46,6 +46,10 @@ LISTA DE TAREFAS PENDENTES - TO DO
 - Orçamento Despesas
     ! Adicoonar parcelamento
         - Falta fazer alteração no backend para reproduzir as parcelas em outros orçamentos.
+        - Adicionar identificador unico na para despesa parcelada do orçamento
+            - id do orçamento
+            - 
+
     - Verificar se ficou com o autocomplete para description
 
 - Adicionar o "autocomplete" no description
@@ -53,6 +57,7 @@ LISTA DE TAREFAS PENDENTES - TO DO
         - adicionar Tags
     - Orçamento provisionamento
     - orçamento despesa
+
 
 - Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
     - descrição | Valor | valor compartilhado | tags
@@ -63,9 +68,11 @@ LISTA DE TAREFAS PENDENTES - TO DO
     - Fazer o teste completo do CRUD
     - Metodo que faz o calculo para gerar o grafico
 
+
 - Re-teste de calculo
     - BudgetGoal
     - TagToOptions
+
 
 - Remover do menu a parte de "Financiamento"
     - Comentar os trechos de codigo que fazem busca das relações
@@ -85,6 +92,7 @@ LISTA DE TAREFAS PENDENTES - TO DO
 - Criar uma tela para alterar dados do usuario
     - Senha
     - Opções que deseja ver no dashboard
+
 
 - Relatorios
     - Orçamentos do Ano (Mês a Mês)

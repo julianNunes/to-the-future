@@ -451,7 +451,6 @@ export default {
                     value: 'INDIVIDUAL',
                 },
             ],
-
         }
     },
 

@@ -31,6 +31,83 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
      * @param string $description
      * @param string $date
      * @param float $value
+     * @param int $portion
+     * @param int $portionTotal
+     * @param string $group
+     * @param string|null $remarks
+     * @param bool|false $paid
+     * @param float|null $shareValue
+     * @param integer|null $shareUserId
+     * @param integer|null $financingInstallmentId
+     * @param Collection|null $tags
+     * @return BudgetExpense
+     */
+    public function createWithPortions(
+        int $budgetId,
+        string $description,
+        string $date,
+        float $value,
+        int $portion,
+        int $portionTotal,        
+        string $group,
+        ?string $remarks = null,
+        ?bool $paid = false,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?int $financingInstallmentId = null,
+        ?Collection $tags = null
+    ): BudgetExpense {
+        $budget = $this->budgetRepository->show($budgetId);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $expense = $this->budgetExpenseRepository->store([
+            'description' => $description,
+            'date' => $date,
+            'value' => $value,
+            'remarks' => $remarks,
+            'group' => $group,
+            'paid' => $paid,
+            'share_value' => $shareValue,
+            'share_user_id' => $shareUserId,
+            'financing_installment_id' => $financingInstallmentId,
+            'budget_id' => $budgetId
+        ]);
+
+        // Atualiza Tags
+        $this->tagRepository->saveTagsToModel($expense, $tags);
+
+        // Atualizar Parcela do Finaciamento
+        // if ($expense->paid && $expense->financing_installment_id) {
+        //     $installment = $this->financingInstallmentRepository->show($expense->financing_installment_id);
+
+        //     if (!$installment) {
+        //         throw new Exception('financing-installment.not-found');
+        //     }
+
+        //     $this->financingInstallmentRepository->store([
+        //         'paid' => $paid,
+        //         'payment_date' => Carbon::parse($date)->format('y-m-d'),
+        //         'paid_value' => $value,
+        //     ], $installment);
+        // }
+
+        // Atualiza Orçamento
+        $this->budgetCalculate->recalculate($budgetId, $shareUserId ? true : false);
+
+        return $expense;
+    }
+
+    /**
+     * Create a new Expense to Budget
+     * @param integer $budgetId
+     * @param string $description
+     * @param string $date
+     * @param float $value
+     * @param int $portion,
+     * @param int $portionTotal, 
      * @param string $group
      * @param string|null $remarks
      * @param bool|false $paid
@@ -45,6 +122,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         string $description,
         string $date,
         float $value,
+        int $portion,
+        int $portionTotal,            
         string $group,
         ?string $remarks = null,
         ?bool $paid = false,
@@ -142,19 +221,19 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         $this->tagRepository->saveTagsToModel($expense, $tags);
 
         // Atualizar Parcela do Finaciamento
-        if ($expense->paid && $expense->financing_installment_id) {
-            $installment = $this->financingInstallmentRepository->show($expense->financing_installment_id);
+        // if ($expense->paid && $expense->financing_installment_id) {
+        //     $installment = $this->financingInstallmentRepository->show($expense->financing_installment_id);
 
-            if (!$installment) {
-                throw new Exception('financing-installment.not-found');
-            }
+        //     if (!$installment) {
+        //         throw new Exception('financing-installment.not-found');
+        //     }
 
-            $this->financingInstallmentRepository->store([
-                'paid' => $paid,
-                'payment_date' => Carbon::parse($date)->format('y-m-d'),
-                'paid_value' => $value,
-            ], $installment);
-        }
+        //     $this->financingInstallmentRepository->store([
+        //         'paid' => $paid,
+        //         'payment_date' => Carbon::parse($date)->format('y-m-d'),
+        //         'paid_value' => $value,
+        //     ], $installment);
+        // }
 
         $this->budgetExpenseRepository->store([
             'description' => $description,
@@ -198,7 +277,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
 
         $budget_id = $expense->budget_id;
         $share_user_id = $expense->share_user_id;
-
+        
+        // Remove Despesa do Orçamento
         $this->budgetExpenseRepository->delete($expense->id);
 
         // Atualiza Orçamento

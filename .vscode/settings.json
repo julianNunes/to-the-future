@@ -1,8 +1,8 @@
 {
-    // --- Formatação e Ações ao Salvar ---
+    // --- Formatação e Ações ao Salvar (OTIMIZADO) ---
     // Formata o código automaticamente ao salvar
     "editor.formatOnSave": true,
-    // Executa ações de correção do ESLint ao salvar
+    // Executa ações de correção do ESLint ao salvar (apenas em arquivos pequenos)
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
     },
@@ -39,11 +39,30 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
 
-    // --- Configurações do ESLint ---
-    // Diz ao ESLint para validar arquivos Vue também
+    // --- Configurações do ESLint (OTIMIZADO) ---
+    // Diz ao ESLint para validar arquivos Vue também, mas com limitações
     "eslint.validate": ["javascript", "javascriptreact", "vue"],
     "eslint.format.enable": true,
+    "eslint.workingDirectories": ["./"],
+    "eslint.options": {
+        "cache": true,
+        "cacheLocation": ".eslintcache"
+    },
+
+    // --- Performance Overrides para Dev Container ---
+    // Essas configurações sobrescrevem as do devcontainer.json quando necessário
+    "editor.quickSuggestions": {
+        "other": "on",
+        "comments": "off", 
+        "strings": "off"
+    },
+    "editor.suggestOnTriggerCharacters": true,
+    "editor.wordBasedSuggestions": "currentDocument",
 
     // --- Outras Configurações de Formatação ---
-    "html.format.wrapLineLength": 120
+    "html.format.wrapLineLength": 120,
+    
+    // --- Git Performance ---
+    "git.autofetch": false,
+    "git.autoStash": false
 }

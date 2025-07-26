@@ -1,73 +1,86 @@
-# Dev Container - To The Future
+# Dev Container - To The Future (Performance Optimized) 🚀
 
-Este projeto está configurado para usar Dev Containers, proporcionando um ambiente de desenvolvimento consistente e isolado.
+Este projeto está configurado com um **Dev Container otimizado** para máxima performance e estabilidade.
 
-## 🚀 Como usar
+## ⚡ Features Otimizadas
 
-### Pré-requisitos
-- Docker Desktop instalado e rodando
-- Visual Studio Code
-- Extensão "Dev Containers" do VS Code
+- ✅ **Extensões mínimas** - Apenas o essencial para evitar sobrecarga
+- ✅ **Performance tunning** - Configurações anti-flickering e baixa latência
+- ✅ **Recursos limitados** - Evita uso excessivo de CPU/RAM
+- ✅ **Network bridged** - Mais estável que modo host
+- ✅ **Volumes otimizados** - Cache inteligente para dependencies
 
-### Iniciando o Dev Container
+## 🏃‍♂️ Quick Start
 
-1. Abra o projeto no VS Code
-2. VS Code deve detectar a configuração do Dev Container e perguntar se você quer "Reopen in Container"
-3. Clique em "Reopen in Container" ou use `Ctrl+Shift+P` e digite "Dev Containers: Reopen in Container"
+### 1. **Abrir Dev Container**
+```bash
+# No VS Code
+Ctrl+Shift+P > "Dev Containers: Reopen in Container"
+```
 
-### O que acontece automaticamente
+### 2. **Verificar Status**
+```bash
+# Após abrir, verificar se tudo está OK
+docker-compose ps
+curl -s http://localhost:8080 && echo "✅ Laravel OK"
+curl -s http://localhost:5173 && echo "✅ Vite OK"
+```
 
-Quando o Dev Container é criado, o seguinte acontece automaticamente:
-- ✅ Serviços Docker são iniciados (PHP, MySQL, Nginx)
-- ✅ Dependências PHP (Composer) são instaladas
-- ✅ Dependências Node.js (NPM) são instaladas
-- ✅ Banco de dados é configurado e migrações executadas
-- ✅ Arquivos de ajuda do IDE são gerados
-- ✅ Permissões são configuradas corretamente
+### 3. **Desenvolvimento**
+```bash
+# Terminal 1: Frontend hot-reload
+npm run dev
 
-## 🛠 Extensões incluídas
+# Terminal 2: Backend (já está rodando)
+php artisan serve # se necessário
+```
 
-### Essenciais
-- **GitHub Copilot** - Assistente de IA para programação
-- **GitHub Copilot Chat** - Chat com IA integrado
-- **Intelephense** - IntelliSense avançado para PHP
-- **Laravel Pint** - Formatador oficial do Laravel
-- **Prettier** - Formatador para JS, Vue, CSS
-- **ESLint** - Linter para JavaScript/Vue
+## � URLs e Portas
 
-### Laravel/Vue específicas
-- **Laravel Extra Intellisense** - Autocompletar para Laravel
-- **Volar** - Suporte completo para Vue 3
-- **Vue TypeScript Plugin** - TypeScript para Vue
-- **Tailwind CSS** - Suporte para Tailwind CSS
-- **Laravel Blade** - Syntax highlighting para Blade
-- **Laravel Artisan** - Comandos Artisan integrados
+| Serviço | URL | Porta |
+|---------|-----|-------|
+| Laravel | http://localhost:8080 | 8080 |
+| Vite | http://localhost:5173 | 5173 |
+| MySQL | localhost:3307 | 3307 |
 
-### Docker
-- **Docker** - Gerenciamento completo de containers
-- **Remote Containers** - Suporte para Dev Containers
+## 🆘 Problemas de Performance?
 
-### Qualidade de vida
-- **GitLens** - Git integrado avançado
-- **Auto Rename Tag** - Renomeia tags HTML/Vue automaticamente
-- **Path Intellisense** - Autocompletar para caminhos
-- **Material Icon Theme** - Ícones para arquivos
+### Quick Fix
+```bash
+# 1. Recarregar janela
+Ctrl+Shift+P > "Developer: Reload Window"
 
-## 🌐 URLs disponíveis
+# 2. Se persistir, limpeza completa
+./.devcontainer/clean.sh
+docker-compose up -d --build
+```
 
-- **Laravel App**: http://localhost:8080
-- **Vite Dev Server**: http://localhost:5173
-- **MySQL**: localhost:3307
+### Troubleshooting Detalhado
+📖 Consulte: [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
 
-## ⚡ Tarefas disponíveis
+## 📊 Monitor de Performance
 
-Use `Ctrl+Shift+P` e digite "Tasks: Run Task" para acessar:
+```bash
+# Verificar recursos
+docker stats --no-stream
 
-- **Laravel: Start Dev Server** - Inicia servidor de desenvolvimento Laravel
-- **Vite: Start Dev Server** - Inicia servidor Vite para front-end
-- **Docker: Start All Services** - Inicia todos os serviços Docker
-- **Docker: Stop All Services** - Para todos os serviços Docker
-- **Laravel: Run Migrations** - Executa migrações do banco
+# Se algum container > 80% CPU/RAM = problema
+```
+
+## 🎯 Extensões Instaladas (Mínimo Essencial)
+
+- **GitHub Copilot** - IA para código
+- **Intelephense** - PHP IntelliSense
+- **Laravel Pint** - Formatador PHP
+- **Volar** - Vue 3 Support
+- **Prettier** - Formatador JS/CSS
+- **Remote Containers** - Dev Container
+
+**Nota:** Extensões extras foram removidas para melhor performance.
+
+---
+
+**⚡ Configuração focada em velocidade e estabilidade!**
 - **Laravel: Clear Cache** - Limpa cache do Laravel
 - **Laravel: Generate IDE Helpers** - Gera arquivos de ajuda do IDE
 - **NPM: Install Dependencies** - Instala dependências Node.js

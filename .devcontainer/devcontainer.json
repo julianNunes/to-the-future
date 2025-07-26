@@ -1,5 +1,5 @@
 {
-    "name": "To The Future (Dev Container)",
+    "name": "To The Future (Dev Container - Optimized)",
 
     // O caminho para o docker-compose.yml, relativo a este arquivo.
     // ".." significa "subir um nível", saindo da pasta .devcontainer.
@@ -12,66 +12,140 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                // GitHub Copilot
+                // Essenciais - CORE para funcionalidade básica
                 "GitHub.copilot",
                 "GitHub.copilot-chat",
-
-                // Essenciais para o desenvolvimento
-                "bmewburn.vscode-intelephense-client", // IntelliSense para PHP
-                "open-southeners.laravel-pint", // Formatador oficial do Laravel (Pint)
-                "esbenp.prettier-vscode", // Formatador para JS, Vue, CSS, etc.
-                "dbaeumer.vscode-eslint", // Linter para JS/Vue
-
-                // Específicas para Laravel/Vue
-                "amiralizadeh948.laravel-extra-intellisense", // Helpers para Laravel
-                "Vue.volar", // Suporte oficial e moderno para Vue 3
-                "Vue.vscode-typescript-vue-plugin", // TypeScript support para Vue
-
-                // Docker
-                "ms-azuretools.vscode-docker", // Suporte completo para Docker
-                "ms-vscode-remote.remote-containers", // Remote Containers
-
-                // Qualidade de vida
-                "eamodio.gitlens", // Melhora a integração com o Git dentro do container
-                "formulahendry.auto-rename-tag", // Auto rename HTML/Vue tags
-                "christian-kohler.path-intellisense", // Path autocomplete
-                "ms-vscode.vscode-json", // JSON support
-                "redhat.vscode-yaml", // YAML support
-
-                // Laravel específico
-                "codingyu.laravel-goto-view", // Go to view from controller
-                "ryannaddy.laravel-artisan", // Laravel Artisan commands
-
-                // Debugging
-                "xdebug.php-debug" // XDebug para PHP
+                "bmewburn.vscode-intelephense-client",
+                
+                // Laravel/PHP Essenciais
+                "open-southeners.laravel-pint",
+                
+                // Frontend Essenciais  
+                "Vue.volar",
+                "esbenp.prettier-vscode",
+                
+                // Dev Container Essencial
+                "ms-vscode-remote.remote-containers"
             ],
             "settings": {
-                // Configurações específicas para o Dev Container
+                // === PERFORMANCE SETTINGS ===
+                
+                // Editor Performance - Reduz Flickering
+                "editor.smoothScrolling": false,
+                "editor.cursorBlinking": "solid",
+                "editor.cursorSmoothCaretAnimation": "off",
+                "editor.renderWhitespace": "none",
+                "editor.minimap.enabled": false,
+                "editor.fontLigatures": false,
+                "editor.acceptSuggestionOnEnter": "off",
+                "editor.quickSuggestions": {
+                    "other": "off",
+                    "comments": "off", 
+                    "strings": "off"
+                },
+                "editor.suggestOnTriggerCharacters": false,
+                "editor.wordBasedSuggestions": "off",
+                "editor.suggest.snippetsPreventQuickSuggestions": true,
+                "editor.suggest.localityBonus": false,
+                "editor.suggest.shareSuggestSelections": false,
+                "editor.parameterHints.enabled": false,
+                
+                // Terminal Performance
+                "terminal.integrated.smoothScrolling": false,
                 "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.gpuAcceleration": "off",
+                
+                // Workbench Performance
+                "workbench.enableExperiments": false,
+                "workbench.settings.enableNaturalLanguageSearch": false,
+                "workbench.startupEditor": "none",
+                
+                // Extensions Performance
+                "extensions.autoUpdate": false,
+                "extensions.autoCheckUpdates": false,
+                
+                // Search Performance
+                "search.followSymlinks": false,
+                "search.maxResults": 1000,
+                
+                // === PHP/INTELEPHENSE OPTIMIZATION ===
                 "php.suggest.basic": false,
-                "intelephense.files.maxSize": 5000000,
+                "intelephense.files.maxSize": 3000000,
+                "intelephense.environment.phpVersion": "8.2.0",
+                "intelephense.maxMemory": 1024,
+                "intelephense.completion.maxItems": 50,
+                "intelephense.diagnostics.enable": false,
+                "intelephense.format.enable": false,
+                "intelephense.environment.includePaths": [
+                    "/var/www/html/vendor"
+                ],
+                
+                // === TYPESCRIPT/JS OPTIMIZATION ===
+                "typescript.preferences.includePackageJsonAutoImports": "off",
+                "typescript.suggest.autoImports": false,
+                "typescript.validate.enable": false,
+                "typescript.preferences.excludePackageJsonAutoImports": "on",
+                "typescript.disableAutomaticTypeAcquisition": true,
+                "typescript.surveys.enabled": false,
+                "javascript.validate.enable": false,
+                "javascript.suggest.autoImports": false,
+                
+                // === VUE OPTIMIZATION ===
+                "vetur.validation.template": false,
+                "vetur.validation.script": false,
+                "vetur.validation.style": false,
+                "vue.server.hybridMode": false,
+                
+                // === FILE WATCHERS OPTIMIZATION ===
+                "files.watcherExclude": {
+                    "**/node_modules/**": true,
+                    "**/vendor/**": true,
+                    "**/.git/objects/**": true,
+                    "**/.git/subtree-cache/**": true,
+                    "**/storage/logs/**": true,
+                    "**/storage/framework/**": true,
+                    "**/storage/app/**": true,
+                    "**/bootstrap/cache/**": true,
+                    "**/.npm/**": true,
+                    "**/.yarn/**": true
+                },
+                "files.exclude": {
+                    "**/node_modules": true,
+                    "**/vendor": true,
+                    "**/.git": true,
+                    "**/storage/logs": true,
+                    "**/bootstrap/cache": true
+                },
+                
+                // === BASIC CONFIG ===
                 "files.associations": {
-                    "*.vue": "vue"
+                    "*.vue": "vue",
+                    "artisan": "php",
+                    ".env*": "dotenv"
                 },
                 "emmet.includeLanguages": {
                     "vue": "html"
                 },
-                // Docker
+                
+                // === DOCKER ===
                 "docker.host": "unix:///var/run/docker.sock",
                 "docker.dockerPath": "/usr/bin/docker",
-                // Copilot
+                
+                // === COPILOT - MINIMALISTA ===
                 "github.copilot.enable": {
                     "*": true,
                     "php": true,
+                    "vue": true,
                     "javascript": true,
-                    "vue": true
+                    "plaintext": false,
+                    "markdown": false
                 }
             }
         }
     },
     // Executa comandos após a criação do container.
-    // Usa nosso script de setup personalizado para uma configuração mais robusta
-    "postCreateCommand": "/var/www/html/.devcontainer/setup.sh",
+    // Usando script otimizado para melhor performance
+    "postCreateCommand": "/var/www/html/.devcontainer/setup-optimized.sh",
 
     // Monta o socket do Docker para permitir uso de comandos Docker dentro do container
     "mounts": [
@@ -81,7 +155,12 @@
     // Variáveis de ambiente específicas para o Dev Container
     "containerEnv": {
         "DOCKER_BUILDKIT": "1",
-        "COMPOSE_DOCKER_CLI_BUILD": "1"
+        "COMPOSE_DOCKER_CLI_BUILD": "1",
+        "VSCODE_AGENT_FOLDER": "/home/www-data/.vscode-server",
+        "NODE_OPTIONS": "--max-old-space-size=4096",
+        "PHP_MEMORY_LIMIT": "512M",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "DISABLE_AUTO_UPDATE": "true"
     },    // Portas que devem ser encaminhadas
     "forwardPorts": [8080, 5173, 3307],
     "portsAttributes": {

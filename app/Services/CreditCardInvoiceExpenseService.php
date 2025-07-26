@@ -4,15 +4,13 @@ namespace App\Services;
 
 use App\Helpers\Budget\Interfaces\BudgetCalculateInterface;
 use App\Models\CreditCardInvoiceExpense;
-use App\Repositories\Interfaces\{
-    CreditCardInvoiceExpenseDivisionRepositoryInterface,
-    CreditCardInvoiceExpenseRepositoryInterface,
-    CreditCardInvoiceFileRepositoryInterface,
-    CreditCardInvoiceRepositoryInterface,
-    CreditCardRepositoryInterface,
-    ShareUserRepositoryInterface,
-    TagRepositoryInterface
-};
+use App\Repositories\Interfaces\CreditCardInvoiceExpenseDivisionRepositoryInterface;
+use App\Repositories\Interfaces\CreditCardInvoiceExpenseRepositoryInterface;
+use App\Repositories\Interfaces\CreditCardInvoiceFileRepositoryInterface;
+use App\Repositories\Interfaces\CreditCardInvoiceRepositoryInterface;
+use App\Repositories\Interfaces\CreditCardRepositoryInterface;
+use App\Repositories\Interfaces\ShareUserRepositoryInterface;
+use App\Repositories\Interfaces\TagRepositoryInterface;
 use App\Services\Interfaces\CreditCardInvoiceExpenseServiceInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,20 +32,6 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
 
     /**
      * Create new Expense to Invoice and your portions
-     * @param integer $creditCardId
-     * @param integer $invoiceId
-     * @param string $description
-     * @param string $date
-     * @param float $value
-     * @param string $group
-     * @param integer|null $portion
-     * @param integer|null $portionTotal
-     * @param string|null $remarks
-     * @param float|null $shareValue
-     * @param integer|null $shareUserId
-     * @param Collection|null $tags
-     * @param Collection|null $divisions
-     * @return CreditCardInvoiceExpense
      */
     public function createWithPortions(
         int $creditCardId,
@@ -66,13 +50,13 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
     ): CreditCardInvoiceExpense {
         $credit_card = $this->creditCardRepository->show($creditCardId);
 
-        if (!$credit_card) {
+        if (! $credit_card) {
             throw new Exception('credit-card.not-found');
         }
 
         $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
 
-        if (!$credit_card_invoice) {
+        if (! $credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
@@ -107,7 +91,7 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
                 $new_credit_card_invoice = $this->creditCardInvoiceRepository->getOne(['year' => $new_due_date->year, 'month' => $new_due_date->month, 'credit_card_id' => $creditCardId]);
 
                 // Se não existe, ela é criada
-                if (!$new_credit_card_invoice) {
+                if (! $new_credit_card_invoice) {
                     $new_credit_card_invoice = $this->creditCardInvoiceRepository->store([
                         'due_date' => $new_due_date->format('y-m-d'),
                         'closing_date' => $new_closing_date->format('y-m-d'),
@@ -144,20 +128,6 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
 
     /**
      * Create new Expense to Invoice
-     * @param integer $creditCardId
-     * @param integer $invoiceId
-     * @param string $description
-     * @param string $date
-     * @param float $value
-     * @param string $group
-     * @param integer|null $portion
-     * @param integer|null $portionTotal
-     * @param string|null $remarks
-     * @param float|null $shareValue
-     * @param integer|null $shareUserId
-     * @param Collection|null $tags
-     * @param Collection|null $divisions
-     * @return CreditCardInvoiceExpense
      */
     public function create(
         int $creditCardId,
@@ -176,13 +146,13 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
     ): CreditCardInvoiceExpense {
         $credit_card = $this->creditCardRepository->show($creditCardId);
 
-        if (!$credit_card) {
+        if (! $credit_card) {
             throw new Exception('credit-card.not-found');
         }
 
         $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
 
-        if (!$credit_card_invoice) {
+        if (! $credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
@@ -196,7 +166,7 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
             'remarks' => $remarks,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
-            'invoice_id' => $invoiceId
+            'invoice_id' => $invoiceId,
         ]);
 
         // Atualiza Tags
@@ -235,21 +205,6 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
 
     /**
      * Update a Expense
-     * @param integer $id
-     * @param integer $creditCardId
-     * @param integer $invoiceId
-     * @param string $description
-     * @param string $date
-     * @param float $value
-     * @param string $group
-     * @param integer|null $portion
-     * @param integer|null $portionTotal
-     * @param string|null $remarks
-     * @param float|null $shareValue
-     * @param integer|null $shareUserId
-     * @param Collection|null $tags
-     * @param Collection|null $divisions
-     * @return CreditCardInvoiceExpense
      */
     public function update(
         int $id,
@@ -269,19 +224,19 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
     ): CreditCardInvoiceExpense {
         $credit_card = $this->creditCardRepository->show($creditCardId);
 
-        if (!$credit_card) {
+        if (! $credit_card) {
             throw new Exception('credit-card.not-found');
         }
 
         $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
 
-        if (!$credit_card_invoice) {
+        if (! $credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
         $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->show($id);
 
-        if (!$credit_card_invoice_expense) {
+        if (! $credit_card_invoice_expense) {
             throw new Exception('credit-card-invoice-expense.not-found');
         }
 
@@ -335,19 +290,18 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
 
     /**
      * Delete a Expense
-     * @param int $id
      */
     public function delete(int $id): bool
     {
         $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->show($id, [
             'invoice:id,budget_id',
             'divisions' => [
-                'tags'
+                'tags',
             ],
-            'tags'
+            'tags',
         ]);
 
-        if (!$credit_card_invoice_expense) {
+        if (! $credit_card_invoice_expense) {
             throw new Exception('credit-card-invoice-expense.not-found');
         }
 
@@ -377,18 +331,16 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
 
     /**
      * Delete all Expense portions of a Invoice Credit Card
-     * @param int $id
-     * @return bool
      */
     public function deletePortions(int $id): bool
     {
         $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->show($id, ['invoice']);
 
-        if (!$credit_card_invoice_expense) {
+        if (! $credit_card_invoice_expense) {
             throw new Exception('credit-card-invoice-expense.not-found');
         }
 
-        if (!$credit_card_invoice_expense->invoice) {
+        if (! $credit_card_invoice_expense->invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
@@ -407,19 +359,19 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
             $this->delete($expense->id);
         }
 
-        return  true;
+        return true;
     }
 
     /**
      * Update Invoice total value
-     * @param integer $invoiceId
+     *
      * @return void
      */
     public function recalculateTotalInvoice(int $invoiceId)
     {
         $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
 
-        if (!$credit_card_invoice) {
+        if (! $credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
 
@@ -437,15 +389,14 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
 
     /**
      * Read data from Excel and save the Expenses
-     * @param integer $id
-     * @param Collection $data
-     * @return boolean
+     *
+     * @param  int  $id
      */
     public function storeImportExcel(int $invoiceId, Collection $data): bool
     {
         $credit_card_invoice = $this->creditCardInvoiceRepository->show($invoiceId);
 
-        if (!$credit_card_invoice) {
+        if (! $credit_card_invoice) {
             throw new Exception('credit-card-inovice.not-found');
         }
 
@@ -488,8 +439,6 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
 
     /**
      * Search by description. Used in the "v-auto-complete" component
-     * @param string $description
-     * @return Collection
      */
     public function search(string $description): Collection
     {

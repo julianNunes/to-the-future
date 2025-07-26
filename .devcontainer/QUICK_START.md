@@ -1,4 +1,4 @@
-# 🚀 Quick Start - Dev Container
+# 🚀 Quick Start - Dev Container (Otimizado)
 
 ## ✅ Verificação Pós-Setup
 
@@ -9,8 +9,10 @@ Após o Dev Container terminar a configuração automática, execute:
 # Ver status dos containers
 docker-compose ps
 
-# Verificar se MySQL está rodando na porta 3307
-nc -zv 127.0.0.1 3307
+# Verificar se todas as portas estão funcionando
+curl -s http://localhost:8080 > /dev/null && echo "✅ Laravel OK" || echo "❌ Laravel FALHOU"
+curl -s http://localhost:5173 > /dev/null && echo "✅ Vite OK" || echo "❌ Vite FALHOU"
+nc -zv 127.0.0.1 3307 && echo "✅ MySQL OK" || echo "❌ MySQL FALHOU"
 ```
 
 ### 2. **Testar Conexão Laravel**
@@ -30,7 +32,7 @@ php artisan tinker
 npm run dev
 
 # Terminal 2: (opcional) Verificar logs
-docker-compose logs -f
+docker-compose logs -f --tail=20
 ```
 
 ### 4. **Acessar Aplicação**
@@ -58,11 +60,11 @@ npm run build               # Build para produção
 npm run preview             # Preview do build
 ```
 
-### **Docker**
+### **Docker - Otimizado**
 ```bash
 docker-compose up -d        # Iniciar todos os serviços
 docker-compose down         # Parar todos os serviços
-docker-compose logs -f      # Ver logs em tempo real
+docker-compose logs -f --tail=20  # Ver logs limitados
 docker-compose exec php bash # Acessar container PHP
 ```
 
@@ -74,42 +76,32 @@ docker-compose exec php bash # Acessar container PHP
 
 ---
 
-## 🆘 Troubleshooting
+## 🆘 Performance Issues
 
-### **Container não inicia**
+Se enfrentar lentidão ou problemas:
+
+### **1. Restart Rápido**
 ```bash
-# Rebuild containers
-docker-compose down
-docker-compose up --build -d
+# Recarregar janela VS Code
+Ctrl+Shift+P > "Developer: Reload Window"
 ```
 
-### **Erro de permissão**
+### **2. Limpeza Completa**
 ```bash
-# Dentro do container
-sudo chown -R www-data:www-data storage bootstrap/cache
-sudo chmod -R 775 storage bootstrap/cache
+# Execute o script de limpeza
+./.devcontainer/clean.sh
+docker-compose up -d --build
 ```
 
-### **Banco não conecta**
+### **3. Monitor de Recursos**
 ```bash
-# Verificar se MySQL está rodando
-docker-compose ps
-docker-compose logs db
-
-# Recriar banco se necessário
-docker-compose down
-docker volume rm to-the-future_db_data
-docker-compose up -d
+# Verificar uso de CPU/RAM
+docker stats --no-stream
 ```
 
-### **NPM/Composer falha**
-```bash
-# Limpar caches e reinstalar
-rm -rf node_modules vendor
-npm install
-composer install
-```
+### **4. Troubleshooting Detalhado**
+Consulte: `.devcontainer/TROUBLESHOOTING.md`
 
 ---
 
-**🎉 Pronto para desenvolver com Copilot + Docker!**
+**🎉 Ambiente otimizado para máxima performance!**
