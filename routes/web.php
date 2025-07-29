@@ -1,27 +1,24 @@
 <?php
 
-use App\Http\Controllers\{
-    BudgetController,
-    BudgetExpenseController,
-    BudgetExpenseTagOptionController,
-    BudgetGoalController,
-    BudgetIncomeController,
-    BudgetProvisionController,
-    DashboardController,
-    CreditCardController,
-    CreditCardInvoiceController,
-    CreditCardInvoiceExpenseController,
-    PeopleController,
-    ProvisionController,
-    TagController,
-    FinancingController,
-    FinancingInstallmentController,
-    FixExpenseController,
-    PrepaidCardController,
-    PrepaidCardExtractController,
-    PrepaidCardExtractExpenseController,
-};
-
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\BudgetExpenseController;
+use App\Http\Controllers\BudgetExpenseTagOptionController;
+use App\Http\Controllers\BudgetGoalController;
+use App\Http\Controllers\BudgetIncomeController;
+use App\Http\Controllers\BudgetProvisionController;
+use App\Http\Controllers\CreditCardController;
+use App\Http\Controllers\CreditCardInvoiceController;
+use App\Http\Controllers\CreditCardInvoiceExpenseController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinancingController;
+use App\Http\Controllers\FinancingInstallmentController;
+use App\Http\Controllers\FixExpenseController;
+use App\Http\Controllers\PeopleController;
+use App\Http\Controllers\PrepaidCardController;
+use App\Http\Controllers\PrepaidCardExtractController;
+use App\Http\Controllers\PrepaidCardExtractExpenseController;
+use App\Http\Controllers\ProvisionController;
+use App\Http\Controllers\TagController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -165,6 +162,7 @@ Route::controller(BudgetExpenseController::class)->group(function () {
     Route::post('/budget-expense', 'store');
     Route::put('/budget-expense/{id}', 'update');
     Route::delete('/budget-expense/{id}', 'delete');
+    Route::delete('/budget-expense/delete-all-portion/{group_portion}', 'delete-all-portion');
 });
 
 // Receitas do Orçamento
@@ -196,4 +194,4 @@ Route::controller(BudgetExpenseTagOptionController::class)->group(function () {
     Route::delete('/budget-expense-tag-option/{id}', 'delete');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

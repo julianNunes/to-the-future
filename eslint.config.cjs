@@ -22,10 +22,16 @@ module.exports = defineConfig([{
             ...globals.browser,
             ...globals.node,
             _: true,
+            route: true,  // Laravel route helper
+            axios: true,  // Global axios
         },
     },
 
-    extends: compat.extends("eslint:recommended", "plugin:vue/recommended", "prettier"),
+    extends: compat.extends(
+        "eslint:recommended", 
+        "plugin:vue/vue3-recommended", 
+        "prettier"
+    ),
 
     plugins: {
         prettier,
@@ -34,5 +40,19 @@ module.exports = defineConfig([{
     rules: {
         "prettier/prettier": ["error"],
         "vue/require-default-prop": "off",
+        "vue/multi-word-component-names": "off",
+        "vue/no-v-html": "off", // Para Inertia.js às vezes é necessário
+        "vue/script-setup-uses-vars": "error",
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "no-console": "warn",
+        "no-debugger": "warn"
     },
+
+    ignores: [
+        "node_modules/**",
+        "vendor/**",
+        "public/build/**",
+        "storage/**",
+        "bootstrap/cache/**"
+    ]
 }]);

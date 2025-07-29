@@ -22,6 +22,7 @@ class BudgetExpense extends Model
         'date',
         'value',
         'group',
+        'group_portion',
         'portion',
         'portion_total',
         'remarks',

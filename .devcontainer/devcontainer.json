@@ -1,5 +1,5 @@
 {
-    "name": "To The Future (Dev Container - Optimized)",
+    "name": "To The Future (Laravel+Inertia+Vue3)",
 
     // O caminho para o docker-compose.yml, relativo a este arquivo.
     // ".." significa "subir um nível", saindo da pasta .devcontainer.
@@ -12,155 +12,253 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                // Essenciais - CORE para funcionalidade básica
-                "GitHub.copilot",
-                "GitHub.copilot-chat",
-                "bmewburn.vscode-intelephense-client",
+                // === CORE ESSENTIALS ===
+                "GitHub.copilot",                        // IA Assistant
+                "GitHub.copilot-chat",                   // Chat IA
+                "bmewburn.vscode-intelephense-client",   // PHP IntelliSense
                 
-                // Laravel/PHP Essenciais
-                "open-southeners.laravel-pint",
+                // === LARAVEL STACK (SEM BLADE) ===
+                "open-southeners.laravel-pint",         // Laravel Pint (PHP Formatter)
+                "codingyu.laravel-goto-view",           // Laravel Navigation (útil para Inertia)
                 
-                // Frontend Essenciais  
-                "Vue.volar",
-                "esbenp.prettier-vscode",
+                // === VUE.JS 3 + INERTIA + VUETIFY ===
+                "Vue.volar",                            // Vue 3 Official
+                "Vue.vscode-typescript-vue-plugin",     // Vue TS Support
                 
-                // Dev Container Essencial
-                "ms-vscode-remote.remote-containers"
+                // === FORMATTERS & TOOLS ===
+                "esbenp.prettier-vscode",               // JS/CSS/Vue Formatter
+                "eamodio.gitlens",                      // Git Enhanced
+                
+                // === UTILITIES ===
+                "ms-vscode.vscode-json",                // JSON Support
+                "DotJoshJohnson.xml"                    // XML Support (se necessário)
             ],
             "settings": {
-                // === PERFORMANCE SETTINGS ===
-                
-                // Editor Performance - Reduz Flickering
+                // === PERFORMANCE BALANCED SETTINGS ===
+
+                // Terminal - Estável mas funcional
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.gpuAcceleration": "auto",
+                "terminal.integrated.smoothScrolling": false,
+                "terminal.integrated.cursorBlinking": false,
+
+                // Editor - Performance otimizada mas usável
                 "editor.smoothScrolling": false,
                 "editor.cursorBlinking": "solid",
                 "editor.cursorSmoothCaretAnimation": "off",
-                "editor.renderWhitespace": "none",
-                "editor.minimap.enabled": false,
-                "editor.fontLigatures": false,
-                "editor.acceptSuggestionOnEnter": "off",
+                "editor.fontLigatures": true,               // Mantido para melhor leitura
+                "editor.minimap.enabled": true,             // Útil para navegação
+                "editor.minimapShowSlider": "mouseover",
+                "editor.lineNumbers": "on",
+                "editor.renderWhitespace": "selection",
+                "editor.renderControlCharacters": false,
+                "editor.occurrencesHighlight": "singleFile",
+                "editor.selectionHighlight": true,
+                "editor.wordHighlight": true,
+                
+                // Suggestions - Balanceadas para produtividade
                 "editor.quickSuggestions": {
-                    "other": "off",
+                    "other": "on",
                     "comments": "off", 
-                    "strings": "off"
+                    "strings": "on"
                 },
-                "editor.suggestOnTriggerCharacters": false,
-                "editor.wordBasedSuggestions": "off",
-                "editor.suggest.snippetsPreventQuickSuggestions": true,
-                "editor.suggest.localityBonus": false,
-                "editor.suggest.shareSuggestSelections": false,
-                "editor.parameterHints.enabled": false,
+                "editor.wordBasedSuggestions": "matchingDocuments",
+                "editor.suggestOnTriggerCharacters": true,
+                "editor.acceptSuggestionOnEnter": "on",
+                "editor.parameterHints.enabled": true,
+                "editor.hover.enabled": true,
+                "editor.hover.delay": 500,                 // Delay para evitar flickering
+                "editor.lightbulb.enabled": "onCode",
+                "editor.codeLens": true,
                 
-                // Terminal Performance
-                "terminal.integrated.smoothScrolling": false,
-                "terminal.integrated.defaultProfile.linux": "bash",
-                "terminal.integrated.gpuAcceleration": "off",
+                // Auto-completion inteligente
+                "editor.inlineSuggest.enabled": true,
+                "editor.suggest.preview": true,
+                "editor.suggest.showIcons": true,
+                "editor.suggest.snippetsPreventQuickSuggestions": false,
+
+                // Workbench - UI limpa mas funcional
+                "workbench.reduceMotion": "on",
+                "workbench.activityBar.visible": true,
+                "workbench.statusBar.visible": true,
+                "workbench.editor.enablePreview": false,
+                "workbench.editor.enablePreviewFromQuickOpen": false,
+                "breadcrumbs.enabled": true,
+                "workbench.iconTheme": "vs-seti",
+
+                // === LARAVEL + PHP SETTINGS ===
+                "php.suggest.basic": true,
+                "intelephense.maxMemory": 512,             // Balanceado
+                "intelephense.diagnostics.enable": true,
+                "intelephense.diagnostics.run": "onSave",   // Não em tempo real
+                "intelephense.completion.triggerParameterHints": true,
+                "intelephense.completion.insertUseDeclaration": true,
+                "intelephense.trace.server": "off",
+                "intelephense.files.maxSize": 2000000,
+                "intelephense.format.enable": true,
                 
-                // Workbench Performance
-                "workbench.enableExperiments": false,
-                "workbench.settings.enableNaturalLanguageSearch": false,
-                "workbench.startupEditor": "none",
+                // Laravel específico (SEM BLADE)
+                "laravel-pint.enable": true,
+                "files.associations": {
+                    "*.vue": "vue"
+                },
+
+                // === VUE.JS 3 + TYPESCRIPT SETTINGS ===
+                "vue.autoInsert.dotValue": true,
+                "vue.autoInsert.parentheses": true,
+                "vue.codeActions.enabled": true,
+                "vue.complete.casing.tags": "kebab",
+                "vue.complete.casing.props": "camel",
+                "typescript.validate.enable": true,
+                "typescript.suggestionActions.enabled": true,
+                "typescript.preferences.quoteStyle": "single",
+                "javascript.validate.enable": true,
+                "javascript.suggestionActions.enabled": true,
+                "javascript.preferences.quoteStyle": "single",
+
+                // === FORMATTERS CONFIGURATION ===
+                "editor.formatOnSave": true,
+                "editor.formatOnType": false,               // Evita conflitos
+                "editor.formatOnPaste": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll": "explicit",
+                    "source.organizeImports": "explicit"
+                },
                 
-                // Extensions Performance
-                "extensions.autoUpdate": false,
-                "extensions.autoCheckUpdates": false,
+                // Default formatters por linguagem
+                "[php]": {
+                    "editor.formatOnSave": true
+                },
+                "[javascript]": {
+                    "editor.formatOnSave": true
+                },
+                "[typescript]": {
+                    "editor.formatOnSave": true
+                },
+                "[vue]": {
+                    "editor.formatOnSave": true
+                },
+                "[json]": {
+                    "editor.formatOnSave": true
+                },
+                "[css]": {
+                    "editor.formatOnSave": true
+                },
+                "[scss]": {
+                    "editor.formatOnSave": true
+                },
+                "[html]": {
+                    "editor.formatOnSave": true
+                },
                 
-                // Search Performance
-                "search.followSymlinks": false,
-                "search.maxResults": 1000,
-                
-                // === PHP/INTELEPHENSE OPTIMIZATION ===
-                "php.suggest.basic": false,
-                "intelephense.files.maxSize": 3000000,
-                "intelephense.environment.phpVersion": "8.2.0",
-                "intelephense.maxMemory": 1024,
-                "intelephense.completion.maxItems": 50,
-                "intelephense.diagnostics.enable": false,
-                "intelephense.format.enable": false,
-                "intelephense.environment.includePaths": [
-                    "/var/www/html/vendor"
-                ],
-                
-                // === TYPESCRIPT/JS OPTIMIZATION ===
-                "typescript.preferences.includePackageJsonAutoImports": "off",
-                "typescript.suggest.autoImports": false,
-                "typescript.validate.enable": false,
-                "typescript.preferences.excludePackageJsonAutoImports": "on",
-                "typescript.disableAutomaticTypeAcquisition": true,
-                "typescript.surveys.enabled": false,
-                "javascript.validate.enable": false,
-                "javascript.suggest.autoImports": false,
-                
-                // === VUE OPTIMIZATION ===
-                "vetur.validation.template": false,
-                "vetur.validation.script": false,
-                "vetur.validation.style": false,
-                "vue.server.hybridMode": false,
-                
-                // === FILE WATCHERS OPTIMIZATION ===
+                // Prettier settings
+                "prettier.requireConfig": false,
+                "prettier.useEditorConfig": false,
+                "prettier.singleQuote": true,
+                "prettier.semi": false,
+                "prettier.tabWidth": 2,
+                "prettier.trailingComma": "none",
+
+                // === GIT SETTINGS ===
+                "git.decorations.enabled": true,
+                "git.showProgress": false,
+                "scm.diffDecorations": "gutter",
+                "git.autofetch": false,                     // Manual para performance
+                "gitlens.codeLens.enabled": true,
+                "gitlens.currentLine.enabled": true,
+                "gitlens.hovers.enabled": true,
+                "gitlens.blame.highlight.enabled": false,  // Performance
+
+                // === FILE WATCHING - OTIMIZADO ===
                 "files.watcherExclude": {
                     "**/node_modules/**": true,
                     "**/vendor/**": true,
-                    "**/.git/objects/**": true,
-                    "**/.git/subtree-cache/**": true,
                     "**/storage/logs/**": true,
                     "**/storage/framework/**": true,
-                    "**/storage/app/**": true,
                     "**/bootstrap/cache/**": true,
+                    "**/.git/**": true,
                     "**/.npm/**": true,
-                    "**/.yarn/**": true
+                    "**/.yarn/**": true,
+                    "**/dist/**": true,
+                    "**/build/**": true,
+                    "**/.vscode/**": true,
+                    "**/public/build/**": true
                 },
                 "files.exclude": {
                     "**/node_modules": true,
                     "**/vendor": true,
-                    "**/.git": true,
-                    "**/storage/logs": true,
-                    "**/bootstrap/cache": true
+                    "**/storage/logs": true
                 },
-                
-                // === BASIC CONFIG ===
-                "files.associations": {
-                    "*.vue": "vue",
-                    "artisan": "php",
-                    ".env*": "dotenv"
+
+                // === SEARCH & INDEXING ===
+                "search.followSymlinks": false,
+                "search.smartCase": true,
+                "search.useIgnoreFiles": true,
+                "search.exclude": {
+                    "**/node_modules": true,
+                    "**/vendor": true,
+                    "**/storage": true,
+                    "**/public/build": true
                 },
-                "emmet.includeLanguages": {
-                    "vue": "html"
-                },
-                
-                // === DOCKER ===
+
+                // === VUETIFY & VUE SETTINGS ===
+                "vue.inlayHints.missingProps": true,
+                "vue.inlayHints.inlineHandlerLeading": true,
+                "vue.complete.normalizeComponentImportName": true,
+
+                // === DOCKER SETTINGS ===
                 "docker.host": "unix:///var/run/docker.sock",
                 "docker.dockerPath": "/usr/bin/docker",
-                
-                // === COPILOT - MINIMALISTA ===
+
+                // === COPILOT SETTINGS ===
                 "github.copilot.enable": {
                     "*": true,
                     "php": true,
-                    "vue": true,
                     "javascript": true,
-                    "plaintext": false,
-                    "markdown": false
-                }
+                    "typescript": true,
+                    "vue": true
+                },
+                // Configurações para compartilhar histórico entre host e container
+                "github.copilot.advanced": {
+                    "debug.overrideEngine": "copilot-chat",
+                    "debug.useElectronNetworking": true
+                },
+                "github.copilot.chat.experimental.codeGeneration.instructions": [
+                    "Use Laravel 10 best practices",
+                    "Follow PSR-12 coding standards", 
+                    "Use Inertia.js for SPA features",
+                    "Prefer Vue 3 Composition API",
+                    "Use Vuetify for UI components and styling",
+                    "Avoid Blade templates, use Inertia.js pages"
+                ],
+
+                // === WORKSPACE SPECIFIC (SEM BLADE) ===
+                "emmet.includeLanguages": {
+                    "vue": "html"
+                },
+                "emmet.triggerExpansionOnTab": true
             }
         }
     },
     // Executa comandos após a criação do container.
-    // Usando script otimizado para melhor performance
+    // Usa nosso script de setup personalizado para uma configuração mais robusta
     "postCreateCommand": "/var/www/html/.devcontainer/setup-optimized.sh",
 
     // Monta o socket do Docker para permitir uso de comandos Docker dentro do container
     "mounts": [
-        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+        // Compartilha dados do GitHub Copilot entre host e container
+        "source=${localEnv:HOME}/.config/github-copilot,target=/home/www-data/.config/github-copilot,type=bind",
+        // Compartilha cache do VS Code para extensões
+        "source=${localEnv:HOME}/.vscode,target=/home/www-data/.vscode,type=bind",
+        // Compartilha configurações git globais
+        "source=${localEnv:HOME}/.gitconfig,target=/home/www-data/.gitconfig,type=bind,readonly"
     ],
 
     // Variáveis de ambiente específicas para o Dev Container
     "containerEnv": {
         "DOCKER_BUILDKIT": "1",
-        "COMPOSE_DOCKER_CLI_BUILD": "1",
-        "VSCODE_AGENT_FOLDER": "/home/www-data/.vscode-server",
-        "NODE_OPTIONS": "--max-old-space-size=4096",
-        "PHP_MEMORY_LIMIT": "512M",
-        "GIT_OPTIONAL_LOCKS": "0",
-        "DISABLE_AUTO_UPDATE": "true"
+        "COMPOSE_DOCKER_CLI_BUILD": "1"
     },    // Portas que devem ser encaminhadas
     "forwardPorts": [8080, 5173, 3307],
     "portsAttributes": {

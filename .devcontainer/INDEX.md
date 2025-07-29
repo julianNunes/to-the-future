@@ -32,3 +32,14 @@
 - ❌ `settings.json` - Redundante
 
 **Total: 5 arquivos removidos para simplificar o ambiente**
+
+## 🛠️ Execução de Limpeza Manual
+
+Para usuários que desejam executar uma limpeza manual mais profunda:
+
+```bash
+cd /home/juliannunes/Projetos/to-the-future
+./.devcontainer/clean.sh
+```
+
+> **Nota:** Este passo é opcional e geralmente não é necessário. Use apenas se você souber o que está fazendo.

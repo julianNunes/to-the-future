@@ -11,9 +11,8 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetExpenseServiceInterface;
-use Illuminate\Support\Carbon;
 use Exception;
-use Illuminate\Support\Collection;
+use Illuminate\Support\{Carbon, Collection};
 
 class BudgetExpenseService implements BudgetExpenseServiceInterface
 {
@@ -27,20 +26,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
 
     /**
      * Create a new Expense to Budget
-     * @param integer $budgetId
-     * @param string $description
-     * @param string $date
-     * @param float $value
-     * @param int $portion
-     * @param int $portionTotal
-     * @param string $group
-     * @param string|null $remarks
-     * @param bool|false $paid
-     * @param float|null $shareValue
-     * @param integer|null $shareUserId
-     * @param integer|null $financingInstallmentId
-     * @param Collection|null $tags
-     * @return BudgetExpense
+     *
+     * @param  bool|false  $paid
      */
     public function createWithPortions(
         int $budgetId,
@@ -48,7 +35,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         string $date,
         float $value,
         int $portion,
-        int $portionTotal,        
+        int $portionTotal,
         string $group,
         ?string $remarks = null,
         ?bool $paid = false,
@@ -59,7 +46,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
     ): BudgetExpense {
         $budget = $this->budgetRepository->show($budgetId);
 
-        if (!$budget) {
+        if (! $budget) {
             throw new Exception('budget.not-found');
         }
 
@@ -73,7 +60,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
             'financing_installment_id' => $financingInstallmentId,
-            'budget_id' => $budgetId
+            'budget_id' => $budgetId,
         ]);
 
         // Atualiza Tags
@@ -102,20 +89,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
 
     /**
      * Create a new Expense to Budget
-     * @param integer $budgetId
-     * @param string $description
-     * @param string $date
-     * @param float $value
-     * @param int $portion,
-     * @param int $portionTotal, 
-     * @param string $group
-     * @param string|null $remarks
-     * @param bool|false $paid
-     * @param float|null $shareValue
-     * @param integer|null $shareUserId
-     * @param integer|null $financingInstallmentId
-     * @param Collection|null $tags
-     * @return BudgetExpense
+     *
+     * @param  bool|false  $paid
      */
     public function create(
         int $budgetId,
@@ -123,7 +98,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         string $date,
         float $value,
         int $portion,
-        int $portionTotal,            
+        int $portionTotal,
         string $group,
         ?string $remarks = null,
         ?bool $paid = false,
@@ -134,7 +109,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
     ): BudgetExpense {
         $budget = $this->budgetRepository->show($budgetId);
 
-        if (!$budget) {
+        if (! $budget) {
             throw new Exception('budget.not-found');
         }
 
@@ -148,7 +123,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
             'financing_installment_id' => $financingInstallmentId,
-            'budget_id' => $budgetId
+            'budget_id' => $budgetId,
         ]);
 
         // Atualiza Tags
@@ -158,7 +133,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         if ($expense->paid && $expense->financing_installment_id) {
             $installment = $this->financingInstallmentRepository->show($expense->financing_installment_id);
 
-            if (!$installment) {
+            if (! $installment) {
                 throw new Exception('financing-installment.not-found');
             }
 
@@ -177,18 +152,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
 
     /**
      * Update a new Expense to Budget
-     * @param integer $id
-     * @param string $description
-     * @param string $date
-     * @param float $value
-     * @param string $group
-     * @param string|null $remarks
-     * @param bool|false $paid
-     * @param float|null $shareValue
-     * @param integer|null $shareUserId
-     * @param integer|null $financingInstallmentId
-     * @param Collection|null $tags
-     * @return boolean
+     *
+     * @param  bool|false  $paid
      */
     public function update(
         int $id,
@@ -205,13 +170,13 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
     ): bool {
         $expense = $this->budgetExpenseRepository->show($id);
 
-        if (!$expense) {
+        if (! $expense) {
             throw new Exception('budget-expense.not-found');
         }
 
         $budget = $this->budgetRepository->show($expense->budget_id);
 
-        if (!$budget) {
+        if (! $budget) {
             throw new Exception('budget.not-found');
         }
 
@@ -255,20 +220,18 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
 
     /**
      * Deleta a Expense to Budget
-     * @param int $id
-     * @return boolean
      */
     public function delete(int $id): bool
     {
         $expense = $this->budgetExpenseRepository->show($id);
 
-        if (!$expense) {
+        if (! $expense) {
             throw new Exception('budget-expense.not-found');
         }
 
         $budget = $this->budgetRepository->show($expense->budget_id);
 
-        if (!$budget) {
+        if (! $budget) {
             throw new Exception('budget.not-found');
         }
 
@@ -277,7 +240,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
 
         $budget_id = $expense->budget_id;
         $share_user_id = $expense->share_user_id;
-        
+
         // Remove Despesa do Orçamento
         $this->budgetExpenseRepository->delete($expense->id);
 

@@ -1,68 +1,124 @@
 {
-    // --- Formatação e Ações ao Salvar (OTIMIZADO) ---
-    // Formata o código automaticamente ao salvar
-    "editor.formatOnSave": true,
-    // Executa ações de correção do ESLint ao salvar (apenas em arquivos pequenos)
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    },
-
-    // --- Formatadores Padrão por Linguagem ---
-
-    // Para PHP, use o Pint como formatador padrão
-    "[php]": {
-        "editor.defaultFormatter": "open-southeners.laravel-pint"
-    },
-
-    // Para JavaScript, Vue, e outros, use o Prettier
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[typescript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[vue]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-
-    // Para HTML
-    "[html]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-
-    // --- Configurações do ESLint (OTIMIZADO) ---
-    // Diz ao ESLint para validar arquivos Vue também, mas com limitações
-    "eslint.validate": ["javascript", "javascriptreact", "vue"],
-    "eslint.format.enable": true,
-    "eslint.workingDirectories": ["./"],
-    "eslint.options": {
-        "cache": true,
-        "cacheLocation": ".eslintcache"
-    },
-
-    // --- Performance Overrides para Dev Container ---
-    // Essas configurações sobrescrevem as do devcontainer.json quando necessário
+    // === CONFIGURAÇÕES EXTREMAS ANTI-FLICKERING PARA HOST ===
+    // Configurações mais agressivas para resolver problemas de scroll e flickering
+    
+    // --- Anti-Flickering MÁXIMO ---
+    "editor.smoothScrolling": false,
+    "editor.cursorBlinking": "solid",
+    "editor.cursorSmoothCaretAnimation": "off",
+    "editor.minimap.enabled": false,
+    "editor.fontLigatures": false,
+    "workbench.reduceMotion": "on",
+    "workbench.tree.renderIndentGuides": "none",
+    "workbench.tree.indent": 8,
+    
+    // --- Scroll Performance (CRÍTICO) ---
+    "editor.scrollBeyondLastLine": false,
+    "editor.fastScrollSensitivity": 5,
+    "editor.mouseWheelScrollSensitivity": 0.5,
+    "workbench.list.smoothScrolling": false,
+    "workbench.list.fastScrollSensitivity": 5,
+    "terminal.integrated.smoothScrolling": false,
+    "terminal.integrated.fastScrollSensitivity": 5,
+    
+    // --- Performance Extremo ---
     "editor.quickSuggestions": {
-        "other": "on",
-        "comments": "off", 
+        "other": "off",
+        "comments": "off",
         "strings": "off"
     },
-    "editor.suggestOnTriggerCharacters": true,
-    "editor.wordBasedSuggestions": "currentDocument",
-
-    // --- Outras Configurações de Formatação ---
-    "html.format.wrapLineLength": 120,
+    "editor.suggestOnTriggerCharacters": false,
+    "editor.wordBasedSuggestions": "off",
+    "editor.parameterHints.enabled": false,
+    "editor.hover.enabled": false,
+    "editor.semanticHighlighting.enabled": false,
+    "editor.occurrencesHighlight": "off",
+    "editor.selectionHighlight": false,
+    "editor.wordHighlight": false,
+    "editor.lightbulb.enabled": "off",
+    "editor.codeLens": false,
+    "editor.folding": false,
+    "editor.foldingHighlight": false,
+    "editor.renderWhitespace": "none",
+    "editor.renderControlCharacters": false,
+    "editor.formatOnType": false,
+    "editor.formatOnPaste": false,
     
-    // --- Git Performance ---
+    // --- UI Simplificado ---
+    "breadcrumbs.enabled": false,
+    "workbench.statusBar.visible": true,
+    "workbench.editor.enablePreview": false,
+    "workbench.editor.enablePreviewFromQuickOpen": false,
+    "workbench.editor.highlightModifiedTabs": false,
+    "workbench.editor.decorations.badges": false,
+    "workbench.editor.decorations.colors": false,
+    
+    // --- Remote Development (Essencial mas otimizado) ---
+    "remote.downloadExtensionsLocally": true,
+    "extensions.autoUpdate": false,
+    "extensions.autoCheckUpdates": false,
+    "remote.extensionKind": {
+        "GitHub.copilot": ["workspace"],
+        "GitHub.copilot-chat": ["workspace"]
+    },
+    
+    // --- Terminal Performance MÁXIMA ---
+    "terminal.integrated.gpuAcceleration": "off",
+    "terminal.integrated.experimentalUseTitleEvent": false,
+    "terminal.integrated.enablePersistentSessions": false,
+    "terminal.integrated.enableImages": false,
+    
+    // --- File Watching MÍNIMO ---
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/vendor/**": true,
+        "**/.git/**": true,
+        "**/storage/**": true,
+        "**/bootstrap/cache/**": true,
+        "**/public/storage/**": true,
+        "**/.npm/**": true,
+        "**/.yarn/**": true,
+        "**/dist/**": true,
+        "**/build/**": true,
+        "**/.vscode/**": true,
+        "**/logs/**": true,
+        "**/*.log": true
+    },
+    "search.followSymlinks": false,
+    "search.useIgnoreFiles": true,
+    "search.smartCase": false,
+    
+    // --- Git Performance MÍNIMO ---
     "git.autofetch": false,
-    "git.autoStash": false
+    "git.autoStash": false,
+    "git.decorations.enabled": false,
+    "git.showProgress": false,
+    "scm.diffDecorations": "none",
+    "scm.diffDecorationsGutterPattern": {
+        "added": false,
+        "modified": false
+    },
+    
+    // --- Language Features TODOS DESABILITADOS NO HOST ---
+    "php.suggest.basic": false,
+    "typescript.suggest.enabled": false,
+    "javascript.suggest.enabled": false,
+    "html.suggest.enabled": false,
+    "css.validate": false,
+    "html.validate.enabled": false,
+    "json.validate.enable": false,
+    
+    // --- Workbench Performance ---
+    "workbench.settings.enableNaturalLanguageSearch": false,
+    "workbench.startupEditor": "none",
+    "window.menuBarVisibility": "toggle",
+    "explorer.decorations.badges": false,
+    "explorer.decorations.colors": false,
+    
+    // --- Desabilitar telemetria e features desnecessárias ---
+    "telemetry.telemetryLevel": "off",
+    "workbench.enableExperiments": false,
+    "extensions.ignoreRecommendations": true,
+    "update.mode": "manual",
+    "editor.guides.indentation": false
 }

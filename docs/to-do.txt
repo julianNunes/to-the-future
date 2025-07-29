@@ -44,7 +44,7 @@ docker compose logs -f vite
 LISTA DE TAREFAS PENDENTES - TO DO
 =================================================
 - Orçamento Despesas
-    ! Adicoonar parcelamento
+    ! Adicionar parcelamento
         - Falta fazer alteração no backend para reproduzir as parcelas em outros orçamentos.
         - Adicionar identificador unico na para despesa parcelada do orçamento
             - id do orçamento

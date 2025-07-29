@@ -19,6 +19,8 @@ return new class extends Migration
             $table->enum('group', ['PORTION', 'WEEK_1', 'WEEK_2', 'WEEK_3', 'WEEK_4']);
             $table->integer('portion')->nullable()->comment('Parcela atual');
             $table->integer('portion_total')->nullable()->comment('Total de Parcelas');
+            $table->uuid('group_portion')->nullable()->comment('Grupo de parcelas, usado para agrupar despesas que foram parceladas');
+            $table->index('group_portion');
             $table->string('remarks')->nullable()->comment('Observacoes');
             $table->decimal('share_value')->nullable()->comment('Valor total compartilhado');
             $table->unsignedBigInteger('invoice_id');
