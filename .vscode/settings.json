@@ -58,9 +58,25 @@
     "extensions.autoUpdate": false,
     "extensions.autoCheckUpdates": false,
     "remote.extensionKind": {
-        "GitHub.copilot": ["workspace"],
-        "GitHub.copilot-chat": ["workspace"]
+        "GitHub.copilot": ["ui"],
+        "GitHub.copilot-chat": ["ui"],
+        "ms-vscode-remote.remote-containers": ["ui"]
     },
+    
+    // --- Dev Containers Configuration ---
+    "dev.containers.defaultExtensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "bmewburn.vscode-intelephense-client",
+        "open-southeners.laravel-pint",
+        "barryvdh.laravel-ide-helper",
+        "Vue.volar",
+        "Vue.vscode-typescript-vue-plugin",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens"
+    ],
+    "dev.containers.copyGitConfig": true,
+    "dev.containers.gitCredentialHelperConfigLocation": "system",
     
     // --- Terminal Performance MÁXIMA ---
     "terminal.integrated.gpuAcceleration": "off",

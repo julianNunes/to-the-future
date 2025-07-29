@@ -42,6 +42,20 @@ echo "🧹 Configurando Laravel..."
 php artisan config:cache --quiet 2>/dev/null || true
 php artisan storage:link --quiet 2>/dev/null || true
 
+# Configurar IDE Helper para Intelephense
+echo "🔧 Configurando Laravel IDE Helper..."
+if [ -f "vendor/autoload.php" ]; then
+    # Verificar se ide-helper está instalado
+    if composer show barryvdh/laravel-ide-helper >/dev/null 2>&1; then
+        echo "📝 Gerando arquivos IDE Helper..."
+        php artisan ide-helper:generate --quiet 2>/dev/null || true
+        php artisan ide-helper:models --nowrite --quiet 2>/dev/null || true
+        php artisan ide-helper:meta --quiet 2>/dev/null || true
+    else
+        echo "⚠️ IDE Helper não instalado, apenas usando arquivos existentes"
+    fi
+fi
+
 # Iniciar serviços
 echo "🚀 Iniciando serviços..."
 /var/www/html/.devcontainer/start-services.sh

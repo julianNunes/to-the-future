@@ -33,10 +33,15 @@ if [ "$DEVCONTAINER" = "true" ] || [ -f "/.dockerenv" ]; then
     echo "=== 2. TESTANDO CONECTIVIDADE ==="
     
     echo "🌐 Testando Laravel (8080):"
-    if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200"; then
+    # Testar tanto localhost quanto 127.0.0.1
+    if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200" || \
+       curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080 | grep -q "200"; then
         echo "✅ Laravel respondendo"
     else
         echo "❌ Laravel não está respondendo"
+        echo "   Tentando diagnosticar..."
+        echo "   - Porta 8080: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 2>/dev/null || echo "ERRO")"
+        echo "   - Containers: $(docker ps --format 'table {{.Names}}\t{{.Status}}' | grep -E '(nginx|php)' | head -2)"
     fi
     
     echo "🌐 Testando Vite (5173):"

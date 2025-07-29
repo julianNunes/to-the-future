@@ -27,6 +27,8 @@
               :footer-props="{
                 'items-per-page-text': $t('default.itens-per-page'),
                 'page-text': $t('default.page-text')
+
+
               }"
               :header-props="{
                 sortByText: $t('default.sort-by')

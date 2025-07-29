@@ -8,5 +8,18 @@
     "bracketSpacing": true,
     "bracketSameLine": false,
     "arrowParens": "always",
-    "proseWrap": "always"
+    "proseWrap": "always",
+    "endOfLine": "lf",
+    "quoteProps": "as-needed",
+    "vueIndentScriptAndStyle": true,
+    "htmlWhitespaceSensitivity": "css",
+    "embeddedLanguageFormatting": "auto",
+    "overrides": [
+        {
+            "files": "*.vue",
+            "options": {
+                "parser": "vue"
+            }
+        }
+    ]
 }

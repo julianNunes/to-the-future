@@ -17,12 +17,13 @@
                 "GitHub.copilot-chat",                   // Chat IA
                 "bmewburn.vscode-intelephense-client",   // PHP IntelliSense
                 
-                // === LARAVEL STACK (SEM BLADE) ===
+                // === LARAVEL STACK ===
                 "open-southeners.laravel-pint",         // Laravel Pint (PHP Formatter)
                 "codingyu.laravel-goto-view",           // Laravel Navigation (útil para Inertia)
+                "barryvdh.laravel-ide-helper",          // Laravel IDE Helper (resolve namespaces)
                 
                 // === VUE.JS 3 + INERTIA + VUETIFY ===
-                "Vue.volar",                            // Vue 3 Official
+                "Vue.volar",                            // Vue 3 Official (Language Server)
                 "Vue.vscode-typescript-vue-plugin",     // Vue TS Support
                 
                 // === FORMATTERS & TOOLS ===
@@ -31,7 +32,7 @@
                 
                 // === UTILITIES ===
                 "ms-vscode.vscode-json",                // JSON Support
-                "DotJoshJohnson.xml"                    // XML Support (se necessário)
+                "DotJoshJohnson.xml"                    // XML Support
             ],
             "settings": {
                 // === PERFORMANCE BALANCED SETTINGS ===
@@ -97,127 +98,24 @@
                 "intelephense.files.maxSize": 2000000,
                 "intelephense.format.enable": true,
                 
-                // Laravel específico (SEM BLADE)
-                "laravel-pint.enable": true,
-                "files.associations": {
-                    "*.vue": "vue"
-                },
-
-                // === VUE.JS 3 + TYPESCRIPT SETTINGS ===
-                "vue.autoInsert.dotValue": true,
-                "vue.autoInsert.parentheses": true,
-                "vue.codeActions.enabled": true,
-                "vue.complete.casing.tags": "kebab",
-                "vue.complete.casing.props": "camel",
-                "typescript.validate.enable": true,
-                "typescript.suggestionActions.enabled": true,
-                "typescript.preferences.quoteStyle": "single",
-                "javascript.validate.enable": true,
-                "javascript.suggestionActions.enabled": true,
-                "javascript.preferences.quoteStyle": "single",
-
-                // === FORMATTERS CONFIGURATION ===
-                "editor.formatOnSave": true,
-                "editor.formatOnType": false,               // Evita conflitos
-                "editor.formatOnPaste": true,
-                "editor.codeActionsOnSave": {
-                    "source.fixAll": "explicit",
-                    "source.organizeImports": "explicit"
-                },
+                                // Laravel IDE Helper - Resolve namespaces e facades
+                "intelephense.stubs": [
+                    "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core", "ctype", "curl", "date",
+                    "dba", "dom", "enchant", "exif", "fileinfo", "filter", "fpm", "ftp", "gd", "hash",
+                    "iconv", "imap", "interbase", "intl", "json", "ldap", "libxml", "mbstring", "mcrypt",
+                    "meta", "mssql", "mysql", "mysqli", "oci8", "odbc", "openssl", "pcntl", "pcre", "PDO",
+                    "pdo_ibm", "pdo_mysql", "pdo_pgsql", "pdo_sqlite", "pgsql", "Phar", "posix", "pspell",
+                    "readline", "recode", "Reflection", "regex", "session", "SimpleXML", "soap", "sockets",
+                    "sodium", "SPL", "sqlite3", "standard", "superglobals", "sybase", "sysvmsg", "sysvsem",
+                    "sysvshm", "tidy", "tokenizer", "wddx", "xml", "xmlreader", "xmlrpc", "xmlwriter", "Zend OPcache",
+                    "zip", "zlib"
+                ],
+                "intelephense.files.exclude": [
+                    "**/.git/**", "**/.svn/**", "**/.hg/**", "**/CVS/**", "**/.DS_Store/**",
+                    "**/node_modules/**", "**/bower_components/**", "**/vendor/**/{Tests,tests}/**",
+                    "**/.history/**", "**/vendor/**/test/**", "**/vendor/**/tests/**"
+                ],
                 
-                // Default formatters por linguagem
-                "[php]": {
-                    "editor.formatOnSave": true
-                },
-                "[javascript]": {
-                    "editor.formatOnSave": true
-                },
-                "[typescript]": {
-                    "editor.formatOnSave": true
-                },
-                "[vue]": {
-                    "editor.formatOnSave": true
-                },
-                "[json]": {
-                    "editor.formatOnSave": true
-                },
-                "[css]": {
-                    "editor.formatOnSave": true
-                },
-                "[scss]": {
-                    "editor.formatOnSave": true
-                },
-                "[html]": {
-                    "editor.formatOnSave": true
-                },
-                
-                // Prettier settings
-                "prettier.requireConfig": false,
-                "prettier.useEditorConfig": false,
-                "prettier.singleQuote": true,
-                "prettier.semi": false,
-                "prettier.tabWidth": 2,
-                "prettier.trailingComma": "none",
-
-                // === GIT SETTINGS ===
-                "git.decorations.enabled": true,
-                "git.showProgress": false,
-                "scm.diffDecorations": "gutter",
-                "git.autofetch": false,                     // Manual para performance
-                "gitlens.codeLens.enabled": true,
-                "gitlens.currentLine.enabled": true,
-                "gitlens.hovers.enabled": true,
-                "gitlens.blame.highlight.enabled": false,  // Performance
-
-                // === FILE WATCHING - OTIMIZADO ===
-                "files.watcherExclude": {
-                    "**/node_modules/**": true,
-                    "**/vendor/**": true,
-                    "**/storage/logs/**": true,
-                    "**/storage/framework/**": true,
-                    "**/bootstrap/cache/**": true,
-                    "**/.git/**": true,
-                    "**/.npm/**": true,
-                    "**/.yarn/**": true,
-                    "**/dist/**": true,
-                    "**/build/**": true,
-                    "**/.vscode/**": true,
-                    "**/public/build/**": true
-                },
-                "files.exclude": {
-                    "**/node_modules": true,
-                    "**/vendor": true,
-                    "**/storage/logs": true
-                },
-
-                // === SEARCH & INDEXING ===
-                "search.followSymlinks": false,
-                "search.smartCase": true,
-                "search.useIgnoreFiles": true,
-                "search.exclude": {
-                    "**/node_modules": true,
-                    "**/vendor": true,
-                    "**/storage": true,
-                    "**/public/build": true
-                },
-
-                // === VUETIFY & VUE SETTINGS ===
-                "vue.inlayHints.missingProps": true,
-                "vue.inlayHints.inlineHandlerLeading": true,
-                "vue.complete.normalizeComponentImportName": true,
-
-                // === DOCKER SETTINGS ===
-                "docker.host": "unix:///var/run/docker.sock",
-                "docker.dockerPath": "/usr/bin/docker",
-
-                // === COPILOT SETTINGS ===
-                "github.copilot.enable": {
-                    "*": true,
-                    "php": true,
-                    "javascript": true,
-                    "typescript": true,
-                    "vue": true
-                },
                 // Configurações para compartilhar histórico entre host e container
                 "github.copilot.advanced": {
                     "debug.overrideEngine": "copilot-chat",
@@ -232,23 +130,30 @@
                     "Avoid Blade templates, use Inertia.js pages"
                 ],
 
-                // === WORKSPACE SPECIFIC (SEM BLADE) ===
-                "emmet.includeLanguages": {
-                    "vue": "html"
-                },
+                // Configurações básicas
+                "editor.formatOnSave": true,
+                "editor.insertSpaces": true,
+                "editor.tabSize": 4,
+                "editor.detectIndentation": false,
+                
+                "laravel-pint.enable": true,
+                "files.associations": { "*.vue": "vue" },
+                "emmet.includeLanguages": { "vue": "html" },
                 "emmet.triggerExpansionOnTab": true
             }
         }
     },
     // Executa comandos após a criação do container.
     // Usa nosso script de setup personalizado para uma configuração mais robusta
-    "postCreateCommand": "/var/www/html/.devcontainer/setup-simple.sh",
+    "postCreateCommand": "/var/www/html/.devcontainer/setup.sh",
 
     // Monta o socket do Docker para permitir uso de comandos Docker dentro do container
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-        // Compartilha dados do GitHub Copilot entre host e container
+        // Compartilha dados do GitHub Copilot entre host e container (MÚLTIPLOS CAMINHOS)
         "source=${localEnv:HOME}/.config/github-copilot,target=/home/www-data/.config/github-copilot,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.vscode/extensions/github.copilot,target=/home/www-data/.vscode/extensions/github.copilot,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.vscode/extensions/github.copilot-chat,target=/home/www-data/.vscode/extensions/github.copilot-chat,type=bind,consistency=cached",
         // Compartilha configurações do VS Code para extensões  
         "source=${localEnv:HOME}/.vscode,target=/home/www-data/.vscode,type=bind,consistency=cached",
         // Compartilha configurações git globais
@@ -257,11 +162,13 @@
         "source=${localEnv:HOME}/.ssh,target=/home/www-data/.ssh,type=bind,readonly"
     ],
 
-    // Variáveis de ambiente específicas para o Dev Container
+    // Variáveis de ambiente específicas para o Dev Container + COPILOT
     "containerEnv": {
         "DOCKER_BUILDKIT": "1",
         "COMPOSE_DOCKER_CLI_BUILD": "1",
-        "VITE_HOST": "0.0.0.0"
+        "VITE_HOST": "0.0.0.0",
+        "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
+        "COPILOT_NODE_PATH": "/usr/local/bin/node"
     },
     
     // Portas que devem ser encaminhadas
@@ -269,14 +176,21 @@
     "portsAttributes": {
         "8080": {
             "label": "Laravel App",
-            "protocol": "http"
+            "protocol": "http",
+            "onAutoForward": "notify"
         },
         "5173": {
             "label": "Vite Dev Server",
-            "protocol": "http"
+            "protocol": "http",
+            "onAutoForward": "silent"
         },
         "3307": {
-            "label": "MySQL Database"
+            "label": "MySQL Database",
+            "onAutoForward": "silent"
+        },
+        "9000": {
+            "label": "PHP-FPM",
+            "onAutoForward": "silent"
         }
     },
     // O usuário deve ser o mesmo criado dentro do seu Dockerfile.dev
