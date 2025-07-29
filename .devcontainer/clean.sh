@@ -5,7 +5,7 @@ echo "🧹 Limpando ambiente Dev Container..."
 
 # Para todos os containers
 echo "⏹️ Parando containers..."
-docker-compose down
+docker compose down
 
 # Remove containers órfãos e volumes não utilizados
 echo "🗑️ Limpando recursos Docker..."
@@ -35,5 +35,5 @@ fi
 echo "✅ Limpeza concluída!"
 echo ""
 echo "🚀 Para iniciar novamente:"
-echo "   docker-compose up -d --build"
+echo "   docker compose up -d --build"
 echo ""

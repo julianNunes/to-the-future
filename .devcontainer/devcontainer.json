@@ -242,15 +242,15 @@
     },
     // Executa comandos após a criação do container.
     // Usa nosso script de setup personalizado para uma configuração mais robusta
-    "postCreateCommand": "/var/www/html/.devcontainer/setup-optimized.sh",
+    "postCreateCommand": "/var/www/html/.devcontainer/setup-simple.sh",
 
     // Monta o socket do Docker para permitir uso de comandos Docker dentro do container
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
         // Compartilha dados do GitHub Copilot entre host e container
-        "source=${localEnv:HOME}/.config/github-copilot,target=/home/www-data/.config/github-copilot,type=bind",
-        // Compartilha cache do VS Code para extensões
-        "source=${localEnv:HOME}/.vscode,target=/home/www-data/.vscode,type=bind",
+        "source=${localEnv:HOME}/.config/github-copilot,target=/home/www-data/.config/github-copilot,type=bind,consistency=cached",
+        // Compartilha cache do VS Code para extensões  
+        "source=${localEnv:HOME}/.vscode,target=/home/www-data/.vscode,type=bind,consistency=cached",
         // Compartilha configurações git globais
         "source=${localEnv:HOME}/.gitconfig,target=/home/www-data/.gitconfig,type=bind,readonly"
     ],
@@ -258,9 +258,12 @@
     // Variáveis de ambiente específicas para o Dev Container
     "containerEnv": {
         "DOCKER_BUILDKIT": "1",
-        "COMPOSE_DOCKER_CLI_BUILD": "1"
-    },    // Portas que devem ser encaminhadas
-    "forwardPorts": [8080, 5173, 3307],
+        "COMPOSE_DOCKER_CLI_BUILD": "1",
+        "VITE_HOST": "0.0.0.0"
+    },
+    
+    // Portas que devem ser encaminhadas
+    "forwardPorts": [8080, 5173, 3307, 9000],
     "portsAttributes": {
         "8080": {
             "label": "Laravel App",

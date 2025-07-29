@@ -149,7 +149,7 @@ Ctrl+Shift+P > "Format Document"
 ### **Problema: Hot-reload lento**
 ```bash
 # Restart Vite
-docker-compose restart vite
+docker compose restart vite
 npm run dev
 ```
 
@@ -157,7 +157,7 @@ npm run dev
 ```bash
 # Limpeza completa
 ./.devcontainer/clean.sh
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ---

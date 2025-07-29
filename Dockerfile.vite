@@ -1,13 +1,22 @@
-# Dockerfile.vite
+# Dockerfile.vite - Versão simplificada e funcional
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Use cache de deps do próprio Docker
-COPY package.json package-lock.json ./
-RUN npm ci --prefer-offline --no-audit
+# Configuração básica do npm
+RUN npm config set registry https://registry.npmjs.org/
 
-# Copia só o resto do código
+# Primeiro, copiar e instalar dependências
+COPY package*.json ./
+RUN npm ci --only=production --silent
+
+# Copiar código fonte
 COPY . .
 
-CMD ["npm","run","dev"]
+# Instalar dependências de desenvolvimento
+RUN npm install --silent
+
+EXPOSE 5173
+
+# Comando mais robusto para Vite
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

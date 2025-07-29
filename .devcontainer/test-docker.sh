@@ -26,7 +26,7 @@ if docker info &> /dev/null; then
     docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 else
     echo "❌ Não consegue se conectar ao Docker daemon!"
-    echo "ℹ️ Isso pode ser normal se o docker-compose não estiver rodando ainda."
+    echo "ℹ️ Isso pode ser normal se o docker compose não estiver rodando ainda."
 fi
 
 echo ""
