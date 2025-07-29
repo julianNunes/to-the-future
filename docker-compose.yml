@@ -43,6 +43,7 @@ services:
         cpus: 0.2
 
     vite:
+        profiles: ["vite-dev"]  # Só ativa com profile específico
         build:
             context: .
             dockerfile: Dockerfile.vite

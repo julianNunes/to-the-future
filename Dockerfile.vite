@@ -1,22 +1,23 @@
-# Dockerfile.vite - Versão simplificada e funcional
+# Dockerfile.vite - Versão funcional para Dev Container
 FROM node:20-alpine
 
 WORKDIR /app
 
 # Configuração básica do npm
-RUN npm config set registry https://registry.npmjs.org/
+RUN npm config set registry https://registry.npmjs.org/ && \
+    npm config set cache /tmp/.npm && \
+    npm config set prefer-offline false
 
-# Primeiro, copiar e instalar dependências
+# Copiar arquivos de dependências
 COPY package*.json ./
-RUN npm ci --only=production --silent
+
+# Instalar TODAS as dependências (desenvolvimento + produção)
+RUN npm ci --silent
 
 # Copiar código fonte
 COPY . .
 
-# Instalar dependências de desenvolvimento
-RUN npm install --silent
-
 EXPOSE 5173
 
-# Comando mais robusto para Vite
+# Comando para Vite
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

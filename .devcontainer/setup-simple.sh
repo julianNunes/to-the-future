@@ -12,8 +12,14 @@ sudo chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/nul
 echo "🤖 Configurando GitHub Copilot..."
 mkdir -p /home/www-data/.config/github-copilot 2>/dev/null || true
 mkdir -p /home/www-data/.vscode 2>/dev/null || true
+mkdir -p /home/www-data/.ssh 2>/dev/null || true
 sudo chown -R www-data:www-data /home/www-data/.config 2>/dev/null || true
 sudo chown -R www-data:www-data /home/www-data/.vscode 2>/dev/null || true
+sudo chown -R www-data:www-data /home/www-data/.ssh 2>/dev/null || true
+
+# Configurar variáveis de ambiente para Copilot
+export GITHUB_COPILOT_DISABLE_TELEMETRY=1
+echo "export GITHUB_COPILOT_DISABLE_TELEMETRY=1" >> /home/www-data/.bashrc || true
 
 # Verificar dependências essenciais
 if [ ! -f "vendor/autoload.php" ]; then

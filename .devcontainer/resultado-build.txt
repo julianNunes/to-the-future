@@ -1,6 +1,33 @@
-1 warning found (use docker --debug to expand):
+=> [dev_container_auto_added_stage_label  9/11] RUN git config --system  34.4s 
+ => [dev_container_auto_added_stage_label 10/11] COPY entrypoint-dev.sh /  0.3s 
+ => [dev_container_auto_added_stage_label 11/11] RUN chmod +x /usr/local/  0.7s 
+ => exporting to image                                                     2.9s
+ => => exporting layers                                                    2.8s
+ => => preparing layers for inline cache                                   0.0s
+ => => writing image sha256:0660c14d531e91d3ff8246e8ba0665d9c669d5e1ad430  0.0s
+ => => naming to docker.io/library/to-the-future-php                       0.0s
+ => resolving provenance for metadata file                                 0.0s
+[+] Building 1/1
+ ✔ php  Built                                                              0.0s 
+[58403 ms] Start: Run: docker inspect --type image to-the-future-php
+[58459 ms] Start: Run: docker build -f /tmp/devcontainercli-juliannunes/updateUID.Dockerfile-0.79.0 -t vsc-to-the-future-ec7369d6bca672282df1db76906d6d98db113e63634e6ab61dea4e8c10c98a68-uid --platform linux/amd64 --build-arg BASE_IMAGE=to-the-future-php --build-arg REMOTE_USER=www-data --build-arg NEW_UID=1000 --build-arg NEW_GID=1000 --build-arg IMAGE_USER=www-data /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data/empty-folder
+[+] Building 0.9s (6/6) FINISHED                                 docker:default
+ => [internal] load build definition from updateUID.Dockerfile-0.79.0      0.0s
+ => => transferring dockerfile: 1.36kB                                     0.0s
+ => WARN: InvalidDefaultArgInFrom: Default value for ARG $BASE_IMAGE resu  0.0s
+ => [internal] load metadata for docker.io/library/to-the-future-php:late  0.0s
+ => [internal] load .dockerignore                                          0.0s
+ => => transferring context: 2B                                            0.0s
+ => [1/2] FROM docker.io/library/to-the-future-php:latest                  0.2s
+ => [2/2] RUN eval $(sed -n "s/www-data:[^:]*:\([^:]*\):\([^:]*\):[^:]*:\  0.4s
+ => exporting to image                                                     0.1s
+ => => exporting layers                                                    0.0s
+ => => writing image sha256:3fac181cb87ee2b0b659f772e137caea43a34fc0aed23  0.0s
+ => => naming to docker.io/library/vsc-to-the-future-ec7369d6bca672282df1  0.0s
+
+ 1 warning found (use docker --debug to expand):
  - InvalidDefaultArgInFrom: Default value for ARG $BASE_IMAGE results in empty or invalid base image name (line 2)
-[207138 ms] Docker Compose override file for creating container:
+[59601 ms] Docker Compose override file for creating container:
 services:
   'php':
     image: vsc-to-the-future-ec7369d6bca672282df1db76906d6d98db113e63634e6ab61dea4e8c10c98a68-uid
@@ -13,6 +40,7 @@ while sleep 1 & wait $$!; do :; done", "-", "entrypoint-dev.sh"]
     environment:
       - 'DOCKER_BUILDKIT=1'
       - 'COMPOSE_DOCKER_CLI_BUILD=1'
+      - 'VITE_HOST=0.0.0.0'
     labels:
       - 'devcontainer.local_folder=/home/juliannunes/Projetos/to-the-future'
       - 'devcontainer.config_file=/home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json'
@@ -26,191 +54,197 @@ volumes:
   
   vscode:
     external: true
-[207138 ms] Writing docker-compose.devcontainer.containerFeatures-1753758580285-ce923dda-d2c4-46ef-af0e-64785cd2283e.yml to /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data/docker-compose
-[207138 ms] Start: Run: docker compose --project-name to-the-future -f /home/juliannunes/Projetos/to-the-future/docker-compose.yml -f /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data/docker-compose/docker-compose.devcontainer.build-1753758425529.yml -f /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data/docker-compose/docker-compose.devcontainer.containerFeatures-1753758580285-ce923dda-d2c4-46ef-af0e-64785cd2283e.yml up -d
-[+] Running 4/4
- ✔ Container to-the-future-db-1     Heal...                                0.8s 
- ✔ Container to-the-future-vite-1   St...                                  0.6s 
+[59601 ms] Writing docker-compose.devcontainer.containerFeatures-1753761842117-f708ec16-2359-4637-82b2-c390d1659873.yml to /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data/docker-compose
+[59602 ms] Start: Run: docker compose --project-name to-the-future -f /home/juliannunes/Projetos/to-the-future/docker-compose.yml -f /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data/docker-compose/docker-compose.devcontainer.build-1753761788415.yml -f /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data/docker-compose/docker-compose.devcontainer.containerFeatures-1753761842117-f708ec16-2359-4637-82b2-c390d1659873.yml up -d
+[+] Running 3/3
+ ✔ Container to-the-future-db-1     Heal...                                0.7s 
  ✔ Container to-the-future-php-1    Hea...                                11.6s 
- ✔ Container to-the-future-nginx-1  R...                                   0.0s 
-[218894 ms] Start: Run: docker ps -q -a --filter label=com.docker.compose.project=to-the-future --filter label=com.docker.compose.service=php
-[218918 ms] Start: Run: docker inspect --type container 0070f432493e
-[218941 ms] Start: Inspecting container
-[218941 ms] Start: Run: docker inspect --type container 0070f432493e94f8679c1b1c085df9b813545daee5c4a90aea43dc1986211d8b
-[218966 ms] Start: Run in container: /bin/sh
-[218970 ms] Start: Run in container: uname -m
-[219043 ms] x86_64
-[219043 ms] 
-[219043 ms] Start: Run in container: (cat /etc/os-release || cat /usr/lib/os-release) 2>/dev/null
-[219044 ms] NAME="Alpine Linux"
+ ✔ Container to-the-future-nginx-1  S...                                   1.0s 
+[72555 ms] Start: Run: docker ps -q -a --filter label=com.docker.compose.project=to-the-future --filter label=com.docker.compose.service=php
+[72615 ms] Start: Run: docker inspect --type container bbe0dc61cfbc
+[72665 ms] Start: Inspecting container
+[72665 ms] Start: Run: docker inspect --type container bbe0dc61cfbc553b4f6a7000cf68a426f17c925eadab8f8adef7fb297339cb0a
+[72712 ms] Start: Run in container: /bin/sh
+[72721 ms] Start: Run in container: uname -m
+[72855 ms] x86_64
+[72855 ms] 
+[72855 ms] Start: Run in container: (cat /etc/os-release || cat /usr/lib/os-release) 2>/dev/null
+[72858 ms] NAME="Alpine Linux"
 ID=alpine
 VERSION_ID=3.22.1
 PRETTY_NAME="Alpine Linux v3.22"
 HOME_URL="https://alpinelinux.org/"
 BUG_REPORT_URL="https://gitlab.alpinelinux.org/alpine/aports/-/issues"
-[219044 ms] 
-[219045 ms] Start: Run in container:  (command -v getent >/dev/null 2>&1 && getent passwd 'www-data' || grep -E '^www-data|^[^:]*:[^:]*:www-data:' /etc/passwd || true)
-[219046 ms] Start: Run in container: test -f '/var/devcontainer/.patchEtcEnvironmentMarker'
-[219048 ms] 
-[219048 ms] 
-[219048 ms] Exit code 1
-[219049 ms] Start: Run in container: /bin/sh
-[219052 ms] Start: Run in container: test ! -f '/var/devcontainer/.patchEtcEnvironmentMarker' && set -o noclobber && mkdir -p '/var/devcontainer' && { > '/var/devcontainer/.patchEtcEnvironmentMarker' ; } 2> /dev/null
-[219159 ms] 
-[219159 ms] 
-[219159 ms] Start: Run in container: cat >> /etc/environment <<'etcEnvironmentEOF'
-[219165 ms] 
-[219165 ms] 
-[219165 ms] Start: Run in container: test -f '/var/devcontainer/.patchEtcProfileMarker'
-[219166 ms] 
-[219166 ms] 
-[219166 ms] Exit code 1
-[219166 ms] Start: Run in container: test ! -f '/var/devcontainer/.patchEtcProfileMarker' && set -o noclobber && mkdir -p '/var/devcontainer' && { > '/var/devcontainer/.patchEtcProfileMarker' ; } 2> /dev/null
-[219167 ms] 
-[219168 ms] 
-[219168 ms] Start: Run in container: sed -i -E 's/((^|\s)PATH=)([^\$]*)$/\1${PATH:-\3}/g' /etc/profile || true
-[219169 ms] 
-[219169 ms] 
-[219178 ms] Start: Run: docker inspect --type container 0070f432493e94f8679c1b1c085df9b813545daee5c4a90aea43dc1986211d8b
-[219204 ms] Start: Run: docker exec -i -u root 0070f432493e94f8679c1b1c085df9b813545daee5c4a90aea43dc1986211d8b /bin/sh -c echo "New container started. Keep-alive process started." ; export VSCODE_REMOTE_CONTAINERS_SESSION=eb4da4c9-2591-481e-a0b9-cdfe8a57e7281753758371513 ; /bin/sh
-[219211 ms] Start: Inspecting container
-[219212 ms] Start: Run: docker inspect --type container 0070f432493e94f8679c1b1c085df9b813545daee5c4a90aea43dc1986211d8b
-[219242 ms] Start: Run in container: /bin/sh
-[219248 ms] Start: Run in container: uname -m
-[219283 ms] New container started. Keep-alive process started.
-[219318 ms] x86_64
-[219318 ms] 
-[219318 ms] Start: Run in container: (cat /etc/os-release || cat /usr/lib/os-release) 2>/dev/null
-[219320 ms] NAME="Alpine Linux"
+[72858 ms] 
+[72859 ms] Start: Run in container:  (command -v getent >/dev/null 2>&1 && getent passwd 'www-data' || grep -E '^www-data|^[^:]*:[^:]*:www-data:' /etc/passwd || true)
+[72864 ms] Start: Run in container: test -f '/var/devcontainer/.patchEtcEnvironmentMarker'
+[72865 ms] 
+[72866 ms] 
+[72866 ms] Exit code 1
+[72866 ms] Start: Run in container: /bin/sh
+[72874 ms] Start: Run in container: test ! -f '/var/devcontainer/.patchEtcEnvironmentMarker' && set -o noclobber && mkdir -p '/var/devcontainer' && { > '/var/devcontainer/.patchEtcEnvironmentMarker' ; } 2> /dev/null
+[73049 ms] 
+[73049 ms] 
+[73050 ms] Start: Run in container: cat >> /etc/environment <<'etcEnvironmentEOF'
+[73059 ms] 
+[73059 ms] 
+[73059 ms] Start: Run in container: test -f '/var/devcontainer/.patchEtcProfileMarker'
+[73061 ms] 
+[73061 ms] 
+[73061 ms] Exit code 1
+[73062 ms] Start: Run in container: test ! -f '/var/devcontainer/.patchEtcProfileMarker' && set -o noclobber && mkdir -p '/var/devcontainer' && { > '/var/devcontainer/.patchEtcProfileMarker' ; } 2> /dev/null
+[73065 ms] 
+[73065 ms] 
+[73065 ms] Start: Run in container: sed -i -E 's/((^|\s)PATH=)([^\$]*)$/\1${PATH:-\3}/g' /etc/profile || true
+[73069 ms] 
+[73069 ms] 
+[73090 ms] Start: Run: docker inspect --type container bbe0dc61cfbc553b4f6a7000cf68a426f17c925eadab8f8adef7fb297339cb0a
+[73154 ms] Start: Run: docker exec -i -u root bbe0dc61cfbc553b4f6a7000cf68a426f17c925eadab8f8adef7fb297339cb0a /bin/sh -c echo "New container started. Keep-alive process started." ; export VSCODE_REMOTE_CONTAINERS_SESSION=1303e228-0397-428c-bd48-b208cfa587141753761779139 ; /bin/sh
+[73169 ms] Start: Inspecting container
+[73170 ms] Start: Run: docker inspect --type container bbe0dc61cfbc553b4f6a7000cf68a426f17c925eadab8f8adef7fb297339cb0a
+[73229 ms] Start: Run in container: /bin/sh
+[73244 ms] Start: Run in container: uname -m
+[73317 ms] New container started. Keep-alive process started.
+[73387 ms] x86_64
+[73387 ms] 
+[73388 ms] Start: Run in container: (cat /etc/os-release || cat /usr/lib/os-release) 2>/dev/null
+[73391 ms] NAME="Alpine Linux"
 ID=alpine
 VERSION_ID=3.22.1
 PRETTY_NAME="Alpine Linux v3.22"
 HOME_URL="https://alpinelinux.org/"
 BUG_REPORT_URL="https://gitlab.alpinelinux.org/alpine/aports/-/issues"
-[219320 ms] 
-[219320 ms] Start: Run in container:  (command -v getent >/dev/null 2>&1 && getent passwd 'www-data' || grep -E '^www-data|^[^:]*:[^:]*:www-data:' /etc/passwd || true)
-[219322 ms] safe.directory: Looking up root folder for workspace folder '/var/www/html'.
-[219322 ms] Start: Run in container: command -v git >/dev/null 2>&1 && ROOT_FOLDER="$(git -C '/var/www/html' rev-parse --show-toplevel)" && test "$(stat -c %u "$ROOT_FOLDER")" != "$(id -u)" && echo -n "$ROOT_FOLDER"
-[219326 ms] 
-[219326 ms] 
-[219326 ms] Exit code 1
-[219326 ms] safe.directory: Checking host ownership of root folder at mount point '/var/www/html' skipped.
-[219326 ms] Start: Updating configuration state
-[219342 ms] Start: Run: docker compose version --short
-[219417 ms] Docker Compose version: 2.38.2
-[219417 ms] Start: Setup shutdown monitor
-[219418 ms] Forking shutdown monitor: /home/juliannunes/.vscode/extensions/ms-vscode-remote.remote-containers-0.422.1/dist/shutdown/shutdownMonitorProcess /run/user/1000/vscode-remote-containers-01a86a51-4515-40b9-afdb-c9b23515e764.sock dockerCompose Debug /home/juliannunes/.config/Code/logs/20250728T234444/window1/exthost/ms-vscode-remote.remote-containers 1753758373147
-[219426 ms] Start: Run in container: test -d '/home/www-data/.vscode-server'
-[219427 ms] 
-[219427 ms] 
-[219428 ms] Exit code 1
-[219428 ms] Start: Run in container: test -d '/home/www-data/.vscode-remote'
-[219429 ms] 
-[219429 ms] 
-[219429 ms] Exit code 1
-[219430 ms] Start: Run in container: test ! -f '/home/www-data/.vscode-server/data/Machine/.writeMachineSettingsMarker' && set -o noclobber && mkdir -p '/home/www-data/.vscode-server/data/Machine' && { > '/home/www-data/.vscode-server/data/Machine/.writeMachineSettingsMarker' ; } 2> /dev/null
-[219432 ms] 
-[219432 ms] 
-[219433 ms] Start: Run in container: test -f '/home/www-data/.vscode-server/data/Machine/settings.json'
-[219434 ms] 
-[219434 ms] 
-[219434 ms] Exit code 1
-[219434 ms] Start: Run in container: which apt dpkg snap dnf yum rpm apk docker git gh kubectl podman curl wget ssh scp rsync gpg ps lsof netstat top tree find grep zip unzip tar gzip bzip2 xz || true
-[219438 ms] Start: Run in container: mkdir -p '/home/www-data/.vscode-server/data/Machine' && cat >'/home/www-data/.vscode-server/data/Machine/settings.json' <<'settingsJSON'
-[219440 ms] 
-[219440 ms] 
-[219441 ms] Start: Run in container: test ! -f '/home/www-data/.vscode-server/data/Machine/.writeMachineMCPConfigMarker' && set -o noclobber && mkdir -p '/home/www-data/.vscode-server/data/Machine' && { > '/home/www-data/.vscode-server/data/Machine/.writeMachineMCPConfigMarker' ; } 2> /dev/null
-[219443 ms] 
-[219443 ms] 
-[219443 ms] Start: Run in container: test -f '/home/www-data/.vscode-server/data/User/mcp.json'
-[219444 ms] 
-[219444 ms] 
-[219444 ms] Exit code 1
-[219445 ms] 
+[73392 ms] 
+[73393 ms] Start: Run in container:  (command -v getent >/dev/null 2>&1 && getent passwd 'www-data' || grep -E '^www-data|^[^:]*:[^:]*:www-data:' /etc/passwd || true)
+[73401 ms] safe.directory: Looking up root folder for workspace folder '/var/www/html'.
+[73401 ms] Start: Run in container: command -v git >/dev/null 2>&1 && ROOT_FOLDER="$(git -C '/var/www/html' rev-parse --show-toplevel)" && test "$(stat -c %u "$ROOT_FOLDER")" != "$(id -u)" && echo -n "$ROOT_FOLDER"
+[73413 ms] 
+[73414 ms] 
+[73414 ms] Exit code 1
+[73415 ms] safe.directory: Checking host ownership of root folder at mount point '/var/www/html' skipped.
+[73415 ms] Start: Updating configuration state
+[73445 ms] Start: Run: docker compose version --short
+[73606 ms] Docker Compose version: 2.38.2
+[73607 ms] Start: Setup shutdown monitor
+[73608 ms] Forking shutdown monitor: /home/juliannunes/.vscode/extensions/ms-vscode-remote.remote-containers-0.422.1/dist/shutdown/shutdownMonitorProcess /run/user/1000/vscode-remote-containers-8f408b6d-3e9a-46ca-af21-0d7205bcfa13.sock dockerCompose Debug /home/juliannunes/.config/Code/logs/20250729T005034/window1/exthost/ms-vscode-remote.remote-containers 1753761782516
+[73628 ms] Start: Run in container: test -d '/home/www-data/.vscode-server'
+[73631 ms] 
+[73632 ms] 
+[73632 ms] Exit code 1
+[73633 ms] Start: Run in container: test -d '/home/www-data/.vscode-remote'
+[73634 ms] 
+[73635 ms] 
+[73635 ms] Exit code 1
+[73636 ms] Start: Run in container: test ! -f '/home/www-data/.vscode-server/data/Machine/.writeMachineSettingsMarker' && set -o noclobber && mkdir -p '/home/www-data/.vscode-server/data/Machine' && { > '/home/www-data/.vscode-server/data/Machine/.writeMachineSettingsMarker' ; } 2> /dev/null
+[73640 ms] 
+[73640 ms] 
+[73641 ms] Start: Run in container: test -f '/home/www-data/.vscode-server/data/Machine/settings.json'
+[73643 ms] 
+[73643 ms] 
+[73644 ms] Exit code 1
+[73645 ms] Start: Run in container: which apt dpkg snap dnf yum rpm apk docker git gh kubectl podman curl wget ssh scp rsync gpg ps lsof netstat top tree find grep zip unzip tar gzip bzip2 xz || true
+[73654 ms] Start: Run in container: mkdir -p '/home/www-data/.vscode-server/data/Machine' && cat >'/home/www-data/.vscode-server/data/Machine/settings.json' <<'settingsJSON'
+[73659 ms] 
+[73659 ms] 
+[73662 ms] Start: Run in container: test ! -f '/home/www-data/.vscode-server/data/Machine/.writeMachineMCPConfigMarker' && set -o noclobber && mkdir -p '/home/www-data/.vscode-server/data/Machine' && { > '/home/www-data/.vscode-server/data/Machine/.writeMachineMCPConfigMarker' ; } 2> /dev/null
+[73668 ms] 
+[73668 ms] 
+[73669 ms] Start: Run in container: test -f '/home/www-data/.vscode-server/data/User/mcp.json'
+[73670 ms] 
+[73671 ms] 
+[73671 ms] Exit code 1
+[73672 ms] 
 Support for Alpine Linux is in preview.
 
-[219445 ms] Start: Run in container: test -d '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0'
-[219447 ms] 
-[219447 ms] 
-[219448 ms] Exit code 1
-[219448 ms] Start: Run in container: /bin/sh
-[219456 ms] Start: Run in container: apk info | grep -e '^libstdc++$' || (apk update && apk add libstdc++)
-[219457 ms] Start: Run in container: test -d '/vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0'
-[219458 ms] 
-[219458 ms] 
-[219458 ms] Start: Run in container: mkdir -p '/home/www-data/.vscode-server/bin' && ln -snf '/vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0' '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0'
-[219460 ms] 
-[219461 ms] 
-[219545 ms] libstdc++
-[219545 ms] WARNING: opening from cache https://dl-cdn.alpinelinux.org/alpine/v3.22/main: No such file or directory
+[73673 ms] Start: Run in container: test -d '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0'
+[73674 ms] 
+[73675 ms] 
+[73675 ms] Exit code 1
+[73676 ms] Start: Run in container: /bin/sh
+[73691 ms] Start: Run in container: apk info | grep -e '^libstdc++$' || (apk update && apk add libstdc++)
+[73693 ms] Start: Run in container: test -d '/vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0'
+[73700 ms] 
+[73701 ms] 
+[73701 ms] Start: Run in container: mkdir -p '/home/www-data/.vscode-server/bin' && ln -snf '/vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0' '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0'
+[73706 ms] 
+[73706 ms] 
+[73873 ms] libstdc++
+[73873 ms] WARNING: opening from cache https://dl-cdn.alpinelinux.org/alpine/v3.22/main: No such file or directory
 WARNING: opening from cache https://dl-cdn.alpinelinux.org/alpine/v3.22/community: No such file or directory
-[219545 ms] Start: Run in container: touch '/vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0'
-[219546 ms] Start: Run in container: test -x '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/bin/helpers/check-requirements.sh'
-[219547 ms] 
-[219547 ms] 
-[219548 ms] Start: Run in container: '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/bin/helpers/check-requirements.sh'
-[219548 ms] 
-[219548 ms] 
-[219554 ms] Warning: alpine distro detected, skipping GLIBCXX check
-[219554 ms] 
-[219555 ms] Start: Launching Dev Containers helper.
-[219555 ms] ssh-agent: SSH_AUTH_SOCK in container (/tmp/vscode-ssh-auth-436f6aa3-22d4-4754-8353-e7b78fff2561.sock) forwarded to local host (/run/user/1000/keyring/ssh).
-[219555 ms] Start: Run in container: test -e /tmp/.X11-unix/X0
-[219556 ms] 
-[219556 ms] 
-[219556 ms] Exit code 1
-[219556 ms] Start: Run in container: mkdir -p '/tmp/.X11-unix'
-[219558 ms] 
-[219558 ms] 
-[219558 ms] X11 forwarding: DISPLAY in container (:0) forwarded to local host (:0).
-[219558 ms] Start: Run in container: gpgconf --list-dirs
-[219559 ms] 
-[219559 ms] /bin/sh: gpgconf: not found
-[219559 ms] Exit code 127
-[219559 ms] gpg-agent: No agent-socket found in container.
-[219559 ms] Start: Run in container: (command -v 'docker' || command -v 'oras' || command -v 'skopeo') >/dev/null 2>&1
-[219560 ms] 
-[219561 ms] 
-[219561 ms] Start: Run in container: /bin/sh
-[219568 ms] userEnvProbe: loginInteractiveShell (default)
-[219569 ms] Start: Run in container: test -f '/tmp/devcontainers-eb4da4c9-2591-481e-a0b9-cdfe8a57e7281753758371513/env-loginInteractiveShell.json'
-[219569 ms] Start: Run in container: echo ~
-[219570 ms] 
-[219570 ms] 
-[219570 ms] Exit code 1
-[219571 ms] userEnvProbe: not found in cache
-[219571 ms] userEnvProbe shell: /bin/bash
-[219572 ms] Start: Run in container: # Test for /home/www-data/.ssh/known_hosts and ssh
-[219574 ms] ssh not found
-[219574 ms] 
-[219574 ms] Exit code 1
-[219574 ms] Start: Run in container: command -v git >/dev/null 2>&1 && git config --system --replace-all credential.helper '!f() { /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node /tmp/vscode-remote-containers-436f6aa3-22d4-4754-8353-e7b78fff2561.js git-credential-helper $*; }; f' || true
-[219577 ms] 
-[219577 ms] 
-[219578 ms] Start: Run in container: for pid in `cd /proc && ls -d [0-9]*`; do { echo $pid ; readlink /proc/$pid/cwd || echo ; readlink /proc/$pid/ns/mnt || echo ; cat /proc/$pid/stat | tr "
-[219616 ms] Start: Run in container: cat '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/product.json'
-[219619 ms] Start: Run in container: cat '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0' 2>/dev/null || (umask 377 && echo '0359994a-674f-409c-b236-fef3e88aba4b' >'/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0-82a3d1b7-1fb2-4847-81ba-6802ba71898f' && mv -n '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0-82a3d1b7-1fb2-4847-81ba-6802ba71898f' '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0' && rm -f '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0-82a3d1b7-1fb2-4847-81ba-6802ba71898f' && cat '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0')
-[219622 ms] 0359994a-674f-409c-b236-fef3e88aba4b
-[219622 ms] 
-[219623 ms] Start: Starting VS Code Server
-[219624 ms] Start: Preparing Extensions
-[219624 ms] Start: Run in container: test ! -f '/home/www-data/.vscode-server/data/Machine/.installExtensionsMarker' && set -o noclobber && mkdir -p '/home/www-data/.vscode-server/data/Machine' && { > '/home/www-data/.vscode-server/data/Machine/.installExtensionsMarker' ; } 2> /dev/null
-[219626 ms] 
-[219626 ms] 
-[219628 ms] Extensions cache, install extensions: GitHub.copilot, GitHub.copilot-chat, bmewburn.vscode-intelephense-client, open-southeners.laravel-pint, codingyu.laravel-goto-view, Vue.volar, Vue.vscode-typescript-vue-plugin, esbenp.prettier-vscode, eamodio.gitlens, ms-vscode.vscode-json, DotJoshJohnson.xml
-[219628 ms] Start: Run in container: test -d /home/www-data/.vscode-server/extensionsCache && ls /home/www-data/.vscode-server/extensionsCache || true
-[219631 ms] 
-[219631 ms] 
-[219631 ms] Start: Run in container: test -d /vscode/vscode-server/extensionsCache && ls /vscode/vscode-server/extensionsCache || true
-[219634 ms] 022bc3a0-53f9-4a4d-8033-5cb36662a4df
+[73874 ms] Start: Run in container: touch '/vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0'
+[73874 ms] Start: Run in container: test -x '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/bin/helpers/check-requirements.sh'
+[73879 ms] 
+[73880 ms] 
+[73880 ms] 
+[73881 ms] 
+[73881 ms] Start: Run in container: '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/bin/helpers/check-requirements.sh'
+[73896 ms] Warning: alpine distro detected, skipping GLIBCXX check
+[73897 ms] 
+[73898 ms] Start: Launching Dev Containers helper.
+[73899 ms] ssh-agent: SSH_AUTH_SOCK in container (/tmp/vscode-ssh-auth-16d27805-fa49-43bc-99ca-54cbf91c7edc.sock) forwarded to local host (/run/user/1000/keyring/ssh).
+[73900 ms] Start: Run in container: test -e /tmp/.X11-unix/X0
+[73902 ms] 
+[73903 ms] 
+[73903 ms] Exit code 1
+[73903 ms] Start: Run in container: mkdir -p '/tmp/.X11-unix'
+[73906 ms] 
+[73906 ms] 
+[73906 ms] X11 forwarding: DISPLAY in container (:0) forwarded to local host (:0).
+[73907 ms] Start: Run in container: gpgconf --list-dirs
+[73908 ms] 
+[73909 ms] /bin/sh: gpgconf: not found
+[73909 ms] Exit code 127
+[73909 ms] gpg-agent: No agent-socket found in container.
+[73910 ms] Start: Run in container: (command -v 'docker' || command -v 'oras' || command -v 'skopeo') >/dev/null 2>&1
+[73913 ms] 
+[73913 ms] 
+[73914 ms] Start: Run in container: /bin/sh
+[73926 ms] userEnvProbe: loginInteractiveShell (default)
+[73927 ms] Start: Run in container: test -f '/tmp/devcontainers-1303e228-0397-428c-bd48-b208cfa587141753761779139/env-loginInteractiveShell.json'
+[73927 ms] Start: Run in container: echo ~
+[73934 ms] 
+[73935 ms] 
+[73935 ms] Exit code 1
+[73936 ms] userEnvProbe: not found in cache
+[73937 ms] userEnvProbe shell: /bin/bash
+[73939 ms] Start: Run in container: # Test for /home/www-data/.ssh/known_hosts and ssh
+[73945 ms] ssh not found
+[73945 ms] 
+[73945 ms] Exit code 1
+[73947 ms] Start: Run in container: command -v git >/dev/null 2>&1 && git config --system --replace-all credential.helper '!f() { /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node /tmp/vscode-remote-containers-16d27805-fa49-43bc-99ca-54cbf91c7edc.js git-credential-helper $*; }; f' || true
+[73953 ms] 
+[73953 ms] 
+[73955 ms] Start: Run in container: for pid in `cd /proc && ls -d [0-9]*`; do { echo $pid ; readlink /proc/$pid/cwd || echo ; readlink /proc/$pid/ns/mnt || echo ; cat /proc/$pid/stat | tr "
+[74067 ms] Start: Run in container: cat '/home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/product.json'
+[74075 ms] Start: Run in container: cat '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0' 2>/dev/null || (umask 377 && echo 'fe671369-b102-4869-b3ec-2e7ff9199ec0' >'/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0-2d54f513-6a7e-4611-ac4f-548401fb563c' && mv -n '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0-2d54f513-6a7e-4611-ac4f-548401fb563c' '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0' && rm -f '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0-2d54f513-6a7e-4611-ac4f-548401fb563c' && cat '/home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0')
+[74086 ms] fe671369-b102-4869-b3ec-2e7ff9199ec0
+[74086 ms] 
+[74088 ms] Start: Starting VS Code Server
+[74089 ms] Start: Preparing Extensions
+[74089 ms] Start: Run in container: test ! -f '/home/www-data/.vscode-server/data/Machine/.installExtensionsMarker' && set -o noclobber && mkdir -p '/home/www-data/.vscode-server/data/Machine' && { > '/home/www-data/.vscode-server/data/Machine/.installExtensionsMarker' ; } 2> /dev/null
+[74099 ms] 
+[74100 ms] 
+[74104 ms] Extensions cache, install extensions: GitHub.copilot, GitHub.copilot-chat, bmewburn.vscode-intelephense-client, open-southeners.laravel-pint, codingyu.laravel-goto-view, Vue.volar, Vue.vscode-typescript-vue-plugin, esbenp.prettier-vscode, eamodio.gitlens, ms-vscode.vscode-json, DotJoshJohnson.xml
+[74104 ms] Start: Run in container: test -d /home/www-data/.vscode-server/extensionsCache && ls /home/www-data/.vscode-server/extensionsCache || true
+[74107 ms] 
+[74108 ms] 
+[74108 ms] Start: Run in container: test -d /vscode/vscode-server/extensionsCache && ls /vscode/vscode-server/extensionsCache || true
+[74121 ms] /home/www-data
+[74121 ms] 
+[74122 ms] Start: Run in container: cat <<'EOF-/tmp/vscode-remote-containers-16d27805-fa49-43bc-99ca-54cbf91c7edc.js' >/tmp/vscode-remote-containers-16d27805-fa49-43bc-99ca-54cbf91c7edc.js
+[74125 ms] 
+[74126 ms] 
+[74127 ms] 022bc3a0-53f9-4a4d-8033-5cb36662a4df
 17403e9d-60c7-480f-81e8-e1c674e7471d
 3d3ad306-4259-4832-b029-79640955c0cc
+5d73a9aa-de80-4de7-8f3d-921e99412bf6
 67687483-dc31-4082-b07f-1d430ae8d8cd
 68941ff3-272a-4508-847e-c076110b15f1
 7120cfd8-02a3-4822-9ca6-cb918cde6f70
 7ab89584-d151-44c8-bb11-23e61612ee59
 8a021727-9067-4c78-ae5b-0c1acc50bf1d
 99067b94-19d3-4e3f-b83d-bf9da5a08ffb
+a6bce9b9-2446-47be-99df-ac929f0d2702
 abca1450-30d8-4973-ab4d-9b2f0bc2ae5b
 bmewburn.vscode-intelephense-client-1.14.4
 bmewburn.vscode-intelephense-client-1.14.4.sigzip
@@ -255,104 +289,100 @@ vue.volar-3.0.3
 vue.volar-3.0.4
 vue.volar-3.0.4.sigzip
 xdebug.php-debug-1.36.1
-[219634 ms] 
-[219634 ms] Extensions cache, link in container: bmewburn.vscode-intelephense-client-1.14.4, bmewburn.vscode-intelephense-client-1.14.4.sigzip, codingyu.laravel-goto-view-1.3.11, codingyu.laravel-goto-view-1.3.11.sigzip, dotjoshjohnson.xml-2.5.1, dotjoshjohnson.xml-2.5.1.sigzip, eamodio.gitlens-17.3.1, eamodio.gitlens-17.3.2, eamodio.gitlens-17.3.3, eamodio.gitlens-17.3.3.sigzip, esbenp.prettier-vscode-11.0.0, esbenp.prettier-vscode-11.0.0.sigzip, github.copilot-1.346.0, github.copilot-1.346.0.sigzip, github.copilot-chat-0.29.1, github.copilot-chat-0.29.1.sigzip, open-southeners.laravel-pint-1.3.0, open-southeners.laravel-pint-1.3.0.sigzip, vue.volar-3.0.3, vue.volar-3.0.4, vue.volar-3.0.4.sigzip
-[219634 ms] Start: Run in container: mkdir -p '/home/www-data/.vscode-server/extensionsCache' && ln -s '/vscode/vscode-server/extensionsCache'/* '/home/www-data/.vscode-server/extensionsCache' || true
-[219639 ms] 
-[219639 ms] 
-[219640 ms] Optimizing extensions for quality: stable
-[219640 ms] Start: Run in container: cd /vscode/vscode-server/extensionsCache && touch 'bmewburn.vscode-intelephense-client-1.14.4' 'bmewburn.vscode-intelephense-client-1.14.4.sigzip' 'codingyu.laravel-goto-view-1.3.11' 'codingyu.laravel-goto-view-1.3.11.sigzip' 'dotjoshjohnson.xml-2.5.1' 'dotjoshjohnson.xml-2.5.1.sigzip' 'eamodio.gitlens-17.3.1' 'eamodio.gitlens-17.3.2' 'eamodio.gitlens-17.3.3' 'eamodio.gitlens-17.3.3.sigzip' 'esbenp.prettier-vscode-11.0.0' 'esbenp.prettier-vscode-11.0.0.sigzip' 'github.copilot-1.346.0' 'github.copilot-1.346.0.sigzip' 'github.copilot-chat-0.29.1' 'github.copilot-chat-0.29.1.sigzip' 'open-southeners.laravel-pint-1.3.0' 'open-southeners.laravel-pint-1.3.0.sigzip' 'vue.volar-3.0.3' 'vue.volar-3.0.4' 'vue.volar-3.0.4.sigzip'
-[219641 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/bin/code-server --log debug --force-disable-user-env --server-data-dir /home/www-data/.vscode-server --use-host-proxy --telemetry-level off --accept-server-license-terms --host 127.0.0.1 --port 0 --connection-token-file /home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0 --extensions-download-dir /home/www-data/.vscode-server/extensionsCache --install-extension GitHub.copilot --install-extension GitHub.copilot-chat --install-extension bmewburn.vscode-intelephense-client --install-extension open-southeners.laravel-pint --install-extension codingyu.laravel-goto-view --install-extension Vue.volar --install-extension Vue.vscode-typescript-vue-plugin --install-extension esbenp.prettier-vscode --install-extension eamodio.gitlens --install-extension ms-vscode.vscode-json --install-extension DotJoshJohnson.xml --start-server --disable-websocket-compression --skip-requirements-check
-[219650 ms] 
-[219650 ms] 
-[219650 ms] /home/www-data
-[219650 ms] 
-[219651 ms] Start: Run in container: cat <<'EOF-/tmp/vscode-remote-containers-436f6aa3-22d4-4754-8353-e7b78fff2561.js' >/tmp/vscode-remote-containers-436f6aa3-22d4-4754-8353-e7b78fff2561.js
-[219652 ms] 
-[219652 ms] 
-[219674 ms] Start: Run in container: cat <<'EOF-/tmp/vscode-remote-containers-server-436f6aa3-22d4-4754-8353-e7b78fff2561.js' >/tmp/vscode-remote-containers-server-436f6aa3-22d4-4754-8353-e7b78fff2561.js_1753758592821
-[219679 ms] 
-[219679 ms] 
-[219791 ms] userEnvProbe PATHs:
+[74127 ms] 
+[74128 ms] Extensions cache, link in container: bmewburn.vscode-intelephense-client-1.14.4, bmewburn.vscode-intelephense-client-1.14.4.sigzip, codingyu.laravel-goto-view-1.3.11, codingyu.laravel-goto-view-1.3.11.sigzip, dotjoshjohnson.xml-2.5.1, dotjoshjohnson.xml-2.5.1.sigzip, eamodio.gitlens-17.3.1, eamodio.gitlens-17.3.2, eamodio.gitlens-17.3.3, eamodio.gitlens-17.3.3.sigzip, esbenp.prettier-vscode-11.0.0, esbenp.prettier-vscode-11.0.0.sigzip, github.copilot-1.346.0, github.copilot-1.346.0.sigzip, github.copilot-chat-0.29.1, github.copilot-chat-0.29.1.sigzip, open-southeners.laravel-pint-1.3.0, open-southeners.laravel-pint-1.3.0.sigzip, vue.volar-3.0.3, vue.volar-3.0.4, vue.volar-3.0.4.sigzip
+[74129 ms] Start: Run in container: mkdir -p '/home/www-data/.vscode-server/extensionsCache' && ln -s '/vscode/vscode-server/extensionsCache'/* '/home/www-data/.vscode-server/extensionsCache' || true
+[74142 ms] 
+[74143 ms] 
+[74144 ms] Optimizing extensions for quality: stable
+[74145 ms] Start: Run in container: cd /vscode/vscode-server/extensionsCache && touch 'bmewburn.vscode-intelephense-client-1.14.4' 'bmewburn.vscode-intelephense-client-1.14.4.sigzip' 'codingyu.laravel-goto-view-1.3.11' 'codingyu.laravel-goto-view-1.3.11.sigzip' 'dotjoshjohnson.xml-2.5.1' 'dotjoshjohnson.xml-2.5.1.sigzip' 'eamodio.gitlens-17.3.1' 'eamodio.gitlens-17.3.2' 'eamodio.gitlens-17.3.3' 'eamodio.gitlens-17.3.3.sigzip' 'esbenp.prettier-vscode-11.0.0' 'esbenp.prettier-vscode-11.0.0.sigzip' 'github.copilot-1.346.0' 'github.copilot-1.346.0.sigzip' 'github.copilot-chat-0.29.1' 'github.copilot-chat-0.29.1.sigzip' 'open-southeners.laravel-pint-1.3.0' 'open-southeners.laravel-pint-1.3.0.sigzip' 'vue.volar-3.0.3' 'vue.volar-3.0.4' 'vue.volar-3.0.4.sigzip'
+[74147 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/bin/code-server --log debug --force-disable-user-env --server-data-dir /home/www-data/.vscode-server --use-host-proxy --telemetry-level off --accept-server-license-terms --host 127.0.0.1 --port 0 --connection-token-file /home/www-data/.vscode-server/data/Machine/.connection-token-c306e94f98122556ca081f527b466015e1bc37b0 --extensions-download-dir /home/www-data/.vscode-server/extensionsCache --install-extension GitHub.copilot --install-extension GitHub.copilot-chat --install-extension bmewburn.vscode-intelephense-client --install-extension open-southeners.laravel-pint --install-extension codingyu.laravel-goto-view --install-extension Vue.volar --install-extension Vue.vscode-typescript-vue-plugin --install-extension esbenp.prettier-vscode --install-extension eamodio.gitlens --install-extension ms-vscode.vscode-json --install-extension DotJoshJohnson.xml --start-server --disable-websocket-compression --skip-requirements-check
+[74162 ms] 
+[74163 ms] 
+[74193 ms] Start: Run in container: cat <<'EOF-/tmp/vscode-remote-containers-server-16d27805-fa49-43bc-99ca-54cbf91c7edc.js' >/tmp/vscode-remote-containers-server-16d27805-fa49-43bc-99ca-54cbf91c7edc.js_1753761856708
+[74216 ms] 
+[74217 ms] 
+[74855 ms] userEnvProbe PATHs:
 Probe:     '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 Container: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-[219792 ms] Start: Run in container: mkdir -p '/tmp/devcontainers-eb4da4c9-2591-481e-a0b9-cdfe8a57e7281753758371513' && cat > '/tmp/devcontainers-eb4da4c9-2591-481e-a0b9-cdfe8a57e7281753758371513/env-loginInteractiveShell.json' << 'envJSON'
-[219794 ms] 
-[219794 ms] 
-[219905 ms] *
+[74856 ms] Start: Run in container: mkdir -p '/tmp/devcontainers-1303e228-0397-428c-bd48-b208cfa587141753761779139' && cat > '/tmp/devcontainers-1303e228-0397-428c-bd48-b208cfa587141753761779139/env-loginInteractiveShell.json' << 'envJSON'
+[74861 ms] 
+[74861 ms] 
+[75005 ms] *
 * Visual Studio Code Server
 *
 * By using the software, you agree to
 * the Visual Studio Code Server License Terms (https://aka.ms/vscode-server-license) and
 * the Microsoft Privacy Statement (https://privacy.microsoft.com/en-US/privacystatement).
 *
-[219916 ms] Server bound to 127.0.0.1:35865 (IPv4)
-Extension host agent listening on 35865
+[75031 ms] Server bound to 127.0.0.1:39195 (IPv4)
+Extension host agent listening on 39195
 
-[219917 ms] Start: Run in container: echo 35865 >'/home/www-data/.vscode-server/data/Machine/.devport-c306e94f98122556ca081f527b466015e1bc37b0'
-[219917 ms] 
-[219918 ms] 
-[219918 ms] Port forwarding for container port 35865 starts listening on local port.
-[219925 ms] Port forwarding local port 35865 to container port 35865
-[219925 ms] Running Dev Containers CLI:   run-user-commands --user-data-folder /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data --container-session-data-folder /tmp/devcontainers-eb4da4c9-2591-481e-a0b9-cdfe8a57e7281753758371513 --workspace-folder /home/juliannunes/Projetos/to-the-future --id-label devcontainer.local_folder=/home/juliannunes/Projetos/to-the-future --id-label devcontainer.config_file=/home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json --container-id 0070f432493e94f8679c1b1c085df9b813545daee5c4a90aea43dc1986211d8b --log-level debug --log-format json --config /home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json --default-user-env-probe loginInteractiveShell --skip-non-blocking-commands false --prebuild false --stop-for-personalization true --remote-env REMOTE_CONTAINERS_IPC=/tmp/vscode-remote-containers-ipc-436f6aa3-22d4-4754-8353-e7b78fff2561.sock --remote-env SSH_AUTH_SOCK=/tmp/vscode-ssh-auth-436f6aa3-22d4-4754-8353-e7b78fff2561.sock --remote-env DISPLAY=:0 --remote-env REMOTE_CONTAINERS_DISPLAY_SOCK=/tmp/.X11-unix/X0 --remote-env REMOTE_CONTAINERS=true --mount-workspace-git-root --terminal-columns 180 --terminal-rows 25 --dotfiles-target-path ~/dotfiles
-[219926 ms] Start: Run: /usr/share/code/code /home/juliannunes/.vscode/extensions/ms-vscode-remote.remote-containers-0.422.1/dist/spec-node/devContainersSpecCLI.js run-user-commands --user-data-folder /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data --container-session-data-folder /tmp/devcontainers-eb4da4c9-2591-481e-a0b9-cdfe8a57e7281753758371513 --workspace-folder /home/juliannunes/Projetos/to-the-future --id-label devcontainer.local_folder=/home/juliannunes/Projetos/to-the-future --id-label devcontainer.config_file=/home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json --container-id 0070f432493e94f8679c1b1c085df9b813545daee5c4a90aea43dc1986211d8b --log-level debug --log-format json --config /home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json --default-user-env-probe loginInteractiveShell --skip-non-blocking-commands false --prebuild false --stop-for-personalization true --remote-env REMOTE_CONTAINERS_IPC=/tmp/vscode-remote-containers-ipc-436f6aa3-22d4-4754-8353-e7b78fff2561.sock --remote-env SSH_AUTH_SOCK=/tmp/vscode-ssh-auth-436f6aa3-22d4-4754-8353-e7b78fff2561.sock --remote-env DISPLAY=:0 --remote-env REMOTE_CONTAINERS_DISPLAY_SOCK=/tmp/.X11-unix/X0 --remote-env REMOTE_CONTAINERS=true --mount-workspace-git-root --terminal-columns 180 --terminal-rows 25 --dotfiles-target-path ~/dotfiles
-[219937 ms] Initializing configuration support...
-[219938 ms] Internal initialization of dev container support package...
-[219950 ms] Port forwarding connection from 33316 > 35865 > 35865 in the container.
-[219951 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
-[220035 ms] Ignoring option 'skip-requirements-check': not supported for server.
-[220046 ms] [03:09:53] 
-
-
+[75032 ms] Start: Run in container: echo 39195 >'/home/www-data/.vscode-server/data/Machine/.devport-c306e94f98122556ca081f527b466015e1bc37b0'
+[75034 ms] 
+[75034 ms] 
+[75035 ms] Port forwarding for container port 39195 starts listening on local port.
+[75051 ms] Port forwarding local port 39195 to container port 39195
+[75052 ms] Running Dev Containers CLI:   run-user-commands --user-data-folder /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data --container-session-data-folder /tmp/devcontainers-1303e228-0397-428c-bd48-b208cfa587141753761779139 --workspace-folder /home/juliannunes/Projetos/to-the-future --id-label devcontainer.local_folder=/home/juliannunes/Projetos/to-the-future --id-label devcontainer.config_file=/home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json --container-id bbe0dc61cfbc553b4f6a7000cf68a426f17c925eadab8f8adef7fb297339cb0a --log-level debug --log-format json --config /home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json --default-user-env-probe loginInteractiveShell --skip-non-blocking-commands false --prebuild false --stop-for-personalization true --remote-env REMOTE_CONTAINERS_IPC=/tmp/vscode-remote-containers-ipc-16d27805-fa49-43bc-99ca-54cbf91c7edc.sock --remote-env SSH_AUTH_SOCK=/tmp/vscode-ssh-auth-16d27805-fa49-43bc-99ca-54cbf91c7edc.sock --remote-env DISPLAY=:0 --remote-env REMOTE_CONTAINERS_DISPLAY_SOCK=/tmp/.X11-unix/X0 --remote-env REMOTE_CONTAINERS=true --mount-workspace-git-root --terminal-columns 179 --terminal-rows 25 --dotfiles-target-path ~/dotfiles
+[75053 ms] Start: Run: /usr/share/code/code /home/juliannunes/.vscode/extensions/ms-vscode-remote.remote-containers-0.422.1/dist/spec-node/devContainersSpecCLI.js run-user-commands --user-data-folder /home/juliannunes/.config/Code/User/globalStorage/ms-vscode-remote.remote-containers/data --container-session-data-folder /tmp/devcontainers-1303e228-0397-428c-bd48-b208cfa587141753761779139 --workspace-folder /home/juliannunes/Projetos/to-the-future --id-label devcontainer.local_folder=/home/juliannunes/Projetos/to-the-future --id-label devcontainer.config_file=/home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json --container-id bbe0dc61cfbc553b4f6a7000cf68a426f17c925eadab8f8adef7fb297339cb0a --log-level debug --log-format json --config /home/juliannunes/Projetos/to-the-future/.devcontainer/devcontainer.json --default-user-env-probe loginInteractiveShell --skip-non-blocking-commands false --prebuild false --stop-for-personalization true --remote-env REMOTE_CONTAINERS_IPC=/tmp/vscode-remote-containers-ipc-16d27805-fa49-43bc-99ca-54cbf91c7edc.sock --remote-env SSH_AUTH_SOCK=/tmp/vscode-ssh-auth-16d27805-fa49-43bc-99ca-54cbf91c7edc.sock --remote-env DISPLAY=:0 --remote-env REMOTE_CONTAINERS_DISPLAY_SOCK=/tmp/.X11-unix/X0 --remote-env REMOTE_CONTAINERS=true --mount-workspace-git-root --terminal-columns 179 --terminal-rows 25 --dotfiles-target-path ~/dotfiles
+[75079 ms] Initializing configuration support...
+[75081 ms] Internal initialization of dev container support package...
+[75114 ms] Port forwarding connection from 50738 > 39195 > 39195 in the container.
+[75115 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[75364 ms] Ignoring option 'skip-requirements-check': not supported for server.
+[75444 ms] [04:04:17] 
 
 
-[220181 ms] Port forwarding 33316 > 35865 > 35865 stderr: Connection established
-[220210 ms] @devcontainers/cli 0.79.0. Node.js v22.15.1. linux 6.8.0-64-generic x64.
-[220210 ms] Start: Run: docker buildx version
-[220279 ms] github.com/docker/buildx v0.25.0 faaea65
-[220280 ms] 
-[220280 ms] Start: Run: docker -v
-[220299 ms] [03:09:53] Installing extensions...
-[220303 ms] [03:09:53] Extension host agent started.
-[220306 ms] Start: Run: docker inspect --type container 0070f432493e94f8679c1b1c085df9b813545daee5c4a90aea43dc1986211d8b
-[220317 ms] Port forwarding connection from 33340 > 35865 > 35865 in the container.
-[220317 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
-[220325 ms] [03:09:53] Error while reading the extension cache file: /home/www-data/.vscode-server/data/CachedProfilesData/__default__profile__/extensions.builtin.cache Unable to read file '/home/www-data/.vscode-server/data/CachedProfilesData/__default__profile__/extensions.builtin.cache' (Error: Unable to resolve nonexistent file '/home/www-data/.vscode-server/data/CachedProfilesData/__default__profile__/extensions.builtin.cache')
-[220326 ms] [03:09:53] Started initializing default profile extensions in extensions installation folder. file:///home/www-data/.vscode-server/extensions
-[220337 ms] Start: Inspecting container
-[220337 ms] Start: Run: docker inspect --type container 0070f432493e94f8679c1b1c085df9b813545daee5c4a90aea43dc1986211d8b
-[220366 ms] Start: Run in container: /bin/sh
-[220370 ms] Start: Run in container: uname -m
-[220390 ms] [03:09:53] [127.0.0.1][d4a6f4d2][ManagementConnection] New connection established.
-[220395 ms] [03:09:53] ComputeTargetPlatform: alpine-x64
-[220495 ms] x86_64
-[220495 ms] 
-[220495 ms] Start: Run in container: (cat /etc/os-release || cat /usr/lib/os-release) 2>/dev/null
-[220498 ms] NAME="Alpine Linux"
+
+
+[75557 ms] Port forwarding 50738 > 39195 > 39195 stderr: Connection established
+[75677 ms] @devcontainers/cli 0.79.0. Node.js v22.15.1. linux 6.8.0-64-generic x64.
+[75677 ms] Start: Run: docker buildx version
+[75828 ms] github.com/docker/buildx v0.25.0 faaea65
+[75828 ms] 
+[75829 ms] Start: Run: docker -v
+[75913 ms] [04:04:18] Installing extensions...
+[75912 ms] Start: Run: docker inspect --type container bbe0dc61cfbc553b4f6a7000cf68a426f17c925eadab8f8adef7fb297339cb0a
+[75928 ms] [04:04:18] Extension host agent started.
+[75949 ms] Port forwarding connection from 50752 > 39195 > 39195 in the container.
+[75950 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[75991 ms] [04:04:18] Error while reading the extension cache file: /home/www-data/.vscode-server/data/CachedProfilesData/__default__profile__/extensions.builtin.cache Unable to read file '/home/www-data/.vscode-server/data/CachedProfilesData/__default__profile__/extensions.builtin.cache' (Error: Unable to resolve nonexistent file '/home/www-data/.vscode-server/data/CachedProfilesData/__default__profile__/extensions.builtin.cache')
+[04:04:18] Started initializing default profile extensions in extensions installation folder. file:///home/www-data/.vscode-server/extensions
+[76059 ms] Start: Inspecting container
+[76064 ms] Start: Run: docker inspect --type container bbe0dc61cfbc553b4f6a7000cf68a426f17c925eadab8f8adef7fb297339cb0a
+[76162 ms] [04:04:18] ComputeTargetPlatform: alpine-x64
+[76159 ms] Start: Run in container: /bin/sh
+[76173 ms] Start: Run in container: uname -m
+[76390 ms] Port forwarding 50752 > 39195 > 39195 stderr: Connection established
+[76443 ms] [04:04:18] Completed initializing default profile extensions in extensions installation folder. file:///home/www-data/.vscode-server/extensions
+[76447 ms] [04:04:18] [127.0.0.1][f66c8d3b][ManagementConnection] New connection established.
+[76456 ms] x86_64
+[76456 ms] 
+[76457 ms] Start: Run in container: (cat /etc/os-release || cat /usr/lib/os-release) 2>/dev/null
+[76463 ms] NAME="Alpine Linux"
 ID=alpine
 VERSION_ID=3.22.1
 PRETTY_NAME="Alpine Linux v3.22"
 HOME_URL="https://alpinelinux.org/"
 BUG_REPORT_URL="https://gitlab.alpinelinux.org/alpine/aports/-/issues"
-[220498 ms] 
-[220498 ms] Start: Run in container:  (command -v getent >/dev/null 2>&1 && getent passwd 'www-data' || grep -E '^www-data|^[^:]*:[^:]*:www-data:' /etc/passwd || true)
-[220501 ms] userEnvProbe: loginInteractiveShell (default)
-[220502 ms] Start: Run in container: test -f '/tmp/devcontainers-eb4da4c9-2591-481e-a0b9-cdfe8a57e7281753758371513/env-loginInteractiveShell.json'
-[220503 ms] Port forwarding 33340 > 35865 > 35865 stderr: Connection established
-[220503 ms] 
-[220503 ms] 
-[220503 ms] Start: Run in container: mkdir -p '/home/www-data/.devcontainer' && CONTENT="$(cat '/home/www-data/.devcontainer/.onCreateCommandMarker' 2>/dev/null || echo ENOENT)" && [ "${CONTENT:-2025-07-29T03:09:40.418886515Z}" != '2025-07-29T03:09:40.418886515Z' ] && echo '2025-07-29T03:09:40.418886515Z' > '/home/www-data/.devcontainer/.onCreateCommandMarker'
-[220506 ms] 
-[220506 ms] 
-[220506 ms] Start: Run in container: cat '/tmp/devcontainers-eb4da4c9-2591-481e-a0b9-cdfe8a57e7281753758371513/env-loginInteractiveShell.json'
-[220507 ms] {
+[76463 ms] 
+[76464 ms] Start: Run in container:  (command -v getent >/dev/null 2>&1 && getent passwd 'www-data' || grep -E '^www-data|^[^:]*:[^:]*:www-data:' /etc/passwd || true)
+[76469 ms] userEnvProbe: loginInteractiveShell (default)
+[76471 ms] Start: Run in container: test -f '/tmp/devcontainers-1303e228-0397-428c-bd48-b208cfa587141753761779139/env-loginInteractiveShell.json'
+[76473 ms] 
+[76473 ms] 
+[76473 ms] Start: Run in container: mkdir -p '/home/www-data/.devcontainer' && CONTENT="$(cat '/home/www-data/.devcontainer/.onCreateCommandMarker' 2>/dev/null || echo ENOENT)" && [ "${CONTENT:-2025-07-29T04:04:02.460916556Z}" != '2025-07-29T04:04:02.460916556Z' ] && echo '2025-07-29T04:04:02.460916556Z' > '/home/www-data/.devcontainer/.onCreateCommandMarker'
+[76479 ms] 
+[76479 ms] 
+[76479 ms] Start: Run in container: cat '/tmp/devcontainers-1303e228-0397-428c-bd48-b208cfa587141753761779139/env-loginInteractiveShell.json'
+[76482 ms] {
         "DB_PASSWORD": "root1234",
         "MAIL_PORT": "1025",
         "PUSHER_SCHEME": "https",
         "REDIS_PASSWORD": "null",
         "CHARSET": "UTF-8",
         "LOG_LEVEL": "debug",
-        "HOSTNAME": "0070f432493e",
+        "HOSTNAME": "bbe0dc61cfbc",
         "PHP_VERSION": "8.2.29",
         "VITE_PUSHER_APP_KEY": "",
         "REDIS_HOST": "127.0.0.1",
@@ -360,7 +390,7 @@ BUG_REPORT_URL="https://gitlab.alpinelinux.org/alpine/aports/-/issues"
         "PHP_INI_DIR": "/usr/local/etc/php",
         "GPG_KEYS": "39B641343D8C104B2B146DC3F9C39DC0B9698544 E60913E4DF209907D8E30D96659A97C9CF2A795A 1198C0117593497A5EC5C199286AF1F9897469DC",
         "AWS_DEFAULT_REGION": "us-east-1",
-        "REMOTE_CONTAINERS_IPC": "/tmp/vscode-remote-containers-ipc-436f6aa3-22d4-4754-8353-e7b78fff2561.sock",
+        "REMOTE_CONTAINERS_IPC": "/tmp/vscode-remote-containers-ipc-16d27805-fa49-43bc-99ca-54cbf91c7edc.sock",
         "PHP_LDFLAGS": "-Wl,-O1 -pie",
         "MEMCACHED_HOST": "127.0.0.1",
         "CACHE_DRIVER": "file",
@@ -389,7 +419,7 @@ BUG_REPORT_URL="https://gitlab.alpinelinux.org/alpine/aports/-/issues"
         "COMPOSE_DOCKER_CLI_BUILD": "1",
         "DB_CONNECTION": "mysql",
         "DB_HOST": "127.0.0.1",
-        "REMOTE_CONTAINERS_SOCKETS": "[\"/tmp/vscode-ssh-auth-436f6aa3-22d4-4754-8353-e7b78fff2561.sock\",\"/tmp/.X11-unix/X0\"]",
+        "REMOTE_CONTAINERS_SOCKETS": "[\"/tmp/vscode-ssh-auth-16d27805-fa49-43bc-99ca-54cbf91c7edc.sock\",\"/tmp/.X11-unix/X0\"]",
         "PHP_URL": "https://www.php.net/distributions/php-8.2.29.tar.xz",
         "PUSHER_APP_KEY": "",
         "PUSHER_APP_SECRET": "",
@@ -413,461 +443,520 @@ BUG_REPORT_URL="https://gitlab.alpinelinux.org/alpine/aports/-/issues"
         "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
         "MAIL_ENCRYPTION": "null",
         "MAIL_HOST": "mailpit",
+        "VITE_HOST": "0.0.0.0",
         "DB_DATABASE": "laravel",
         "SESSION_LIFETIME": "120",
         "PHP_ASC_URL": "https://www.php.net/distributions/php-8.2.29.tar.xz.asc",
         "PHP_CPPFLAGS": "-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64",
         "_": "/bin/cat"
 }
-[220507 ms] 
-[220507 ms] Start: Run in container: mkdir -p '/home/www-data/.devcontainer' && CONTENT="$(cat '/home/www-data/.devcontainer/.updateContentCommandMarker' 2>/dev/null || echo ENOENT)" && [ "${CONTENT:-2025-07-29T03:09:40.418886515Z}" != '2025-07-29T03:09:40.418886515Z' ] && echo '2025-07-29T03:09:40.418886515Z' > '/home/www-data/.devcontainer/.updateContentCommandMarker'
-[220509 ms] 
-[220509 ms] 
-[220509 ms] Start: Run in container: mkdir -p '/home/www-data/.devcontainer' && CONTENT="$(cat '/home/www-data/.devcontainer/.postCreateCommandMarker' 2>/dev/null || echo ENOENT)" && [ "${CONTENT:-2025-07-29T03:09:40.418886515Z}" != '2025-07-29T03:09:40.418886515Z' ] && echo '2025-07-29T03:09:40.418886515Z' > '/home/www-data/.devcontainer/.postCreateCommandMarker'
-[220512 ms] 
-[220512 ms] 
+[76482 ms] 
+[76482 ms] Start: Run in container: mkdir -p '/home/www-data/.devcontainer' && CONTENT="$(cat '/home/www-data/.devcontainer/.updateContentCommandMarker' 2>/dev/null || echo ENOENT)" && [ "${CONTENT:-2025-07-29T04:04:02.460916556Z}" != '2025-07-29T04:04:02.460916556Z' ] && echo '2025-07-29T04:04:02.460916556Z' > '/home/www-data/.devcontainer/.updateContentCommandMarker'
+[76487 ms] 
+[76487 ms] 
+[76487 ms] Start: Run in container: mkdir -p '/home/www-data/.devcontainer' && CONTENT="$(cat '/home/www-data/.devcontainer/.postCreateCommandMarker' 2>/dev/null || echo ENOENT)" && [ "${CONTENT:-2025-07-29T04:04:02.460916556Z}" != '2025-07-29T04:04:02.460916556Z' ] && echo '2025-07-29T04:04:02.460916556Z' > '/home/www-data/.devcontainer/.postCreateCommandMarker'
+[76494 ms] 
+[76494 ms] 
 Running the postCreateCommand from devcontainer.json...
 
-[220513 ms] Start: Run in container: /bin/sh -c /var/www/html/.devcontainer/setup-optimized.sh
-[220529 ms] [03:09:53] Log level changed to info
-🚀 Configuração equilibrada do Dev Container - Laravel+Inertia+Vue3...
-⏳ Aguardando MySQL...
-Aguardando MySQL... (90 segundos restantes)
-[220789 ms] [03:09:53] Completed initializing default profile extensions in extensions installation folder. file:///home/www-data/.vscode-server/extensions
-[221008 ms] [03:09:54] [127.0.0.1][d0d2a917][ExtensionHostConnection] New connection established.
-[221193 ms] [03:09:54] [127.0.0.1][d0d2a917][ExtensionHostConnection] <359> Launched Extension Host Process.
-[222340 ms] [03:09:55] Extension 'vue.vscode-typescript-vue-plugin' not found.
-Make sure you use the full extension ID, including the publisher, e.g.: ms-dotnettools.csharp
-[222344 ms] [03:09:55] Extension 'ms-vscode.vscode-json' not found.
-Make sure you use the full extension ID, including the publisher, e.g.: ms-dotnettools.csharp
-[222689 ms] [03:09:55] Installing extension 'github.copilot-chat'...
-[222720 ms] [03:09:55] Installing extension 'bmewburn.vscode-intelephense-client'...
-[222749 ms] [03:09:55] Installing extension 'github.copilot'...
-[222772 ms] [03:09:55] Installing extension 'vue.volar'...
-[222811 ms] [03:09:55] Installing extension 'codingyu.laravel-goto-view'...
-[222847 ms] [03:09:55] Installing extension 'open-southeners.laravel-pint'...
-[222904 ms] [03:09:56] Installing extension 'eamodio.gitlens'...
-[222908 ms] [03:09:56] Installing extension 'dotjoshjohnson.xml'...
-[222929 ms] [03:09:56] Installing extension 'esbenp.prettier-vscode'...
-[222935 ms] [03:09:56] Getting Manifest... github.copilot-chat
-[03:09:56] Getting Manifest... bmewburn.vscode-intelephense-client
-[03:09:56] Getting Manifest... github.copilot
-[222935 ms] [03:09:56] Getting Manifest... vue.volar
-[03:09:56] Getting Manifest... codingyu.laravel-goto-view
-[03:09:56] Getting Manifest... open-southeners.laravel-pint
-[03:09:56] Getting Manifest... eamodio.gitlens
-[03:09:56] Getting Manifest... dotjoshjohnson.xml
-[222935 ms] [03:09:56] Getting Manifest... esbenp.prettier-vscode
-[223377 ms] [03:09:56] Installing extension: github.copilot-chat {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:09:56] Installing extension: bmewburn.vscode-intelephense-client {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:09:56] Installing extension: github.copilot {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:09:56] Installing extension: vue.volar {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:09:56] Installing extension: open-southeners.laravel-pint {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:09:56] Installing extension: esbenp.prettier-vscode {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:09:56] Installing extension: dotjoshjohnson.xml {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:09:56] Installing extension: eamodio.gitlens {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:09:56] Installing extension: codingyu.laravel-goto-view {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  isBuiltin: false,
-  installGivenVersion: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[223610 ms] [03:09:56] Getting Manifest... github.copilot-chat
-Aguardando MySQL... (87 segundos restantes)
-[223930 ms] [03:09:57] Getting Manifest... github.copilot
-Aguardando MySQL... (84 segundos restantes)
-[229685 ms] Start: Run in container: mkdir -p '/vscode/vscode-server/extensionsCache' && cd '/home/www-data/.vscode-server/extensionsCache' && cp '5d73a9aa-de80-4de7-8f3d-921e99412bf6' 'a6bce9b9-2446-47be-99df-ac929f0d2702' '/vscode/vscode-server/extensionsCache'
-Aguardando MySQL... (81 segundos restantes)
-[229783 ms] 
-[229783 ms] 
-[229784 ms] Start: Run in container: cd '/vscode/vscode-server/extensionsCache' && ls -t | tail -n +500 | xargs rm -f
-[229797 ms] 
-[229797 ms] 
-[232199 ms] [03:10:05] Downloaded extension to file:///home/www-data/.vscode-server/extensionsCache/a6bce9b9-2446-47be-99df-ac929f0d2702
-[232303 ms] [03:10:05] Installing extension: github.copilot-chat {
-  isApplicationScoped: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-Aguardando MySQL... (78 segundos restantes)
-[234081 ms] [03:10:07] Getting Manifest... github.copilot
-[234984 ms] [03:10:08] Waiting for already requested installing extension github.copilot github.copilot-chat file:///home/www-data/.vscode-server/extensions/extensions.json
-Aguardando MySQL... (75 segundos restantes)
-[236689 ms] [03:10:09] Extension signature verification result for github.copilot-chat: Success. Internal Code: 0. Executed: true. Duration: 12102ms.
-[236904 ms] [03:10:10] Extension signature verification result for codingyu.laravel-goto-view: Success. Internal Code: 0. Executed: true. Duration: 12217ms.
-[236905 ms] [03:10:10] Extension signature verification result for dotjoshjohnson.xml: Success. Internal Code: 0. Executed: true. Duration: 12115ms.
-[237097 ms] [03:10:10] Extension signature verification result for eamodio.gitlens: Success. Internal Code: 0. Executed: true. Duration: 12396ms.
-[237203 ms] [03:10:10] Extension signature verification result for esbenp.prettier-vscode: Success. Internal Code: 0. Executed: true. Duration: 12285ms.
-[237588 ms] [03:10:10] Extension signature verification result for vue.volar: Success. Internal Code: 0. Executed: true. Duration: 12896ms.
-[237780 ms] [03:10:10] Extension signature verification result for github.copilot: Success. Internal Code: 0. Executed: true. Duration: 13258ms.
-[237984 ms] [03:10:11] Extension signature verification result for open-southeners.laravel-pint: Success. Internal Code: 0. Executed: true. Duration: 13399ms.
-[237989 ms] [03:10:11] Extension signature verification result for bmewburn.vscode-intelephense-client: Success. Internal Code: 0. Executed: true. Duration: 13458ms.
-[237998 ms] [03:10:11] Extracted extension to file:///home/www-data/.vscode-server/extensions/codingyu.laravel-goto-view-1.3.11: codingyu.laravel-goto-view
-[238184 ms] [03:10:11] Renamed to /home/www-data/.vscode-server/extensions/codingyu.laravel-goto-view-1.3.11
-[238308 ms] [03:10:11] Extracted extension to file:///home/www-data/.vscode-server/extensions/open-southeners.laravel-pint-1.3.0: open-southeners.laravel-pint
-[238583 ms] [03:10:11] Renamed to /home/www-data/.vscode-server/extensions/open-southeners.laravel-pint-1.3.0
-[238809 ms] [03:10:11] Extracted extension to file:///home/www-data/.vscode-server/extensions/vue.volar-3.0.4: vue.volar
-Aguardando MySQL... (72 segundos restantes)
-[240006 ms] [03:10:13] Extracted extension to file:///home/www-data/.vscode-server/extensions/esbenp.prettier-vscode-11.0.0: esbenp.prettier-vscode
-[240234 ms] [03:10:13] Downloaded extension to file:///home/www-data/.vscode-server/extensionsCache/5d73a9aa-de80-4de7-8f3d-921e99412bf6
-[240293 ms] [03:10:13] Renamed to /home/www-data/.vscode-server/extensions/vue.volar-3.0.4
-[240392 ms] [03:10:13] Installing extension: github.copilot {
-  isApplicationScoped: false,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[240480 ms] [03:10:13] Renamed to /home/www-data/.vscode-server/extensions/esbenp.prettier-vscode-11.0.0
-[240807 ms] [03:10:13] Getting Manifest... github.copilot-chat
-[240999 ms] [03:10:14] Extracted extension to file:///home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1: github.copilot-chat
-[241208 ms] [03:10:14] Renamed to /home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1
-[241316 ms] [03:10:14] Waiting for already requested installing extension github.copilot-chat github.copilot file:///home/www-data/.vscode-server/extensions/extensions.json
-[241384 ms] [03:10:14] Extracted extension to file:///home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1: github.copilot-chat
-Aguardando MySQL... (69 segundos restantes)
-[242096 ms] [03:10:15] Extracted extension to file:///home/www-data/.vscode-server/extensions/eamodio.gitlens-17.3.3: eamodio.gitlens
-[243989 ms] [03:10:17] Rename failed because of ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142' -> '/home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1'. Deleted from extracted location xr {
-  scheme: 'file',
-  authority: '',
-  path: '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142',
-  query: '',
-  fragment: '',
-  _formatted: null,
-  _fsPath: '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142'
-}
-[244030 ms] [03:10:17] Error while installing the extension github.copilot-chat ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142' -> '/home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1' file:///home/www-data/.vscode-server/extensions/extensions.json
-[244164 ms] [03:10:17] Extracted extension to file:///home/www-data/.vscode-server/extensions/github.copilot-1.346.0: github.copilot
-[244434 ms] [03:10:17] Extracted extension to file:///home/www-data/.vscode-server/extensions/bmewburn.vscode-intelephense-client-1.14.4: bmewburn.vscode-intelephense-client
-Aguardando MySQL... (66 segundos restantes)
-[245030 ms] rejected promise not handled within 1 second: Rename: ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142' -> '/home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1'
-stack trace: Error: ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142' -> '/home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1'
-    at async Object.rename (node:internal/fs/promises:780:10)
-    at async Object.eR (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:27:89391)
-    at async Yh.G (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:55:25526)
-    at async Yh.extractUserExtension (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:55:21996)
-    at async Kc.Ab (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:55:15505)
-[245031 ms] [03:10:18] Error: ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142' -> '/home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1'
-    at async Object.rename (node:internal/fs/promises:780:10)
-    at async Object.eR (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:27:89391)
-    at async Yh.G (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:55:25526)
-    at async Yh.extractUserExtension (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:55:21996)
-    at async Kc.Ab (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:55:15505) {
-  code: 'Rename',
-  name: 'Rename'
-}
-[245035 ms] [03:10:18] Renamed to /home/www-data/.vscode-server/extensions/eamodio.gitlens-17.3.3
-[245234 ms] [03:10:18] Renamed to /home/www-data/.vscode-server/extensions/github.copilot-1.346.0
-[245235 ms] [03:10:18] Renamed to /home/www-data/.vscode-server/extensions/bmewburn.vscode-intelephense-client-1.14.4
-[245446 ms] [03:10:18] Extracted extension to file:///home/www-data/.vscode-server/extensions/dotjoshjohnson.xml-2.5.1: dotjoshjohnson.xml
-[245683 ms] [03:10:18] Renamed to /home/www-data/.vscode-server/extensions/dotjoshjohnson.xml-2.5.1
-[245720 ms] [03:10:18] Extracted extension to file:///home/www-data/.vscode-server/extensions/github.copilot-1.346.0: github.copilot
-[245805 ms] [03:10:18] Rename failed because of ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.f91a7847-d274-49df-8045-607600d9506f' -> '/home/www-data/.vscode-server/extensions/github.copilot-1.346.0'. Deleted from extracted location xr {
-  scheme: 'file',
-  authority: '',
-  path: '/home/www-data/.vscode-server/extensions/.f91a7847-d274-49df-8045-607600d9506f',
-  query: '',
-  fragment: '',
-  _formatted: null,
-  _fsPath: '/home/www-data/.vscode-server/extensions/.f91a7847-d274-49df-8045-607600d9506f'
-}
-[245835 ms] [03:10:18] Error while installing the extension github.copilot ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.f91a7847-d274-49df-8045-607600d9506f' -> '/home/www-data/.vscode-server/extensions/github.copilot-1.346.0' file:///home/www-data/.vscode-server/extensions/extensions.json
-[245835 ms] [03:10:18] Finished waiting for already requested installing extension github.copilot github.copilot-chat file:///home/www-data/.vscode-server/extensions/extensions.json
-[245836 ms] [03:10:18] Extension installed successfully: github.copilot-chat file:///home/www-data/.vscode-server/extensions/extensions.json
-[245839 ms] [03:10:18] Finished waiting for already requested installing extension github.copilot-chat github.copilot file:///home/www-data/.vscode-server/extensions/extensions.json
-[246019 ms] [03:10:19] Rollback: Uninstalled extension github.copilot
-[246023 ms] [03:10:19] Extension installed successfully: codingyu.laravel-goto-view file:///home/www-data/.vscode-server/extensions/extensions.json
-[03:10:19] Extension installed successfully: open-southeners.laravel-pint file:///home/www-data/.vscode-server/extensions/extensions.json
-[03:10:19] Extension installed successfully: vue.volar file:///home/www-data/.vscode-server/extensions/extensions.json
-[03:10:19] Extension installed successfully: esbenp.prettier-vscode file:///home/www-data/.vscode-server/extensions/extensions.json
-[03:10:19] Extension installed successfully: eamodio.gitlens file:///home/www-data/.vscode-server/extensions/extensions.json
-[03:10:19] Extension installed successfully: bmewburn.vscode-intelephense-client file:///home/www-data/.vscode-server/extensions/extensions.json
-[03:10:19] Extension installed successfully: dotjoshjohnson.xml file:///home/www-data/.vscode-server/extensions/extensions.json
-[246036 ms] [03:10:19] Extension 'codingyu.laravel-goto-view' v1.3.11 was successfully installed.
-[03:10:19] Extension 'open-southeners.laravel-pint' v1.3.0 was successfully installed.
-[03:10:19] Extension 'vue.volar' v3.0.4 was successfully installed.
-[03:10:19] Extension 'esbenp.prettier-vscode' v11.0.0 was successfully installed.
-[246036 ms] [03:10:19] Extension 'eamodio.gitlens' v17.3.3 was successfully installed.
-[03:10:19] Extension 'bmewburn.vscode-intelephense-client' v1.14.4 was successfully installed.
-[03:10:19] Extension 'dotjoshjohnson.xml' v2.5.1 was successfully installed.
-[246036 ms] [03:10:19] Error while installing extension github.copilot-chat: ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142' -> '/home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1'
-[03:10:19] Error while installing extension github.copilot: ENOTEMPTY: directory not empty, rename '/home/www-data/.vscode-server/extensions/.0380bfa4-b0dc-4c1d-b666-ddab652f1142' -> '/home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1'
-[03:10:19] Error: Failed Installing Extensions: vue.vscode-typescript-vue-plugin, ms-vscode.vscode-json, github.copilot-chat, github.copilot
-    at cl.installExtensions (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:67:35419)
-[246049 ms] [03:10:19] Marked extension as removed github.copilot-1.346.0
-[246091 ms] [03:10:19] Relaying the following extensions to install later: GitHub.copilot, Vue.vscode-typescript-vue-plugin, ms-vscode.vscode-json
-[246119 ms] [03:10:19] github.copilot 1.346.0 Running post uninstall script
-[246881 ms] [03:10:20] Finished running post uninstall script github.copilot 1.346.0
-[246884 ms] [03:10:20] Deleted marked for removal extension from disk github.copilot /home/www-data/.vscode-server/extensions/github.copilot-1.346.0
-[246993 ms] Port forwarding connection from 51974 > 35865 > 35865 in the container.
-[246994 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
-[247119 ms] Port forwarding 51974 > 35865 > 35865 stderr: Connection established
-Aguardando MySQL... (63 segundos restantes)
-Aguardando MySQL... (60 segundos restantes)
-[251634 ms] [03:10:24] Downloaded extension to file:///home/www-data/.vscode-server/extensionsCache/553d652f-8db8-4a10-afe5-73d5355b2e1c
-[251639 ms] [03:10:24] Installing extension: github.copilot-chat {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  downloadExtensionsLocally: true,
-  donotVerifySignature: false,
-  donotIncludePackAndDependencies: true,
-  keepExisting: true,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[251640 ms] [03:10:24] Installing the extension without checking dependencies and pack github.copilot-chat
-[251691 ms] [03:10:24] Deleted existing extension from disk github.copilot-chat /home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1
-[252116 ms] [03:10:25] Extracted extension to file:///home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1: github.copilot-chat
-[252129 ms] [03:10:25] Renamed to /home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1
-[252285 ms] [03:10:25] Extension installed successfully: github.copilot-chat file:///home/www-data/.vscode-server/extensions/extensions.json
-[253185 ms] Port forwarding 51974 > 35865 > 35865 stderr: Remote close
-[253198 ms] Port forwarding 51974 > 35865 > 35865 terminated with code 0 and signal null.
-[253620 ms] Port forwarding 51974 > 35865 > 35865: Local close
-Aguardando MySQL... (57 segundos restantes)
-Aguardando MySQL... (54 segundos restantes)
-[257070 ms] [03:10:30] Downloaded extension to file:///home/www-data/.vscode-server/extensionsCache/37ddf3af-0f89-4a22-a2d2-78f2dee82c3b
-[257073 ms] [03:10:30] Installing extension: github.copilot {
-  isMachineScoped: false,
-  installPreReleaseVersion: false,
-  isApplicationScoped: true,
-  downloadExtensionsLocally: true,
-  donotVerifySignature: false,
-  donotIncludePackAndDependencies: true,
-  keepExisting: true,
-  profileLocation: xr {
-    scheme: 'file',
-    authority: '',
-    path: '/home/www-data/.vscode-server/extensions/extensions.json',
-    query: '',
-    fragment: '',
-    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
-    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
-  },
-  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
-}
-[03:10:30] Installing the extension without checking dependencies and pack github.copilot
-[257695 ms] [03:10:30] Extracted extension to file:///home/www-data/.vscode-server/extensions/github.copilot-1.346.0: github.copilot
-[257729 ms] [03:10:30] Renamed to /home/www-data/.vscode-server/extensions/github.copilot-1.346.0
-[257766 ms] [03:10:30] Extension installed successfully: github.copilot file:///home/www-data/.vscode-server/extensions/extensions.json
-Aguardando MySQL... (51 segundos restantes)
-Aguardando MySQL... (48 segundos restantes)
-Aguardando MySQL... (45 segundos restantes)
-Aguardando MySQL... (42 segundos restantes)
-Aguardando MySQL... (39 segundos restantes)
-Aguardando MySQL... (36 segundos restantes)
-Aguardando MySQL... (33 segundos restantes)
-Aguardando MySQL... (30 segundos restantes)
-Aguardando MySQL... (27 segundos restantes)
-Aguardando MySQL... (24 segundos restantes)
-Aguardando MySQL... (21 segundos restantes)
-Aguardando MySQL... (18 segundos restantes)
-Aguardando MySQL... (15 segundos restantes)
-Aguardando MySQL... (12 segundos restantes)
-Aguardando MySQL... (9 segundos restantes)
-Aguardando MySQL... (6 segundos restantes)
-Aguardando MySQL... (3 segundos restantes)
-⚠️ MySQL demorou para iniciar, mas continuando...
+[76498 ms] Start: Run in container: /bin/sh -c /var/www/html/.devcontainer/setup-simple.sh
+[76513 ms] [04:04:19] ComputeTargetPlatform: alpine-x64
+🚀 Configuração do Dev Container - Laravel+Inertia+Vue3...
 🔧 Configurando permissões...
 🤖 Configurando GitHub Copilot...
-✅ Dependências PHP já instaladas
-✅ Dependências Node.js já instaladas
-✅ Arquivo .env já existe
-🧹 Otimizando Laravel...
-🗄️ Verificando banco de dados...
-ℹ️ Executando migrações...
-⚠️ Migrações falharam (normal em projetos novos)
-🎨 Verificando assets...
-📦 Compilando assets...
+[76900 ms] [04:04:19] Log level changed to info
+[77294 ms] [04:04:19] [127.0.0.1][b4483158][ExtensionHostConnection] New connection established.
+[77356 ms] [04:04:19] [127.0.0.1][b4483158][ExtensionHostConnection] <353> Launched Extension Host Process.
+[77666 ms] [04:04:20] #4: https://www.vscode-unpkg.net/_gallery/bmewburn/vscode-intelephense-client/latest - error GET AggregateError [ETIMEDOUT]: 
+[77667 ms] [04:04:20] Error while getting the latest version for the extension bmewburn.vscode-intelephense-client. AggregateError [ETIMEDOUT]: 
+[77669 ms] [04:04:20] #5: https://www.vscode-unpkg.net/_gallery/open-southeners/laravel-pint/latest - error GET AggregateError [ETIMEDOUT]: 
+[77669 ms] [04:04:20] Error while getting the latest version for the extension open-southeners.laravel-pint. AggregateError [ETIMEDOUT]: 
+[77670 ms] [04:04:20] #6: https://www.vscode-unpkg.net/_gallery/codingyu/laravel-goto-view/latest - error GET AggregateError [ETIMEDOUT]: 
+[04:04:20] Error while getting the latest version for the extension codingyu.laravel-goto-view. AggregateError [ETIMEDOUT]: 
+[77744 ms] [04:04:20] #7: https://www.vscode-unpkg.net/_gallery/vue/volar/latest - error GET AggregateError [ETIMEDOUT]: 
+[77745 ms] [04:04:20] Error while getting the latest version for the extension vue.volar. AggregateError [ETIMEDOUT]: 
+🧹 Configurando Laravel...
+[80876 ms] [04:04:23] Extension 'vue.vscode-typescript-vue-plugin' not found.
+Make sure you use the full extension ID, including the publisher, e.g.: ms-dotnettools.csharp
+[04:04:23] Extension 'ms-vscode.vscode-json' not found.
+Make sure you use the full extension ID, including the publisher, e.g.: ms-dotnettools.csharp
+[82099 ms] [04:04:24] #17: https://open-southeners.gallerycdn.vsassets.io/extensions/open-southeners/laravel-pint/1.3.0/1737367396779/Microsoft.VisualStudio.Code.Manifest - error GET AggregateError [ETIMEDOUT]: 
+[04:04:24] #16: https://bmewburn.gallerycdn.vsassets.io/extensions/bmewburn/vscode-intelephense-client/1.14.4/1743476731040/Microsoft.VisualStudio.Code.Manifest - error GET AggregateError [ETIMEDOUT]: 
+[82363 ms] [04:04:24] Installing extension 'codingyu.laravel-goto-view'...
+[82365 ms] [04:04:24] Installing extension 'vue.volar'...
+[83254 ms] [04:04:25] Installing extension 'dotjoshjohnson.xml'...
+[83288 ms] [04:04:25] Installing extension 'esbenp.prettier-vscode'...
+🚀 Iniciando serviços...
+🚀 INICIANDO SERVIÇOS - Dev Container
+===================================
+✅ Rodando dentro do Dev Container
+⏳ Aguardando serviços...
+📊 Aguardando MySQL...
+✅ MySQL está pronto!
+🌐 Aguardando Laravel...
+[83401 ms] [04:04:25] Installing extension 'eamodio.gitlens'...
+[83451 ms] [04:04:25] Installing extension 'github.copilot'...
+[83483 ms] [04:04:25] Installing extension 'open-southeners.laravel-pint'...
+[83553 ms] [04:04:26] Installing extension 'bmewburn.vscode-intelephense-client'...
+[83580 ms] [04:04:26] Installing extension 'github.copilot-chat'...
+[83670 ms] [04:04:26] Getting Manifest... codingyu.laravel-goto-view
+[04:04:26] Getting Manifest... vue.volar
+[04:04:26] Getting Manifest... dotjoshjohnson.xml
+[04:04:26] Getting Manifest... esbenp.prettier-vscode
+[04:04:26] Getting Manifest... eamodio.gitlens
+[04:04:26] Getting Manifest... github.copilot
+[04:04:26] Getting Manifest... open-southeners.laravel-pint
+[04:04:26] Getting Manifest... bmewburn.vscode-intelephense-client
+[04:04:26] Getting Manifest... github.copilot-chat
+[83861 ms] [04:04:26] Getting Manifest... github.copilot
+[04:04:26] Getting Manifest... github.copilot-chat
+[83974 ms] [04:04:26] Installing extension: github.copilot {
+  installPreReleaseVersion: false,
+  donotIncludePackAndDependencies: true,
+  donotVerifySignature: false,
+  context: { clientTargetPlatform: 'linux-x64' },
+  isApplicationScoped: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[83980 ms] [04:04:26] Installing the extension without checking dependencies and pack github.copilot
+[84151 ms] [04:04:26] Installing extension: github.copilot-chat {
+  installPreReleaseVersion: false,
+  donotIncludePackAndDependencies: true,
+  donotVerifySignature: false,
+  context: { clientTargetPlatform: 'linux-x64' },
+  isApplicationScoped: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[04:04:26] Installing the extension without checking dependencies and pack github.copilot-chat
+[84776 ms] [04:04:27] Installing extension: open-southeners.laravel-pint {
+  isMachineScoped: false,
+  installPreReleaseVersion: false,
+  isApplicationScoped: true,
+  isBuiltin: false,
+  installGivenVersion: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[84777 ms] [04:04:27] Installing extension: codingyu.laravel-goto-view {
+  isMachineScoped: false,
+  installPreReleaseVersion: false,
+  isApplicationScoped: true,
+  isBuiltin: false,
+  installGivenVersion: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[84780 ms] [04:04:27] Installing extension: bmewburn.vscode-intelephense-client {
+  isMachineScoped: false,
+  installPreReleaseVersion: false,
+  isApplicationScoped: true,
+  isBuiltin: false,
+  installGivenVersion: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[04:04:27] Installing extension: vue.volar {
+  isMachineScoped: false,
+  installPreReleaseVersion: false,
+  isApplicationScoped: true,
+  isBuiltin: false,
+  installGivenVersion: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[84783 ms] [04:04:27] Installing extension: esbenp.prettier-vscode {
+  isMachineScoped: false,
+  installPreReleaseVersion: false,
+  isApplicationScoped: true,
+  isBuiltin: false,
+  installGivenVersion: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[04:04:27] Installing extension: dotjoshjohnson.xml {
+  isMachineScoped: false,
+  installPreReleaseVersion: false,
+  isApplicationScoped: true,
+  isBuiltin: false,
+  installGivenVersion: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[84788 ms] [04:04:27] Installing extension: eamodio.gitlens {
+  isMachineScoped: false,
+  installPreReleaseVersion: false,
+  isApplicationScoped: true,
+  isBuiltin: false,
+  installGivenVersion: false,
+  profileLocation: xr {
+    scheme: 'file',
+    authority: '',
+    path: '/home/www-data/.vscode-server/extensions/extensions.json',
+    query: '',
+    fragment: '',
+    _formatted: 'file:///home/www-data/.vscode-server/extensions/extensions.json',
+    _fsPath: '/home/www-data/.vscode-server/extensions/extensions.json'
+  },
+  productVersion: { version: '1.102.2', date: '2025-07-22T12:15:48.520Z' }
+}
+[04:04:27] Extension is already requested to install github.copilot file:///home/www-data/.vscode-server/extensions/extensions.json
+[04:04:27] Extension is already requested to install github.copilot-chat file:///home/www-data/.vscode-server/extensions/extensions.json
+✅ Laravel está pronto!
+⚡ Verificando Vite (modo Dev Container)...
+💡 Para usar Vite no Dev Container, execute: npm run dev
+💡 Ou inicie o container Vite: docker compose --profile vite-dev up vite -d
 
-> build
-> vite build
+🎯 SERVIÇOS DISPONÍVEIS:
+  📱 Laravel: http://localhost:8080
+  ⚡ Vite: http://localhost:5173
+  🗄️ MySQL: localhost:3307
 
-ℹ️ Build falhou (pode ser normal)
-🔧 Configurações finais...
+✅ Dev Container pronto para desenvolvimento!
 
-✅ Dev Container configurado com sucesso!
+✅ Dev Container configurado!
 
 🌐 URLs disponíveis:
   📱 Laravel: http://localhost:8080
   ⚡ Vite: http://localhost:5173
-  🗄️ MySQL: localhost:3307 (admin/root1234)
-
-�️ Comandos úteis:
-  npm run dev    # Iniciar Vite dev server
-  php artisan    # Comandos Laravel
-  composer       # Gerenciar dependências PHP
-
-💡 Para melhor performance:
-  - Use Ctrl+Shift+P > 'Format Document' para formatação
-  - Configure o Git: git config user.name 'Seu Nome'
-  - Configure o Git: git config user.email 'seu@email.com'
-
-[312803 ms] Start: Run in container: # Test for /home/www-data/.gitconfig and git
-[312805 ms] [credential]
+  🗄️ MySQL: localhost:3307
+[85609 ms] Start: Run in container: # Test for /home/www-data/.gitconfig and git
+[85645 ms] [credential]
 /home/www-data/.gitconfig exists
-[312806 ms] 
-[312806 ms] Exit code 1
-[312807 ms] Start: Run in container: command -v git >/dev/null 2>&1 && git config --global --replace-all credential.helper '!f() { /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node /tmp/vscode-remote-containers-436f6aa3-22d4-4754-8353-e7b78fff2561.js git-credential-helper $*; }; f' || true
-[312809 ms] 
-[312810 ms] error: could not write config file /home/www-data/.gitconfig: Resource busy
+[85645 ms] 
+[85646 ms] Exit code 1
+[85648 ms] Start: Run in container: command -v git >/dev/null 2>&1 && git config --global --replace-all credential.helper '!f() { /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node /tmp/vscode-remote-containers-16d27805-fa49-43bc-99ca-54cbf91c7edc.js git-credential-helper $*; }; f' || true
+[85659 ms] 
+[85660 ms] error: could not write config file /home/www-data/.gitconfig: Resource busy
+[94758 ms] [04:04:37] No ptyHost heartbeat after 6 seconds
+[97970 ms] Start: Run in container: cat /proc/543/environ
+[100213 ms] Port forwarding connection from 55262 > 39195 > 39195 in the container.
+[100221 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[100260 ms] Port forwarding connection from 55276 > 39195 > 39195 in the container.
+[100261 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[102848 ms] Port forwarding 55262 > 39195 > 39195 stderr: Connection established
+[102861 ms] Port forwarding 55276 > 39195 > 39195 stderr: Connection established
+[104351 ms] rejected promise not handled within 1 second: AggregateError
+stack trace: AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[104445 ms] [04:04:46] AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:8080
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8080
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:8080
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8080
+    }
+  ]
+}
+[104456 ms] rejected promise not handled within 1 second: AggregateError
+[104545 ms] stack trace: AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[104549 ms] [04:04:47] AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:8080
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8080
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:8080
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8080
+    }
+  ]
+}
+[106290 ms] Port forwarding connection from 38236 > 39195 > 39195 in the container.
+[106291 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[106369 ms] Port forwarding connection from 38238 > 39195 > 39195 in the container.
+[106372 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[108268 ms] Port forwarding 38236 > 39195 > 39195 stderr: Connection established
+[108655 ms] Port forwarding 38238 > 39195 > 39195 stderr: Connection established
+[109662 ms] rejected promise not handled within 1 second: AggregateError
+stack trace: AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[04:04:52] AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:5173
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 5173
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:5173
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 5173
+    }
+  ]
+}
+[110050 ms] rejected promise not handled within 1 second: AggregateError
+stack trace: AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[04:04:52] AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:5173
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 5173
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:5173
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 5173
+    }
+  ]
+}
+[116456 ms] [04:04:58] Extension signature verification result for bmewburn.vscode-intelephense-client: Success. Internal Code: 0. Executed: true. Duration: 28384ms.
+[116654 ms] [04:04:59] Extension signature verification result for vue.volar: Success. Internal Code: 0. Executed: true. Duration: 29007ms.
+[116752 ms] [04:04:59] Extension signature verification result for open-southeners.laravel-pint: Success. Internal Code: 0. Executed: true. Duration: 29296ms.
+[116953 ms] [04:04:59] Extension signature verification result for dotjoshjohnson.xml: Success. Internal Code: 0. Executed: true. Duration: 25994ms.
+[117051 ms] [04:04:59] Extension signature verification result for github.copilot: Success. Internal Code: 0. Executed: true. Duration: 30993ms.
+[117358 ms] [04:04:59] Extension signature verification result for codingyu.laravel-goto-view: Success. Internal Code: 0. Executed: true. Duration: 29000ms.
+[117361 ms] [04:04:59] Extension signature verification result for eamodio.gitlens: Success. Internal Code: 0. Executed: true. Duration: 26997ms.
+[117546 ms] [04:05:00] Extension signature verification result for github.copilot-chat: Success. Internal Code: 0. Executed: true. Duration: 30675ms.
+[117653 ms] [04:05:00] Extracted extension to file:///home/www-data/.vscode-server/extensions/open-southeners.laravel-pint-1.3.0: open-southeners.laravel-pint
+[117765 ms] [04:05:00] Renamed to /home/www-data/.vscode-server/extensions/open-southeners.laravel-pint-1.3.0
+[118069 ms] [04:05:00] Extension signature verification result for esbenp.prettier-vscode: Success. Internal Code: 0. Executed: true. Duration: 28822ms.
+[118247 ms] [04:05:00] Extracted extension to file:///home/www-data/.vscode-server/extensions/codingyu.laravel-goto-view-1.3.11: codingyu.laravel-goto-view
+[118274 ms] [04:05:00] Renamed to /home/www-data/.vscode-server/extensions/codingyu.laravel-goto-view-1.3.11
+[118783 ms] [04:05:01] Extracted extension to file:///home/www-data/.vscode-server/extensions/vue.volar-3.0.4: vue.volar
+[118843 ms] [04:05:01] Renamed to /home/www-data/.vscode-server/extensions/vue.volar-3.0.4
+[119646 ms] [04:05:02] Extracted extension to file:///home/www-data/.vscode-server/extensions/esbenp.prettier-vscode-11.0.0: esbenp.prettier-vscode
+[119667 ms] [04:05:02] Renamed to /home/www-data/.vscode-server/extensions/esbenp.prettier-vscode-11.0.0
+[120872 ms] [04:05:03] Extracted extension to file:///home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1: github.copilot-chat
+[120944 ms] [04:05:03] Renamed to /home/www-data/.vscode-server/extensions/github.copilot-chat-0.29.1
+[121044 ms] [04:05:03] Extension installed successfully: github.copilot-chat file:///home/www-data/.vscode-server/extensions/extensions.json
+[121410 ms] Port forwarding connection from 38916 > 39195 > 39195 in the container.
+[121414 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[121893 ms] [04:05:04] Extracted extension to file:///home/www-data/.vscode-server/extensions/eamodio.gitlens-17.3.3: eamodio.gitlens
+[121954 ms] Port forwarding 38916 > 39195 > 39195 stderr: Connection established
+[122020 ms] [04:05:04] Renamed to /home/www-data/.vscode-server/extensions/eamodio.gitlens-17.3.3
+[124851 ms] [04:05:07] Extracted extension to file:///home/www-data/.vscode-server/extensions/github.copilot-1.346.0: github.copilot
+[124886 ms] [04:05:07] Renamed to /home/www-data/.vscode-server/extensions/github.copilot-1.346.0
+[125157 ms] [04:05:07] Extension installed successfully: github.copilot file:///home/www-data/.vscode-server/extensions/extensions.json
+[125781 ms] [04:05:08] Extracted extension to file:///home/www-data/.vscode-server/extensions/bmewburn.vscode-intelephense-client-1.14.4: bmewburn.vscode-intelephense-client
+[126365 ms] [04:05:08] Renamed to /home/www-data/.vscode-server/extensions/bmewburn.vscode-intelephense-client-1.14.4
+[127647 ms] [04:05:10] Extracted extension to file:///home/www-data/.vscode-server/extensions/dotjoshjohnson.xml-2.5.1: dotjoshjohnson.xml
+[127967 ms] [04:05:10] Renamed to /home/www-data/.vscode-server/extensions/dotjoshjohnson.xml-2.5.1
+[128062 ms] Port forwarding 38916 > 39195 > 39195 stderr: Remote close
+[128084 ms] Port forwarding 38916 > 39195 > 39195 terminated with code 0 and signal null.
+[128146 ms] [04:05:10] Extension installed successfully: open-southeners.laravel-pint file:///home/www-data/.vscode-server/extensions/extensions.json
+[128147 ms] [04:05:10] Extension installed successfully: codingyu.laravel-goto-view file:///home/www-data/.vscode-server/extensions/extensions.json
+[04:05:10] Extension installed successfully: vue.volar file:///home/www-data/.vscode-server/extensions/extensions.json
+[04:05:10] Extension installed successfully: esbenp.prettier-vscode file:///home/www-data/.vscode-server/extensions/extensions.json
+[04:05:10] Extension installed successfully: eamodio.gitlens file:///home/www-data/.vscode-server/extensions/extensions.json
+[04:05:10] Extension installed successfully: bmewburn.vscode-intelephense-client file:///home/www-data/.vscode-server/extensions/extensions.json
+[04:05:10] Extension installed successfully: dotjoshjohnson.xml file:///home/www-data/.vscode-server/extensions/extensions.json
+[128182 ms] [04:05:10] Extension 'open-southeners.laravel-pint' v1.3.0 was successfully installed.
+[04:05:10] Extension 'codingyu.laravel-goto-view' v1.3.11 was successfully installed.
+[04:05:10] Extension 'vue.volar' v3.0.4 was successfully installed.
+[128183 ms] [04:05:10] Extension 'esbenp.prettier-vscode' v11.0.0 was successfully installed.
+[04:05:10] Extension 'eamodio.gitlens' v17.3.3 was successfully installed.
+[04:05:10] Extension 'bmewburn.vscode-intelephense-client' v1.14.4 was successfully installed.
+[04:05:10] Extension 'dotjoshjohnson.xml' v2.5.1 was successfully installed.
+[128183 ms] [04:05:10] Error: Failed Installing Extensions: vue.vscode-typescript-vue-plugin, ms-vscode.vscode-json
+    at cl.installExtensions (file:///vscode/vscode-server/bin/linux-alpine/c306e94f98122556ca081f527b466015e1bc37b0/out/server-main.js:67:35419)
+[128279 ms] [04:05:10] Relaying the following extensions to install later: Vue.vscode-typescript-vue-plugin, ms-vscode.vscode-json
+[128635 ms] Port forwarding 38916 > 39195 > 39195: Local close
+[128645 ms] Port forwarding connection from 59116 > 39195 > 39195 in the container.
+[128646 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[128830 ms] Port forwarding connection from 59132 > 39195 > 39195 in the container.
+[128831 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[128947 ms] Port forwarding 59116 > 39195 > 39195 stderr: Connection established
+[129142 ms] Port forwarding 59132 > 39195 > 39195 stderr: Connection established
+[134965 ms] Port forwarding 59116 > 39195 > 39195 stderr: Remote close
+[134983 ms] Port forwarding 59116 > 39195 > 39195 terminated with code 0 and signal null.
+[135159 ms] Port forwarding 59132 > 39195 > 39195 stderr: Remote close
+[135176 ms] Port forwarding 59132 > 39195 > 39195 terminated with code 0 and signal null.
+[139897 ms] Port forwarding 59132 > 39195 > 39195: Local close
+[139897 ms] Port forwarding 59116 > 39195 > 39195: Local close
+[188821 ms] Port forwarding 55262 > 39195 > 39195: Local close
+[188827 ms] Port forwarding 38238 > 39195 > 39195: Local close
+[188832 ms] Port forwarding 55276 > 39195 > 39195: Local close
+[188849 ms] Port forwarding 55262 > 39195 > 39195 stderr: Remote stdin close
+[188853 ms] Port forwarding 38238 > 39195 > 39195 stderr: Remote stdin close
+[188854 ms] Port forwarding 55276 > 39195 > 39195 stderr: Remote stdin close
+[188880 ms] Port forwarding 55276 > 39195 > 39195 terminated by extension (closed) with code 0 and signal null.
+[188883 ms] Port forwarding 55262 > 39195 > 39195 terminated by extension (closed) with code 0 and signal null.
+[188886 ms] Port forwarding 38238 > 39195 > 39195 terminated by extension (closed) with code 0 and signal null.
+[194270 ms] Port forwarding connection from 35180 > 39195 > 39195 in the container.
+[194271 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[194288 ms] Port forwarding connection from 35196 > 39195 > 39195 in the container.
+[194289 ms] Start: Run in container: /home/www-data/.vscode-server/bin/c306e94f98122556ca081f527b466015e1bc37b0/node -e 
+[194501 ms] Port forwarding 35180 > 39195 > 39195 stderr: Connection established
+[194502 ms] Port forwarding 35196 > 39195 > 39195 stderr: Connection established
+[195532 ms] rejected promise not handled within 1 second: AggregateError
+stack trace: AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[195536 ms] [04:06:18] AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:8080
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8080
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:8080
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8080
+    }
+  ]
+}
+[195536 ms] rejected promise not handled within 1 second: AggregateError
+stack trace: AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+[04:06:18] AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:8080
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 8080
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:8080
+        at createConnectionError (node:net:1677:14)
+        at afterConnectMultiple (node:net:1707:16) {
+      errno: -111,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8080
+    }
+  ]
+}

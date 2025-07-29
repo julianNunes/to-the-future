@@ -30,13 +30,10 @@ if [ "$REMOTE_CONTAINERS" = "true" ] || [ "$CODESPACES" = "true" ] || [ -f "/.do
         sleep 2
     done
     
-    # Verificar Vite
-    echo "⚡ Verificando Vite..."
-    if curl -s http://vite:5173 > /dev/null 2>&1; then
-        echo "✅ Vite está rodando!"
-    else
-        echo "⚠️ Vite não responde - pode estar inicializando"
-    fi
+    # Verificar Vite (opcional no Dev Container)
+    echo "⚡ Verificando Vite (modo Dev Container)..."
+    echo "💡 Para usar Vite no Dev Container, execute: npm run dev"
+    echo "💡 Ou inicie o container Vite: docker compose --profile vite-dev up vite -d"
     
     echo ""
     echo "🎯 SERVIÇOS DISPONÍVEIS:"

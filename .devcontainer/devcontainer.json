@@ -249,10 +249,12 @@
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
         // Compartilha dados do GitHub Copilot entre host e container
         "source=${localEnv:HOME}/.config/github-copilot,target=/home/www-data/.config/github-copilot,type=bind,consistency=cached",
-        // Compartilha cache do VS Code para extensões  
+        // Compartilha configurações do VS Code para extensões  
         "source=${localEnv:HOME}/.vscode,target=/home/www-data/.vscode,type=bind,consistency=cached",
         // Compartilha configurações git globais
-        "source=${localEnv:HOME}/.gitconfig,target=/home/www-data/.gitconfig,type=bind,readonly"
+        "source=${localEnv:HOME}/.gitconfig,target=/home/www-data/.gitconfig,type=bind,readonly",
+        // Compartilha SSH keys se existirem
+        "source=${localEnv:HOME}/.ssh,target=/home/www-data/.ssh,type=bind,readonly"
     ],
 
     // Variáveis de ambiente específicas para o Dev Container

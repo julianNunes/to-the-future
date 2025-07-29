@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import laravel from 'laravel-vite-plugin'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
-import eslintPlugin from 'vite-plugin-eslint'
+// import eslintPlugin from 'vite-plugin-eslint' // Temporariamente desabilitado
 import path from 'path'
 
 const isProduction = process.env.NODE_ENV === 'production'
@@ -22,7 +22,7 @@ export default defineConfig({
             },
         }),
         vuetify({ autoImport: true }),
-        !isProduction && eslintPlugin(),
+        // !isProduction && eslintPlugin(), // Temporariamente desabilitado
     ].filter(Boolean),
     resolve: {
         alias: {
