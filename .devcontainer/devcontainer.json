@@ -22,9 +22,8 @@
                 "codingyu.laravel-goto-view",           // Laravel Navigation (útil para Inertia)
                 "barryvdh.laravel-ide-helper",          // Laravel IDE Helper (resolve namespaces)
                 
-                // === VUE.JS 3 + INERTIA + VUETIFY ===
+                // === VUE.JS 3 + INERTIA + VUETIFY (SEM CONFLITOS) ===
                 "Vue.volar",                            // Vue 3 Official (Language Server)
-                "Vue.vscode-typescript-vue-plugin",     // Vue TS Support
                 
                 // === FORMATTERS & TOOLS ===
                 "esbenp.prettier-vscode",               // JS/CSS/Vue Formatter
@@ -35,6 +34,12 @@
                 "DotJoshJohnson.xml"                    // XML Support
             ],
             "settings": {
+                // === FORÇAR COPILOT NO CONTAINER (SOLUÇÃO DO PROBLEMA) ===
+                "remote.extensionKind": {
+                    "GitHub.copilot": ["workspace"],
+                    "GitHub.copilot-chat": ["workspace"]
+                },
+
                 // === PERFORMANCE BALANCED SETTINGS ===
 
                 // Terminal - Estável mas funcional
@@ -89,16 +94,20 @@
 
                 // === LARAVEL + PHP SETTINGS ===
                 "php.suggest.basic": true,
-                "intelephense.maxMemory": 512,             // Balanceado
+                "intelephense.maxMemory": 512,
                 "intelephense.diagnostics.enable": true,
-                "intelephense.diagnostics.run": "onSave",   // Não em tempo real
+                "intelephense.diagnostics.run": "onSave",
                 "intelephense.completion.triggerParameterHints": true,
                 "intelephense.completion.insertUseDeclaration": true,
                 "intelephense.trace.server": "off",
                 "intelephense.files.maxSize": 2000000,
                 "intelephense.format.enable": true,
                 
-                                // Laravel IDE Helper - Resolve namespaces e facades
+                // === INTELEPHENSE PSR-12 FORMATTING ===
+                "intelephense.format.braces": "psr12",
+                "intelephense.format.insertSpaces": true,
+                "intelephense.format.tabSize": 4,
+                
                 "intelephense.stubs": [
                     "apache", "bcmath", "bz2", "calendar", "com_dotnet", "Core", "ctype", "curl", "date",
                     "dba", "dom", "enchant", "exif", "fileinfo", "filter", "fpm", "ftp", "gd", "hash",
@@ -115,11 +124,85 @@
                     "**/node_modules/**", "**/bower_components/**", "**/vendor/**/{Tests,tests}/**",
                     "**/.history/**", "**/vendor/**/test/**", "**/vendor/**/tests/**"
                 ],
+
+                // === VUE + TYPESCRIPT CONFIGURAÇÕES (SEM CONFLITOS) ===
+                "typescript.preferences.includePackageJsonAutoImports": "on",
+                "typescript.suggest.autoImports": true,
+                "typescript.inlayHints.parameterNames.enabled": "literals",
+                "typescript.inlayHints.parameterTypes.enabled": false,
+                "typescript.format.enable": false,
+                "javascript.format.enable": false,
                 
-                // Configurações para compartilhar histórico entre host e container
+                "vue.autoInsert.dotValue": true,
+                "vue.autoInsert.parentheses": true,
+                "vue.codeActions.enabled": true,
+                "vue.complete.casing.tags": "kebab",
+                "vue.complete.casing.props": "camel",
+                "vue.inlayHints.missingProps": true,
+                "vue.inlayHints.inlineHandlerLeading": true,
+                "vue.inlayHints.optionsWrapper": true,
+                "vue.server.hybridMode": false,
+                "vue.server.maxOldSpaceSize": 4096,
+                "vue.server.runtime": "typescript",
+                
+                // === FORMATADORES POR LINGUAGEM (CRÍTICO) ===
+                "[php]": {
+                    "editor.formatOnSave": true,
+                    "editor.formatOnType": true,
+                    "editor.formatOnPaste": true,
+                    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
+                    "editor.tabSize": 4,
+                    "editor.insertSpaces": true
+                },
+                "[vue]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "esbenp.prettier-vscode",
+                    "editor.tabSize": 4,
+                    "editor.insertSpaces": true
+                },
+                "[javascript]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "esbenp.prettier-vscode",
+                    "editor.tabSize": 4,
+                    "editor.insertSpaces": true
+                },
+                "[typescript]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "esbenp.prettier-vscode",
+                    "editor.tabSize": 4,
+                    "editor.insertSpaces": true
+                },
+                "[json]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "esbenp.prettier-vscode",
+                    "editor.tabSize": 4,
+                    "editor.insertSpaces": true
+                },
+                "[css]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "esbenp.prettier-vscode",
+                    "editor.tabSize": 4,
+                    "editor.insertSpaces": true
+                },
+                "[scss]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "esbenp.prettier-vscode",
+                    "editor.tabSize": 4,
+                    "editor.insertSpaces": true
+                },
+                
+                // === GITHUB COPILOT CONFIGURAÇÕES OTIMIZADAS ===
+                "github.copilot.enable": {
+                    "*": true,
+                    "yaml": false,
+                    "plaintext": false,
+                    "markdown": false
+                },
+                "github.copilot.editor.enableAutoCompletions": true,
                 "github.copilot.advanced": {
                     "debug.overrideEngine": "copilot-chat",
-                    "debug.useElectronNetworking": true
+                    "debug.useElectronNetworking": true,
+                    "debug.useNodeFetcher": false
                 },
                 "github.copilot.chat.experimental.codeGeneration.instructions": [
                     "Use Laravel 10 best practices",
@@ -127,7 +210,10 @@
                     "Use Inertia.js for SPA features",
                     "Prefer Vue 3 Composition API",
                     "Use Vuetify for UI components and styling",
-                    "Avoid Blade templates, use Inertia.js pages"
+                    "Avoid Blade templates, use Inertia.js pages",
+                    "Use 4 spaces for indentation",
+                    "Format code with Intelephense for PHP",
+                    "Format code with Prettier for Vue/JS/TS"
                 ],
 
                 // Configurações básicas
@@ -136,10 +222,7 @@
                 "editor.tabSize": 4,
                 "editor.detectIndentation": false,
                 
-                "laravel-pint.enable": true,
-                "files.associations": { "*.vue": "vue" },
-                "emmet.includeLanguages": { "vue": "html" },
-                "emmet.triggerExpansionOnTab": true
+                "files.associations": { "*.vue": "vue" }
             }
         }
     },
@@ -149,26 +232,14 @@
 
     // Monta o socket do Docker para permitir uso de comandos Docker dentro do container
     "mounts": [
-        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-        // Compartilha dados do GitHub Copilot entre host e container (MÚLTIPLOS CAMINHOS)
-        "source=${localEnv:HOME}/.config/github-copilot,target=/home/www-data/.config/github-copilot,type=bind,consistency=cached",
-        "source=${localEnv:HOME}/.vscode/extensions/github.copilot,target=/home/www-data/.vscode/extensions/github.copilot,type=bind,consistency=cached",
-        "source=${localEnv:HOME}/.vscode/extensions/github.copilot-chat,target=/home/www-data/.vscode/extensions/github.copilot-chat,type=bind,consistency=cached",
-        // Compartilha configurações do VS Code para extensões  
-        "source=${localEnv:HOME}/.vscode,target=/home/www-data/.vscode,type=bind,consistency=cached",
-        // Compartilha configurações git globais
-        "source=${localEnv:HOME}/.gitconfig,target=/home/www-data/.gitconfig,type=bind,readonly",
-        // Compartilha SSH keys se existirem
-        "source=${localEnv:HOME}/.ssh,target=/home/www-data/.ssh,type=bind,readonly"
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
     ],
 
-    // Variáveis de ambiente específicas para o Dev Container + COPILOT
+    // Variáveis de ambiente específicas para o Dev Container
     "containerEnv": {
         "DOCKER_BUILDKIT": "1",
         "COMPOSE_DOCKER_CLI_BUILD": "1",
-        "VITE_HOST": "0.0.0.0",
-        "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
-        "COPILOT_NODE_PATH": "/usr/local/bin/node"
+        "VITE_HOST": "0.0.0.0"
     },
     
     // Portas que devem ser encaminhadas
