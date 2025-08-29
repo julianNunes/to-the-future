@@ -394,16 +394,6 @@
                                 density="comfortable"
                             ></v-select>
                         </v-col>
-                        <!-- <v-col cols="12" sm="12" md="12">
-                            <v-select
-                                v-model="expense.financing_installment_id"
-                                :label="$t('budget-expense.finaning-installment')"
-                                :items="listInstallments"
-                                :item-props="itemPropsInstallment"
-                                clearable
-                                density="comfortable"
-                            ></v-select>
-                        </v-col> -->
                         <v-col cols="12" md="12">
                             <v-text-field
                                 v-model="expense.remarks"
@@ -537,7 +527,6 @@ export default {
                 remarks: null,
                 share_value: 0,
                 share_user_id: null,
-                financing_installment_id: null,
                 budget_id: null,
                 tags: [],
             },
@@ -763,7 +752,6 @@ export default {
                 paid: 0,
                 share_value: 0,
                 share_user_id: null,
-                financing_installment_id: null,
                 tags: [],
                 budget_id: this.budgetId,
             };
@@ -795,7 +783,6 @@ export default {
                 remarks: item.remarks,
                 share_value: item.share_value ? Number(item.share_value) : 0,
                 share_user_id: item.share_user_id,
-                financing_installment_id: item.financing_installment_id,
                 tags: item.tags,
                 budget_id: item.budget_id,
             };
@@ -834,8 +821,6 @@ export default {
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
-                    financing_installment_id:
-                        this.expense.financing_installment_id,
                     budget_id: this.expense.budget_id,
                     tags: this.expense.tags,
                 },
@@ -866,8 +851,6 @@ export default {
                     remarks: this.expense.remarks,
                     share_value: this.expense.share_value,
                     share_user_id: this.expense.share_user_id,
-                    financing_installment_id:
-                        this.expense.financing_installment_id,
                     tags: this.expense.tags,
                 },
                 {

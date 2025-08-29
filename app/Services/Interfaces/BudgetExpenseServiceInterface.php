@@ -8,6 +8,37 @@ use Illuminate\Support\Collection;
 interface BudgetExpenseServiceInterface
 {
     /**
+     * Create a new Expense to Budget with Portions
+     * @param integer $budgetId
+     * @param string $description
+     * @param string $date
+     * @param float $value
+     * @param int $portion
+     * @param int $portionTotal
+     * @param string $group
+     * @param string|null $remarks
+     * @param bool|false $paid
+     * @param float|null $shareValue
+     * @param integer|null $shareUserId
+     * @param Collection|null $tags
+     * @return BudgetExpense
+     */
+    public function createWithPortions(
+        int $budgetId,
+        string $description,
+        string $date,
+        float $value,
+        int $portion,
+        int $portionTotal,
+        string $group,
+        ?string $remarks = null,
+        ?bool $paid = false,
+        ?float $shareValue = null,
+        ?int $shareUserId = null,
+        ?Collection $tags = null
+    ): BudgetExpense;
+
+    /**
      * Create a new Expense to Budget
      * @param integer $budgetId
      * @param string $description
@@ -18,7 +49,7 @@ interface BudgetExpenseServiceInterface
      * @param bool|false $paid
      * @param float|null $shareValue
      * @param integer|null $shareUserId
-     * @param integer|null $financingInstallmentId
+     * @param integer|null $
      * @param Collection|null $tags
      * @return BudgetExpense
      */
@@ -32,7 +63,6 @@ interface BudgetExpenseServiceInterface
         ?bool $paid = false,
         ?float $shareValue = null,
         ?int $shareUserId = null,
-        ?int $financingInstallmentId = null,
         ?Collection $tags = null
     ): BudgetExpense;
 
@@ -47,7 +77,6 @@ interface BudgetExpenseServiceInterface
      * @param bool|false $paid
      * @param float|null $shareValue
      * @param integer|null $shareUserId
-     * @param integer|null $financingInstallmentId
      * @param Collection|null $tags
      * @return boolean
      */
@@ -61,7 +90,6 @@ interface BudgetExpenseServiceInterface
         ?bool $paid = false,
         ?float $shareValue = null,
         ?int $shareUserId = null,
-        ?int $financingInstallmentId = null,
         ?Collection $tags = null
     ): bool;
 

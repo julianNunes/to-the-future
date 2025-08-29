@@ -28,8 +28,6 @@ return new class extends Migration
             $table->foreign('budget_id')->references('id')->on('budgets');
             $table->unsignedBigInteger('share_user_id')->nullable()->comment('Id do usuario que sera compartilhado o gasto');
             $table->foreign('share_user_id')->references('id')->on('users');
-            $table->unsignedBigInteger('financing_installment_id')->nullable()->comment('Id da parcela de financiamento');
-            $table->foreign('financing_installment_id')->references('id')->on('financing_installments');
             $table->timestamps();
             $table->engine = 'InnoDB';
         });

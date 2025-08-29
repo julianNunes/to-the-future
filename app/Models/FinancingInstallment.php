@@ -30,9 +30,4 @@ class FinancingInstallment extends Model
     {
         return $this->belongsTo(Financing::class, 'financing_id', 'id');
     }
-
-    public function budgetExpense(): HasOne
-    {
-        return $this->hasOne(BudgetExpense::class, 'financing_installment_id', 'id');
-    }
 }

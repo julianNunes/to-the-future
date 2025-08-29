@@ -31,12 +31,11 @@ class BudgetExpenseController extends Controller
                 floatval($request->value),
                 $request->portion ? intval($request->portion) : null,
                 $request->portion_total ? intval($request->portion_total) : null,
-                $request->date,
+                $request->group,
                 $request->remarks,
                 $request->paid == 1 ? true : false,
                 $request->share_value ? floatval($request->share_value) : null,
                 $request->share_user_id,
-                $request->financing_installment_id ? intval($request->financing_installment_id) : null,
                 collect($request->tags)
             );
         } else {
@@ -45,14 +44,11 @@ class BudgetExpenseController extends Controller
                 $request->description,
                 $request->date,
                 floatval($request->value),
-                $request->portion ? intval($request->portion) : null,
-                $request->portion_total ? intval($request->portion_total) : null,
-                $request->date,
+                $request->group,
                 $request->remarks,
                 $request->paid == 1 ? true : false,
                 $request->share_value ? floatval($request->share_value) : null,
                 $request->share_user_id,
-                $request->financing_installment_id ? intval($request->financing_installment_id) : null,
                 collect($request->tags)
             );
         }
@@ -84,7 +80,6 @@ class BudgetExpenseController extends Controller
             $request->paid == 1 ? true : false,
             $request->share_value ? floatval($request->share_value) : null,
             $request->share_user_id,
-            $request->financing_installment_id ? intval($request->financing_installment_id) : null,
             collect($request->tags)
         );
 
@@ -97,7 +92,18 @@ class BudgetExpenseController extends Controller
     public function delete(int $id)
     {
         $this->budgetExpenseSevice->delete($id);
+        return redirect()->back()->with('success', 'default.sucess-delete');
+    }
 
+    /**
+     * Delete all Expenses with Portion from a Budget 
+     *
+     * @param string $groupPortion
+     * @return void
+     */
+    public function deleteAllPortions(string $groupPortion)
+    {
+        $this->budgetExpenseSevice->deleteAllPortions($groupPortion);
         return redirect()->back()->with('success', 'default.sucess-delete');
     }
 }

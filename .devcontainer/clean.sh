@@ -9,8 +9,8 @@ docker compose down
 
 # Remove containers órfãos e volumes não utilizados
 echo "🗑️ Limpando recursos Docker..."
-docker system prune -f
-docker volume prune -f
+# docker system prune -f
+# docker volume prune -f
 
 # Limpa node_modules e vendor se necessário
 if [ -d "node_modules" ]; then

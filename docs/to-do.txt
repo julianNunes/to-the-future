@@ -46,21 +46,27 @@ LISTA DE TAREFAS PENDENTES - TO DO
 - Orçamento Despesas
     ! Adicionar parcelamento
         - Falta fazer alteração no backend para reproduzir as parcelas em outros orçamentos.
-        - Adicionar identificador unico na para despesa parcelada do orçamento
-            - id do orçamento
-            - 
+
+        - Para opção de remover todas as parcelas.
+            - No Front quando for remover, pergunto se realmente quer remover, se sim e caso seja parcelado pergunto se quero remover todas ou não 
+            - Adicionar identificador unico na para despesa parcelada do orçamento
+            - ADICIONAR UM "UUID" para todas as parcelas da despesa
+                - Adicionar na migration
+            
+        - Fazer o agrupamento no front entre "MONTHLY" e "INDIVIDUAL"
+            - $table->enum('group', ['MONTHLY', 'INDIVIDUAL'])->default('MONTHLY')->comment('Valor fixo demonstrar que os valores são RECORRENTES');
 
     - Verificar se ficou com o autocomplete para description
 
 - Adicionar o "autocomplete" no description
+    - descrição | Valor | valor compartilhado | tags
+
     - Receitas
         - adicionar Tags
     - Orçamento provisionamento
     - orçamento despesa
-
-
-- Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
-    - descrição | Valor | valor compartilhado | tags
+    
+    - Procurar por todos os lugares que tem "description" e atualizar o componente para autocomplete
     - TESTAR TUDO
 
 

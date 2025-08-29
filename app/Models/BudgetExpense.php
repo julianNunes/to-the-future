@@ -28,17 +28,11 @@ class BudgetExpense extends Model
         'share_value',
         'share_user_id',
         'budget_id',
-        'financing_installment_id',
     ];
 
     public function budget(): BelongsTo
     {
         return $this->belongsTo(Budget::class, 'budget_id', 'id');
-    }
-
-    public function financingInstallment(): HasOne
-    {
-        return $this->hasOne(FinancingInstallment::class, 'id', 'financing_installment_id');
     }
 
     public function shareUser(): HasOne

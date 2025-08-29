@@ -162,7 +162,7 @@ Route::controller(BudgetExpenseController::class)->group(function () {
     Route::post('/budget-expense', 'store');
     Route::put('/budget-expense/{id}', 'update');
     Route::delete('/budget-expense/{id}', 'delete');
-    Route::delete('/budget-expense/delete-all-portion/{group_portion}', 'delete-all-portion');
+    Route::delete('/budget-expense/delete-all-portion/{group_portion}', 'deleteAllPortions');
 });
 
 // Receitas do Orçamento
@@ -194,4 +194,4 @@ Route::controller(BudgetExpenseTagOptionController::class)->group(function () {
     Route::delete('/budget-expense-tag-option/{id}', 'delete');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
