@@ -233,6 +233,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
 
     /**
      * Deleta a Expense to Budget
+     * @param integer $id
+     * @return boolean
      */
     public function delete(int $id): bool
     {

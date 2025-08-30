@@ -99,4 +99,11 @@ interface BudgetExpenseServiceInterface
      * @return boolean
      */
     public function delete(int $id): bool;
+
+    /**
+     * Delete all Expenses with Portion from a Budget 
+     * @param string $groupPortion
+     * @return boolean
+     */
+    public function deleteAllPortions(string $groupPortion): bool;
 }
