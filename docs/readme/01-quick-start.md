@@ -76,5 +76,4 @@ Após o setup, verifique se tudo está funcionando:
 ---
 
 **⏱️ Tempo total do setup: ~5-10 minutos**
-
 **🎉 Ambiente pronto para desenvolvimento!**

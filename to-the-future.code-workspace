@@ -244,7 +244,7 @@
         "typescript.inlayHints.parameterTypes.enabled": false,
         "typescript.format.enable": false,
         "javascript.format.enable": false,
-        
+
         "vue.autoInsert.dotValue": true,
         "vue.autoInsert.parentheses": true,
         "vue.codeActions.enabled": true,
@@ -284,14 +284,30 @@
             "*": true,
             "scminput": false
         },
+        "chat.tools.terminal.autoApprove": {
+            "allow": ["npm test", "npm run build", "git status"]
+        },
+        // Modelo automático otimizado
+        "github.copilot.chat.model": "auto",
+        // Agent sessions visível
+        // AGENTS.md ativo
+        "chat.useAgentsMdFile": true,
+        // Terminal seguro
+        "chat.tools.terminal.enableAutoApprove": true,
+
+        // Matemática em respostas
+        // "chat.math.enabled": true,
+        // Font customizada no chat
+        "chat.fontFamily": "Fira Code",
+        "chat.fontSize": 14,
+        // Notificações de conclusão
+        "chat.notifyWindowOnResponseReceived": true,
+        "task.notifyWindowOnTaskCompletion": true,
         "github.copilot.inlineSuggest.enable": true,
         "github.copilot.editor.enableAutoCompletions": true,
-        "github.copilot.chat.welcomeMessage": "never",
-        "github.copilot.advanced": {
-            "debug.showScores": false,
-            "debug.useElectronNetworking": true
-        },
         "github.copilot.chat.locale": "pt-BR",
+
+
 
         // ===== XDEBUG / PHP DEBUG (REQUER CONFIGURAÇÃO ADICIONAL) =====
         // NOTA: Para usar debug, é necessário instalar e configurar Xdebug no container
@@ -331,7 +347,9 @@
         "diffEditor.codeLens": true,
         "editor.minimap.enabled": true,
         "editor.minimap.showSlider": "mouseover",
-        "workbench.reduceMotion": "on"
+        "workbench.reduceMotion": "on",
+        "containers.containerCommand": "docker",
+        "containers.enableComposeLanguageService": true
     },
     "extensions": {
         "recommendations": [

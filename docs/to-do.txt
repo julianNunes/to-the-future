@@ -31,9 +31,6 @@ PRESENTE
 DAMARES
 
 
-		"remote.containers.configFile": "./to-the-future/.devcontainer/devcontainer.json"
-
-
 ==================================================
 COMANDOS DOCKER
 =================================================
