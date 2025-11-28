@@ -288,7 +288,7 @@
             "allow": ["npm test", "npm run build", "git status"]
         },
         // Modelo automático otimizado
-        "github.copilot.chat.model": "auto",
+        // "github.copilot.chat.model": "auto",
         // Agent sessions visível
         // AGENTS.md ativo
         "chat.useAgentsMdFile": true,
