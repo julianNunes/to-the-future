@@ -12,49 +12,30 @@
 </template>
 
 <script setup>
+    import { computed } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import ExtractExpense from '@/Components/PrepaidCardExtract/ExtractExpense.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
     import { Head } from '@inertiajs/vue3'
-</script>
+    import { useI18n } from 'vue-i18n'
 
-<script>
-    export default {
-        name: 'PrepaidCardExtractShow',
-        props: {
-            extract: {
-                type: Object,
-            },
-            shareUsers: {
-                type: Array,
-            },
-        },
+    defineOptions({ name: 'PrepaidCardExtractShow' })
 
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: this.$t('menus.dashboard'),
-                        disabled: false,
-                        href: '/dashboard',
-                    },
-                    {
-                        title: this.$t('menus.prepaid-card'),
-                        disabled: false,
-                        href: '/prepaid-card',
-                    },
-                    {
-                        title: this.$t('prepaid-card-extract.title-index'),
-                        disabled: false,
-                        href: '/prepaid-card/' + this.extract.prepaid_card_id + '/extract',
-                    },
-                    {
-                        title: this.$t('prepaid-card-extract-expense.title'),
-                        disabled: true,
-                    },
-                ],
-                isLoading: false,
-            }
+    const props = defineProps({
+        extract: { type: Object },
+        shareUsers: { type: Array },
+    })
+
+    const { t } = useI18n()
+
+    const breadcrumbs = computed(() => [
+        { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
+        { title: t('menus.prepaid-card'), disabled: false, href: '/prepaid-card' },
+        {
+            title: t('prepaid-card-extract.title-index'),
+            disabled: false,
+            href: '/prepaid-card/' + props.extract.prepaid_card_id + '/extract',
         },
-    }
+        { title: t('prepaid-card-extract-expense.title'), disabled: true },
+    ])
 </script>

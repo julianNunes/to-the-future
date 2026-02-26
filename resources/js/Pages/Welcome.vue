@@ -3,6 +3,8 @@
     import VuetifyLogo from '@/Components/VuetifyLogo.vue'
     import { Head, Link } from '@inertiajs/vue3'
 
+    defineOptions({ name: 'WelcomePage' })
+
     const props = defineProps({
         canLogin: Boolean,
         canRegister: Boolean,
@@ -56,9 +58,3 @@
         </v-main>
     </v-app>
 </template>
-
-<script>
-    export default {
-        name: 'WelcomePage',
-    }
-</script>

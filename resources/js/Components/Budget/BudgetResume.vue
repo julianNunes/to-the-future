@@ -73,53 +73,33 @@
 </template>
 
 <script setup>
+    import { ref, computed } from 'vue'
+    import { useI18n } from 'vue-i18n'
     import { currencyField } from '@/utils/utils.js'
-</script>
 
-<script>
-    export default {
-        name: 'BudgetResume',
-        props: {
-            resume: {
-                type: Object,
-            },
+    defineOptions({ name: 'BudgetResume' })
+
+    const props = defineProps({
+        resume: {
+            type: Object,
+            default: () => ({}),
         },
+    })
 
-        data() {
-            return {
-                panel: 1,
-            }
-        },
+    const { t } = useI18n()
 
-        computed: {
-            resumeTotalExpense() {
-                return currencyField(this.resume.total_expense)
-            },
-            resumeTotalIncome() {
-                return currencyField(this.resume.total_income)
-            },
-            resumeBalance() {
-                return currencyField(this.resume.balance)
-            },
-            resumePayShare() {
-                return currencyField(this.resume.pay_share)
-            },
-            resumeReceiveShare() {
-                return currencyField(this.resume.receive_share)
-            },
-            resumeBalanceShare() {
-                return currencyField(this.resume.balance_share)
-            },
-            resumeBalanceShareLabel() {
-                return this.resume.balance_share < 0
-                    ? this.$t('budget-resume.value-to-pay')
-                    : this.$t('budget-resume.value-to-receive')
-            },
-            itemsResumeCreditCard() {
-                return this.resume.resume_credit_card
-            },
-        },
+    const panel = ref(1)
 
+    const resumeTotalExpense = computed(() => currencyField(props.resume.total_expense))
+    const resumeTotalIncome = computed(() => currencyField(props.resume.total_income))
+    const resumeBalance = computed(() => currencyField(props.resume.balance))
+    const resumePayShare = computed(() => currencyField(props.resume.pay_share))
+    const resumeReceiveShare = computed(() => currencyField(props.resume.receive_share))
+    const resumeBalanceShare = computed(() => currencyField(props.resume.balance_share))
 
-    }
+    const resumeBalanceShareLabel = computed(() => {
+        return props.resume.balance_share < 0 ? t('budget-resume.value-to-pay') : t('budget-resume.value-to-receive')
+    })
+
+    const itemsResumeCreditCard = computed(() => props.resume.resume_credit_card)
 </script>

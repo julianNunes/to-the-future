@@ -17,24 +17,13 @@
 </template>
 
 <script setup>
+    import { computed } from 'vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import { Head } from '@inertiajs/vue3'
     // import GroupResumes from '../Components/Dashboard/GroupResumes.vue'
-</script>
 
-<script>
-    export default {
-        name: 'DashboardPage',
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: 'Dashboard',
-                        disabled: true,
-                    },
-                ],
-            }
-        },
-    }
+    defineOptions({ name: 'DashboardPage' })
+
+    const breadcrumbs = computed(() => [{ title: 'Dashboard', disabled: true }])
 </script>

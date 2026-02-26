@@ -201,159 +201,121 @@
 </template>
 
 <script setup>
+    import { ref, computed, nextTick } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-    import { Head, Link } from '@inertiajs/vue3'
+    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
+    import { Head, Link, router } from '@inertiajs/vue3'
     import moment from 'moment'
-    import { MONTHS, currencyField } from '@/utils/utils.js'
-</script>
+    import { currencyField } from '@/utils/utils.js'
+    import { useI18n } from 'vue-i18n'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
 
-<script>
-    export default {
-        name: 'CreditCardInvoiceIndex',
-        props: {
-            creditCard: {
-                type: Object,
-            },
-            invoices: {
-                type: Array,
-            },
+    defineOptions({ name: 'CreditCardInvoiceIndex' })
+
+    const componentProps = defineProps({
+        creditCard: {
+            type: Object,
         },
+        invoices: {
+            type: Array,
+        },
+    })
 
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: this.$t('menus.dashboard'),
-                        disabled: false,
-                        href: '/dashboard',
-                    },
-                    {
-                        title: this.$t('menus.credit-card'),
-                        disabled: false,
-                        href: '/credit-card',
-                    },
-                    {
-                        title: this.$t('credit-card-invoice.title-index'),
-                        disabled: true,
-                    },
-                ],
-                headers: [
-                    { title: this.$t('credit-card-invoice.closing-date'), key: 'closing_date' },
-                    { title: this.$t('credit-card-invoice.due-date'), key: 'due_date' },
-                    { title: 'Total', key: 'total' },
-                    { title: this.$t('default.total-paid'), key: 'total_paid' },
-                    { title: this.$t('credit-card-invoice.closed'), key: 'closed' },
-                    // { title: this.$t('default.remarks'), key: 'remarks' },
-                    { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
-                ],
-                rules: {
-                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+    const { t } = useI18n()
+
+    const {
+        isLoading,
+        editDialog,
+        titleModal,
+        confirmRemove: crudConfirmRemove,
+    } = useCrudOperations('/credit-card/invoice')
+
+    const breadcrumbs = computed(() => [
+        {
+            title: t('menus.dashboard'),
+            disabled: false,
+            href: '/dashboard',
+        },
+        {
+            title: t('menus.credit-card'),
+            disabled: false,
+            href: '/credit-card',
+        },
+        {
+            title: t('credit-card-invoice.title-index'),
+            disabled: true,
+        },
+    ])
+
+    const headers = computed(() => [
+        { title: t('credit-card-invoice.closing-date'), key: 'closing_date' },
+        { title: t('credit-card-invoice.due-date'), key: 'due_date' },
+        { title: 'Total', key: 'total' },
+        { title: t('default.total-paid'), key: 'total_paid' },
+        { title: t('credit-card-invoice.closed'), key: 'closed' },
+        { title: t('default.action'), align: 'center', key: 'action', sortable: false },
+    ])
+
+    const rules = {
+        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
+    }
+
+    const automaticGenerate = ref(false)
+    const yearMonth = ref(null)
+    const search = ref(null)
+
+    const credit_card = ref(componentProps.creditCard)
+
+    const form = ref(null)
+    const confirm = ref(null)
+    const selectMonthYear = ref(null)
+
+    const isActive = computed(() => {
+        return credit_card.value.is_active ? t('default.yes') : t('default.no')
+    })
+
+    function hrefInvoiceShow(item) {
+        return '/credit-card/invoice/' + item.id
+    }
+
+    function newItem() {
+        titleModal.value = t('credit-card-invoice.new-item')
+        editDialog.value = true
+        yearMonth.value = null
+        automaticGenerate.value = false
+        nextTick(() => {
+            selectMonthYear.value?.focus()
+        })
+    }
+
+    async function save() {
+        let validate = await form.value.validate()
+        if (validate.valid) {
+            isLoading.value = true
+            router.post(
+                '/credit-card/invoice',
+                {
+                    due_date: yearMonth.value + '-' + credit_card.value.due_date,
+                    closing_date: yearMonth.value + '-' + credit_card.value.closing_date,
+                    year: yearMonth.value.substring(0, 4),
+                    month: yearMonth.value.substring(5, 7),
+                    credit_card_id: credit_card.value.id,
+                    automatic_generate: automaticGenerate.value,
                 },
-                modalYear: false,
-                automaticGenerate: false,
-                yearMonth: null,
-                search: null,
-                editDialog: false,
-                titleModal: '',
-                isLoading: false,
-                deleteId: null,
-                credit_card: this.creditCard,
-                invoice: {
-                    id: null,
-                    due_date: null,
-                    closing_date: null,
-                    year_month: null,
-                    year: null,
-                    month: null,
-                    total_paid: null,
-                    closed: null,
-                    remarks: null,
-                    credit_card_id: null,
-                },
-                listMonths: MONTHS,
-            }
-        },
-
-        computed: {
-            isActive() {
-                return this.credit_card.is_active ? this.$t('default.yes') : this.$t('default.no')
-            },
-        },
-
-
-
-        methods: {
-            hrefInvoiceShow(item) {
-                return '/credit-card/invoice/' + item.id
-            },
-
-            newItem() {
-                this.titleModal = this.$t('credit-card-invoice.new-item')
-                this.editDialog = true
-                this.yearMonth = null
-                this.automaticGenerate = false
-                setTimeout(() => {
-                    this.$refs.selectMonthYear.focus()
-                })
-            },
-
-            closeItem() {
-                this.editDialog = false
-            },
-
-            async save() {
-                let validate = await this.$refs.form.validate()
-                if (validate.valid) {
-                    this.isLoading = true
-                    this.$inertia.post(
-                        '/credit-card/invoice',
-                        {
-                            due_date: this.yearMonth + '-' + this.credit_card.due_date,
-                            closing_date: this.yearMonth + '-' + this.credit_card.closing_date,
-                            year: this.yearMonth.substring(0, 4),
-                            month: this.yearMonth.substring(5, 7),
-                            credit_card_id: this.credit_card.id,
-                            automatic_generate: this.automaticGenerate,
-                        },
-                        {
-                            onSuccess: () => {
-                                this.editDialog = false
-                            },
-                            onFinish: () => {
-                                this.isLoading = false
-                            },
-                        }
-                    )
-                }
-            },
-
-            async confirmRemove(item) {
-                this.deleteId = item.id
-                if (
-                    await this.$refs.confirm.open(
-                        this.$t('credit-card-invoice.title-show'),
-                        this.$t('default.confirm-delete-item')
-                    )
-                ) {
-                    this.remove()
-                }
-            },
-
-            remove() {
-                this.isLoading = true
-                this.$inertia.delete(`/credit-card/invoice/${this.deleteId}`, {
-                    preserveState: true,
-                    preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {
-                        this.isLoading = false
+                {
+                    onSuccess: () => {
+                        editDialog.value = false
                     },
                     onFinish: () => {
-                        this.isLoading = false
+                        isLoading.value = false
                     },
-                })
-            },
-        },
+                }
+            )
+        }
+    }
+
+    function confirmRemove(item) {
+        crudConfirmRemove(item, confirm.value, t('credit-card-invoice.title-show'), t('default.confirm-delete-item'))
     }
 </script>

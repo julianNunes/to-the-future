@@ -261,318 +261,221 @@
 </template>
 
 <script setup>
+    import { ref, computed, nextTick } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
     import { logger } from '@/utils/logger.js'
-    import { Head } from '@inertiajs/vue3'
+    import { Head, router } from '@inertiajs/vue3'
     import { currencyField, reverseFormatNumber, sumField } from '@/utils/utils.js'
-</script>
+    import { useI18n } from 'vue-i18n'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
 
-<script>
-    export default {
-        name: 'FixExpenseIndex',
-        props: {
-            expenses: {
-                type: Array,
+    defineOptions({ name: 'FixExpenseIndex' })
+
+    defineProps({
+        expenses: { type: Array },
+        shareUsers: { type: Array },
+    })
+
+    const { t } = useI18n()
+
+    const { isLoading, editDialog, titleModal, confirmRemove: crudConfirmRemove } = useCrudOperations('/fix-expense')
+
+    const search = ref(null)
+    const percentage = ref(null)
+    const searchTag = ref('')
+    const loadingData = ref(false)
+    const listTags = ref([])
+    const txtDescription = ref(null)
+    const form = ref(null)
+    const confirm = ref(null)
+    let timeOut = null
+
+    const dueDateList = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'))
+
+    const expense = ref({
+        id: null,
+        description: null,
+        value: 0,
+        due_date: null,
+        remarks: null,
+        share_value: 0,
+        share_user_id: null,
+        tags: [],
+    })
+
+    const breadcrumbs = computed(() => [
+        { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
+        { title: t('menus.fix-expense'), disabled: true },
+    ])
+
+    const headers = computed(() => [
+        { title: t('default.description'), align: 'start', key: 'description', groupable: false },
+        { title: t('fix-expense.due-date'), align: 'center', key: 'due_date' },
+        { title: t('default.value'), align: 'end', key: 'value' },
+        { title: t('default.share-value'), align: 'end', key: 'share_value' },
+        { title: t('default.share-user'), key: 'share_user_id' },
+        { title: t('default.remarks'), key: 'remarks' },
+        { title: t('default.tags'), key: 'tags' },
+        { title: t('default.action'), align: 'center', key: 'action', sortable: false, width: 40 },
+    ])
+
+    const rules = {
+        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
+        currencyFieldRules: [
+            (value) => {
+                value = reverseFormatNumber(value)
+                if (!value) return t('rules.required-text-field')
+                if (Number(value) <= 0) return t('rules.required-currency-field')
+                return true
             },
-            shareUsers: {
-                type: Array,
-            },
-        },
+        ],
+    }
 
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: this.$t('menus.dashboard'),
-                        disabled: false,
-                        href: '/dashboard',
-                    },
-                    {
-                        title: this.$t('menus.fix-expense'),
-                        disabled: true,
-                    },
-                ],
-                headers: [
-                    {
-                        title: this.$t('default.description'),
-                        align: 'start',
-                        key: 'description',
-                        groupable: false,
-                    },
-                    {
-                        title: this.$t('fix-expense.due-date'),
-                        align: 'center',
-                        key: 'due_date',
-                    },
-                    { title: this.$t('default.value'), align: 'end', key: 'value' },
-                    {
-                        title: this.$t('default.share-value'),
-                        align: 'end',
-                        key: 'share_value',
-                    },
-                    { title: this.$t('default.share-user'), key: 'share_user_id' },
-                    { title: this.$t('default.remarks'), key: 'remarks' },
-                    { title: this.$t('default.tags'), key: 'tags' },
-                    {
-                        title: this.$t('default.action'),
-                        align: 'center',
-                        key: 'action',
-                        sortable: false,
-                        width: 40,
-                    },
-                ],
-                rules: {
-                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                    currencyFieldRules: [
-                        (value) => {
-                            value = reverseFormatNumber(value)
-                            if (!value) return this.$t('rules.required-text-field')
-                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+    const itemsTags = computed(() => listTags.value)
 
-                            return true
-                        },
-                    ],
-                },
-                search: null,
-                editDialog: false,
-                titleModal: '',
-                isLoading: false,
-                deleteId: null,
-                modalEntryDateStart: false,
-                percentage: null,
-                expense: {
-                    id: null,
-                    description: null,
-                    value: 0,
-                    due_date: null,
-                    remarks: null,
-                    share_value: 0,
-                    share_user_id: null,
-                    tags: [],
-                },
-                dueDateList: [
-                    '01',
-                    '02',
-                    '03',
-                    '04',
-                    '05',
-                    '06',
-                    '07',
-                    '08',
-                    '09',
-                    '10',
-                    '11',
-                    '12',
-                    '13',
-                    '14',
-                    '15',
-                    '16',
-                    '17',
-                    '18',
-                    '19',
-                    '20',
-                    '21',
-                    '22',
-                    '23',
-                    '24',
-                    '25',
-                    '26',
-                    '27',
-                    '28',
-                    '29',
-                    '30',
-                    '31',
-                ],
-                listTags: [],
-                searchFieldsData: [],
-                searchTag: '',
-                loadingData: false,
+    function calculeShareValue(evt) {
+        if (expense.value.value) {
+            expense.value.share_value = parseFloat((expense.value.value * evt.target.value) / 100).toFixed(2)
+        }
+    }
+
+    async function searchTags(val) {
+        if (loadingData.value) return
+
+        if (!val || val.length <= 1) {
+            listTags.value = []
+            clearTimeout(timeOut)
+            return
+        }
+
+        if (expense.value.tags && expense.value.tags.length > 0 && expense.value.tags.find((x) => x.name == val)) {
+            return
+        }
+
+        clearTimeout(timeOut)
+        timeOut = setTimeout(async () => {
+            loadingData.value = true
+            let searchFieldsData = []
+            await window.axios
+                .get('/tag/search/' + val)
+                .then(function (response) {
+                    if (response.data && response.data.length > 0) {
+                        searchFieldsData = response.data
+                    }
+
+                    if (
+                        (searchFieldsData &&
+                            searchFieldsData.length > 0 &&
+                            !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                        !searchFieldsData ||
+                        searchFieldsData.length == 0
+                    ) {
+                        searchFieldsData.unshift({ name: val.toUpperCase() })
+                    }
+                })
+                .catch(function (error) {
+                    logger.error('error', error)
+                })
+
+            listTags.value = searchFieldsData
+            loadingData.value = false
+        }, 300)
+    }
+
+    function newItem() {
+        titleModal.value = t('fix-expense.new-item')
+        editDialog.value = true
+        expense.value = {
+            id: null,
+            description: null,
+            value: 0,
+            due_date: null,
+            remarks: null,
+            share_value: 0,
+            share_user_id: null,
+            tags: [],
+        }
+        nextTick(() => txtDescription.value?.focus())
+    }
+
+    function editItem(item) {
+        titleModal.value = t('fix-expense.edit-item')
+        editDialog.value = true
+        expense.value = {
+            id: item.id,
+            description: item.description,
+            value: Number(item.value),
+            due_date: item.due_date,
+            remarks: item.remarks,
+            share_value: item.share_value ? Number(item.share_value) : 0,
+            share_user_id: item.share_user_id,
+            tags: item.tags,
+        }
+        nextTick(() => txtDescription.value?.focus())
+    }
+
+    async function save() {
+        const validate = await form.value.validate()
+        if (validate.valid) {
+            if (expense.value.id) {
+                await _update()
+            } else {
+                await _create()
             }
-        },
+        }
+    }
 
-        computed: {
-            itemsTags() {
-                return this.listTags
+    async function _create() {
+        isLoading.value = true
+        router.post(
+            '/fix-expense',
+            {
+                description: expense.value.description,
+                value: expense.value.value,
+                due_date: expense.value.due_date,
+                remarks: expense.value.remarks,
+                share_value: expense.value.share_value,
+                share_user_id: expense.value.share_user_id,
+                tags: expense.value.tags,
             },
-        },
+            {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+            }
+        )
+    }
 
-
-
-        methods: {
-            calculeShareValue(evt) {
-                if (this.expense.value) {
-                    this.expense.share_value = parseFloat((this.expense.value * evt.target.value) / 100).toFixed(2)
-                }
+    async function _update() {
+        isLoading.value = true
+        router.put(
+            '/fix-expense/' + expense.value.id,
+            {
+                description: expense.value.description,
+                value: expense.value.value,
+                due_date: expense.value.due_date,
+                remarks: expense.value.remarks,
+                share_value: expense.value.share_value,
+                share_user_id: expense.value.share_user_id,
+                tags: expense.value.tags,
             },
+            {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+            }
+        )
+    }
 
-            async searchTags(val) {
-                if (this.loadingData) return
-
-                if (!val || val.length <= 1) {
-                    this.listTags = []
-                    clearTimeout(this.timeOut)
-                    return
-                }
-
-                if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
-                    return
-                }
-
-                clearTimeout(this.timeOut)
-                this.timeOut = setTimeout(async () => {
-                    this.loadingData = true
-                    let searchFieldsData = []
-                    await window.axios
-                        .get('/tag/search/' + val)
-                        .then(function (response) {
-                            if (response.data && response.data.length > 0) {
-                                searchFieldsData = response.data
-                            }
-
-                            if (
-                                (searchFieldsData &&
-                                    searchFieldsData.length > 0 &&
-                                    !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
-                                !searchFieldsData ||
-                                searchFieldsData.length == 0
-                            ) {
-                                searchFieldsData.unshift({
-                                    name: val.toUpperCase(),
-                                })
-                            }
-                        })
-                        .catch(function (error) {
-                            logger.error('error', error)
-                        })
-
-                    this.listTags = searchFieldsData
-                    this.loadingData = false
-                }, 300)
-            },
-
-            newItem() {
-                this.titleModal = this.$t('fix-expense.new-item')
-                this.editDialog = true
-                this.expense = {
-                    id: null,
-                    description: null,
-                    value: 0,
-                    due_date: null,
-                    remarks: null,
-                    share_value: 0,
-                    share_user_id: null,
-                    tags: [],
-                }
-                setTimeout(() => {
-                    this.$refs.txtDescription.focus()
-                })
-            },
-
-            editItem(item) {
-                this.titleModal = this.$t('fix-expense.edit-item')
-                this.editDialog = true
-                this.expense = {
-                    id: item.id,
-                    description: item.description,
-                    value: Number(item.value),
-                    due_date: item.due_date,
-                    remarks: item.remarks,
-                    share_value: item.share_value ? Number(item.share_value) : 0,
-                    share_user_id: item.share_user_id,
-                    tags: item.tags,
-                }
-                setTimeout(() => {
-                    this.$refs.txtDescription.focus()
-                })
-            },
-
-            closeItem() {
-                this.editDialog = false
-            },
-
-            async save() {
-                let validate = await this.$refs.form.validate()
-                if (validate.valid) {
-                    if (this.expense.id) {
-                        await this.update()
-                    } else {
-                        await this.create()
-                    }
-                }
-            },
-
-            async create() {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/fix-expense',
-                    {
-                        description: this.expense.description,
-                        value: this.expense.value,
-                        due_date: this.expense.due_date,
-                        remarks: this.expense.remarks,
-                        share_value: this.expense.share_value,
-                        share_user_id: this.expense.share_user_id,
-                        tags: this.expense.tags,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-
-            async update() {
-                this.isLoading = true
-                this.$inertia.put(
-                    '/fix-expense/' + this.expense.id,
-                    {
-                        description: this.expense.description,
-                        value: this.expense.value,
-                        due_date: this.expense.due_date,
-                        remarks: this.expense.remarks,
-                        share_value: this.expense.share_value,
-                        share_user_id: this.expense.share_user_id,
-                        tags: this.expense.tags,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-
-            async confirmRemove(item) {
-                this.deleteId = item.id
-                if (
-                    await this.$refs.confirm.open(this.$t('fix-expense.item'), this.$t('default.confirm-delete-item'))
-                ) {
-                    this.remove()
-                }
-            },
-
-            remove() {
-                this.isLoading = true
-                this.$inertia.delete(`/fix-expense/${this.deleteId}`, {
-                    preserveState: true,
-                    preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                })
-            },
-        },
+    function confirmRemove(item) {
+        crudConfirmRemove(item, confirm.value, t('fix-expense.item'), t('default.confirm-delete-item'))
     }
 </script>

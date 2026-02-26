@@ -4,23 +4,17 @@
     </div>
 </template>
 
-<script>
-    import VueApexCharts from 'vue3-apexcharts'
+<script setup>
+    import apexcharts from 'vue3-apexcharts'
 
-    export default {
-        name: 'BarChart',
+    defineOptions({ name: 'BarChart' })
 
-        components: {
-            apexcharts: VueApexCharts,
+    defineProps({
+        options: {
+            type: Object,
         },
-
-        props: {
-            options: {
-                type: Object,
-            },
-            series: {
-                type: Array,
-            },
+        series: {
+            type: Array,
         },
-    }
+    })
 </script>

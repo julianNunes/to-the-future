@@ -283,162 +283,121 @@
 </template>
 
 <script setup>
+    import { ref, computed } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-    import { Head } from '@inertiajs/vue3'
+    import { Head, router } from '@inertiajs/vue3'
     import moment from 'moment'
     import { currencyField, formatDate, percentField, reverseFormatNumber, sumField } from '@/utils/utils.js'
-</script>
+    import { useI18n } from 'vue-i18n'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
 
-<script>
-    export default {
-        name: 'FinancingShow',
-        props: {
-            financing: {
-                type: Object,
+    defineOptions({ name: 'FinancingShow' })
+
+    const props = defineProps({
+        financing: { type: Object },
+        installments: { type: Array },
+    })
+
+    const { t } = useI18n()
+
+    const { isLoading, editDialog, titleModal } = useCrudOperations('/financing/installment')
+
+    const search = ref(null)
+    const form = ref(null)
+
+    const installment = ref({
+        id: null,
+        portion: 0,
+        value: 0,
+        paid_value: 0,
+        date: null,
+        payment_date: null,
+        paid: false,
+    })
+
+    const breadcrumbs = computed(() => [
+        { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
+        { title: t('menus.financing'), disabled: false, href: '/financing' },
+        { title: t('financing-installment.title'), disabled: true },
+    ])
+
+    const headers = computed(() => [
+        { title: t('financing-installment.portion'), align: 'start', key: 'portion' },
+        { title: t('default.date'), align: 'center', key: 'date' },
+        { title: t('default.value'), align: 'end', key: 'value' },
+        { title: t('financing-installment.paid-value'), align: 'end', key: 'paid_value' },
+        { title: t('financing-installment.payment-date'), align: 'center', key: 'payment_date' },
+        { title: 'Status', align: 'start', key: 'paid' },
+        { title: t('default.action'), align: 'center', key: 'action', sortable: false },
+    ])
+
+    const listStatus = computed(() => [
+        { value: 0, name: t('default.open') },
+        { value: 1, name: t('default.paid') },
+    ])
+
+    const rules = {
+        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
+        currencyFieldRules: [
+            (value) => {
+                value = reverseFormatNumber(value)
+                if (!value) return t('rules.required-text-field')
+                if (Number(value) <= 0) return t('rules.required-currency-field')
+                return true
             },
-            installments: {
-                type: Array,
+        ],
+    }
+
+    const financingDescription = computed(() => props.financing.description)
+    const financingStartDate = computed(() => moment(props.financing.start_date).format('DD/MM/YYYY'))
+    const financingTotal = computed(() => currencyField(props.financing.total))
+    const financingFeesMonthly = computed(() => percentField(props.financing.fees_monthly))
+    const financingPortionTotal = computed(() => props.financing.portion_total)
+    const financingRemarks = computed(() => props.financing.remarks)
+
+    function editItem(item) {
+        titleModal.value = t('financing-installment.edit-item')
+        editDialog.value = true
+        installment.value = {
+            id: item.id,
+            portion: Number(item.portion),
+            date: moment(item.date, 'YYYY-MM-DD').toDate(),
+            value: Number(item.value),
+            paid: item.paid ? 1 : 0,
+            paid_value: item.paid_value ? Number(item.paid_value) : 0,
+            payment_date: item.payment_date ? moment(item.payment_date, 'YYYY-MM-DD').toDate() : null,
+        }
+    }
+
+    async function save() {
+        const validate = await form.value.validate()
+        if (validate.valid) {
+            await _update()
+        }
+    }
+
+    async function _update() {
+        isLoading.value = true
+        router.put(
+            `/financing/installment/${installment.value.id}`,
+            {
+                date: moment(installment.value.date).format('YYYY-MM-DD'),
+                value: installment.value.value,
+                paid: !!installment.value.paid,
+                payment_date: installment.value.payment_date
+                    ? moment(installment.value.payment_date).format('YYYY-MM-DD')
+                    : null,
+                paid_value: installment.value.paid_value,
             },
-        },
-
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: this.$t('menus.dashboard'),
-                        disabled: false,
-                        href: '/dashboard',
-                    },
-                    {
-                        title: this.$t('menus.financing'),
-                        disabled: false,
-                        href: '/financing',
-                    },
-                    {
-                        title: this.$t('financing-installment.title'),
-                        disabled: true,
-                    },
-                ],
-                headers: [
-                    { title: this.$t('financing-installment.portion'), align: 'start', key: 'portion' },
-                    { title: this.$t('default.date'), align: 'center', key: 'date' },
-                    { title: this.$t('default.value'), align: 'end', key: 'value' },
-                    { title: this.$t('financing-installment.paid-value'), align: 'end', key: 'paid_value' },
-                    { title: this.$t('financing-installment.payment-date'), align: 'center', key: 'payment_date' },
-                    { title: 'Status', align: 'start', key: 'paid' },
-                    { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
-                ],
-                rules: {
-                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                    currencyFieldRules: [
-                        (value) => {
-                            value = reverseFormatNumber(value)
-                            if (!value) return this.$t('rules.required-text-field')
-                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
-
-                            return true
-                        },
-                    ],
+            {
+                onSuccess: () => {
+                    editDialog.value = false
                 },
-                search: null,
-                editDialog: false,
-                titleModal: '',
-                isLoading: false,
-                installment: {
-                    id: null,
-                    portion: 0,
-                    value: 0,
-                    paid_value: 0,
-                    date: null,
-                    payment_date: null,
-                    paid: false,
+                onFinish: () => {
+                    isLoading.value = false
                 },
-                listStatus: [
-                    {
-                        value: 0,
-                        name: this.$t('default.open'),
-                    },
-                    {
-                        value: 1,
-                        name: this.$t('default.paid'),
-                    },
-                ],
             }
-        },
-
-        computed: {
-            financingDescription() {
-                return this.financing.description
-            },
-            financingStartDate() {
-                return moment(this.financing.start_date).format('DD/MM/YYYY')
-            },
-            financingTotal() {
-                return currencyField(this.financing.total)
-            },
-            financingFeesMonthly() {
-                return percentField(this.financing.fees_monthly)
-            },
-            financingPortionTotal() {
-                return this.financing.portion_total
-            },
-            financingRemarks() {
-                return this.financing.remarks
-            },
-        },
-
-
-        methods: {
-            editItem(item) {
-                this.titleModal = this.$t('financing-installment.edit-item')
-                this.editDialog = true
-                this.installment = {
-                    id: item.id,
-                    portion: Number(item.portion),
-                    date: moment(item.date, 'YYYY-MM-DD'),
-                    value: Number(item.value),
-                    paid: item.paid ? 1 : 0,
-                    paid_value: item.paid_value ? Number(item.paid_value) : 0,
-                    payment_date: moment(item.payment_date, 'YYYY-MM-DD'),
-                }
-                setTimeout(() => {
-                    this.$refs.inputDate.focus()
-                })
-            },
-
-            closeItem() {
-                this.editDialog = false
-            },
-
-            async save() {
-                let validate = await this.$refs.form.validate()
-                if (validate.valid) {
-                    await this.update()
-                }
-            },
-
-            async update() {
-                this.isLoading = true
-                this.$inertia.put(
-                    `/financing/installment/${this.installment.id}`,
-                    {
-                        date: this.installment.date.format('YYYY-MM-DD'),
-                        value: this.installment.value,
-                        paid: this.installment.paid ? true : false,
-                        payment_date: this.installment.payment_date.format('YYYY-MM-DD'),
-                        paid_value: this.installment.paid_value,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-        },
+        )
     }
 </script>

@@ -12,49 +12,45 @@
 </template>
 
 <script setup>
+    import { computed } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import InvoiceExpense from '@/Components/CreditCardInvoice/InvoiceExpense.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
     import { Head } from '@inertiajs/vue3'
-</script>
+    import { useI18n } from 'vue-i18n'
 
-<script>
-    export default {
-        name: 'CreditCardInvoiceShow',
-        props: {
-            invoice: {
-                type: Object,
-            },
-            shareUsers: {
-                type: Array,
-            },
-        },
+    defineOptions({ name: 'CreditCardInvoiceShow' })
 
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: this.$t('menus.dashboard'),
-                        disabled: false,
-                        href: '/dashboard',
-                    },
-                    {
-                        title: this.$t('menus.credit-card'),
-                        disabled: false,
-                        href: '/credit-card',
-                    },
-                    {
-                        title: this.$t('credit-card-invoice.title-index'),
-                        disabled: false,
-                        href: '/credit-card/' + this.invoice.credit_card_id + '/invoice',
-                    },
-                    {
-                        title: this.$t('credit-card-invoice-expense.title'),
-                        disabled: true,
-                    },
-                ],
-                isLoading: false,
-            }
+    const componentProps = defineProps({
+        invoice: {
+            type: Object,
         },
-    }
+        shareUsers: {
+            type: Array,
+        },
+    })
+
+    const { t } = useI18n()
+
+    const breadcrumbs = computed(() => [
+        {
+            title: t('menus.dashboard'),
+            disabled: false,
+            href: '/dashboard',
+        },
+        {
+            title: t('menus.credit-card'),
+            disabled: false,
+            href: '/credit-card',
+        },
+        {
+            title: t('credit-card-invoice.title-index'),
+            disabled: false,
+            href: '/credit-card/' + componentProps.invoice.credit_card_id + '/invoice',
+        },
+        {
+            title: t('credit-card-invoice-expense.title'),
+            disabled: true,
+        },
+    ])
 </script>

@@ -8,29 +8,16 @@
     </v-expansion-panels>
 </template>
 
-<script setup></script>
+<script setup>
+    import { ref } from 'vue'
 
-<script>
-    export default {
-        name: 'GroupResumes',
-        props: {
-            itens: {
-                type: Object,
-            },
+    defineOptions({ name: 'GroupResumes' })
+
+    defineProps({
+        itens: {
+            type: Object,
         },
+    })
 
-        data() {
-            return {
-                panel: 1,
-            }
-        },
-
-        computed: {
-            itemsResumeTags() {
-                return this.itens.resume_tags || []
-            },
-        },
-
-
-    }
+    const panel = ref(1)
 </script>

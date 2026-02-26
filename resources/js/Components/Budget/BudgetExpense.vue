@@ -363,445 +363,325 @@
 </template>
 
 <script setup>
-    import { logger } from '@/utils/logger.js'
+    import { ref, computed, nextTick } from 'vue'
+    import { router } from '@inertiajs/vue3'
+    import { useI18n } from 'vue-i18n'
     import moment from 'moment'
+
     import { currencyField, formatDate, reverseFormatNumber, sumField } from '@/utils/utils.js'
-</script>
 
-<script>
-    export default {
-        name: 'BudgetExpense',
-        props: {
-            budgetId: {
-                type: Number,
-            },
-            yearMonth: {
-                type: String,
-            },
-            expenses: {
-                type: Array,
-                default: () => [],
-            },
-            shareUsers: {
-                type: Array,
-            },
-            installments: {
-                type: Array,
-            },
-            viewOnly: {
-                type: Boolean,
-            },
+    import { useValidationRules } from '@/composables/useFormConstants.js'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import { useTagSearch } from '@/composables/useTagSearch.js'
+    import { useShareCalculation } from '@/composables/useShareCalculation.js'
+
+    defineOptions({ name: 'BudgetExpense' })
+
+    const componentProps = defineProps({
+        budgetId: { type: Number },
+        yearMonth: { type: String },
+        expenses: {
+            type: Array,
+            default: () => [],
         },
+        shareUsers: { type: Array },
+        installments: { type: Array },
+        viewOnly: { type: Boolean, default: false },
+    })
 
-        data() {
-            return {
-                rules: {
-                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                    currencyFieldRules: [
-                        (value) => {
-                            value = reverseFormatNumber(value)
-                            if (!value) return this.$t('rules.required-text-field')
-                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+    const { t } = useI18n()
+    const rules = useValidationRules()
 
-                            return true
-                        },
-                    ],
-                },
-                search: null,
-                editDialog: false,
-                isLoading: false,
-                deleteId: null,
-                modalEntryDateStart: false,
-                panel: 1,
-                expanded: [],
-                percentage: null,
-                deleteAllPortions: false,
-                deleteDialog: false,
-                expense: {
-                    id: null,
-                    description: null,
-                    value: 0,
-                    portion: null,
-                    portion_total: null,
-                    group: null,
-                    date: null,
-                    paid: 0,
-                    remarks: null,
-                    share_value: 0,
-                    share_user_id: null,
-                    budget_id: null,
-                    tags: [],
-                },
-                listInstallments: [],
-                listStatus: [
-                    {
-                        value: 0,
-                        name: this.$t('default.open'),
-                    },
-                    {
-                        value: 1,
-                        name: this.$t('default.paid'),
-                    },
-                ],
-                listTags: [],
-                searchFieldsData: [],
-                searchTag: '',
-                loadingData: false,
-                titleModal: '',
-                groupList: [
-                    {
-                        name: this.$t('default.monthly'),
-                        value: 'MONTHLY',
-                    },
-                    {
-                        name: this.$t('default.individual'),
-                        value: 'INDIVIDUAL',
-                    },
-                ],
+    const { isLoading, editDialog, titleModal } = useCrudOperations('/budget-expense')
+
+    const { tags: listTags, searchTags: doSearchTags } = useTagSearch()
+
+    const { calculateShareValue } = useShareCalculation()
+
+    const search = ref(null)
+    const panel = ref(1)
+    const percentage = ref(null)
+    const deleteId = ref(null)
+    const loadingData = ref(false)
+    const searchTag = ref('')
+    const deleteAllPortions = ref(false)
+    const deleteDialog = ref(false)
+
+    const expense = ref({
+        id: null,
+        description: null,
+        value: 0,
+        portion: null,
+        portion_total: null,
+        group: null,
+        date: null,
+        paid: 0,
+        remarks: null,
+        share_value: 0,
+        share_user_id: null,
+        budget_id: null,
+        tags: [],
+    })
+
+    const listInstallments = ref([])
+
+    const listStatus = [
+        { value: 0, name: t('default.open') },
+        { value: 1, name: t('default.paid') },
+    ]
+
+    const groupList = [
+        { name: t('default.monthly'), value: 'MONTHLY' },
+        { name: t('default.individual'), value: 'INDIVIDUAL' },
+    ]
+
+    // Refs for template
+    const txtDescription = ref(null)
+    const form = ref(null)
+    const confirm = ref(null)
+
+    const itemsTags = computed(() => listTags.value)
+
+    const headers = computed(() => {
+        let hdrs = [
+            { title: t('default.description'), align: 'start', key: 'description', groupable: false },
+            { title: t('budget-expense.due-date'), align: 'center', key: 'date' },
+            { title: t('default.value'), align: 'end', key: 'value' },
+            { title: t('default.portion'), key: 'portion' },
+            { title: t('default.group'), align: 'start', key: 'group' },
+            { title: t('default.share-value'), align: 'end', key: 'share_value' },
+            { title: t('default.share-user'), key: 'share_user_id' },
+            { title: t('default.remarks'), key: 'remarks' },
+            { title: t('default.tags'), key: 'tags' },
+            { title: 'Status', key: 'paid' },
+            { title: t('budget-expense.finaning-installment'), align: 'center', key: 'data-table-expand' },
+        ]
+
+        if (!componentProps.viewOnly) {
+            hdrs.push({
+                title: t('default.action'),
+                align: 'end',
+                key: 'action',
+                sortable: false,
+                width: 40,
+            })
+        }
+        return hdrs
+    })
+
+    const monthToDateInput = computed(() => moment(componentProps.yearMonth + '-01').month())
+    const yearToDateInput = computed(() => moment(componentProps.yearMonth + '-01').year())
+
+    function calculeShareValue(evt) {
+        if (expense.value.value) {
+            expense.value.share_value = calculateShareValue(expense.value.value, evt.target.value)
+        }
+    }
+
+    function convertGroup(group) {
+        return groupList.find((x) => x.value === group)?.name || group
+    }
+
+    async function searchTags(val) {
+        loadingData.value = true
+        const existing = expense.value.tags ? expense.value.tags : []
+        doSearchTags(val, existing)
+        setTimeout(() => {
+            loadingData.value = false
+        }, 300)
+    }
+
+    function itemRowFont(row) {
+        return { class: !row.item.id ? 'font-weight-bold ' : '' }
+    }
+
+    function infoInstallment(item) {
+        if (item) {
+            return (
+                t('default.description') +
+                ': ' +
+                item.financing.description +
+                ' | ' +
+                t('budget-expense.due-date') +
+                ': ' +
+                moment(item.date).format('DD/MM/YYYY') +
+                ' | ' +
+                t('default.value') +
+                ': ' +
+                currencyField(item.value) +
+                ' | ' +
+                t('financing-installment.portion') +
+                ': ' +
+                item.portion
+            )
+        } else {
+            return 'nao tem item'
+        }
+    }
+
+    function newItem() {
+        titleModal.value = t('budget-expense.new-item')
+        editDialog.value = true
+        listInstallments.value = componentProps.installments || []
+        expense.value = {
+            id: null,
+            description: null,
+            value: 0,
+            portion: null,
+            portion_total: null,
+            date: moment(componentProps.yearMonth + '-01', 'YYYY-MM-DD').toDate(),
+            group: null,
+            remarks: null,
+            paid: 0,
+            share_value: 0,
+            share_user_id: null,
+            tags: [],
+            budget_id: componentProps.budgetId,
+        }
+        nextTick(() => {
+            if (txtDescription.value) txtDescription.value.focus()
+        })
+    }
+
+    function editItem(item) {
+        titleModal.value = t('budget-expense.edit-item')
+        editDialog.value = true
+        let data = componentProps.installments ? [...componentProps.installments] : []
+
+        if (item.financing_installment) {
+            data.unshift(item.financing_installment)
+        }
+
+        listInstallments.value = data
+        expense.value = {
+            id: item.id,
+            description: item.description,
+            value: Number(item.value),
+            portion: item.portion,
+            portion_total: item.portion_total,
+            date: moment(item.date, 'YYYY-MM-DD').toDate(),
+            paid: item.paid ? 1 : 0,
+            group: item.group,
+            remarks: item.remarks,
+            share_value: item.share_value ? Number(item.share_value) : 0,
+            share_user_id: item.share_user_id,
+            tags: item.tags || [],
+            budget_id: item.budget_id,
+        }
+        nextTick(() => {
+            if (txtDescription.value) txtDescription.value.focus()
+        })
+    }
+
+    async function save() {
+        let validate = await form.value.validate()
+        if (validate.valid) {
+            if (expense.value.id) {
+                await updateData()
+            } else {
+                await createData()
             }
-        },
+        }
+    }
 
-        computed: {
-            itemsTags() {
-                return this.listTags
+    async function createData() {
+        isLoading.value = true
+        router.post(
+            '/budget-expense',
+            {
+                description: expense.value.description,
+                date: moment(expense.value.date).format('YYYY-MM-DD'),
+                value: expense.value.value,
+                portion: expense.value.portion,
+                portion_total: expense.value.portion_total,
+                paid: expense.value.paid ? true : false,
+                group: expense.value.group,
+                remarks: expense.value.remarks,
+                share_value: expense.value.share_value,
+                share_user_id: expense.value.share_user_id,
+                budget_id: expense.value.budget_id,
+                tags: expense.value.tags,
             },
-            headers() {
-                let headers = [
-                    {
-                        title: this.$t('default.description'),
-                        align: 'start',
-                        key: 'description',
-                        groupable: false,
-                    },
-                    {
-                        title: this.$t('budget-expense.due-date'),
-                        align: 'center',
-                        key: 'date',
-                    },
-                    { title: this.$t('default.value'), align: 'end', key: 'value' },
-                    { title: this.$t('default.portion'), key: 'portion' },
-                    {
-                        title: this.$t('default.group'),
-                        align: 'start',
-                        key: 'group',
-                    },
-                    {
-                        title: this.$t('default.share-value'),
-                        align: 'end',
-                        key: 'share_value',
-                    },
-                    { title: this.$t('default.share-user'), key: 'share_user_id' },
-                    { title: this.$t('default.remarks'), key: 'remarks' },
-                    { title: this.$t('default.tags'), key: 'tags' },
-                    { title: 'Status', key: 'paid' },
-                    {
-                        title: this.$t('budget-expense.finaning-installment'),
-                        align: 'center',
-                        key: 'data-table-expand',
-                    },
-                ]
+            {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+                preserveScroll: true,
+            }
+        )
+    }
 
-                if (!this.viewOnly) {
-                    headers.push({
-                        title: this.$t('default.action'),
-                        align: 'end',
-                        key: 'action',
-                        sortable: false,
-                        width: 40,
-                    })
-                }
-
-                return headers
+    async function updateData() {
+        isLoading.value = true
+        router.put(
+            '/budget-expense/' + expense.value.id,
+            {
+                description: expense.value.description,
+                value: expense.value.value,
+                portion: expense.value.portion,
+                portion_total: expense.value.portion_total,
+                date: moment(expense.value.date).format('YYYY-MM-DD'),
+                paid: expense.value.paid ? true : false,
+                group: expense.value.group,
+                remarks: expense.value.remarks,
+                share_value: expense.value.share_value,
+                share_user_id: expense.value.share_user_id,
+                tags: expense.value.tags,
             },
-            monthToDateInput() {
-                return moment(this.yearMonth + '-01').month()
-            },
-            yearToDateInput() {
-                return moment(this.yearMonth + '-01').year()
-            },
-        },
+            {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+                preserveScroll: true,
+            }
+        )
+    }
 
-        methods: {
-            calculeShareValue(evt) {
-                if (this.expense.value) {
-                    this.expense.share_value = parseFloat((this.expense.value * evt.target.value) / 100).toFixed(2)
-                }
-            },
+    async function confirmRemove(item) {
+        deleteId.value = item.id
+        deleteAllPortions.value = false
+        expense.value = { ...item }
+        deleteDialog.value = true
+        if (await confirm.value.open(t('budget-expense.budget-expense'), t('default.confirm-delete-item'))) {
+            removeData()
+        }
+    }
 
-            convertGroup(group) {
-                return this.groupList.find((x) => x.value == group).name
-            },
+    function removeData() {
+        isLoading.value = true
 
-            async searchTags(val) {
-                if (this.loadingData) return
-
-                if (!val || val.length <= 1) {
-                    this.listTags = []
-                    clearTimeout(this.timeOut)
-                    return
-                }
-
-                if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
-                    return
-                }
-
-                clearTimeout(this.timeOut)
-                this.timeOut = setTimeout(async () => {
-                    this.loadingData = true
-                    let searchFieldsData = []
-                    await window.axios
-                        .get('/tag/search/' + val)
-                        .then(function (response) {
-                            if (response.data && response.data.length > 0) {
-                                searchFieldsData = response.data
-                            }
-
-                            if (
-                                (searchFieldsData &&
-                                    searchFieldsData.length > 0 &&
-                                    !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
-                                !searchFieldsData ||
-                                searchFieldsData.length == 0
-                            ) {
-                                searchFieldsData.unshift({
-                                    name: val.toUpperCase(),
-                                })
-                            }
-                        })
-                        .catch(function (error) {
-                            logger.error('error', error)
-                        })
-
-                    this.listTags = searchFieldsData
-                    this.loadingData = false
-                }, 300)
-            },
-
-            itemRowFont(row) {
-                return { class: !row.item.id ? 'font-weight-bold ' : '' }
-            },
-
-            itemPropsInstallment(item) {
-                return {
-                    title:
-                        this.$t('default.description') +
-                        ': ' +
-                        item.financing.description +
-                        ' | ' +
-                        this.$t('budget-expense.due-date') +
-                        ': ' +
-                        moment(item.date).format('DD/MM/YYYY') +
-                        ' | ' +
-                        this.$t('default.value') +
-                        ': ' +
-                        currencyField(item.value) +
-                        ' | ' +
-                        this.$t('financing-installment.portion') +
-                        ': ' +
-                        item.portion,
-                    value: item.id,
-                }
-            },
-
-            infoInstallment(item) {
-                if (item) {
-                    return (
-                        this.$t('default.description') +
-                        ': ' +
-                        item.financing.description +
-                        ' | ' +
-                        this.$t('budget-expense.due-date') +
-                        ': ' +
-                        moment(item.date).format('DD/MM/YYYY') +
-                        ' | ' +
-                        this.$t('default.value') +
-                        ': ' +
-                        currencyField(item.value) +
-                        ' | ' +
-                        this.$t('financing-installment.portion') +
-                        ': ' +
-                        item.portion
-                    )
-                } else {
-                    return 'nao tem item'
-                }
-            },
-
-            newItem() {
-                this.titleModal = this.$t('budget-expense.new-item')
-                this.editDialog = true
-                this.listInstallments = this.installments
-                this.expense = {
-                    id: null,
-                    description: null,
-                    value: 0,
-                    portion: null,
-                    portion_total: null,
-                    date: moment(this.yearMonth + '-01', 'YYYY-MM-DD'),
-                    group: null,
-                    remarks: null,
-                    paid: 0,
-                    share_value: 0,
-                    share_user_id: null,
-                    tags: [],
-                    budget_id: this.budgetId,
-                }
-                setTimeout(() => {
-                    logger.log('this.expense', this.expense)
-                    this.$refs.txtDescription.focus()
-                })
-            },
-
-            editItem(item) {
-                this.titleModal = this.$t('budget-expense.edit-item')
-                this.editDialog = true
-                let data = this.installments
-
-                if (item.financing_installment) {
-                    data.unshift(item.financing_installment)
-                }
-
-                this.listInstallments = data
-                this.expense = {
-                    id: item.id,
-                    description: item.description,
-                    value: Number(item.value),
-                    portion: item.portion,
-                    portion_total: item.portion_total,
-                    date: moment(item.date, 'YYYY-MM-DD'),
-                    paid: item.paid ? 1 : 0,
-                    group: item.group,
-                    remarks: item.remarks,
-                    share_value: item.share_value ? Number(item.share_value) : 0,
-                    share_user_id: item.share_user_id,
-                    tags: item.tags,
-                    budget_id: item.budget_id,
-                }
-                setTimeout(() => {
-                    this.$refs.txtDescription.focus()
-                })
-            },
-
-            closeItem() {
-                this.editDialog = false
-            },
-
-            async save() {
-                let validate = await this.$refs.form.validate()
-                if (validate.valid) {
-                    if (this.expense.id) {
-                        await this.update()
-                    } else {
-                        await this.create()
-                    }
-                }
-            },
-
-            async create() {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/budget-expense',
-                    {
-                        description: this.expense.description,
-                        date: this.expense.date.format('YYYY-MM-DD'),
-                        value: this.expense.value,
-                        portion: this.expense.portion,
-                        portion_total: this.expense.portion_total,
-                        paid: this.expense.paid ? true : false,
-                        group: this.expense.group,
-                        remarks: this.expense.remarks,
-                        share_value: this.expense.share_value,
-                        share_user_id: this.expense.share_user_id,
-                        budget_id: this.expense.budget_id,
-                        tags: this.expense.tags,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                        preserveScroll: true,
-                    }
-                )
-            },
-
-            async update() {
-                this.isLoading = true
-                this.$inertia.put(
-                    '/budget-expense/' + this.expense.id,
-                    {
-                        description: this.expense.description,
-                        value: this.expense.value,
-                        portion: this.expense.portion,
-                        portion_total: this.expense.portion_total,
-                        date: this.expense.date.format('YYYY-MM-DD'),
-                        paid: this.expense.paid ? true : false,
-                        group: this.expense.group,
-                        remarks: this.expense.remarks,
-                        share_value: this.expense.share_value,
-                        share_user_id: this.expense.share_user_id,
-                        tags: this.expense.tags,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                        preserveScroll: true,
-                    }
-                )
-            },
-
-            async confirmRemove(item) {
-                this.deleteId = item.id
-                this.deleteAllPortions = false
-                this.expense = item
-                this.deleteDialog = true
-                if (
-                    await this.$refs.confirm.open(
-                        this.$t('budget-expense.budget-expense'),
-                        this.$t('default.confirm-delete-item')
-                    )
-                ) {
-                    this.remove()
-                }
-            },
-
-            remove() {
-                this.isLoading = true
-
-                if (this.deleteAllPortions) {
-                    this.$inertia.delete(`/budget-expense/${this.deleteId}/delete-all-portions`, {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onError: () => {
-                            this.isLoading = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                        preserveScroll: true,
-                    })
-                } else {
-                    this.$inertia.delete(`/budget-expense/${this.deleteId}`, {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onError: () => {
-                            this.isLoading = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                        preserveScroll: true,
-                    })
-                }
-            },
-        },
+        if (deleteAllPortions.value) {
+            router.delete(`/budget-expense/${deleteId.value}/delete-all-portions`, {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onError: () => {
+                    isLoading.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+                preserveScroll: true,
+            })
+        } else {
+            router.delete(`/budget-expense/${deleteId.value}`, {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onError: () => {
+                    isLoading.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+                preserveScroll: true,
+            })
+        }
     }
 </script>

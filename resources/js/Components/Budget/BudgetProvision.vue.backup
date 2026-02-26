@@ -78,8 +78,7 @@
                                             variant="text"
                                             :icon="isGroupOpen(item) ? '$expand' : '$next'"
                                             @click="toggleGroup(item)"
-                                        >
-                                        </VBtn>
+                                        ></VBtn>
                                         {{ convertGroup(item.value) }}
                                     </th>
                                     <th class="title font-weight-bold text-right">Total</th>
@@ -295,282 +294,411 @@
 </template>
 
 <script setup>
-    import { ref, computed, nextTick } from 'vue'
-    import { router } from '@inertiajs/vue3'
-    import { useI18n } from 'vue-i18n'
-    import { currencyField, sumField, sumGroup } from '@/utils/utils.js'
+    import { logger } from '@/utils/logger.js'
+    import { currencyField, reverseFormatNumber, sumField, sumGroup } from '@/utils/utils.js'
+</script>
 
-    import { useValidationRules } from '@/composables/useFormConstants.js'
-    import { useCrudOperations } from '@/composables/useCrudOperations.js'
-    import { useTagSearch } from '@/composables/useTagSearch.js'
-    import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
-    import { useShareCalculation } from '@/composables/useShareCalculation.js'
-
-    defineOptions({ name: 'BudgetProvision' })
-
-    const componentProps = defineProps({
-        budgetId: { type: Number },
-        provisions: {
-            type: Array,
-            default: () => [],
+<script>
+    export default {
+        name: 'BudgetProvision',
+        props: {
+            budgetId: {
+                type: Number,
+            },
+            provisions: {
+                type: Array,
+                default: () => [],
+            },
+            yearMonth: {
+                type: String,
+            },
+            shareUsers: {
+                type: Array,
+            },
+            budgetWeeks: {
+                type: Array,
+            },
+            viewOnly: {
+                type: Boolean,
+            },
         },
-        yearMonth: { type: String },
-        shareUsers: { type: Array },
-        budgetWeeks: { type: Array },
-        viewOnly: { type: Boolean, default: false },
-    })
 
-    const { t } = useI18n()
-    const rules = useValidationRules()
+        data() {
+            return {
+                rules: {
+                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+                    currencyFieldRules: [
+                        (value) => {
+                            value = reverseFormatNumber(value)
+                            if (!value) return this.$t('rules.required-text-field')
+                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
-    const { isLoading, editDialog, titleModal } = useCrudOperations('/budget-provision')
+                            return true
+                        },
+                    ],
+                },
+                search: null,
+                editDialog: false,
+                titleModal: '',
+                isLoading: false,
+                deleteId: null,
+                panel: 1,
+                percentage: null,
+                provision: {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    group: null,
+                    remarks: null,
+                    share_value: 0,
+                    share_user_id: null,
+                    tags: [],
+                    budget_id: null,
+                },
+                groupList: [
+                    {
+                        name: this.$t('default.monthly'),
+                        value: 'MONTHLY',
+                    },
+                    {
+                        name: this.$t('default.week-1'),
+                        value: 'WEEK_1',
+                    },
+                    {
+                        name: this.$t('default.week-2'),
+                        value: 'WEEK_2',
+                    },
+                    {
+                        name: this.$t('default.week-3'),
+                        value: 'WEEK_3',
+                    },
+                    {
+                        name: this.$t('default.week-4'),
+                        value: 'WEEK_4',
+                    },
+                ],
+                listTags: [],
+                listDescriptions: [],
+                searchFieldsData: [],
+                searchTag: '',
+                searchDescription: '',
+                loadingData: false,
+            }
+        },
 
-    const { tags: listTags, searchTags: doSearchTags } = useTagSearch()
-    const { descriptions: listDescriptions, searchDescriptions: doSearchDescriptions } =
-        useDescriptionSearch('budget-provision')
-    const { calculateShareValue } = useShareCalculation()
+        computed: {
+            itemsTags() {
+                return this.listTags
+            },
+            itemsDescriptions() {
+                let result = []
 
-    const search = ref(null)
-    const panel = ref(1)
-    const percentage = ref(null)
-    const deleteId = ref(null)
-    const loadingData = ref(false)
-    const searchTag = ref('')
-    const searchDescription = ref('')
+                if (this.listDescriptions?.length) {
+                    result = this.listDescriptions.map((x) => {
+                        let resume = ''
 
-    const provision = ref({
-        id: null,
-        description: null,
-        value: 0,
-        group: null,
-        remarks: null,
-        share_value: 0,
-        share_user_id: null,
-        tags: [],
-        budget_id: null,
-    })
+                        if (x.value) {
+                            resume += this.$t('default.value') + ': ' + currencyField(x.value)
+                        }
 
-    const groupList = [
-        { name: t('default.monthly'), value: 'MONTHLY' },
-        { name: t('default.week-1'), value: 'WEEK_1' },
-        { name: t('default.week-2'), value: 'WEEK_2' },
-        { name: t('default.week-3'), value: 'WEEK_3' },
-        { name: t('default.week-4'), value: 'WEEK_4' },
-    ]
+                        if (x.share_value) {
+                            resume += ' | ' + this.$t('default.share-value') + ': ' + currencyField(x.share_value)
+                        }
 
-    // Refs for template
-    const txtDescription = ref(null)
-    const form = ref(null)
-    const confirm = ref(null)
+                        if (x.tags && x.tags.length > 0) {
+                            resume += ' | ' + this.$t('default.tags') + ': ' + x.tags.map((tag) => tag.name).join(', ')
+                        }
 
-    const itemsTags = computed(() => listTags.value)
+                        if (x.remarks) {
+                            resume += ' | ' + this.$t('default.remarks') + ': ' + x.remarks
+                        }
 
-    const itemsDescriptions = computed(() => {
-        let result = []
-        if (listDescriptions.value?.length) {
-            result = listDescriptions.value.map((x) => {
-                let resume = ''
-                if (x.value) resume += t('default.value') + ': ' + currencyField(x.value)
-                if (x.share_value) resume += ' | ' + t('default.share-value') + ': ' + currencyField(x.share_value)
-                if (x.tags && x.tags.length > 0)
-                    resume += ' | ' + t('default.tags') + ': ' + x.tags.map((tag) => tag.name).join(', ')
-                if (x.remarks) resume += ' | ' + t('default.remarks') + ': ' + x.remarks
-                return {
-                    description: x.description,
-                    resume: resume,
-                    data: x,
+                        return {
+                            description: x.description,
+                            resume: resume,
+                            data: x,
+                        }
+                    })
                 }
-            })
-        }
-        return result
-    })
 
-    const headers = computed(() => {
-        let hdrs = [
-            { title: t('default.description'), align: 'start', key: 'description', groupable: false },
-            { title: t('default.value'), align: 'end', key: 'value' },
-            { title: t('default.share-value'), align: 'end', key: 'share_value' },
-            { title: t('default.share-user'), key: 'share_user_id' },
-            { title: t('default.remarks'), key: 'remarks' },
-            { title: t('default.tags'), key: 'tags' },
-        ]
-
-        if (!componentProps.viewOnly) {
-            hdrs.push({
-                title: t('default.action'),
-                align: 'end',
-                key: 'action',
-                sortable: false,
-                width: 40,
-            })
-        }
-        return hdrs
-    })
-
-    function calculeShareValue(evt) {
-        if (provision.value.value) {
-            provision.value.share_value = calculateShareValue(provision.value.value, evt.target.value)
-        }
-    }
-
-    function convertGroup(group) {
-        if (componentProps.budgetWeeks?.length && componentProps.budgetWeeks.find((x) => x.value === group)) {
-            return (
-                groupList.find((x) => x.value === group)?.name +
-                ' (' +
-                componentProps.budgetWeeks.find((x) => x.value === group).text +
-                ')'
-            )
-        }
-        return groupList.find((x) => x.value === group)?.name || group
-    }
-
-    async function searchTags(val) {
-        loadingData.value = true
-        const existing = provision.value.tags ? provision.value.tags : []
-        doSearchTags(val, existing)
-        setTimeout(() => {
-            loadingData.value = false
-        }, 300)
-    }
-
-    async function searchDescriptions(val) {
-        loadingData.value = true
-        doSearchDescriptions(val)
-        setTimeout(() => {
-            loadingData.value = false
-        }, 400)
-    }
-
-    async function selectedDescription(item) {
-        if (item?.data) {
-            provision.value.value = item.data.value
-            provision.value.share_value = item.data.share_value
-            provision.value.share_user_id = item.data.share_user_id
-            provision.value.remarks = item.data.remarks
-            provision.value.tags = item.data.tags
-        }
-    }
-
-    function newItem() {
-        titleModal.value = t('budget-provision.new-item')
-        editDialog.value = true
-        provision.value = {
-            id: null,
-            description: null,
-            value: 0,
-            group: null,
-            remarks: null,
-            share_value: 0,
-            share_user_id: null,
-            tags: [],
-            budget_id: componentProps.budgetId,
-        }
-        nextTick(() => {
-            if (txtDescription.value) txtDescription.value.focus()
-        })
-    }
-
-    function editItem(item) {
-        titleModal.value = t('budget-provision.edit-item')
-        editDialog.value = true
-        provision.value = {
-            id: item.id,
-            description: item.description?.description || item.description,
-            value: Number(item.value),
-            group: item.group,
-            remarks: item.remarks,
-            share_value: item.share_value ? Number(item.share_value) : 0,
-            share_user_id: item.share_user_id,
-            tags: item.tags || [],
-            budget_id: componentProps.budgetId,
-        }
-        nextTick(() => {
-            if (txtDescription.value) txtDescription.value.focus()
-        })
-    }
-
-    async function save() {
-        let validate = await form.value.validate()
-        if (validate.valid) {
-            if (provision.value.id) {
-                await updateData()
-            } else {
-                await createData()
-            }
-        }
-    }
-
-    async function createData() {
-        isLoading.value = true
-        router.post(
-            '/budget-provision',
-            {
-                description: provision.value.description?.description || provision.value.description,
-                value: provision.value.value,
-                group: provision.value.group,
-                remarks: provision.value.remarks,
-                share_value: provision.value.share_value,
-                share_user_id: provision.value.share_user_id,
-                tags: provision.value.tags,
-                budget_id: provision.value.budget_id,
+                return result
             },
-            {
-                onSuccess: () => {
-                    editDialog.value = false
-                },
-                onFinish: () => {
-                    isLoading.value = false
-                },
-                preserveScroll: true,
-            }
-        )
-    }
+            headers() {
+                let headers = [
+                    { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
+                    { title: this.$t('default.value'), align: 'end', key: 'value' },
+                    { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
+                    { title: this.$t('default.share-user'), key: 'share_user_id' },
+                    { title: this.$t('default.remarks'), key: 'remarks' },
+                    { title: this.$t('default.tags'), key: 'tags' },
+                ]
 
-    async function updateData() {
-        isLoading.value = true
-        router.put(
-            '/budget-provision/' + provision.value.id,
-            {
-                description: provision.value.description?.description || provision.value.description,
-                value: provision.value.value,
-                group: provision.value.group,
-                remarks: provision.value.remarks,
-                share_value: provision.value.share_value,
-                share_user_id: provision.value.share_user_id,
-                tags: provision.value.tags,
-                budget_id: provision.value.budget_id,
-            },
-            {
-                onSuccess: () => {
-                    editDialog.value = false
-                },
-                onFinish: () => {
-                    isLoading.value = false
-                },
-                preserveScroll: true,
-            }
-        )
-    }
+                if (!this.viewOnly) {
+                    headers.push({
+                        title: this.$t('default.action'),
+                        align: 'end',
+                        key: 'action',
+                        sortable: false,
+                        width: 40,
+                    })
+                }
 
-    async function confirmRemove(item) {
-        deleteId.value = item.id
-        if (await confirm.value.open(t('budget-provision.item'), t('default.confirm-delete-item'))) {
-            removeData()
-        }
-    }
+                return headers
+            },
+        },
 
-    function removeData() {
-        isLoading.value = true
-        router.delete(`/budget-provision/${deleteId.value}`, {
-            onSuccess: () => {},
-            onError: () => {
-                isLoading.value = false
+
+
+        methods: {
+            calculeShareValue(evt) {
+                if (this.provision.value) {
+                    this.provision.share_value = parseFloat((this.provision.value * evt.target.value) / 100).toFixed(2)
+                }
             },
-            onFinish: () => {
-                isLoading.value = false
+
+            convertGroup(group) {
+                if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
+                    return (
+                        this.groupList.find((x) => x.value === group).name +
+                        ' (' +
+                        this.budgetWeeks.find((x) => x.value === group).text +
+                        ')'
+                    )
+                }
+
+                return this.groupList.find((x) => x.value === group).name
             },
-            preserveScroll: true,
-        })
+
+            async searchTags(val) {
+                if (this.loadingData) return
+
+                if (!val || val.length <= 1) {
+                    this.listTags = []
+                    clearTimeout(this.timeOut)
+                    return
+                }
+
+                if (
+                    this.provision.tags &&
+                    this.provision.tags.length > 0 &&
+                    this.provision.tags.find((x) => x.name == val)
+                ) {
+                    return
+                }
+
+                clearTimeout(this.timeOut)
+                this.timeOut = setTimeout(async () => {
+                    this.loadingData = true
+                    let searchFieldsData = []
+                    await window.axios
+                        .get('/tag/search/' + val)
+                        .then(function (response) {
+                            if (response.data && response.data.length > 0) {
+                                searchFieldsData = response.data
+                            }
+
+                            if (
+                                (searchFieldsData &&
+                                    searchFieldsData.length > 0 &&
+                                    !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                                !searchFieldsData ||
+                                searchFieldsData.length == 0
+                            ) {
+                                searchFieldsData.unshift({ name: val.toUpperCase() })
+                            }
+                        })
+                        .catch(function (error) {
+                            logger.error('error', error)
+                        })
+
+                    this.listTags = searchFieldsData
+                    this.loadingData = false
+                }, 300)
+            },
+
+            async searchDescriptions(val) {
+                if (this.loadingData) return
+
+                if (!val || val.length <= 0) {
+                    this.listDescriptions = []
+                    clearTimeout(this.timeOut)
+                    return
+                }
+
+                if (this.provision.description && this.provision.description == val) {
+                    return
+                }
+
+                clearTimeout(this.timeOut)
+                this.timeOut = setTimeout(async () => {
+                    this.loadingData = true
+                    let searchFieldsData = []
+                    await window.axios
+                        .get('/budget-provision/search/' + val)
+                        .then(function (response) {
+                            if (response.data && response.data.length > 0) {
+                                searchFieldsData = response.data
+                            }
+
+                            if (
+                                (searchFieldsData &&
+                                    searchFieldsData.length > 0 &&
+                                    !searchFieldsData.find((x) => x.description == val)) ||
+                                !searchFieldsData ||
+                                searchFieldsData.length == 0
+                            ) {
+                                searchFieldsData.unshift({ description: val, resume: '', data: null })
+                            }
+                        })
+                        .catch(function (error) {
+                            logger.error('error', error)
+                        })
+
+                    this.listDescriptions = searchFieldsData
+                    this.loadingData = false
+                }, 400)
+            },
+
+            async selectedDescription(item) {
+                if (item?.data) {
+                    this.provision.value = item.data.value
+                    this.provision.share_value = item.data.share_value
+                    this.provision.share_user_id = item.data.share_user_id
+                    this.provision.remarks = item.data.remarks
+                    this.provision.tags = item.data.tags
+                }
+            },
+
+            newItem() {
+                this.titleModal = this.$t('budget-provision.new-item')
+                this.editDialog = true
+                this.provision = {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    group: null,
+                    remarks: null,
+                    share_value: 0,
+                    share_user_id: null,
+                    tags: [],
+                    budget_id: this.budgetId,
+                }
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
+                })
+            },
+
+            editItem(item) {
+                this.titleModal = this.$t('budget-provision.edit-item')
+                this.editDialog = true
+                this.provision = {
+                    id: item.id,
+                    description: item.description.description,
+                    value: Number(item.value),
+                    group: item.group,
+                    remarks: item.remarks,
+                    share_value: item.share_value ? Number(item.share_value) : 0,
+                    share_user_id: item.share_user_id,
+                    tags: item.tags,
+                    budget_id: this.budgetId,
+                }
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
+                })
+            },
+
+            closeItem() {
+                this.editDialog = false
+            },
+
+            async save() {
+                let validate = await this.$refs.form.validate()
+                if (validate.valid) {
+                    if (this.provision.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
+                }
+            },
+
+            async create() {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/budget-provision',
+                    {
+                        description: this.provision.description.description,
+                        value: this.provision.value,
+                        group: this.provision.group,
+                        remarks: this.provision.remarks,
+                        share_value: this.provision.share_value,
+                        share_user_id: this.provision.share_user_id,
+                        tags: this.provision.tags,
+                        budget_id: this.provision.budget_id,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                        preserveScroll: true,
+                    }
+                )
+            },
+
+            async update() {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/budget-provision/' + this.provision.id,
+                    {
+                        description: this.provision.description.description,
+                        value: this.provision.value,
+                        group: this.provision.group,
+                        remarks: this.provision.remarks,
+                        share_value: this.provision.share_value,
+                        share_user_id: this.provision.share_user_id,
+                        tags: this.provision.tags,
+                        budget_id: this.provision.budget_id,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                        preserveScroll: true,
+                    }
+                )
+            },
+
+            async confirmRemove(item) {
+                this.deleteId = item.id
+                if (
+                    await this.$refs.confirm.open(
+                        this.$t('budget-provision.item'),
+                        this.$t('default.confirm-delete-item')
+                    )
+                ) {
+                    this.remove()
+                }
+            },
+
+            remove() {
+                this.isLoading = true
+                this.$inertia.delete(`/budget-provision/${this.deleteId}`, {
+                    onSuccess: () => {},
+                    onError: () => {
+                        this.isLoading = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                    preserveScroll: true,
+                })
+            },
+        },
     }
 </script>

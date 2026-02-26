@@ -168,6 +168,7 @@
 </template>
 
 <script setup>
+    import { ref, computed } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import BudgetExpense from '@/Components/Budget/BudgetExpense.vue'
     import BudgetExpenseTagOptions from '@/Components/Budget/BudgetExpenseTagOptions.vue'
@@ -179,332 +180,164 @@
     import InvoiceExpense from '@/Components/CreditCardInvoice/InvoiceExpense.vue'
     import ExtractExpense from '@/Components/PrepaidCardExtract/ExtractExpense.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
     import { logger } from '@/utils/logger.js'
-    import { Head } from '@inertiajs/vue3'
+    import { Head, router } from '@inertiajs/vue3'
+    import { useI18n } from 'vue-i18n'
     import moment from 'moment'
-</script>
 
-<script>
-    export default {
-        name: 'BudgetShow',
+    defineOptions({ name: 'BudgetShow' })
 
-        props: {
-            installments: {
-                type: Array,
-            },
-            shareUser: {
-                type: Object,
-            },
-            shareUsers: {
-                type: Array,
-            },
-            owner: {
-                type: Object,
-            },
-            share: {
-                type: Object,
-            },
-        },
+    const props = defineProps({
+        installments: { type: Array },
+        shareUser: { type: Object },
+        shareUsers: { type: Array },
+        owner: { type: Object },
+        share: { type: Object },
+    })
 
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: this.$t('menus.dashboard'),
-                        disabled: false,
-                        href: '/dashboard',
-                    },
-                    {
-                        title: this.$t('menus.budget'),
-                        disabled: false,
-                        href: '/budget/' + moment().format('YYYY'),
-                    },
-                    {
-                        title: this.$t('budget-show.title'),
-                        disabled: true,
-                    },
-                ],
-                tab: null,
-                isLoading: false,
-                yearMonth: null,
+    const { t } = useI18n()
+    const confirm = ref(null)
+    const tab = ref(null)
+    const isLoading = ref(false)
+
+    const breadcrumbs = computed(() => [
+        { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
+        { title: t('menus.budget'), disabled: false, href: '/budget/' + moment().format('YYYY') },
+        { title: t('budget-show.title'), disabled: true },
+    ])
+
+    const yearMonthModel = computed(() => props.owner.budget.year + '-' + props.owner.budget.month)
+    const shareUserName = computed(() => props.shareUser?.share_user?.name)
+    const budgetId = computed(() => props.owner.budget.id)
+
+    function buildWeeks(budget) {
+        const weeks = []
+        for (let i = 1; i <= 4; i++) {
+            const start = budget[`start_week_${i}`]
+            const end = budget[`end_week_${i}`]
+            if (start && end) {
+                weeks.push({
+                    text: t('budget.range-week', {
+                        start: moment(start).format('DD/MM/YYYY'),
+                        end: moment(end).format('DD/MM/YYYY'),
+                    }),
+                    value: `WEEK_${i}`,
+                })
             }
-        },
+        }
+        return weeks
+    }
 
-        computed: {
-            yearMonthModel() {
-                return this.owner.budget.year + '-' + this.owner.budget.month
-            },
-            shareUserName() {
-                return this.shareUser.share_user.name
-            },
-            budgetId() {
-                return this.owner.budget.id
-            },
-            budgetWeeks() {
-                let weeks = []
+    function weekLabel(budget, week) {
+        const start = budget[`start_week_${week}`]
+        const end = budget[`end_week_${week}`]
+        if (start && end) {
+            return t('budget.range-week', {
+                start: moment(start).format('DD/MM/YYYY'),
+                end: moment(end).format('DD/MM/YYYY'),
+            })
+        }
+        return null
+    }
 
-                if (this.owner.budget.start_week_1 && this.owner.budget.end_week_1) {
-                    weeks.push({
-                        text: this.$t('budget.range-week', {
-                            start: moment(this.owner.budget.start_week_1).format('DD/MM/YYYY'),
-                            end: moment(this.owner.budget.end_week_1).format('DD/MM/YYYY'),
-                        }),
-                        value: 'WEEK_1',
-                    })
-                }
+    const budgetWeeks = computed(() => buildWeeks(props.owner.budget))
+    const budgetWeek1 = computed(() => weekLabel(props.owner.budget, 1))
+    const budgetWeek2 = computed(() => weekLabel(props.owner.budget, 2))
+    const budgetWeek3 = computed(() => weekLabel(props.owner.budget, 3))
+    const budgetWeek4 = computed(() => weekLabel(props.owner.budget, 4))
 
-                if (this.owner.budget.start_week_2 && this.owner.budget.end_week_2) {
-                    weeks.push({
-                        text: this.$t('budget.range-week', {
-                            start: moment(this.owner.budget.start_week_2).format('DD/MM/YYYY'),
-                            end: moment(this.owner.budget.end_week_2).format('DD/MM/YYYY'),
-                        }),
-                        value: 'WEEK_2',
-                    })
-                }
+    const budgetResume = computed(() => props.owner.resume)
+    const budgetExpanseToTags = computed(() => props.owner.expenseToTags)
+    const budgetExpenseToTagOptions = computed(() => {
+        logger.log('budgetExpenseToTagOptions ', props.owner.budget.expenseTagOptions)
+        return props.owner.budget.expenseTagOptions
+    })
+    const budgetExpenseToTagOptionCharts = computed(() => {
+        logger.log('budgetExpenseToTagOptionCharts ', props.owner.budget.expenseToTagOptionCharts)
+        return props.owner.expenseToTagOptionCharts
+    })
+    const budgetExpenses = computed(() => props.owner.budget.expenses)
+    const budgetIncomes = computed(() => props.owner.budget.incomes)
+    const budgetProvisions = computed(() => props.owner.budget.provisions)
+    const budgetInvoices = computed(() => props.owner.budget.invoices)
+    const budgetExtracts = computed(() => props.owner.budget.extracts)
+    const budgetGoals = computed(() => props.owner.budget.goals)
+    const budgetGoalsCharts = computed(() => props.owner.goalsCharts)
 
-                if (this.owner.budget.start_week_3 && this.owner.budget.end_week_3) {
-                    weeks.push({
-                        text: this.$t('budget.range-week', {
-                            start: moment(this.owner.budget.start_week_3).format('DD/MM/YYYY'),
-                            end: moment(this.owner.budget.end_week_3).format('DD/MM/YYYY'),
-                        }),
-                        value: 'WEEK_3',
-                    })
-                }
+    const budgetShareId = computed(() => props.share?.budget?.id)
+    const budgetShareWeeks = computed(() => (props.share?.budget ? buildWeeks(props.share.budget) : []))
+    const budgetShareResume = computed(() => props.share?.resume)
+    const budgetShareExpanseToTags = computed(() => props.share?.expenseToTags)
+    const budgetShareExpenseToTagOptions = computed(() => {
+        logger.log('budgetShareExpenseToTagOptions ', props.share?.budget?.expenseTagOptions)
+        return props.share?.budget?.expenseTagOptions
+    })
+    const budgetShareExpenseToTagOptionCharts = computed(() => {
+        logger.log('budgetShareExpenseToTagOptionCharts ', props.share?.budget?.expenseToTagOptionCharts)
+        return props.share?.expenseToTagOptionCharts
+    })
+    const budgetShareExpenses = computed(() => props.share?.budget?.expenses)
+    const budgetShareIncomes = computed(() => props.share?.budget?.incomes)
+    const budgetShareProvisions = computed(() => props.share?.budget?.provisions)
+    const budgetShareInvoices = computed(() => props.share?.budget?.invoices)
+    const budgetShareExtracts = computed(() => props.share?.budget?.extracts)
+    const budgetShareGoals = computed(() => props.share?.budget?.goals)
+    const budgetShareGoalsCharts = computed(() => props.share?.goalsCharts)
 
-                if (this.owner.budget.start_week_4 && this.owner.budget.end_week_4) {
-                    weeks.push({
-                        text: this.$t('budget.range-week', {
-                            start: moment(this.owner.budget.start_week_4).format('DD/MM/YYYY'),
-                            end: moment(this.owner.budget.end_week_4).format('DD/MM/YYYY'),
-                        }),
-                        value: 'WEEK_4',
-                    })
-                }
+    function changeYearMonth(event) {
+        const year = event.target.value.substring(0, 4)
+        const month = event.target.value.substring(5, 7)
+        router.get(`/budget/find/${year}/${month}`)
+    }
 
-                return weeks
-            },
-            budgetWeek1() {
-                if (this.owner.budget.start_week_1 && this.owner.budget.end_week_1) {
-                    return this.$t('budget.range-week', {
-                        start: moment(this.owner.budget.start_week_1).format('DD/MM/YYYY'),
-                        end: moment(this.owner.budget.end_week_1).format('DD/MM/YYYY'),
-                    })
-                }
+    async function confirmIncludeFixExpenses() {
+        if (
+            await confirm.value.open(t('budget-show.include-fix-expense'), t('budget-show.confirm-include-fix-expense'))
+        ) {
+            includeFixExpenses()
+        }
+    }
 
-                return null
-            },
-            budgetWeek2() {
-                if (this.owner.budget.start_week_2 && this.owner.budget.end_week_2) {
-                    return this.$t('budget.range-week', {
-                        start: moment(this.owner.budget.start_week_2).format('DD/MM/YYYY'),
-                        end: moment(this.owner.budget.end_week_2).format('DD/MM/YYYY'),
-                    })
-                }
+    function includeFixExpenses() {
+        isLoading.value = true
+        router.post(
+            `/budget/${props.owner.budget.id}/include-fix-expenses`,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onError: () => {
+                    isLoading.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+            }
+        )
+    }
 
-                return null
-            },
-            budgetWeek3() {
-                if (this.owner.budget.start_week_3 && this.owner.budget.end_week_3) {
-                    return this.$t('budget.range-week', {
-                        start: moment(this.owner.budget.start_week_3).format('DD/MM/YYYY'),
-                        end: moment(this.owner.budget.end_week_3).format('DD/MM/YYYY'),
-                    })
-                }
+    async function confirmIncludeProvisionss() {
+        if (await confirm.value.open(t('budget-show.include-provision'), t('budget-show.confirm-include-provision'))) {
+            includeProvisions()
+        }
+    }
 
-                return null
-            },
-            budgetWeek4() {
-                if (this.owner.budget.start_week_4 && this.owner.budget.end_week_4) {
-                    return this.$t('budget.range-week', {
-                        start: moment(this.owner.budget.start_week_4).format('DD/MM/YYYY'),
-                        end: moment(this.owner.budget.end_week_4).format('DD/MM/YYYY'),
-                    })
-                }
-
-                return null
-            },
-            budgetResume() {
-                return this.owner.resume
-            },
-            budgetExpanseToTags() {
-                return this.owner.expenseToTags
-            },
-            budgetExpenseToTagOptions() {
-                logger.log('budgetExpenseToTagOptions ', this.owner.budget.expenseTagOptions)
-                return this.owner.budget.expenseTagOptions
-            },
-            budgetExpenseToTagOptionCharts() {
-                logger.log('budgetExpenseToTagOptionCharts ', this.owner.budget.expenseToTagOptionCharts)
-                return this.owner.expenseToTagOptionCharts
-            },
-            budgetExpenses() {
-                return this.owner.budget.expenses
-            },
-            budgetIncomes() {
-                return this.owner.budget.incomes
-            },
-            budgetProvisions() {
-                return this.owner.budget.provisions
-            },
-            budgetInvoices() {
-                return this.owner.budget.invoices
-            },
-            budgetExtracts() {
-                return this.owner.budget.extracts
-            },
-            budgetGoals() {
-                return this.owner.budget.goals
-            },
-            budgetGoalsCharts() {
-                return this.owner.goalsCharts
-            },
-            budgetShareId() {
-                return this.share.budget?.id
-            },
-            // Para usuario compartilhado
-            budgetShareWeeks() {
-                let weeks = []
-
-                if (this.share.budget?.start_week_1 && this.share.budget?.end_week_1) {
-                    weeks.push({
-                        text: this.$t('budget.range-week', {
-                            start: moment(this.share.budget?.start_week_1).format('DD/MM/YYYY'),
-                            end: moment(this.share.budget?.end_week_1).format('DD/MM/YYYY'),
-                        }),
-                        value: 'WEEK_1',
-                    })
-                }
-
-                if (this.share.budget?.start_week_2 && this.share.budget?.end_week_2) {
-                    weeks.push({
-                        text: this.$t('budget.range-week', {
-                            start: moment(this.share.budget?.start_week_2).format('DD/MM/YYYY'),
-                            end: moment(this.share.budget?.end_week_2).format('DD/MM/YYYY'),
-                        }),
-                        value: 'WEEK_2',
-                    })
-                }
-
-                if (this.share.budget?.start_week_3 && this.share.budget?.end_week_3) {
-                    weeks.push({
-                        text: this.$t('budget.range-week', {
-                            start: moment(this.share.budget?.start_week_3).format('DD/MM/YYYY'),
-                            end: moment(this.share.budget?.end_week_3).format('DD/MM/YYYY'),
-                        }),
-                        value: 'WEEK_3',
-                    })
-                }
-
-                if (this.share.budget?.start_week_4 && this.share.budget?.end_week_4) {
-                    weeks.push({
-                        text: this.$t('budget.range-week', {
-                            start: moment(this.share.budget?.start_week_4).format('DD/MM/YYYY'),
-                            end: moment(this.share.budget?.end_week_4).format('DD/MM/YYYY'),
-                        }),
-                        value: 'WEEK_4',
-                    })
-                }
-
-                return weeks
-            },
-            budgetShareResume() {
-                return this.share.resume
-            },
-            budgetShareExpanseToTags() {
-                return this.share.expenseToTags
-            },
-            budgetShareExpenseToTagOptions() {
-                logger.log('budgetShareExpenseToTagOptions ', this.share.budget.expenseTagOptions)
-                return this.share.budget.expenseTagOptions
-            },
-            budgetShareExpenseToTagOptionCharts() {
-                logger.log('budgetShareExpenseToTagOptionCharts ', this.share.budget.expenseToTagOptionCharts)
-                return this.share.expenseToTagOptionCharts
-            },
-            budgetShareExpenses() {
-                return this.share.budget?.expenses
-            },
-            budgetShareIncomes() {
-                return this.share.budget?.incomes
-            },
-            budgetShareProvisions() {
-                return this.share.budget?.provisions
-            },
-            budgetShareInvoices() {
-                return this.share.budget?.invoices
-            },
-            budgetShareExtracts() {
-                return this.share.budget?.extracts
-            },
-            budgetShareGoals() {
-                return this.share.budget?.goals
-            },
-            budgetShareGoalsCharts() {
-                return this.share.goalsCharts
-            },
-        },
-
-        methods: {
-            changeYearMonth(event) {
-                let year = event.target.value.substring(0, 4)
-                let month = event.target.value.substring(5, 7)
-
-                this.$inertia.get(`/budget/find/${year}/${month}`)
-            },
-
-            async confirmIncludeFixExpenses() {
-                if (
-                    await this.$refs.confirm.open(
-                        this.$t('budget-show.include-fix-expense'),
-                        this.$t('budget-show.confirm-include-fix-expense')
-                    )
-                ) {
-                    this.includeFixExpenses()
-                }
-            },
-
-            includeFixExpenses() {
-                this.isLoading = true
-                this.$inertia.post(`/budget/${this.owner.budget.id}/include-fix-expenses`, {
-                    preserveState: true,
-                    preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                })
-            },
-
-            async confirmIncludeProvisionss() {
-                if (
-                    await this.$refs.confirm.open(
-                        this.$t('budget-show.include-provision'),
-                        this.$t('budget-show.confirm-include-provision')
-                    )
-                ) {
-                    this.includeProvisions()
-                }
-            },
-
-            includeProvisions() {
-                this.isLoading = true
-                this.$inertia.post(`/budget/${this.owner.budget.id}/include-provisions`, {
-                    preserveState: true,
-                    preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                })
-            },
-        },
+    function includeProvisions() {
+        isLoading.value = true
+        router.post(
+            `/budget/${props.owner.budget.id}/include-provisions`,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onError: () => {
+                    isLoading.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+            }
+        )
     }
 </script>

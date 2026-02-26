@@ -184,229 +184,166 @@
 </template>
 
 <script setup>
+    import { ref, computed, nextTick } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
     import { Head, Link } from '@inertiajs/vue3'
-</script>
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import { useI18n } from 'vue-i18n'
 
-<script>
-    export default {
-        name: 'CreditCardIndex',
-        props: {
-            creditCards: {
-                type: Array,
-            },
+    defineOptions({ name: 'CreditCardIndex' })
+
+    defineProps({
+        creditCards: {
+            type: Array,
         },
+    })
 
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: this.$t('menus.dashboard'),
-                        disabled: false,
-                        href: '/dashboard',
-                    },
-                    {
-                        title: this.$t('menus.credit-card'),
-                        disabled: true,
-                    },
-                ],
-                headers: [
-                    { title: this.$t('default.name'), key: 'name', groupable: false },
-                    { title: this.$t('credit-card.digits'), key: 'digits' },
-                    { title: this.$t('credit-card.due-date'), key: 'due_date' },
-                    { title: this.$t('credit-card.closing-date'), key: 'closing_date' },
-                    { title: this.$t('default.active'), key: 'is_active' },
-                    { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
-                ],
-                rules: {
-                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                    booleanFieldRules: [(v) => v !== null || this.$t('rules.required-text-field')],
-                    digitsFieldRules: [
-                        (value) => {
-                            if (!value) return this.$t('rules.required-text-field')
-                            if (!/^\d+$/.test(value)) return this.$t('rules.only-numbers')
+    const { t } = useI18n()
 
-                            return true
-                        },
-                    ],
-                },
-                search: null,
-                editDialog: false,
-                titleModal: '',
-                isLoading: false,
-                deleteId: null,
-                creditCard: {
-                    id: null,
-                    name: null,
-                    digits: null,
-                    due_date: null,
-                    closing_date: null,
-                    is_active: null,
-                },
-                days: [
-                    '1',
-                    '2',
-                    '3',
-                    '4',
-                    '5',
-                    '6',
-                    '7',
-                    '8',
-                    '9',
-                    '10',
-                    '11',
-                    '12',
-                    '13',
-                    '14',
-                    '15',
-                    '16',
-                    '17',
-                    '18',
-                    '19',
-                    '20',
-                    '21',
-                    '22',
-                    '23',
-                    '24',
-                    '25',
-                    '26',
-                    '27',
-                    '28',
-                    '29',
-                    '30',
-                    '31',
-                ],
-                isActiveOptions: [
-                    {
-                        name: this.$t('default.no'),
-                        value: 0,
-                    },
-                    {
-                        name: this.$t('default.yes'),
-                        value: 1,
-                    },
-                ],
-            }
+    const {
+        isLoading,
+        editDialog,
+        titleModal,
+        confirmRemove: crudConfirmRemove,
+        save: crudSave,
+    } = useCrudOperations('/credit-card')
+
+    const breadcrumbs = computed(() => [
+        {
+            title: t('menus.dashboard'),
+            disabled: false,
+            href: '/dashboard',
         },
-
-
-
-        methods: {
-            hrefInvoice(item) {
-                return '/credit-card/' + item.id + '/invoice'
-            },
-
-            newItem() {
-                this.titleModal = this.$t('credit-card.new-item')
-                this.editDialog = true
-                this.creditCard = {
-                    id: null,
-                    name: null,
-                    digits: null,
-                    due_date: null,
-                    closing_date: null,
-                    is_active: null,
-                }
-                setTimeout(() => {
-                    this.$refs.txtName.focus()
-                })
-            },
-
-            editItem(item) {
-                this.titleModal = this.$t('credit-card.edit-item')
-                this.editDialog = true
-                this.creditCard = {
-                    id: item.id,
-                    name: item.name,
-                    digits: item.digits,
-                    due_date: item.due_date,
-                    closing_date: item.closing_date,
-                    is_active: item.is_active,
-                }
-                setTimeout(() => {
-                    this.$refs.txtName.focus()
-                })
-            },
-
-            async save() {
-                let validate = await this.$refs.form.validate()
-                if (validate.valid) {
-                    if (this.creditCard.id) {
-                        await this.update()
-                    } else {
-                        await this.create()
-                    }
-                }
-            },
-
-            async create() {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/credit-card',
-                    {
-                        name: this.creditCard.name,
-                        digits: this.creditCard.digits,
-                        due_date: this.creditCard.due_date,
-                        closing_date: this.creditCard.closing_date,
-                        is_active: this.creditCard.is_active,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-
-            async update() {
-                this.isLoading = true
-                this.$inertia.put(
-                    '/credit-card/' + this.creditCard.id,
-                    {
-                        name: this.creditCard.name,
-                        digits: this.creditCard.digits,
-                        due_date: this.creditCard.due_date,
-                        closing_date: this.creditCard.closing_date,
-                        is_active: this.creditCard.is_active,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-
-            async confirmRemove(item) {
-                this.deleteId = item.id
-                if (
-                    await this.$refs.confirm.open(this.$t('credit-card.item'), this.$t('default.confirm-delete-item'))
-                ) {
-                    this.remove()
-                }
-            },
-
-            remove() {
-                this.isLoading = true
-                this.$inertia.delete(`/credit-card/${this.deleteId}`, {
-                    preserveState: true,
-                    preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                })
-            },
+        {
+            title: t('menus.credit-card'),
+            disabled: true,
         },
+    ])
+
+    const headers = computed(() => [
+        { title: t('default.name'), key: 'name', groupable: false },
+        { title: t('credit-card.digits'), key: 'digits' },
+        { title: t('credit-card.due-date'), key: 'due_date' },
+        { title: t('credit-card.closing-date'), key: 'closing_date' },
+        { title: t('default.active'), key: 'is_active' },
+        { title: t('default.action'), align: 'center', key: 'action', sortable: false },
+    ])
+
+    const rules = {
+        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
+        booleanFieldRules: [(v) => v !== null || t('rules.required-text-field')],
+        digitsFieldRules: [
+            (value) => {
+                if (!value) return t('rules.required-text-field')
+                if (!/^\d+$/.test(value)) return t('rules.only-numbers')
+
+                return true
+            },
+        ],
+    }
+
+    const search = ref(null)
+    const txtName = ref(null)
+    const form = ref(null)
+    const confirm = ref(null)
+
+    const creditCard = ref({
+        id: null,
+        name: null,
+        digits: null,
+        due_date: null,
+        closing_date: null,
+        is_active: null,
+    })
+
+    const days = [
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        '11',
+        '12',
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+        '25',
+        '26',
+        '27',
+        '28',
+        '29',
+        '30',
+        '31',
+    ]
+
+    const isActiveOptions = computed(() => [
+        {
+            name: t('default.no'),
+            value: 0,
+        },
+        {
+            name: t('default.yes'),
+            value: 1,
+        },
+    ])
+
+    function hrefInvoice(item) {
+        return '/credit-card/' + item.id + '/invoice'
+    }
+
+    function newItem() {
+        titleModal.value = t('credit-card.new-item')
+        editDialog.value = true
+        creditCard.value = {
+            id: null,
+            name: null,
+            digits: null,
+            due_date: null,
+            closing_date: null,
+            is_active: null,
+        }
+        nextTick(() => {
+            txtName.value?.focus()
+        })
+    }
+
+    function editItem(item) {
+        titleModal.value = t('credit-card.edit-item')
+        editDialog.value = true
+        creditCard.value = {
+            id: item.id,
+            name: item.name,
+            digits: item.digits,
+            due_date: item.due_date,
+            closing_date: item.closing_date,
+            is_active: item.is_active,
+        }
+        nextTick(() => {
+            txtName.value?.focus()
+        })
+    }
+
+    function save() {
+        crudSave(form.value, creditCard.value)
+    }
+
+    function confirmRemove(item) {
+        crudConfirmRemove(item, confirm.value, t('credit-card.item'), t('default.confirm-delete-item'))
     }
 </script>

@@ -124,169 +124,105 @@
 </template>
 
 <script setup>
+    import { ref, computed, nextTick } from 'vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
     import { Head } from '@inertiajs/vue3'
     import writeXlsxFile from 'write-excel-file'
     import { upperCase } from '@/utils/utils.js'
-</script>
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import { useI18n } from 'vue-i18n'
 
-<script>
-    export default {
-        name: 'TagIndex',
-        props: {
-            tags: {
-                type: Array,
-            },
+    defineOptions({ name: 'TagIndex' })
+
+    const componentProps = defineProps({
+        tags: {
+            type: Array,
         },
+    })
 
-        data() {
-            return {
-                headers: [
-                    { title: this.$t('default.name'), align: 'start', key: 'name', groupable: false },
-                    { title: this.$t('default.action'), align: 'center', width: '100', key: 'action', sortable: false },
-                ],
-                rules: {
-                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                },
-                search: null,
-                editDialog: false,
-                titleModal: '',
-                removeDialog: false,
-                isLoading: false,
-                deleteId: null,
-                tag: {
-                    id: null,
-                    name: null,
-                },
-            }
+    const { t } = useI18n()
+
+    const {
+        isLoading,
+        editDialog,
+        titleModal,
+        confirmRemove: crudConfirmRemove,
+        save: crudSave,
+    } = useCrudOperations('/tag')
+
+    const search = ref(null)
+    const tag = ref({ id: null, name: null })
+    const txtName = ref(null)
+    const form = ref(null)
+    const confirm = ref(null)
+
+    const headers = computed(() => [
+        { title: t('default.name'), align: 'start', key: 'name', groupable: false },
+        { title: t('default.action'), align: 'center', width: '100', key: 'action', sortable: false },
+    ])
+
+    const rules = {
+        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
+    }
+
+    const tagName = computed({
+        get() {
+            return tag.value.name
         },
-
-        computed: {
-            tagName: {
-                get() {
-                    return this.tag.name
-                },
-                set(value) {
-                    this.tag.name = upperCase(value)
-                },
-            },
+        set(value) {
+            tag.value.name = upperCase(value)
         },
+    })
 
+    function newItem() {
+        titleModal.value = t('tag.new-item')
+        editDialog.value = true
+        tag.value = {
+            id: null,
+            name: null,
+        }
+        nextTick(() => {
+            txtName.value?.focus()
+        })
+    }
 
+    function editItem(item) {
+        titleModal.value = t('tag.edit-item')
+        editDialog.value = true
+        tag.value = {
+            id: item.id,
+            name: item.name,
+        }
+        nextTick(() => {
+            txtName.value?.focus()
+        })
+    }
 
-        methods: {
-            newItem() {
-                this.titleModal = this.$t('tag.new-item')
-                this.editDialog = true
-                this.tag = {
-                    id: null,
-                    name: null,
-                }
-                setTimeout(() => {
-                    this.$refs.txtName.focus()
-                })
-            },
+    function save() {
+        crudSave(form.value, {
+            id: tag.value.id,
+            name: tag.value.name,
+        })
+    }
 
-            editItem(item) {
-                this.titleModal = this.$t('tag.edit-item')
-                this.editDialog = true
-                this.tag = {
-                    id: item.id,
-                    name: item.name,
-                }
-                setTimeout(() => {
-                    this.$refs.txtName.focus()
-                })
-            },
+    function confirmRemove(item) {
+        crudConfirmRemove(item, confirm.value, t('tag.item'), t('default.confirm-delete-item'))
+    }
 
-            closeItem() {
-                this.editDialog = false
-            },
+    async function exportExcel() {
+        if (componentProps.tags && componentProps.tags.length) {
+            let data = []
+            data.push([{ value: t('default.name') }])
 
-            async save() {
-                let validate = await this.$refs.form.validate()
-                if (validate.valid) {
-                    if (this.tag.id) {
-                        await this.update()
-                    } else {
-                        await this.create()
-                    }
-                }
-            },
+            componentProps.tags.forEach((item) => {
+                data.push([{ type: String, value: item.name }])
+            })
 
-            async create() {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/tag',
-                    {
-                        name: this.tag.name,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-
-            async update() {
-                this.isLoading = true
-                this.$inertia.put(
-                    '/tag/' + this.tag.id,
-                    {
-                        name: this.tag.name,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-
-            async confirmRemove(item) {
-                this.deleteId = item.id
-                if (await this.$refs.confirm.open(this.$t('tag.item'), this.$t('default.confirm-delete-item'))) {
-                    this.remove()
-                }
-            },
-
-            remove() {
-                this.isLoading = true
-                this.$inertia.delete(`/tag/${this.deleteId}`, {
-                    preserveState: true,
-                    preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                })
-            },
-
-            async exportExcel() {
-                if (this.tags && this.tags.length) {
-                    let data = []
-                    data.push([{ value: this.$t('default.name') }])
-
-                    this.tags.forEach((item) => {
-                        data.push([{ type: String, value: item.name }])
-                    })
-
-                    await writeXlsxFile(data, {
-                        data, // (optional) column widths, etc.
-                        fileName: 'export-tags.xlsx',
-                    })
-                }
-            },
-        },
+            await writeXlsxFile(data, {
+                data,
+                fileName: 'export-tags.xlsx',
+            })
+        }
     }
 </script>

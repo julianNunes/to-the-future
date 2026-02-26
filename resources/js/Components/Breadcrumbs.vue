@@ -1,5 +1,14 @@
 <script setup>
     import { Link } from '@inertiajs/vue3'
+
+    defineOptions({ name: 'BreadcrumbsComponent' })
+
+    defineProps({
+        items: {
+            type: Array,
+            required: true,
+        },
+    })
 </script>
 
 <template>
@@ -12,15 +21,3 @@
         </template>
     </v-breadcrumbs>
 </template>
-
-<script>
-    export default {
-        name: 'BreadcrumbsComponent',
-        props: {
-            items: {
-                type: Array,
-                required: true,
-            },
-        },
-    }
-</script>

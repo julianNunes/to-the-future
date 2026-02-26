@@ -72,100 +72,90 @@
 </template>
 
 <script setup>
+    import { ref, computed } from 'vue'
+    import { useI18n } from 'vue-i18n'
     import BarChart from '@/Components/BarChart.vue'
     import { currencyField } from '@/utils/utils.js'
-</script>
 
-<script>
-    export default {
-        name: 'BudgetExpenseTags',
+    defineOptions({ name: 'BudgetExpenseTags' })
 
-        components: {
-            BarChart,
+    const props = defineProps({
+        expenseToTags: {
+            type: Array,
+            default: () => [],
         },
+    })
 
-        props: {
-            expenseToTags: {
-                type: Array,
+    const { t } = useI18n()
+
+    const headers = [
+        { title: 'Tag', align: 'start', key: 'tag' },
+        { title: t('default.value'), align: 'end', key: 'value' },
+    ]
+
+    const search = ref(null)
+    const isLoading = ref(false)
+    const panel = ref(1)
+    const tab = ref(null)
+
+    const chartOptions = computed(() => {
+        return {
+            chart: {
+                id: 'basic-bar',
+                heigth: 10,
             },
-        },
-
-        data() {
-            return {
-                headers: [
-                    { title: 'Tag', align: 'start', key: 'tag' },
-                    { title: this.$t('default.value'), align: 'end', key: 'value' },
-                ],
-                search: null,
-                isLoading: false,
-                panel: 1,
-                tab: null,
-            }
-        },
-
-        computed: {
-            chartOptions() {
-                return {
-                    chart: {
-                        id: 'basic-bar',
-                        heigth: 10,
+            colors: ['#FB8C00'],
+            xaxis: {
+                categories: props.expenseToTags?.length ? props.expenseToTags.map((x) => x.tag) : [],
+            },
+            yaxis: {
+                labels: {
+                    formatter: function (value) {
+                        return currencyField(value)
                     },
-                    colors: ['#FB8C00'],
-                    xaxis: {
-                        categories: this.expenseToTags?.length ? this.expenseToTags.map((x) => x.tag) : [],
-                    },
-                    yaxis: {
-                        labels: {
-                            formatter: function (value) {
-                                return currencyField(value)
-                            },
-                        },
-                    },
-                    responsive: [
-                        {
-                            breakpoint: 1280,
-                        },
-                    ],
-                    plotOptions: {
-                        bar: {
-                            dataLabels: {
-                                position: 'top',
-                            },
-                        },
-                    },
+                },
+            },
+            responsive: [
+                {
+                    breakpoint: 1280,
+                },
+            ],
+            plotOptions: {
+                bar: {
                     dataLabels: {
-                        enabled: true,
-                        style: {
-                            colors: ['#333'],
-                        },
-                        offsetY: -20,
-                        formatter: function (val) {
-                            return currencyField(val)
-                        },
+                        position: 'top',
                     },
-                    noData: {
-                        text: this.$t('default.no-data-text'),
-                        align: 'center',
-                        verticalAlign: 'middle',
-                        offsetX: 0,
-                        offsetY: 0,
-                    },
-                }
+                },
             },
-            chartSeries() {
-                if (this.expenseToTags?.length) {
-                    return [
-                        {
-                            name: 'Despesas',
-                            data: this.expenseToTags.map((x) => x.value),
-                        },
-                    ]
-                }
-
-                return []
+            dataLabels: {
+                enabled: true,
+                style: {
+                    colors: ['#333'],
+                },
+                offsetY: -20,
+                formatter: function (val) {
+                    return currencyField(val)
+                },
             },
-        },
+            noData: {
+                text: t('default.no-data-text'),
+                align: 'center',
+                verticalAlign: 'middle',
+                offsetX: 0,
+                offsetY: 0,
+            },
+        }
+    })
 
-        methods: {},
-    }
+    const chartSeries = computed(() => {
+        if (props.expenseToTags?.length) {
+            return [
+                {
+                    name: 'Despesas',
+                    data: props.expenseToTags.map((x) => x.value),
+                },
+            ]
+        }
+        return []
+    })
 </script>

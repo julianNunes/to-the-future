@@ -216,206 +216,162 @@
 </template>
 
 <script setup>
+    import { ref, computed, nextTick } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-    import { Head, Link } from '@inertiajs/vue3'
+    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
+    import { Head, Link, router } from '@inertiajs/vue3'
     import moment from 'moment'
     import { currencyField, formatDate, reverseFormatNumber } from '@/utils/utils.js'
-</script>
+    import { useI18n } from 'vue-i18n'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
 
-<script>
-    export default {
-        name: 'PrepaidCardExtractIndex',
-        props: {
-            prepaidCard: {
-                type: Object,
-            },
-            extracts: {
-                type: Array,
-            },
-        },
+    defineOptions({ name: 'PrepaidCardExtractIndex' })
 
-        data() {
-            return {
-                breadcrumbs: [
-                    {
-                        title: this.$t('menus.dashboard'),
-                        disabled: false,
-                        href: '/dashboard',
-                    },
-                    {
-                        title: this.$t('menus.prepaid-card'),
-                        disabled: false,
-                        href: '/prepaid-card',
-                    },
-                    {
-                        title: this.$t('prepaid-card-extract.title-index'),
-                        disabled: true,
-                    },
-                ],
-                headers: [
-                    { title: this.$t('default.year-month'), key: 'year_month' },
-                    { title: this.$t('prepaid-card-extract.credit-date'), key: 'credit_date' },
-                    { title: this.$t('prepaid-card-extract.credit'), key: 'credit' },
-                    { title: this.$t('default.remarks'), key: 'remarks' },
-                    { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
-                ],
-                rules: {
-                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                    currencyFieldRules: [
-                        (value) => {
-                            value = reverseFormatNumber(value)
-                            if (!value) return this.$t('rules.required-text-field')
-                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
-                            return true
-                        },
-                    ],
+    const props = defineProps({
+        prepaidCard: { type: Object },
+        extracts: { type: Array },
+    })
+
+    const { t } = useI18n()
+
+    const {
+        isLoading,
+        editDialog,
+        titleModal,
+        confirmRemove: crudConfirmRemove,
+    } = useCrudOperations('/prepaid-card/extract')
+
+    const prepaid_card = ref({ ...props.prepaidCard })
+    const search = ref(null)
+    const selectMonthYear = ref(null)
+    const form = ref(null)
+    const confirm = ref(null)
+
+    const extract = ref({
+        id: null,
+        year_month: null,
+        credit: 0,
+        credit_date: null,
+        remarks: null,
+        prepaid_card_id: null,
+    })
+
+    const breadcrumbs = computed(() => [
+        { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
+        { title: t('menus.prepaid-card'), disabled: false, href: '/prepaid-card' },
+        { title: t('prepaid-card-extract.title-index'), disabled: true },
+    ])
+
+    const headers = computed(() => [
+        { title: t('default.year-month'), key: 'year_month' },
+        { title: t('prepaid-card-extract.credit-date'), key: 'credit_date' },
+        { title: t('prepaid-card-extract.credit'), key: 'credit' },
+        { title: t('default.remarks'), key: 'remarks' },
+        { title: t('default.action'), align: 'center', key: 'action', sortable: false },
+    ])
+
+    const rules = {
+        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
+        currencyFieldRules: [
+            (value) => {
+                value = reverseFormatNumber(value)
+                if (!value) return t('rules.required-text-field')
+                if (Number(value) <= 0) return t('rules.required-currency-field')
+                return true
+            },
+        ],
+    }
+
+    const isActive = computed(() => (prepaid_card.value.is_active ? t('default.yes') : t('default.no')))
+
+    function hrefExtractShow(item) {
+        return '/prepaid-card/extract/' + item.id
+    }
+
+    function newItem() {
+        titleModal.value = t('prepaid-card-extract.new-item')
+        editDialog.value = true
+        extract.value = {
+            id: null,
+            year_month: null,
+            credit: 0,
+            credit_date: null,
+            remarks: null,
+            prepaid_card_id: props.prepaidCard.id,
+        }
+        nextTick(() => selectMonthYear.value?.focus())
+    }
+
+    function editItem(item) {
+        titleModal.value = t('prepaid-card-extract.edit-item')
+        editDialog.value = true
+        extract.value = {
+            id: item.id,
+            year_month: item.year + '-' + item.month,
+            credit: item.credit,
+            credit_date: moment(item.credit_date, 'YYYY-MM-DD').toDate(),
+            remarks: item.remarks,
+            prepaid_card_id: item.prepaid_card_id,
+        }
+        nextTick(() => selectMonthYear.value?.focus())
+    }
+
+    async function save() {
+        const validate = await form.value.validate()
+        if (validate.valid) {
+            if (extract.value.id) {
+                await _update()
+            } else {
+                await _create()
+            }
+        }
+    }
+
+    async function _create() {
+        isLoading.value = true
+        router.post(
+            '/prepaid-card/extract',
+            {
+                year: extract.value.year_month.substring(0, 4),
+                month: extract.value.year_month.substring(5, 7),
+                credit: extract.value.credit,
+                credit_date: moment(extract.value.credit_date).format('YYYY-MM-DD'),
+                remarks: extract.value.remarks,
+                prepaid_card_id: extract.value.prepaid_card_id,
+            },
+            {
+                onSuccess: () => {
+                    editDialog.value = false
                 },
-                modalYear: false,
-                automaticGenerate: false,
-                year_month: null,
-                search: null,
-                editDialog: false,
-                titleModal: '',
-                isLoading: false,
-                deleteId: null,
-                prepaid_card: this.prepaidCard,
-                extract: {
-                    id: null,
-                    year_month: null,
-                    credit: 0,
-                    credit_date: null,
-                    remarks: null,
-                    prepaid_card_id: null,
+                onFinish: () => {
+                    isLoading.value = false
                 },
             }
-        },
+        )
+    }
 
-        computed: {
-            isActive() {
-                return this.prepaid_card.is_active ? this.$t('default.yes') : this.$t('default.no')
+    async function _update() {
+        isLoading.value = true
+        router.put(
+            '/prepaid-card/extract/' + extract.value.id,
+            {
+                credit: extract.value.credit,
+                credit_date: moment(extract.value.credit_date).format('YYYY-MM-DD'),
+                remarks: extract.value.remarks,
             },
-        },
+            {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+            }
+        )
+    }
 
-
-
-        methods: {
-            hrefExtractShow(item) {
-                return '/prepaid-card/extract/' + item.id
-            },
-
-            newItem() {
-                this.titleModal = this.$t('prepaid-card-extract.new-item')
-                this.editDialog = true
-                this.extract = {
-                    id: null,
-                    year_month: null,
-                    credit: 0,
-                    credit_date: null,
-                    remarks: null,
-                    prepaid_card_id: this.prepaidCard.id,
-                }
-                setTimeout(() => {
-                    this.$refs.selectMonthYear.focus()
-                })
-            },
-
-            editItem(item) {
-                this.titleModal = this.$t('prepaid-card-extract.edit-item')
-                this.editDialog = true
-                this.extract = {
-                    id: item.id,
-                    year_month: item.year + '-' + item.month,
-                    credit: item.credit,
-                    credit_date: moment(item.credit_date, 'YYYY-MM-DD'),
-                    remarks: item.remarks,
-                    prepaid_card_id: item.prepaid_card_id,
-                }
-                setTimeout(() => {
-                    this.$refs.selectMonthYear.focus()
-                })
-            },
-
-            async save() {
-                let validate = await this.$refs.form.validate()
-                if (validate.valid) {
-                    if (this.extract.id) {
-                        await this.update()
-                    } else {
-                        await this.create()
-                    }
-                }
-            },
-
-            async create() {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/prepaid-card/extract',
-                    {
-                        year: this.extract.year_month.substring(0, 4),
-                        month: this.extract.year_month.substring(5, 7),
-                        credit: this.extract.credit,
-                        credit_date: this.extract.credit_date.format('YYYY-MM-DD'),
-                        remarks: this.extract.remarks,
-                        prepaid_card_id: this.extract.prepaid_card_id,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-
-            async update() {
-                this.isLoading = true
-                this.$inertia.put(
-                    '/prepaid-card/extract/' + this.extract.id,
-                    {
-                        credit: this.extract.credit,
-                        credit_date: this.extract.credit_date.format('YYYY-MM-DD'),
-                        remarks: this.extract.remarks,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                    }
-                )
-            },
-
-            async confirmRemove(item) {
-                this.deleteId = item.id
-                if (
-                    await this.$refs.confirm.open(
-                        this.$t('prepaid-card-extract.title-show'),
-                        this.$t('default.confirm-delete-item')
-                    )
-                ) {
-                    this.remove()
-                }
-            },
-
-            remove() {
-                this.isLoading = true
-                this.$inertia.delete(`/prepaid-card/extract/${this.deleteId}`, {
-                    preserveState: true,
-                    preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                })
-            },
-        },
+    function confirmRemove(item) {
+        crudConfirmRemove(item, confirm.value, t('prepaid-card-extract.title-show'), t('default.confirm-delete-item'))
     }
 </script>

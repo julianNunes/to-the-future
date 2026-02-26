@@ -1,0 +1,23 @@
+# Ignorar pastas e arquivos de dependências e builds no contexto da IA
+node_modules/
+vendor/
+public/build/
+storage/
+.git/
+boostrap/
+
+# Arquivos de IDE e helpers gerados
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+.vscode/
+
+# Resultados de testes
+playwright-report/
+test-results/
+
+# Variáveis de ambiente
+.env
+
+# Outros
+*.log

@@ -198,356 +198,293 @@
 </template>
 
 <script setup>
+    import { ref, computed, nextTick } from 'vue'
+    import { router } from '@inertiajs/vue3'
+    import { useI18n } from 'vue-i18n'
     import BarChart from '@/Components/BarChart.vue'
-    import { logger } from '@/utils/logger.js'
-    import { currencyField, reverseFormatNumber } from '@/utils/utils.js'
-</script>
+    import { currencyField } from '@/utils/utils.js'
 
-<script>
-    export default {
-        name: 'BudgetGoal',
-        props: {
-            budgetId: {
-                type: Number,
-            },
-            goals: {
-                type: Array,
-                default: () => [],
-            },
-            goalsCharts: {
-                type: Array,
-            },
-            viewOnly: {
-                type: Boolean,
-                default: false,
-            },
+    import { useValidationRules } from '@/composables/useFormConstants.js'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import { useTagSearch } from '@/composables/useTagSearch.js'
+
+    defineOptions({ name: 'BudgetGoal' })
+
+    const componentProps = defineProps({
+        budgetId: { type: Number },
+        goals: {
+            type: Array,
+            default: () => [],
         },
+        goalsCharts: { type: Array },
+        viewOnly: { type: Boolean, default: false },
+    })
 
-        data() {
-            return {
-                headers: [
-                    { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                    { title: this.$t('default.value'), align: 'end', key: 'value' },
-                    { title: this.$t('default.group'), align: 'end', key: 'group' },
-                    { title: this.$t('budget-goal.count-share'), key: 'count_share' },
-                    { title: this.$t('default.tag'), key: 'tags' },
-                    { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
-                ],
-                rules: {
-                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                    currencyFieldRules: [
-                        (value) => {
-                            value = reverseFormatNumber(value)
-                            if (!value) return this.$t('rules.required-text-field')
-                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+    const { t } = useI18n()
+    const rules = useValidationRules()
 
-                            return true
-                        },
-                    ],
-                },
-                search: null,
-                editDialog: false,
-                titleModal: '',
-                isLoading: false,
-                deleteId: null,
-                panel: 1,
-                tab: null,
-                goal: {
-                    id: null,
-                    description: null,
-                    value: 0,
-                    group: null,
-                    count_share: false,
-                    budget_id: null,
-                    tags: [],
-                },
-                groupList: [
-                    {
-                        name: this.$t('default.in-installments'),
-                        value: 'PORTION',
-                    },
-                    {
-                        name: this.$t('default.monthly'),
-                        value: 'MONTHLY',
-                    },
-                    {
-                        name: this.$t('default.week-1'),
-                        value: 'WEEK_1',
-                    },
-                    {
-                        name: this.$t('default.week-2'),
-                        value: 'WEEK_2',
-                    },
-                    {
-                        name: this.$t('default.week-3'),
-                        value: 'WEEK_3',
-                    },
-                    {
-                        name: this.$t('default.week-4'),
-                        value: 'WEEK_4',
-                    },
-                ],
-                listTags: [],
-                searchFieldsData: [],
-                searchTag: '',
-                loadingData: false,
-            }
-        },
+    const { isLoading, editDialog, titleModal } = useCrudOperations('/budget-goal')
+    const { tags: listTags, searchTags: doSearchTags } = useTagSearch()
 
-        computed: {
-            itemsTags() {
-                return this.listTags
+    const search = ref(null)
+    const deleteId = ref(null)
+    const panel = ref(1)
+    const tab = ref(null)
+    const searchTag = ref('')
+    const loadingData = ref(false)
+
+    const goal = ref({
+        id: null,
+        description: null,
+        value: 0,
+        group: null,
+        count_share: false,
+        budget_id: null,
+        tags: [],
+    })
+
+    // Refs for template
+    const txtDescription = ref(null)
+    const form = ref(null)
+    const confirm = ref(null)
+
+    const groupList = [
+        { name: t('default.in-installments'), value: 'PORTION' },
+        { name: t('default.monthly'), value: 'MONTHLY' },
+        { name: t('default.week-1'), value: 'WEEK_1' },
+        { name: t('default.week-2'), value: 'WEEK_2' },
+        { name: t('default.week-3'), value: 'WEEK_3' },
+        { name: t('default.week-4'), value: 'WEEK_4' },
+    ]
+
+    const headers = computed(() => {
+        let hdrs = [
+            { title: t('default.description'), align: 'start', key: 'description', groupable: false },
+            { title: t('default.value'), align: 'end', key: 'value' },
+            { title: t('default.group'), align: 'end', key: 'group' },
+            { title: t('budget-goal.count-share'), key: 'count_share' },
+            { title: t('default.tag'), key: 'tags' },
+        ]
+
+        if (!componentProps.viewOnly) {
+            hdrs.push({ title: t('default.action'), align: 'center', key: 'action', sortable: false })
+        }
+        return hdrs
+    })
+
+    const itemsTags = computed(() => listTags.value)
+
+    const chartOptions = computed(() => {
+        return {
+            chart: {
+                id: 'basic-bar',
             },
-            chartOptions() {
-                return {
-                    chart: {
-                        id: 'basic-bar',
+            colors: ['#43A047', '#FB8C00'],
+            xaxis: {
+                categories: componentProps.goalsCharts?.length
+                    ? componentProps.goalsCharts.map((x) => x.description)
+                    : [],
+            },
+            yaxis: {
+                labels: {
+                    formatter: function (value) {
+                        return currencyField(value)
                     },
-                    colors: ['#43A047', '#FB8C00'],
-                    xaxis: {
-                        categories: this.goalsCharts?.length ? this.goalsCharts.map((x) => x.description) : [],
-                    },
-                    yaxis: {
-                        labels: {
-                            formatter: function (value) {
-                                return currencyField(value)
-                            },
-                        },
-                    },
-                    stroke: {
-                        show: true,
-                        width: 2,
-                        colors: ['transparent'],
-                    },
-                    responsive: [
-                        {
-                            breakpoint: 1280,
-                        },
-                    ],
-                    fill: {
-                        opacity: 1,
-                    },
-                    plotOptions: {
-                        bar: {
-                            dataLabels: {
-                                position: 'top',
-                            },
-                            columnWidth: '55%',
-                            endingShape: 'rounded',
-                        },
-                    },
+                },
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent'],
+            },
+            responsive: [
+                {
+                    breakpoint: 1280,
+                },
+            ],
+            fill: {
+                opacity: 1,
+            },
+            plotOptions: {
+                bar: {
                     dataLabels: {
-                        enabled: true,
-                        style: {
-                            colors: ['#333'],
-                        },
-                        offsetY: -20,
-                        formatter: function (val) {
-                            return currencyField(val)
-                        },
+                        position: 'top',
                     },
-                    legend: {
-                        show: true,
-                        position: 'bottom',
-                        onItemHover: {
-                            highlightDataSeries: true,
-                        },
-                    },
-                    noData: {
-                        text: this.$t('default.no-data-text'),
-                        align: 'center',
-                        verticalAlign: 'middle',
-                        offsetX: 0,
-                        offsetY: 0,
-                    },
-                }
+                    columnWidth: '55%',
+                    endingShape: 'rounded',
+                },
             },
-            chartSeries() {
-                if (this.goalsCharts?.length) {
-                    return [
-                        {
-                            name: this.$t('budget-goal.expenses'),
-                            data: this.goalsCharts.map((x) => x.value),
-                        },
-                        {
-                            name: this.$t('budget-goal.limit'),
-                            data: this.goalsCharts.map((x) => x.total),
-                        },
-                    ]
-                }
-
-                return []
+            dataLabels: {
+                enabled: true,
+                style: {
+                    colors: ['#333'],
+                },
+                offsetY: -20,
+                formatter: function (val) {
+                    return currencyField(val)
+                },
             },
-        },
-
-        methods: {
-            convertGroup(group) {
-                return this.groupList.find((x) => x.value === group).name
+            legend: {
+                show: true,
+                position: 'bottom',
+                onItemHover: {
+                    highlightDataSeries: true,
+                },
             },
-
-            async searchTags(val) {
-                if (this.loadingData) return
-
-                if (!val || val.length <= 1) {
-                    this.listTags = []
-                    clearTimeout(this.timeOut)
-                    return
-                }
-
-                if (this.goal.tags && this.goal.tags.length > 0 && this.goal.tags.find((x) => x.name == val)) {
-                    return
-                }
-
-                clearTimeout(this.timeOut)
-                this.timeOut = setTimeout(async () => {
-                    this.loadingData = true
-                    let searchFieldsData = []
-                    await window.axios
-                        .get('/tag/search/' + val)
-                        .then(function (response) {
-                            if (response.data && response.data.length > 0) {
-                                searchFieldsData = response.data
-                            }
-
-                            if (
-                                (searchFieldsData &&
-                                    searchFieldsData.length > 0 &&
-                                    !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
-                                !searchFieldsData ||
-                                searchFieldsData.length == 0
-                            ) {
-                                searchFieldsData.unshift({ name: val.toUpperCase() })
-                            }
-                        })
-                        .catch(function (error) {
-                            logger.error('error', error)
-                        })
-
-                    this.listTags = searchFieldsData
-                    this.loadingData = false
-                }, 300)
+            noData: {
+                text: t('default.no-data-text'),
+                align: 'center',
+                verticalAlign: 'middle',
+                offsetX: 0,
+                offsetY: 0,
             },
+        }
+    })
 
-            newItem() {
-                this.titleModal = this.$t('budget-goal.new-item')
-                this.editDialog = true
-                this.goal = {
-                    id: null,
-                    description: null,
-                    value: 0,
-                    group: null,
-                    count_share: false,
-                    budget_id: this.budgetId,
-                    tags: [],
-                }
-                setTimeout(() => {
-                    this.$refs.txtDescription.focus()
-                })
-            },
+    const chartSeries = computed(() => {
+        if (componentProps.goalsCharts?.length) {
+            return [
+                {
+                    name: t('budget-goal.expenses'),
+                    data: componentProps.goalsCharts.map((x) => x.value),
+                },
+                {
+                    name: t('budget-goal.limit'),
+                    data: componentProps.goalsCharts.map((x) => x.total),
+                },
+            ]
+        }
+        return []
+    })
 
-            editItem(item) {
-                this.titleModal = this.$t('budget-goal.edit-item')
-                this.editDialog = true
-                this.goal = {
-                    id: item.id,
-                    description: item.description,
-                    value: Number(item.value),
-                    group: item.group,
-                    count_share: item.count_share,
-                    tags: item.tags,
-                    budget_id: this.budgetId,
-                }
-                setTimeout(() => {
-                    this.$refs.txtDescription.focus()
-                })
-            },
+    function convertGroup(group) {
+        return groupList.find((x) => x.value === group)?.name || group
+    }
 
-            closeItem() {
-                this.editDialog = false
-            },
+    async function searchTags(val) {
+        loadingData.value = true
+        const existing = []
+        if (goal.value.tags && goal.value.tags.name) {
+            existing.push(goal.value.tags)
+        }
+        doSearchTags(val, existing)
+        setTimeout(() => {
+            loadingData.value = false
+        }, 300)
+    }
 
-            async save() {
-                let validate = await this.$refs.form.validate()
-                if (validate.valid) {
-                    if (this.goal.id) {
-                        await this.update()
-                    } else {
-                        await this.create()
-                    }
-                }
-            },
+    function newItem() {
+        titleModal.value = t('budget-goal.new-item')
+        editDialog.value = true
+        goal.value = {
+            id: null,
+            description: null,
+            value: 0,
+            group: null,
+            count_share: false,
+            budget_id: componentProps.budgetId,
+            tags: [],
+        }
+        nextTick(() => {
+            if (txtDescription.value) txtDescription.value.focus()
+        })
+    }
 
-            async create() {
-                this.isLoading = true
-                this.$inertia.post(
-                    '/budget-goal',
-                    {
-                        description: this.goal.description,
-                        value: Number(this.goal.value),
-                        group: this.goal.group,
-                        count_share: this.goal.count_share,
-                        tags: [this.goal.tags],
-                        budget_id: this.budgetId,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                        preserveScroll: true,
-                    }
-                )
-            },
+    function editItem(item) {
+        titleModal.value = t('budget-goal.edit-item')
+        editDialog.value = true
+        goal.value = {
+            id: item.id,
+            description: item.description,
+            value: Number(item.value),
+            group: item.group,
+            count_share: item.count_share,
+            tags: item.tags && item.tags.length ? item.tags[0] : [],
+            budget_id: componentProps.budgetId,
+        }
+        nextTick(() => {
+            if (txtDescription.value) txtDescription.value.focus()
+        })
+    }
 
-            async update() {
-                this.isLoading = true
-                this.$inertia.put(
-                    '/budget-goal/' + this.goal.id,
-                    {
-                        id: this.goal.id,
-                        description: this.goal.description,
-                        value: Number(this.goal.value),
-                        group: this.goal.group,
-                        count_share: this.goal.count_share,
-                        tags: [this.goal.tags],
-                        budget_id: this.budgetId,
-                    },
-                    {
-                        onSuccess: () => {
-                            this.editDialog = false
-                        },
-                        onFinish: () => {
-                            this.isLoading = false
-                        },
-                        preserveScroll: true,
-                    }
-                )
-            },
+    async function save() {
+        let validate = await form.value.validate()
+        if (validate.valid) {
+            if (goal.value.id) {
+                await updateData()
+            } else {
+                await createData()
+            }
+        }
+    }
 
-            async confirmRemove(item) {
-                this.deleteId = item.id
-                if (
-                    await this.$refs.confirm.open(this.$t('budget-goal.item'), this.$t('default.confirm-delete-item'))
-                ) {
-                    this.remove()
-                }
+    async function createData() {
+        isLoading.value = true
+        router.post(
+            '/budget-goal',
+            {
+                description: goal.value.description,
+                value: Number(goal.value.value),
+                group: goal.value.group,
+                count_share: goal.value.count_share,
+                tags: [goal.value.tags],
+                budget_id: componentProps.budgetId,
             },
+            {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+                preserveScroll: true,
+            }
+        )
+    }
 
-            remove() {
-                this.isLoading = true
-                this.$inertia.delete(`/budget-goal/${this.deleteId}`, {
-                    preserveScroll: true,
-                    onSuccess: () => {},
-                    onError: () => {
-                        this.isLoading = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                })
+    async function updateData() {
+        isLoading.value = true
+        router.put(
+            '/budget-goal/' + goal.value.id,
+            {
+                id: goal.value.id,
+                description: goal.value.description,
+                value: Number(goal.value.value),
+                group: goal.value.group,
+                count_share: goal.value.count_share,
+                tags: [goal.value.tags],
+                budget_id: componentProps.budgetId,
             },
-        },
+            {
+                onSuccess: () => {
+                    editDialog.value = false
+                },
+                onFinish: () => {
+                    isLoading.value = false
+                },
+                preserveScroll: true,
+            }
+        )
+    }
+
+    async function confirmRemove(item) {
+        deleteId.value = item.id
+        if (await confirm.value.open(t('budget-goal.item'), t('default.confirm-delete-item'))) {
+            removeData()
+        }
+    }
+
+    function removeData() {
+        isLoading.value = true
+        router.delete(`/budget-goal/${deleteId.value}`, {
+            preserveScroll: true,
+            onSuccess: () => {},
+            onError: () => {
+                isLoading.value = false
+            },
+            onFinish: () => {
+                isLoading.value = false
+            },
+        })
     }
 </script>

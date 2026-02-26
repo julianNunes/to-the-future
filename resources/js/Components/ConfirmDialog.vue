@@ -25,44 +25,45 @@
     </v-dialog>
 </template>
 
-<script>
-    export default {
-        name: 'ConfirmDialog',
+<script setup>
+    import { ref } from 'vue'
 
-        data: function () {
-            return {
-                dialog: false,
-                resolve: null,
-                reject: null,
-                message: null,
-                title: null,
-                options: {
-                    color: 'primary',
-                    width: 400,
-                    zIndex: 200,
-                    noconfirm: false,
-                },
-            }
-        },
-        methods: {
-            open(title, message, options) {
-                this.dialog = true
-                this.title = title
-                this.message = message
-                this.options = Object.assign(this.options, options)
-                return new Promise((resolve, reject) => {
-                    this.resolve = resolve
-                    this.reject = reject
-                })
-            },
-            agree() {
-                this.resolve(true)
-                this.dialog = false
-            },
-            cancel() {
-                this.resolve(false)
-                this.dialog = false
-            },
-        },
+    defineOptions({ name: 'ConfirmDialog' })
+
+    const dialog = ref(false)
+    const resolve = ref(null)
+    const reject = ref(null)
+    const message = ref(null)
+    const title = ref(null)
+    const options = ref({
+        color: 'primary',
+        width: 400,
+        zIndex: 200,
+        noconfirm: false,
+    })
+
+    function open(t, m, opts) {
+        dialog.value = true
+        title.value = t
+        message.value = m
+        options.value = Object.assign(options.value, opts)
+        return new Promise((res, rej) => {
+            resolve.value = res
+            reject.value = rej
+        })
     }
+
+    function agree() {
+        if (resolve.value) resolve.value(true)
+        dialog.value = false
+    }
+
+    function cancel() {
+        if (resolve.value) resolve.value(false)
+        dialog.value = false
+    }
+
+    defineExpose({
+        open,
+    })
 </script>

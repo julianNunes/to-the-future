@@ -3,6 +3,8 @@
     import { Head, Link, useForm } from '@inertiajs/vue3'
     import { ref } from 'vue'
 
+    defineOptions({ name: 'RegisterPage' })
+
     defineProps({
         canResetPassword: {
             type: Boolean,
@@ -24,11 +26,6 @@
         form.post('/register', {
             onFinish: () => form.reset('password', 'password_confirmation'),
         })
-    }
-</script>
-<script>
-    export default {
-        name: 'RegisterPage',
     }
 </script>
 
