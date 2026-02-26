@@ -1,20 +1,20 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue'
-import { Head, useForm } from '@inertiajs/vue3'
+    import GuestLayout from '@/Layouts/GuestLayout.vue'
+    import { Head, useForm } from '@inertiajs/vue3'
 
-defineProps({
-    status: {
-        type: String,
-    },
-})
+    defineProps({
+        status: {
+            type: String,
+        },
+    })
 
-const form = useForm({
-    email: '',
-})
+    const form = useForm({
+        email: '',
+    })
 
-const submit = () => {
-    form.post('/forgot-password')
-}
+    const submit = () => {
+        form.post('/forgot-password')
+    }
 </script>
 
 <template>

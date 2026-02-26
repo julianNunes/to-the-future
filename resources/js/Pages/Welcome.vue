@@ -1,13 +1,13 @@
 <script setup>
-import ApplicationLogo from '@/Components/ApplicationLogo.vue'
-import VuetifyLogo from '@/Components/VuetifyLogo.vue'
-import { Head, Link } from '@inertiajs/vue3'
+    import ApplicationLogo from '@/Components/ApplicationLogo.vue'
+    import VuetifyLogo from '@/Components/VuetifyLogo.vue'
+    import { Head, Link } from '@inertiajs/vue3'
 
-const props = defineProps({
-    canLogin: Boolean,
-    canRegister: Boolean,
-    auth: Object,
-})
+    const props = defineProps({
+        canLogin: Boolean,
+        canRegister: Boolean,
+        auth: Object,
+    })
 </script>
 
 <template>
@@ -58,7 +58,7 @@ const props = defineProps({
 </template>
 
 <script>
-export default {
-    name: 'WelcomePage',
-}
+    export default {
+        name: 'WelcomePage',
+    }
 </script>

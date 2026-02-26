@@ -164,183 +164,184 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head, Link } from '@inertiajs/vue3'
-import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { Head, Link } from '@inertiajs/vue3'
 </script>
 
 <script>
-export default {
-    name: 'PrepaidCardIndex',
-    props: {
-        prepaidCards: {
-            type: Array,
+    export default {
+        name: 'PrepaidCardIndex',
+        props: {
+            prepaidCards: {
+                type: Array,
+            },
         },
-    },
 
-    data() {
-        return {
-            breadcrumbs: [
-                {
-                    title: this.$t('menus.dashboard'),
-                    disabled: false,
-                    href: '/dashboard',
-                },
-                {
-                    title: this.$t('menus.prepaid-card'),
-                    disabled: true,
-                },
-            ],
-            headers: [
-                { title: this.$t('default.name'), key: 'name', groupable: false },
-                { title: this.$t('prepaid-card.digits'), key: 'digits' },
-                { title: this.$t('default.active'), key: 'is_active' },
-                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
-            ],
-            rules: {
-                textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                booleanFieldRules: [(v) => v !== null || this.$t('rules.required-text-field')],
-                digitsFieldRules: [
-                    (value) => {
-                        if (!value) return this.$t('rules.required-text-field')
-                        if (!/^\d+$/.test(value)) return this.$t('rules.only-numbers')
-
-                        return true
+        data() {
+            return {
+                breadcrumbs: [
+                    {
+                        title: this.$t('menus.dashboard'),
+                        disabled: false,
+                        href: '/dashboard',
+                    },
+                    {
+                        title: this.$t('menus.prepaid-card'),
+                        disabled: true,
                     },
                 ],
-            },
-            search: null,
-            editDialog: false,
-            isLoading: false,
-            deleteId: null,
-            prepaidCard: {
-                id: null,
-                name: null,
-                digits: null,
-                is_active: null,
-            },
-            isActiveOptions: [
-                {
-                    name: this.$t('default.no'),
-                    value: 0,
+                headers: [
+                    { title: this.$t('default.name'), key: 'name', groupable: false },
+                    { title: this.$t('prepaid-card.digits'), key: 'digits' },
+                    { title: this.$t('default.active'), key: 'is_active' },
+                    { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
+                ],
+                rules: {
+                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+                    booleanFieldRules: [(v) => v !== null || this.$t('rules.required-text-field')],
+                    digitsFieldRules: [
+                        (value) => {
+                            if (!value) return this.$t('rules.required-text-field')
+                            if (!/^\d+$/.test(value)) return this.$t('rules.only-numbers')
+
+                            return true
+                        },
+                    ],
                 },
-                {
-                    name: this.$t('default.yes'),
-                    value: 1,
+                search: null,
+                editDialog: false,
+                titleModal: '',
+                isLoading: false,
+                deleteId: null,
+                prepaidCard: {
+                    id: null,
+                    name: null,
+                    digits: null,
+                    is_active: null,
                 },
-            ],
-        }
-    },
-
-    async created() {},
-
-    async mounted() {},
-
-    methods: {
-        hrefExtract(item) {
-            return '/prepaid-card/' + item.id + '/extract'
-        },
-
-        newItem() {
-            this.titleModal = this.$t('prepaid-card.new-item')
-            this.editDialog = true
-            this.prepaidCard = {
-                id: null,
-                name: null,
-                digits: null,
-                is_active: null,
+                isActiveOptions: [
+                    {
+                        name: this.$t('default.no'),
+                        value: 0,
+                    },
+                    {
+                        name: this.$t('default.yes'),
+                        value: 1,
+                    },
+                ],
             }
-            setTimeout(() => {
-                this.$refs.txtName.focus()
-            })
         },
 
-        editItem(item) {
-            this.titleModal = this.$t('prepaid-card.edit-item')
-            this.editDialog = true
-            this.prepaidCard = {
-                id: item.id,
-                name: item.name,
-                digits: item.digits,
-                is_active: item.is_active,
-            }
-            setTimeout(() => {
-                this.$refs.txtName.focus()
-            })
-        },
 
-        async save() {
-            let validate = await this.$refs.form.validate()
-            if (validate.valid) {
-                if (this.prepaidCard.id) {
-                    await this.update()
-                } else {
-                    await this.create()
+
+        methods: {
+            hrefExtract(item) {
+                return '/prepaid-card/' + item.id + '/extract'
+            },
+
+            newItem() {
+                this.titleModal = this.$t('prepaid-card.new-item')
+                this.editDialog = true
+                this.prepaidCard = {
+                    id: null,
+                    name: null,
+                    digits: null,
+                    is_active: null,
                 }
-            }
-        },
+                setTimeout(() => {
+                    this.$refs.txtName.focus()
+                })
+            },
 
-        async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/prepaid-card',
-                {
-                    name: this.prepaidCard.name,
-                    digits: this.prepaidCard.digits,
-                    is_active: this.prepaidCard.is_active,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
+            editItem(item) {
+                this.titleModal = this.$t('prepaid-card.edit-item')
+                this.editDialog = true
+                this.prepaidCard = {
+                    id: item.id,
+                    name: item.name,
+                    digits: item.digits,
+                    is_active: item.is_active,
+                }
+                setTimeout(() => {
+                    this.$refs.txtName.focus()
+                })
+            },
+
+            async save() {
+                let validate = await this.$refs.form.validate()
+                if (validate.valid) {
+                    if (this.prepaidCard.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
+                }
+            },
+
+            async create() {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/prepaid-card',
+                    {
+                        name: this.prepaidCard.name,
+                        digits: this.prepaidCard.digits,
+                        is_active: this.prepaidCard.is_active,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
+
+            async update() {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/prepaid-card/' + this.prepaidCard.id,
+                    {
+                        name: this.prepaidCard.name,
+                        digits: this.prepaidCard.digits,
+                        is_active: this.prepaidCard.is_active,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
+
+            async confirmRemove(item) {
+                this.deleteId = item.id
+                if (
+                    await this.$refs.confirm.open(this.$t('prepaid-card.item'), this.$t('default.confirm-delete-item'))
+                ) {
+                    this.remove()
+                }
+            },
+
+            remove() {
+                this.isLoading = true
+                this.$inertia.delete(`/prepaid-card/${this.deleteId}`, {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {},
+                    onError: () => {
+                        this.isLoading = false
                     },
                     onFinish: () => {
                         this.isLoading = false
                     },
-                }
-            )
+                })
+            },
         },
-
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/prepaid-card/' + this.prepaidCard.id,
-                {
-                    name: this.prepaidCard.name,
-                    digits: this.prepaidCard.digits,
-                    is_active: this.prepaidCard.is_active,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
-        },
-
-        async confirmRemove(item) {
-            this.deleteId = item.id
-            if (await this.$refs.confirm.open(this.$t('prepaid-card.item'), this.$t('default.confirm-delete-item'))) {
-                this.remove()
-            }
-        },
-
-        remove() {
-            this.isLoading = true
-            this.$inertia.delete(`/prepaid-card/${this.deleteId}`, {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {},
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-            })
-        },
-    },
-}
+    }
 </script>

@@ -19,58 +19,58 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3'
-import moment from 'moment'
+    import { Link } from '@inertiajs/vue3'
+    import moment from 'moment'
 </script>
 
 <script>
-export default {
-    data() {
-        return {
-            items: [
-                {
-                    title: this.$t('menus.dashboard'),
-                    icon: 'mdi-view-dashboard',
-                    to: '/dashboard',
-                },
-                {
-                    title: this.$t('menus.tags'),
-                    icon: 'mdi-tag',
-                    to: '/tag',
-                },
-                {
-                    title: this.$t('menus.provision'),
-                    icon: 'mdi-cash-lock',
-                    to: '/provision',
-                },
+    export default {
+        data() {
+            return {
+                items: [
+                    {
+                        title: this.$t('menus.dashboard'),
+                        icon: 'mdi-view-dashboard',
+                        to: '/dashboard',
+                    },
+                    {
+                        title: this.$t('menus.tags'),
+                        icon: 'mdi-tag',
+                        to: '/tag',
+                    },
+                    {
+                        title: this.$t('menus.provision'),
+                        icon: 'mdi-cash-lock',
+                        to: '/provision',
+                    },
 
-                {
-                    title: this.$t('menus.fix-expense'),
-                    icon: 'mdi-cash-lock',
-                    to: '/fix-expense',
-                },
-                {
-                    title: this.$t('menus.financing'),
-                    icon: 'mdi-cash-multiple',
-                    to: '/financing',
-                },
-                {
-                    title: this.$t('menus.credit-card'),
-                    icon: 'mdi-credit-card',
-                    to: '/credit-card',
-                },
-                {
-                    title: this.$t('menus.prepaid-card'),
-                    icon: 'mdi-credit-card',
-                    to: '/prepaid-card',
-                },
-                {
-                    title: this.$t('menus.budget'),
-                    icon: 'mdi-credit-card',
-                    to: '/budget/' + moment().format('YYYY'),
-                },
-            ],
-        }
-    },
-}
+                    {
+                        title: this.$t('menus.fix-expense'),
+                        icon: 'mdi-cash-lock',
+                        to: '/fix-expense',
+                    },
+                    {
+                        title: this.$t('menus.financing'),
+                        icon: 'mdi-cash-multiple',
+                        to: '/financing',
+                    },
+                    {
+                        title: this.$t('menus.credit-card'),
+                        icon: 'mdi-credit-card',
+                        to: '/credit-card',
+                    },
+                    {
+                        title: this.$t('menus.prepaid-card'),
+                        icon: 'mdi-credit-card',
+                        to: '/prepaid-card',
+                    },
+                    {
+                        title: this.$t('menus.budget'),
+                        icon: 'mdi-credit-card',
+                        to: '/budget/' + moment().format('YYYY'),
+                    },
+                ],
+            }
+        },
+    }
 </script>

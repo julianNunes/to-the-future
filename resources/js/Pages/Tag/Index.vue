@@ -124,170 +124,169 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head } from '@inertiajs/vue3'
-import { upperCase } from '../../utils/utils.js'
-import writeXlsxFile from 'write-excel-file'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { Head } from '@inertiajs/vue3'
+    import writeXlsxFile from 'write-excel-file'
+    import { upperCase } from '@/utils/utils.js'
 </script>
 
 <script>
-export default {
-    name: 'TagIndex',
-    props: {
-        tags: {
-            type: Array,
-        },
-    },
-
-    data() {
-        return {
-            headers: [
-                { title: this.$t('default.name'), align: 'start', key: 'name', groupable: false },
-                { title: this.$t('default.action'), align: 'center', width: '100', key: 'action', sortable: false },
-            ],
-            rules: {
-                textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-            },
-            search: null,
-            editDialog: false,
-            removeDialog: false,
-            isLoading: false,
-            deleteId: null,
-            tag: {
-                id: null,
-                name: null,
-            },
-        }
-    },
-
-    computed: {
-        tagName: {
-            get() {
-                return this.tag.name
-            },
-            set(value) {
-                this.tag.name = upperCase(value)
+    export default {
+        name: 'TagIndex',
+        props: {
+            tags: {
+                type: Array,
             },
         },
-    },
 
-    async created() {},
-
-    async mounted() {},
-
-    methods: {
-        newItem() {
-            this.titleModal = this.$t('tag.new-item')
-            this.editDialog = true
-            this.tag = {
-                id: null,
-                name: null,
-            }
-            setTimeout(() => {
-                this.$refs.txtName.focus()
-            })
-        },
-
-        editItem(item) {
-            this.titleModal = this.$t('tag.edit-item')
-            this.editDialog = true
-            this.tag = {
-                id: item.id,
-                name: item.name,
-            }
-            setTimeout(() => {
-                this.$refs.txtName.focus()
-            })
-        },
-
-        closeItem() {
-            this.editDialog = false
-        },
-
-        async save() {
-            let validate = await this.$refs.form.validate()
-            if (validate.valid) {
-                if (this.tag.id) {
-                    await this.update()
-                } else {
-                    await this.create()
-                }
-            }
-        },
-
-        async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/tag',
-                {
-                    name: this.tag.name,
+        data() {
+            return {
+                headers: [
+                    { title: this.$t('default.name'), align: 'start', key: 'name', groupable: false },
+                    { title: this.$t('default.action'), align: 'center', width: '100', key: 'action', sortable: false },
+                ],
+                rules: {
+                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
                 },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
+                search: null,
+                editDialog: false,
+                titleModal: '',
+                removeDialog: false,
+                isLoading: false,
+                deleteId: null,
+                tag: {
+                    id: null,
+                    name: null,
+                },
+            }
+        },
+
+        computed: {
+            tagName: {
+                get() {
+                    return this.tag.name
+                },
+                set(value) {
+                    this.tag.name = upperCase(value)
+                },
+            },
+        },
+
+
+
+        methods: {
+            newItem() {
+                this.titleModal = this.$t('tag.new-item')
+                this.editDialog = true
+                this.tag = {
+                    id: null,
+                    name: null,
+                }
+                setTimeout(() => {
+                    this.$refs.txtName.focus()
+                })
+            },
+
+            editItem(item) {
+                this.titleModal = this.$t('tag.edit-item')
+                this.editDialog = true
+                this.tag = {
+                    id: item.id,
+                    name: item.name,
+                }
+                setTimeout(() => {
+                    this.$refs.txtName.focus()
+                })
+            },
+
+            closeItem() {
+                this.editDialog = false
+            },
+
+            async save() {
+                let validate = await this.$refs.form.validate()
+                if (validate.valid) {
+                    if (this.tag.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
+                }
+            },
+
+            async create() {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/tag',
+                    {
+                        name: this.tag.name,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
+
+            async update() {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/tag/' + this.tag.id,
+                    {
+                        name: this.tag.name,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
+
+            async confirmRemove(item) {
+                this.deleteId = item.id
+                if (await this.$refs.confirm.open(this.$t('tag.item'), this.$t('default.confirm-delete-item'))) {
+                    this.remove()
+                }
+            },
+
+            remove() {
+                this.isLoading = true
+                this.$inertia.delete(`/tag/${this.deleteId}`, {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {},
+                    onError: () => {
+                        this.isLoading = false
                     },
                     onFinish: () => {
                         this.isLoading = false
                     },
-                }
-            )
-        },
-
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/tag/' + this.tag.id,
-                {
-                    name: this.tag.name,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
-        },
-
-        async confirmRemove(item) {
-            this.deleteId = item.id
-            if (await this.$refs.confirm.open(this.$t('tag.item'), this.$t('default.confirm-delete-item'))) {
-                this.remove()
-            }
-        },
-
-        remove() {
-            this.isLoading = true
-            this.$inertia.delete(`/tag/${this.deleteId}`, {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {},
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-            })
-        },
-
-        async exportExcel() {
-            if (this.tags && this.tags.length) {
-                let data = []
-                data.push([{ value: this.$t('default.name') }])
-
-                this.tags.forEach((item) => {
-                    data.push([{ type: String, value: item.name }])
                 })
+            },
 
-                await writeXlsxFile(data, {
-                    data, // (optional) column widths, etc.
-                    fileName: 'export-tags.xlsx',
-                })
-            }
+            async exportExcel() {
+                if (this.tags && this.tags.length) {
+                    let data = []
+                    data.push([{ value: this.$t('default.name') }])
+
+                    this.tags.forEach((item) => {
+                        data.push([{ type: String, value: item.name }])
+                    })
+
+                    await writeXlsxFile(data, {
+                        data, // (optional) column widths, etc.
+                        fileName: 'export-tags.xlsx',
+                    })
+                }
+            },
         },
-    },
-}
+    }
 </script>

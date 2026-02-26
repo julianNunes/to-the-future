@@ -2,7 +2,9 @@
     <Head title="Provision" />
     <AuthenticatedLayout>
         <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('provision.title') }}</h5>
+            <h5 class="text-h5 font-weight-bold">
+                {{ $t('provision.title') }}
+            </h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
 
@@ -10,7 +12,9 @@
             <v-card-text>
                 <v-row dense>
                     <v-col md="12">
-                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
+                        <v-btn color="primary" @click="newItem">
+                            {{ $t('default.new') }}
+                        </v-btn>
                     </v-col>
                     <v-col md="12">
                         <v-data-table
@@ -36,21 +40,28 @@
                             :items-per-page="50"
                             fixed-header
                         >
-                            <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                            <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                            <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
-                            <template #[`item.tags`]="{ item }">{{
-                                item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
-                            }}</template>
-                            <template #[`item.share_user_id`]="{ item }">{{
-                                item.share_user ? item.share_user.name : ''
-                            }}</template>
+                            <template #[`item.value`]="{ item }">
+                                {{ currencyField(item.value) }}
+                            </template>
+                            <template #[`item.share_value`]="{ item }">
+                                {{ currencyField(item.share_value) }}
+                            </template>
+                            <template #[`item.group`]="{ item }">
+                                {{ convertGroup(item.group) }}
+                            </template>
+                            <template #[`item.tags`]="{ item }">
+                                {{ item.tags.length ? item.tags.map((x) => x.name).join(' | ') : '' }}
+                            </template>
+                            <template #[`item.share_user_id`]="{ item }">
+                                {{ item.share_user ? item.share_user.name : '' }}
+                            </template>
                             <template #[`item.action`]="{ item }">
                                 <v-tooltip :text="$t('default.edit')" location="top">
                                     <template #activator="{ props }">
                                         <v-icon
                                             v-bind="props"
-                                            color="warning"
+                                            color="war
+                                        ning"
                                             icon="mdi-pencil"
                                             size="small"
                                             @click="editItem(item)"
@@ -76,6 +87,7 @@
                             <template #group-header="{ item, toggleGroup, isGroupOpen }">
                                 <tr>
                                     <th class="title">
+                                        v
                                         <VBtn
                                             size="small"
                                             variant="text"
@@ -91,16 +103,20 @@
                                     <th class="title text-right">
                                         {{ sumGroup(provisions, item.key, item.value, 'share_value') }}
                                     </th>
-                                    <th :colspan="3"></th>
+                                    <th :colspan="3" />
                                 </tr>
                             </template>
 
                             <template v-if="provisions.length" #tfoot>
-                                <tr class="green--text">
-                                    <th class="title"></th>
+                                <tr class="text-green">
+                                    <th class="title" />
                                     <th class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">{{ sumField(provisions, 'value') }}</th>
-                                    <th class="title text-right">{{ sumField(provisions, 'share_value') }}</th>
+                                    <th class="title text-right">
+                                        {{ sumField(provisions, 'value') }}
+                                    </th>
+                                    <th class="title text-right">
+                                        {{ sumField(provisions, 'share_value') }}
+                                    </th>
                                 </tr>
                             </template>
 
@@ -144,7 +160,7 @@
                                     :rules="rules.textFieldRules"
                                     required
                                     density="comfortable"
-                                ></v-text-field>
+                                />
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <vuetify-money
@@ -258,7 +274,7 @@
                     </v-form>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
                         {{ $t('default.cancel') }}
                     </v-btn>
@@ -274,290 +290,306 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head } from '@inertiajs/vue3'
-import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import { sumField, sumGroup, currencyField, reverseFormatNumber } from '../../utils/utils.js'
+    import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { logger } from '@/utils/logger.js'
+    import { Head } from '@inertiajs/vue3'
+    import { currencyField, reverseFormatNumber, sumField, sumGroup } from '@/utils/utils.js'
 </script>
 
 <script>
-export default {
-    name: 'ProvisionIndex',
-    props: {
-        provisions: {
-            type: Array,
+    export default {
+        name: 'ProvisionIndex',
+        props: {
+            provisions: {
+                type: Array,
+            },
+            shareUsers: {
+                type: Array,
+            },
         },
-        shareUsers: {
-            type: Array,
-        },
-    },
 
-    data() {
-        return {
-            breadcrumbs: [
-                {
-                    title: this.$t('menus.dashboard'),
-                    disabled: false,
-                    href: '/dashboard',
-                },
-                {
-                    title: this.$t('menus.provision'),
-                    disabled: true,
-                },
-            ],
-            headers: [
-                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
-                { title: this.$t('default.share-user'), key: 'share_user_id' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.tags'), key: 'tags' },
-                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
-            ],
-            rules: {
-                textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                currencyFieldRules: [
-                    (value) => {
-                        value = reverseFormatNumber(value)
-                        if (!value) return this.$t('rules.required-text-field')
-                        if (Number(value) <= 0) return this.$t('rules.required-currency-field')
-
-                        return true
+        data() {
+            return {
+                breadcrumbs: [
+                    {
+                        title: this.$t('menus.dashboard'),
+                        disabled: false,
+                        href: '/dashboard',
+                    },
+                    {
+                        title: this.$t('menus.provision'),
+                        disabled: true,
                     },
                 ],
-            },
-            search: null,
-            editDialog: false,
-            isLoading: false,
-            deleteId: null,
-            percentage: null,
-            provision: {
-                id: null,
-                description: null,
-                value: 0,
-                group: null,
-                remarks: null,
-                share_value: 0,
-                share_user_id: null,
-                tags: [],
-            },
-            groupList: [
-                {
-                    name: this.$t('default.monthly'),
-                    value: 'MONTHLY',
-                },
-                {
-                    name: this.$t('default.week-1'),
-                    value: 'WEEK_1',
-                },
-                {
-                    name: this.$t('default.week-2'),
-                    value: 'WEEK_2',
-                },
-                {
-                    name: this.$t('default.week-3'),
-                    value: 'WEEK_3',
-                },
-                {
-                    name: this.$t('default.week-4'),
-                    value: 'WEEK_4',
-                },
-            ],
-            listTags: [],
-            searchFieldsData: [],
-            searchTag: '',
-            loadingData: false,
-        }
-    },
+                headers: [
+                    {
+                        title: this.$t('default.description'),
+                        align: 'start',
+                        key: 'description',
+                        groupable: false,
+                    },
+                    { title: this.$t('default.value'), align: 'end', key: 'value' },
+                    {
+                        title: this.$t('default.share-value'),
+                        align: 'end',
+                        key: 'share_value',
+                    },
+                    { title: this.$t('default.share-user'), key: 'share_user_id' },
+                    { title: this.$t('default.remarks'), key: 'remarks' },
+                    { title: this.$t('default.tags'), key: 'tags' },
+                    {
+                        title: this.$t('default.action'),
+                        align: 'center',
+                        key: 'action',
+                        sortable: false,
+                    },
+                ],
+                rules: {
+                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+                    currencyFieldRules: [
+                        (value) => {
+                            value = reverseFormatNumber(value)
+                            if (!value) return this.$t('rules.required-text-field')
+                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
-    computed: {
-        itemsTags() {
-            return this.listTags
-        },
-    },
-
-    async created() {},
-
-    async mounted() {},
-
-    methods: {
-        calculeShareValue(evt) {
-            if (this.provision.value) {
-                this.provision.share_value = parseFloat((this.provision.value * evt.target.value) / 100).toFixed(2)
+                            return true
+                        },
+                    ],
+                },
+                search: null,
+                editDialog: false,
+                titleModal: '',
+                isLoading: false,
+                deleteId: null,
+                percentage: null,
+                provision: {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    group: null,
+                    remarks: null,
+                    share_value: 0,
+                    share_user_id: null,
+                    tags: [],
+                },
+                groupList: [
+                    {
+                        name: this.$t('default.monthly'),
+                        value: 'MONTHLY',
+                    },
+                    {
+                        name: this.$t('default.week-1'),
+                        value: 'WEEK_1',
+                    },
+                    {
+                        name: this.$t('default.week-2'),
+                        value: 'WEEK_2',
+                    },
+                    {
+                        name: this.$t('default.week-3'),
+                        value: 'WEEK_3',
+                    },
+                    {
+                        name: this.$t('default.week-4'),
+                        value: 'WEEK_4',
+                    },
+                ],
+                listTags: [],
+                searchFieldsData: [],
+                searchTag: '',
+                loadingData: false,
             }
         },
 
-        convertGroup(group) {
-            return this.groupList.find((x) => x.value === group).name
+        computed: {
+            itemsTags() {
+                return this.listTags
+            },
         },
 
-        async searchTags(val) {
-            if (this.loadingData) return
 
-            if (!val || val.length <= 1) {
-                this.listTags = []
+
+        methods: {
+            calculeShareValue(evt) {
+                if (this.provision.value) {
+                    this.provision.share_value = parseFloat((this.provision.value * evt.target.value) / 100).toFixed(2)
+                }
+            },
+
+            convertGroup(group) {
+                return this.groupList.find((x) => x.value === group).name
+            },
+
+            async searchTags(val) {
+                if (this.loadingData) return
+
+                if (!val || val.length <= 1) {
+                    this.listTags = []
+                    clearTimeout(this.timeOut)
+                    return
+                }
+
+                if (
+                    this.provision.tags &&
+                    this.provision.tags.length > 0 &&
+                    this.provision.tags.find((x) => x.name == val)
+                ) {
+                    return
+                }
+
                 clearTimeout(this.timeOut)
-                return
-            }
+                this.timeOut = setTimeout(async () => {
+                    this.loadingData = true
+                    let searchFieldsData = []
+                    await window.axios
+                        .get('/tag/search/' + val)
+                        .then(function (response) {
+                            if (response.data && response.data.length > 0) {
+                                searchFieldsData = response.data
+                            }
 
-            if (
-                this.provision.tags &&
-                this.provision.tags.length > 0 &&
-                this.provision.tags.find((x) => x.name == val)
-            ) {
-                return
-            }
+                            if (
+                                (searchFieldsData &&
+                                    searchFieldsData.length > 0 &&
+                                    !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                                !searchFieldsData ||
+                                searchFieldsData.length == 0
+                            ) {
+                                searchFieldsData.unshift({
+                                    name: val.toUpperCase(),
+                                })
+                            }
+                        })
+                        .catch(function (error) {
+                            logger.error('error', error)
+                        })
 
-            clearTimeout(this.timeOut)
-            this.timeOut = setTimeout(async () => {
-                this.loadingData = true
-                let searchFieldsData = []
-                await window.axios
-                    .get('/tag/search/' + val)
-                    .then(function (response) {
-                        if (response.data && response.data.length > 0) {
-                            searchFieldsData = response.data
-                        }
+                    this.listTags = searchFieldsData
+                    this.loadingData = false
+                }, 300)
+            },
 
-                        if (
-                            (searchFieldsData &&
-                                searchFieldsData.length > 0 &&
-                                !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
-                            !searchFieldsData ||
-                            searchFieldsData.length == 0
-                        ) {
-                            searchFieldsData.unshift({ name: val.toUpperCase() })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log('error', error)
-                    })
-
-                this.listTags = searchFieldsData
-                this.loadingData = false
-            }, 300)
-        },
-
-        newItem() {
-            this.titleModal = this.$t('provision.new-item')
-            this.editDialog = true
-            this.provision = {
-                id: null,
-                description: null,
-                value: 0,
-                group: null,
-                remarks: null,
-                share_value: 0,
-                share_user_id: null,
-                tags: [],
-            }
-            setTimeout(() => {
-                this.$refs.txtDescription.focus()
-            })
-        },
-
-        editItem(item) {
-            this.titleModal = this.$t('provision.edit-item')
-            this.editDialog = true
-            this.provision = {
-                id: item.id,
-                description: item.description,
-                value: Number(item.value),
-                group: item.group,
-                remarks: item.remarks,
-                share_value: item.share_value ? Number(item.share_value) : 0,
-                share_user_id: item.share_user_id,
-                tags: item.tags,
-            }
-            setTimeout(() => {
-                this.$refs.txtDescription.focus()
-            })
-        },
-
-        closeItem() {
-            this.editDialog = false
-        },
-
-        async save() {
-            let validate = await this.$refs.form.validate()
-            if (validate.valid) {
-                if (this.provision.id) {
-                    await this.update()
-                } else {
-                    await this.create()
+            newItem() {
+                this.titleModal = this.$t('provision.new-item')
+                this.editDialog = true
+                this.provision = {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    group: null,
+                    remarks: null,
+                    share_value: 0,
+                    share_user_id: null,
+                    tags: [],
                 }
-            }
-        },
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
+                })
+            },
 
-        async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/provision',
-                {
-                    description: this.provision.description,
-                    value: this.provision.value,
-                    group: this.provision.group,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
-                    tags: this.provision.tags,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
+            editItem(item) {
+                this.titleModal = this.$t('provision.edit-item')
+                this.editDialog = true
+                this.provision = {
+                    id: item.id,
+                    description: item.description,
+                    value: Number(item.value),
+                    group: item.group,
+                    remarks: item.remarks,
+                    share_value: item.share_value ? Number(item.share_value) : 0,
+                    share_user_id: item.share_user_id,
+                    tags: item.tags,
+                }
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
+                })
+            },
+
+            closeItem() {
+                this.editDialog = false
+            },
+
+            async save() {
+                let validate = await this.$refs.form.validate()
+                if (validate.valid) {
+                    if (this.provision.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
+                }
+            },
+
+            async create() {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/provision',
+                    {
+                        description: this.provision.description,
+                        value: this.provision.value,
+                        group: this.provision.group,
+                        remarks: this.provision.remarks,
+                        share_value: this.provision.share_value,
+                        share_user_id: this.provision.share_user_id,
+                        tags: this.provision.tags,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
+
+            async update() {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/provision/' + this.provision.id,
+                    {
+                        description: this.provision.description,
+                        value: this.provision.value,
+                        group: this.provision.group,
+                        remarks: this.provision.remarks,
+                        share_value: this.provision.share_value,
+                        share_user_id: this.provision.share_user_id,
+                        tags: this.provision.tags,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
+
+            async confirmRemove(item) {
+                this.deleteId = item.id
+                if (await this.$refs.confirm.open(this.$t('provision.item'), this.$t('default.confirm-delete-item'))) {
+                    this.remove()
+                }
+            },
+
+            remove() {
+                this.isLoading = true
+                this.$inertia.delete(`/provision/${this.deleteId}`, {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {},
+                    onError: () => {
+                        this.isLoading = false
                     },
                     onFinish: () => {
                         this.isLoading = false
                     },
-                }
-            )
+                })
+            },
         },
-
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/provision/' + this.provision.id,
-                {
-                    description: this.provision.description,
-                    value: this.provision.value,
-                    group: this.provision.group,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
-                    tags: this.provision.tags,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
-        },
-
-        async confirmRemove(item) {
-            this.deleteId = item.id
-            if (await this.$refs.confirm.open(this.$t('provision.item'), this.$t('default.confirm-delete-item'))) {
-                this.remove()
-            }
-        },
-
-        remove() {
-            this.isLoading = true
-            this.$inertia.delete(`/provision/${this.deleteId}`, {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {},
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-            })
-        },
-    },
-}
+    }
 </script>

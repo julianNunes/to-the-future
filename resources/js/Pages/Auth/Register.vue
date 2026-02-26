@@ -1,40 +1,40 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue'
-import { Head, Link, useForm } from '@inertiajs/vue3'
-import { ref } from 'vue'
+    import GuestLayout from '@/Layouts/GuestLayout.vue'
+    import { Head, Link, useForm } from '@inertiajs/vue3'
+    import { ref } from 'vue'
 
-defineProps({
-    canResetPassword: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-})
-
-const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-})
-const showPassword = ref(false)
-
-const submit = () => {
-    form.post('/register', {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+    defineProps({
+        canResetPassword: {
+            type: Boolean,
+        },
+        status: {
+            type: String,
+        },
     })
-}
+
+    const form = useForm({
+        name: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+    })
+    const showPassword = ref(false)
+
+    const submit = () => {
+        form.post('/register', {
+            onFinish: () => form.reset('password', 'password_confirmation'),
+        })
+    }
 </script>
 <script>
-export default {
-    name: 'RegisterPage',
-}
+    export default {
+        name: 'RegisterPage',
+    }
 </script>
 
 <template>
     <GuestLayout>
-        <Head title="Log in" />
+        <Head title="Register" />
         <v-form @submit.prevent="submit">
             <div class="text-subtitle-1 text-medium-emphasis">Name</div>
             <v-text-field

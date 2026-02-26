@@ -93,7 +93,7 @@
                             </template>
 
                             <template v-if="provisions.length" #tfoot>
-                                <tr class="green--text">
+                                <tr class="text-green">
                                     <th class="title"></th>
                                     <th class="title font-weight-bold text-right">Total</th>
                                     <th class="title text-right">{{ sumField(provisions, 'value') }}</th>
@@ -294,408 +294,411 @@
 </template>
 
 <script setup>
-import { sumField, sumGroup, currencyField, reverseFormatNumber } from '../../utils/utils.js'
+    import { logger } from '@/utils/logger.js'
+    import { currencyField, reverseFormatNumber, sumField, sumGroup } from '@/utils/utils.js'
 </script>
 
 <script>
-export default {
-    name: 'BudgetProvision',
-    props: {
-        budgetId: {
-            type: Number,
+    export default {
+        name: 'BudgetProvision',
+        props: {
+            budgetId: {
+                type: Number,
+            },
+            provisions: {
+                type: Array,
+                default: () => [],
+            },
+            yearMonth: {
+                type: String,
+            },
+            shareUsers: {
+                type: Array,
+            },
+            budgetWeeks: {
+                type: Array,
+            },
+            viewOnly: {
+                type: Boolean,
+            },
         },
-        provisions: {
-            type: Array,
-            default: new Array(),
-        },
-        yearMonth: {
-            type: String,
-        },
-        shareUsers: {
-            type: Array,
-        },
-        budgetWeeks: {
-            type: Array,
-        },
-        viewOnly: {
-            type: Boolean,
-        },
-    },
 
-    data() {
-        return {
-            rules: {
-                textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                currencyFieldRules: [
-                    (value) => {
-                        value = reverseFormatNumber(value)
-                        if (!value) return this.$t('rules.required-text-field')
-                        if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+        data() {
+            return {
+                rules: {
+                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+                    currencyFieldRules: [
+                        (value) => {
+                            value = reverseFormatNumber(value)
+                            if (!value) return this.$t('rules.required-text-field')
+                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
-                        return true
+                            return true
+                        },
+                    ],
+                },
+                search: null,
+                editDialog: false,
+                titleModal: '',
+                isLoading: false,
+                deleteId: null,
+                panel: 1,
+                percentage: null,
+                provision: {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    group: null,
+                    remarks: null,
+                    share_value: 0,
+                    share_user_id: null,
+                    tags: [],
+                    budget_id: null,
+                },
+                groupList: [
+                    {
+                        name: this.$t('default.monthly'),
+                        value: 'MONTHLY',
+                    },
+                    {
+                        name: this.$t('default.week-1'),
+                        value: 'WEEK_1',
+                    },
+                    {
+                        name: this.$t('default.week-2'),
+                        value: 'WEEK_2',
+                    },
+                    {
+                        name: this.$t('default.week-3'),
+                        value: 'WEEK_3',
+                    },
+                    {
+                        name: this.$t('default.week-4'),
+                        value: 'WEEK_4',
                     },
                 ],
+                listTags: [],
+                listDescriptions: [],
+                searchFieldsData: [],
+                searchTag: '',
+                searchDescription: '',
+                loadingData: false,
+            }
+        },
+
+        computed: {
+            itemsTags() {
+                return this.listTags
             },
-            search: null,
-            editDialog: false,
-            isLoading: false,
-            deleteId: null,
-            panel: 1,
-            percentage: null,
-            provision: {
-                id: null,
-                description: null,
-                value: 0,
-                group: null,
-                remarks: null,
-                share_value: 0,
-                share_user_id: null,
-                tags: [],
-                budget_id: null,
+            itemsDescriptions() {
+                let result = []
+
+                if (this.listDescriptions?.length) {
+                    result = this.listDescriptions.map((x) => {
+                        let resume = ''
+
+                        if (x.value) {
+                            resume += this.$t('default.value') + ': ' + currencyField(x.value)
+                        }
+
+                        if (x.share_value) {
+                            resume += ' | ' + this.$t('default.share-value') + ': ' + currencyField(x.share_value)
+                        }
+
+                        if (x.tags && x.tags.length > 0) {
+                            resume += ' | ' + this.$t('default.tags') + ': ' + x.tags.map((tag) => tag.name).join(', ')
+                        }
+
+                        if (x.remarks) {
+                            resume += ' | ' + this.$t('default.remarks') + ': ' + x.remarks
+                        }
+
+                        return {
+                            description: x.description,
+                            resume: resume,
+                            data: x,
+                        }
+                    })
+                }
+
+                return result
             },
-            groupList: [
-                {
-                    name: this.$t('default.monthly'),
-                    value: 'MONTHLY',
-                },
-                {
-                    name: this.$t('default.week-1'),
-                    value: 'WEEK_1',
-                },
-                {
-                    name: this.$t('default.week-2'),
-                    value: 'WEEK_2',
-                },
-                {
-                    name: this.$t('default.week-3'),
-                    value: 'WEEK_3',
-                },
-                {
-                    name: this.$t('default.week-4'),
-                    value: 'WEEK_4',
-                },
-            ],
-            listTags: [],
-            listDescriptions: [],
-            searchFieldsData: [],
-            searchTag: '',
-            searchDescription: '',
-            loadingData: false,
-        }
-    },
+            headers() {
+                let headers = [
+                    { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
+                    { title: this.$t('default.value'), align: 'end', key: 'value' },
+                    { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
+                    { title: this.$t('default.share-user'), key: 'share_user_id' },
+                    { title: this.$t('default.remarks'), key: 'remarks' },
+                    { title: this.$t('default.tags'), key: 'tags' },
+                ]
 
-    computed: {
-        itemsTags() {
-            return this.listTags
+                if (!this.viewOnly) {
+                    headers.push({
+                        title: this.$t('default.action'),
+                        align: 'end',
+                        key: 'action',
+                        sortable: false,
+                        width: 40,
+                    })
+                }
+
+                return headers
+            },
         },
-        itemsDescriptions() {
-            let result = []
 
-            if (this.listDescriptions?.length) {
-                result = this.listDescriptions.map((x) => {
-                    let resume = ''
 
-                    if (x.value) {
-                        resume += this.$t('default.value') + ': ' + currencyField(x.value)
-                    }
 
-                    if (x.share_value) {
-                        resume += ' | ' + this.$t('default.share-value') + ': ' + currencyField(x.share_value)
-                    }
+        methods: {
+            calculeShareValue(evt) {
+                if (this.provision.value) {
+                    this.provision.share_value = parseFloat((this.provision.value * evt.target.value) / 100).toFixed(2)
+                }
+            },
 
-                    if (x.tags && x.tags.length > 0) {
-                        resume += ' | ' + this.$t('default.tags') + ': ' + x.tags.map((tag) => tag.name).join(', ')
-                    }
+            convertGroup(group) {
+                if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
+                    return (
+                        this.groupList.find((x) => x.value === group).name +
+                        ' (' +
+                        this.budgetWeeks.find((x) => x.value === group).text +
+                        ')'
+                    )
+                }
 
-                    if (x.remarks) {
-                        resume += ' | ' + this.$t('default.remarks') + ': ' + x.remarks
-                    }
+                return this.groupList.find((x) => x.value === group).name
+            },
 
-                    return {
-                        description: x.description,
-                        resume: resume,
-                        data: x,
-                    }
+            async searchTags(val) {
+                if (this.loadingData) return
+
+                if (!val || val.length <= 1) {
+                    this.listTags = []
+                    clearTimeout(this.timeOut)
+                    return
+                }
+
+                if (
+                    this.provision.tags &&
+                    this.provision.tags.length > 0 &&
+                    this.provision.tags.find((x) => x.name == val)
+                ) {
+                    return
+                }
+
+                clearTimeout(this.timeOut)
+                this.timeOut = setTimeout(async () => {
+                    this.loadingData = true
+                    let searchFieldsData = []
+                    await window.axios
+                        .get('/tag/search/' + val)
+                        .then(function (response) {
+                            if (response.data && response.data.length > 0) {
+                                searchFieldsData = response.data
+                            }
+
+                            if (
+                                (searchFieldsData &&
+                                    searchFieldsData.length > 0 &&
+                                    !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                                !searchFieldsData ||
+                                searchFieldsData.length == 0
+                            ) {
+                                searchFieldsData.unshift({ name: val.toUpperCase() })
+                            }
+                        })
+                        .catch(function (error) {
+                            logger.error('error', error)
+                        })
+
+                    this.listTags = searchFieldsData
+                    this.loadingData = false
+                }, 300)
+            },
+
+            async searchDescriptions(val) {
+                if (this.loadingData) return
+
+                if (!val || val.length <= 0) {
+                    this.listDescriptions = []
+                    clearTimeout(this.timeOut)
+                    return
+                }
+
+                if (this.provision.description && this.provision.description == val) {
+                    return
+                }
+
+                clearTimeout(this.timeOut)
+                this.timeOut = setTimeout(async () => {
+                    this.loadingData = true
+                    let searchFieldsData = []
+                    await window.axios
+                        .get('/budget-provision/search/' + val)
+                        .then(function (response) {
+                            if (response.data && response.data.length > 0) {
+                                searchFieldsData = response.data
+                            }
+
+                            if (
+                                (searchFieldsData &&
+                                    searchFieldsData.length > 0 &&
+                                    !searchFieldsData.find((x) => x.description == val)) ||
+                                !searchFieldsData ||
+                                searchFieldsData.length == 0
+                            ) {
+                                searchFieldsData.unshift({ description: val, resume: '', data: null })
+                            }
+                        })
+                        .catch(function (error) {
+                            logger.error('error', error)
+                        })
+
+                    this.listDescriptions = searchFieldsData
+                    this.loadingData = false
+                }, 400)
+            },
+
+            async selectedDescription(item) {
+                if (item?.data) {
+                    this.provision.value = item.data.value
+                    this.provision.share_value = item.data.share_value
+                    this.provision.share_user_id = item.data.share_user_id
+                    this.provision.remarks = item.data.remarks
+                    this.provision.tags = item.data.tags
+                }
+            },
+
+            newItem() {
+                this.titleModal = this.$t('budget-provision.new-item')
+                this.editDialog = true
+                this.provision = {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    group: null,
+                    remarks: null,
+                    share_value: 0,
+                    share_user_id: null,
+                    tags: [],
+                    budget_id: this.budgetId,
+                }
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
                 })
-            }
+            },
 
-            return result
-        },
-        headers() {
-            let headers = [
-                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
-                { title: this.$t('default.share-user'), key: 'share_user_id' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.tags'), key: 'tags' },
-            ]
-
-            if (!this.viewOnly) {
-                headers.push({
-                    title: this.$t('default.action'),
-                    align: 'end',
-                    key: 'action',
-                    sortable: false,
-                    width: 40,
+            editItem(item) {
+                this.titleModal = this.$t('budget-provision.edit-item')
+                this.editDialog = true
+                this.provision = {
+                    id: item.id,
+                    description: item.description.description,
+                    value: Number(item.value),
+                    group: item.group,
+                    remarks: item.remarks,
+                    share_value: item.share_value ? Number(item.share_value) : 0,
+                    share_user_id: item.share_user_id,
+                    tags: item.tags,
+                    budget_id: this.budgetId,
+                }
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
                 })
-            }
+            },
 
-            return headers
-        },
-    },
+            closeItem() {
+                this.editDialog = false
+            },
 
-    async created() {},
+            async save() {
+                let validate = await this.$refs.form.validate()
+                if (validate.valid) {
+                    if (this.provision.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
+                }
+            },
 
-    async mounted() {},
-
-    methods: {
-        calculeShareValue(evt) {
-            if (this.provision.value) {
-                this.provision.share_value = parseFloat((this.provision.value * evt.target.value) / 100).toFixed(2)
-            }
-        },
-
-        convertGroup(group) {
-            if (this.budgetWeeks?.length && this.budgetWeeks.find((x) => x.value === group)) {
-                return (
-                    this.groupList.find((x) => x.value === group).name +
-                    ' (' +
-                    this.budgetWeeks.find((x) => x.value === group).text +
-                    ')'
+            async create() {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/budget-provision',
+                    {
+                        description: this.provision.description.description,
+                        value: this.provision.value,
+                        group: this.provision.group,
+                        remarks: this.provision.remarks,
+                        share_value: this.provision.share_value,
+                        share_user_id: this.provision.share_user_id,
+                        tags: this.provision.tags,
+                        budget_id: this.provision.budget_id,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                        preserveScroll: true,
+                    }
                 )
-            }
+            },
 
-            return this.groupList.find((x) => x.value === group).name
-        },
+            async update() {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/budget-provision/' + this.provision.id,
+                    {
+                        description: this.provision.description.description,
+                        value: this.provision.value,
+                        group: this.provision.group,
+                        remarks: this.provision.remarks,
+                        share_value: this.provision.share_value,
+                        share_user_id: this.provision.share_user_id,
+                        tags: this.provision.tags,
+                        budget_id: this.provision.budget_id,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                        preserveScroll: true,
+                    }
+                )
+            },
 
-        async searchTags(val) {
-            if (this.loadingData) return
-
-            if (!val || val.length <= 1) {
-                this.listTags = []
-                clearTimeout(this.timeOut)
-                return
-            }
-
-            if (
-                this.provision.tags &&
-                this.provision.tags.length > 0 &&
-                this.provision.tags.find((x) => x.name == val)
-            ) {
-                return
-            }
-
-            clearTimeout(this.timeOut)
-            this.timeOut = setTimeout(async () => {
-                this.loadingData = true
-                let searchFieldsData = []
-                await window.axios
-                    .get('/tag/search/' + val)
-                    .then(function (response) {
-                        if (response.data && response.data.length > 0) {
-                            searchFieldsData = response.data
-                        }
-
-                        if (
-                            (searchFieldsData &&
-                                searchFieldsData.length > 0 &&
-                                !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
-                            !searchFieldsData ||
-                            searchFieldsData.length == 0
-                        ) {
-                            searchFieldsData.unshift({ name: val.toUpperCase() })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log('error', error)
-                    })
-
-                this.listTags = searchFieldsData
-                this.loadingData = false
-            }, 300)
-        },
-
-        async searchDescriptions(val) {
-            if (this.loadingData) return
-
-            if (!val || val.length <= 0) {
-                this.listDescriptions = []
-                clearTimeout(this.timeOut)
-                return
-            }
-
-            if (this.provision.description && this.provision.description == val) {
-                return
-            }
-
-            clearTimeout(this.timeOut)
-            this.timeOut = setTimeout(async () => {
-                this.loadingData = true
-                let searchFieldsData = []
-                await window.axios
-                    .get('/budget-provision/search/' + val)
-                    .then(function (response) {
-                        if (response.data && response.data.length > 0) {
-                            searchFieldsData = response.data
-                        }
-
-                        if (
-                            (searchFieldsData &&
-                                searchFieldsData.length > 0 &&
-                                !searchFieldsData.find((x) => x.description == val)) ||
-                            !searchFieldsData ||
-                            searchFieldsData.length == 0
-                        ) {
-                            searchFieldsData.unshift({ description: val, resume: '', data: null })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log('error', error)
-                    })
-
-                this.listDescriptions = searchFieldsData
-                this.loadingData = false
-            }, 400)
-        },
-
-        async selectedDescription(item) {
-            if (item?.data) {
-                this.provision.value = item.data.value
-                this.provision.share_value = item.data.share_value
-                this.provision.share_user_id = item.data.share_user_id
-                this.provision.remarks = item.data.remarks
-                this.provision.tags = item.data.tags
-            }
-        },
-
-        newItem() {
-            this.titleModal = this.$t('budget-provision.new-item')
-            this.editDialog = true
-            this.provision = {
-                id: null,
-                description: null,
-                value: 0,
-                group: null,
-                remarks: null,
-                share_value: 0,
-                share_user_id: null,
-                tags: [],
-                budget_id: this.budgetId,
-            }
-            setTimeout(() => {
-                this.$refs.txtDescription.focus()
-            })
-        },
-
-        editItem(item) {
-            this.titleModal = this.$t('budget-provision.edit-item')
-            this.editDialog = true
-            this.provision = {
-                id: item.id,
-                description: item.description.description,
-                value: Number(item.value),
-                group: item.group,
-                remarks: item.remarks,
-                share_value: item.share_value ? Number(item.share_value) : 0,
-                share_user_id: item.share_user_id,
-                tags: item.tags,
-                budget_id: this.budgetId,
-            }
-            setTimeout(() => {
-                this.$refs.txtDescription.focus()
-            })
-        },
-
-        closeItem() {
-            this.editDialog = false
-        },
-
-        async save() {
-            let validate = await this.$refs.form.validate()
-            if (validate.valid) {
-                if (this.provision.id) {
-                    await this.update()
-                } else {
-                    await this.create()
+            async confirmRemove(item) {
+                this.deleteId = item.id
+                if (
+                    await this.$refs.confirm.open(
+                        this.$t('budget-provision.item'),
+                        this.$t('default.confirm-delete-item')
+                    )
+                ) {
+                    this.remove()
                 }
-            }
-        },
+            },
 
-        async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/budget-provision',
-                {
-                    description: this.provision.description.description,
-                    value: this.provision.value,
-                    group: this.provision.group,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
-                    tags: this.provision.tags,
-                    budget_id: this.provision.budget_id,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
+            remove() {
+                this.isLoading = true
+                this.$inertia.delete(`/budget-provision/${this.deleteId}`, {
+                    onSuccess: () => {},
+                    onError: () => {
+                        this.isLoading = false
                     },
                     onFinish: () => {
                         this.isLoading = false
                     },
                     preserveScroll: true,
-                }
-            )
+                })
+            },
         },
-
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/budget-provision/' + this.provision.id,
-                {
-                    description: this.provision.description.description,
-                    value: this.provision.value,
-                    group: this.provision.group,
-                    remarks: this.provision.remarks,
-                    share_value: this.provision.share_value,
-                    share_user_id: this.provision.share_user_id,
-                    tags: this.provision.tags,
-                    budget_id: this.provision.budget_id,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                    preserveScroll: true,
-                }
-            )
-        },
-
-        async confirmRemove(item) {
-            this.deleteId = item.id
-            if (
-                await this.$refs.confirm.open(this.$t('budget-provision.item'), this.$t('default.confirm-delete-item'))
-            ) {
-                this.remove()
-            }
-        },
-
-        remove() {
-            this.isLoading = true
-            this.$inertia.delete(`/budget-provision/${this.deleteId}`, {
-                onSuccess: () => {},
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-                preserveScroll: true,
-            })
-        },
-    },
-}
+    }
 </script>

@@ -72,104 +72,100 @@
 </template>
 
 <script setup>
-import { currencyField } from '../../utils/utils.js'
-import BarChart from '../../Components/BarChart.vue'
+    import BarChart from '@/Components/BarChart.vue'
+    import { currencyField } from '@/utils/utils.js'
 </script>
 
 <script>
-export default {
-    name: 'BudgetExpenseTags',
+    export default {
+        name: 'BudgetExpenseTags',
 
-    components: {
-        BarChart,
-    },
-
-    props: {
-        expenseToTags: {
-            type: Array,
+        components: {
+            BarChart,
         },
-    },
 
-    data() {
-        return {
-            headers: [
-                { title: 'Tag', align: 'start', key: 'tag' },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-            ],
-            search: null,
-            isLoading: false,
-            panel: 1,
-            tab: null,
-        }
-    },
+        props: {
+            expenseToTags: {
+                type: Array,
+            },
+        },
 
-    computed: {
-        chartOptions() {
+        data() {
             return {
-                chart: {
-                    id: 'basic-bar',
-                    heigth: 10,
-                },
-                colors: ['#FB8C00'],
-                xaxis: {
-                    categories: this.expenseToTags?.length ? this.expenseToTags.map((x) => x.tag) : [],
-                },
-                yaxis: {
-                    labels: {
-                        formatter: function (value) {
-                            return currencyField(value)
-                        },
-                    },
-                },
-                responsive: [
-                    {
-                        breakpoint: 1280,
-                    },
+                headers: [
+                    { title: 'Tag', align: 'start', key: 'tag' },
+                    { title: this.$t('default.value'), align: 'end', key: 'value' },
                 ],
-                plotOptions: {
-                    bar: {
-                        dataLabels: {
-                            position: 'top',
+                search: null,
+                isLoading: false,
+                panel: 1,
+                tab: null,
+            }
+        },
+
+        computed: {
+            chartOptions() {
+                return {
+                    chart: {
+                        id: 'basic-bar',
+                        heigth: 10,
+                    },
+                    colors: ['#FB8C00'],
+                    xaxis: {
+                        categories: this.expenseToTags?.length ? this.expenseToTags.map((x) => x.tag) : [],
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function (value) {
+                                return currencyField(value)
+                            },
                         },
                     },
-                },
-                dataLabels: {
-                    enabled: true,
-                    style: {
-                        colors: ['#333'],
+                    responsive: [
+                        {
+                            breakpoint: 1280,
+                        },
+                    ],
+                    plotOptions: {
+                        bar: {
+                            dataLabels: {
+                                position: 'top',
+                            },
+                        },
                     },
-                    offsetY: -20,
-                    formatter: function (val) {
-                        return currencyField(val)
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            colors: ['#333'],
+                        },
+                        offsetY: -20,
+                        formatter: function (val) {
+                            return currencyField(val)
+                        },
                     },
-                },
-                noData: {
-                    text: this.$t('default.no-data-text'),
-                    align: 'center',
-                    verticalAlign: 'middle',
-                    offsetX: 0,
-                    offsetY: 0,
-                },
-            }
+                    noData: {
+                        text: this.$t('default.no-data-text'),
+                        align: 'center',
+                        verticalAlign: 'middle',
+                        offsetX: 0,
+                        offsetY: 0,
+                    },
+                }
+            },
+            chartSeries() {
+                if (this.expenseToTags?.length) {
+                    return [
+                        {
+                            name: 'Despesas',
+                            data: this.expenseToTags.map((x) => x.value),
+                        },
+                    ]
+                }
+
+                return []
+            },
         },
-        chartSeries() {
-            if (this.expenseToTags?.length) {
-                return [
-                    {
-                        name: 'Despesas',
-                        data: this.expenseToTags.map((x) => x.value),
-                    },
-                ]
-            }
 
-            return []
-        },
-    },
-
-    async created() {},
-
-    async mounted() {},
-
-    methods: {},
-}
+        methods: {},
+    }
 </script>

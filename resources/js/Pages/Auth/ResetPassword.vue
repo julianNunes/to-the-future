@@ -1,33 +1,33 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue'
-import { Head, useForm } from '@inertiajs/vue3'
-import { ref } from 'vue'
+    import GuestLayout from '@/Layouts/GuestLayout.vue'
+    import { Head, useForm } from '@inertiajs/vue3'
+    import { ref } from 'vue'
 
-const props = defineProps({
-    email: {
-        type: String,
-        required: true,
-    },
-    token: {
-        type: String,
-        required: true,
-    },
-})
-
-const form = useForm({
-    token: props.token,
-    email: props.email,
-    password: '',
-    password_confirmation: '',
-})
-
-const submit = () => {
-    form.post('/reset-password', {
-        onFinish: () => form.reset('password', 'password_confirmation'),
+    const props = defineProps({
+        email: {
+            type: String,
+            required: true,
+        },
+        token: {
+            type: String,
+            required: true,
+        },
     })
-}
 
-const showPassword = ref(false)
+    const form = useForm({
+        token: props.token,
+        email: props.email,
+        password: '',
+        password_confirmation: '',
+    })
+
+    const submit = () => {
+        form.post('/reset-password', {
+            onFinish: () => form.reset('password', 'password_confirmation'),
+        })
+    }
+
+    const showPassword = ref(false)
 </script>
 
 <template>

@@ -12,49 +12,49 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head } from '@inertiajs/vue3'
-import InvoiceExpense from '../../Components/CreditCardInvoice/InvoiceExpense.vue'
-import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import InvoiceExpense from '@/Components/CreditCardInvoice/InvoiceExpense.vue'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { Head } from '@inertiajs/vue3'
 </script>
 
 <script>
-export default {
-    name: 'CreditCardInvoiceShow',
-    props: {
-        invoice: {
-            type: Object,
+    export default {
+        name: 'CreditCardInvoiceShow',
+        props: {
+            invoice: {
+                type: Object,
+            },
+            shareUsers: {
+                type: Array,
+            },
         },
-        shareUsers: {
-            type: Array,
-        },
-    },
 
-    data() {
-        return {
-            breadcrumbs: [
-                {
-                    title: this.$t('menus.dashboard'),
-                    disabled: false,
-                    href: '/dashboard',
-                },
-                {
-                    title: this.$t('menus.credit-card'),
-                    disabled: false,
-                    href: '/credit-card',
-                },
-                {
-                    title: this.$t('credit-card-invoice.title-index'),
-                    disabled: false,
-                    href: '/credit-card/' + this.invoice.credit_card_id + '/invoice',
-                },
-                {
-                    title: this.$t('credit-card-invoice-expense.title'),
-                    disabled: true,
-                },
-            ],
-            isLoading: false,
-        }
-    },
-}
+        data() {
+            return {
+                breadcrumbs: [
+                    {
+                        title: this.$t('menus.dashboard'),
+                        disabled: false,
+                        href: '/dashboard',
+                    },
+                    {
+                        title: this.$t('menus.credit-card'),
+                        disabled: false,
+                        href: '/credit-card',
+                    },
+                    {
+                        title: this.$t('credit-card-invoice.title-index'),
+                        disabled: false,
+                        href: '/credit-card/' + this.invoice.credit_card_id + '/invoice',
+                    },
+                    {
+                        title: this.$t('credit-card-invoice-expense.title'),
+                        disabled: true,
+                    },
+                ],
+                isLoading: false,
+            }
+        },
+    }
 </script>

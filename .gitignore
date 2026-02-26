@@ -21,3 +21,11 @@ _ide_helper_models.php
 _ide_helper.php
 .phpstorm.meta.php
 package-lock.json
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

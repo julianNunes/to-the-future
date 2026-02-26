@@ -1,8 +1,9 @@
-
 @media screen and (min-width: 1280px) {
     #v-container {
         max-width: 1900px;
     }
 }
 
-.v-expansion-panel-text__wrapper { padding: 0 !important; }
+.v-expansion-panel-text__wrapper {
+    padding: 0 !important;
+}

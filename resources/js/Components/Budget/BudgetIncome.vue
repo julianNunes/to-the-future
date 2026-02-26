@@ -76,7 +76,7 @@
                             </template>
                             <!-- Footer -->
                             <template v-if="incomes.length" #tfoot>
-                                <tr class="green--text">
+                                <tr class="text-green">
                                     <th class="title"></th>
                                     <th class="title font-weight-bold text-right">Total</th>
                                     <th class="title text-right">{{ sumField(incomes, 'value') }}</th>
@@ -209,266 +209,268 @@
 </template>
 
 <script setup>
-import moment from 'moment'
-import { sumField, currencyField, formatDate, reverseFormatNumber } from '../../utils/utils.js'
+    import { logger } from '@/utils/logger.js'
+    import moment from 'moment'
+    import { currencyField, formatDate, reverseFormatNumber, sumField } from '@/utils/utils.js'
 </script>
 
 <script>
-export default {
-    name: 'BudgetIncome',
-    props: {
-        budgetId: {
-            type: Number,
-        },
-        yearMonth: {
-            type: String,
-        },
-        incomes: {
-            type: Array,
-            default: new Array(),
-        },
-        viewOnly: {
-            type: Boolean,
-        },
-    },
-
-    data() {
-        return {
-            rules: {
-                textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                currencyFieldRules: [
-                    (value) => {
-                        value = reverseFormatNumber(value)
-                        if (!value) return this.$t('rules.required-text-field')
-                        if (Number(value) <= 0) return this.$t('rules.required-currency-field')
-
-                        return true
-                    },
-                ],
+    export default {
+        name: 'BudgetIncome',
+        props: {
+            budgetId: {
+                type: Number,
             },
-            search: null,
-            editDialog: false,
-            isLoading: false,
-            deleteId: null,
-            panel: 1,
-            income: {
-                id: null,
-                description: null,
-                value: 0,
-                date: null,
-                remarks: null,
-                budget_id: null,
-                tags: [],
+            yearMonth: {
+                type: String,
             },
-            listTags: [],
-            searchFieldsData: [],
-            searchTag: '',
-            loadingData: false,
-        }
-    },
-
-    computed: {
-        itemsTags() {
-            return this.listTags
+            incomes: {
+                type: Array,
+                default: () => [],
+            },
+            viewOnly: {
+                type: Boolean,
+            },
         },
-        headers() {
-            let headers = [
-                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('budget-income.date'), align: 'center', key: 'date' },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.tags'), key: 'tags' },
-            ]
 
-            if (!this.viewOnly) {
-                headers.push({
-                    title: this.$t('default.action'),
-                    align: 'end',
-                    key: 'action',
-                    sortable: false,
-                    width: 40,
-                })
+        data() {
+            return {
+                rules: {
+                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+                    currencyFieldRules: [
+                        (value) => {
+                            value = reverseFormatNumber(value)
+                            if (!value) return this.$t('rules.required-text-field')
+                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
+
+                            return true
+                        },
+                    ],
+                },
+                search: null,
+                editDialog: false,
+                titleModal: '',
+                isLoading: false,
+                deleteId: null,
+                panel: 1,
+                income: {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    date: null,
+                    remarks: null,
+                    budget_id: null,
+                    tags: [],
+                },
+                listTags: [],
+                searchFieldsData: [],
+                searchTag: '',
+                loadingData: false,
             }
-
-            return headers
         },
-        monthToDateInput() {
-            return moment(this.yearMonth + '-01').month()
+
+        computed: {
+            itemsTags() {
+                return this.listTags
+            },
+            headers() {
+                let headers = [
+                    { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
+                    { title: this.$t('budget-income.date'), align: 'center', key: 'date' },
+                    { title: this.$t('default.value'), align: 'end', key: 'value' },
+                    { title: this.$t('default.remarks'), key: 'remarks' },
+                    { title: this.$t('default.tags'), key: 'tags' },
+                ]
+
+                if (!this.viewOnly) {
+                    headers.push({
+                        title: this.$t('default.action'),
+                        align: 'end',
+                        key: 'action',
+                        sortable: false,
+                        width: 40,
+                    })
+                }
+
+                return headers
+            },
+            monthToDateInput() {
+                return moment(this.yearMonth + '-01').month()
+            },
+            yearToDateInput() {
+                return moment(this.yearMonth + '-01').year()
+            },
         },
-        yearToDateInput() {
-            return moment(this.yearMonth + '-01').year()
-        },
-    },
 
-    async created() {},
 
-    async mounted() {},
 
-    methods: {
-        async searchTags(val) {
-            if (this.loadingData) return
+        methods: {
+            async searchTags(val) {
+                if (this.loadingData) return
 
-            if (!val || val.length <= 1) {
-                this.listTags = []
+                if (!val || val.length <= 1) {
+                    this.listTags = []
+                    clearTimeout(this.timeOut)
+                    return
+                }
+
+                if (this.income.tags && this.income.tags.length > 0 && this.income.tags.find((x) => x.name == val)) {
+                    return
+                }
+
                 clearTimeout(this.timeOut)
-                return
-            }
+                this.timeOut = setTimeout(async () => {
+                    this.loadingData = true
+                    let searchFieldsData = []
+                    await window.axios
+                        .get('/tag/search/' + val)
+                        .then(function (response) {
+                            if (response.data && response.data.length > 0) {
+                                searchFieldsData = response.data
+                            }
 
-            if (this.income.tags && this.income.tags.length > 0 && this.income.tags.find((x) => x.name == val)) {
-                return
-            }
+                            if (
+                                (searchFieldsData &&
+                                    searchFieldsData.length > 0 &&
+                                    !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                                !searchFieldsData ||
+                                searchFieldsData.length == 0
+                            ) {
+                                searchFieldsData.unshift({ name: val.toUpperCase() })
+                            }
+                        })
+                        .catch(function (error) {
+                            logger.error('error', error)
+                        })
 
-            clearTimeout(this.timeOut)
-            this.timeOut = setTimeout(async () => {
-                this.loadingData = true
-                let searchFieldsData = []
-                await window.axios
-                    .get('/tag/search/' + val)
-                    .then(function (response) {
-                        if (response.data && response.data.length > 0) {
-                            searchFieldsData = response.data
-                        }
+                    this.listTags = searchFieldsData
+                    this.loadingData = false
+                }, 300)
+            },
 
-                        if (
-                            (searchFieldsData &&
-                                searchFieldsData.length > 0 &&
-                                !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
-                            !searchFieldsData ||
-                            searchFieldsData.length == 0
-                        ) {
-                            searchFieldsData.unshift({ name: val.toUpperCase() })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log('error', error)
-                    })
+            itemRowFont(row) {
+                return { class: !row.item.id ? 'font-weight-bold' : '' }
+            },
 
-                this.listTags = searchFieldsData
-                this.loadingData = false
-            }, 300)
-        },
-
-        itemRowFont(row) {
-            return { class: !row.item.id ? 'font-weight-bold' : '' }
-        },
-
-        newItem() {
-            this.titleModal = this.$t('budget-income.new-item')
-            this.editDialog = true
-            this.income = {
-                id: null,
-                description: null,
-                value: 0,
-                date: moment(this.yearMonth + '-01', 'YYYY-MM-DD'),
-                remarks: null,
-                tags: [],
-                budget_id: this.budgetId,
-            }
-            setTimeout(() => {
-                this.$refs.txtDescription.focus()
-            })
-        },
-
-        editItem(item) {
-            this.titleModal = this.$t('budget-income.edit-item')
-            this.editDialog = true
-
-            this.income = {
-                id: item.id,
-                description: item.description,
-                value: Number(item.value),
-                date: moment(item.date, 'YYYY-MM-DD'),
-                remarks: item.remarks,
-                tags: item.tags,
-                budget_id: item.budget_id,
-            }
-            setTimeout(() => {
-                this.$refs.txtDescription.focus()
-            })
-        },
-
-        closeItem() {
-            this.editDialog = false
-        },
-
-        async save() {
-            let validate = await this.$refs.form.validate()
-            if (validate.valid) {
-                if (this.income.id) {
-                    await this.update()
-                } else {
-                    await this.create()
+            newItem() {
+                this.titleModal = this.$t('budget-income.new-item')
+                this.editDialog = true
+                this.income = {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    date: moment(this.yearMonth + '-01', 'YYYY-MM-DD'),
+                    remarks: null,
+                    tags: [],
+                    budget_id: this.budgetId,
                 }
-            }
-        },
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
+                })
+            },
 
-        async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/budget-income',
-                {
-                    description: this.income.description,
-                    date: this.income.date.format('YYYY-MM-DD'),
-                    value: this.income.value,
-                    remarks: this.income.remarks,
-                    budget_id: this.income.budget_id,
-                    tags: this.income.tags,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
+            editItem(item) {
+                this.titleModal = this.$t('budget-income.edit-item')
+                this.editDialog = true
+
+                this.income = {
+                    id: item.id,
+                    description: item.description,
+                    value: Number(item.value),
+                    date: moment(item.date, 'YYYY-MM-DD'),
+                    remarks: item.remarks,
+                    tags: item.tags,
+                    budget_id: item.budget_id,
+                }
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
+                })
+            },
+
+            closeItem() {
+                this.editDialog = false
+            },
+
+            async save() {
+                let validate = await this.$refs.form.validate()
+                if (validate.valid) {
+                    if (this.income.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
+                }
+            },
+
+            async create() {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/budget-income',
+                    {
+                        description: this.income.description,
+                        date: this.income.date.format('YYYY-MM-DD'),
+                        value: this.income.value,
+                        remarks: this.income.remarks,
+                        budget_id: this.income.budget_id,
+                        tags: this.income.tags,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                        preserveScroll: true,
+                    }
+                )
+            },
+
+            async update() {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/budget-income/' + this.income.id,
+                    {
+                        description: this.income.description,
+                        value: this.income.value,
+                        date: this.income.date.format('YYYY-MM-DD'),
+                        remarks: this.income.remarks,
+                        tags: this.income.tags,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                        preserveScroll: true,
+                    }
+                )
+            },
+
+            async confirmRemove(item) {
+                this.deleteId = item.id
+                if (
+                    await this.$refs.confirm.open(this.$t('budget-income.item'), this.$t('default.confirm-delete-item'))
+                ) {
+                    this.remove()
+                }
+            },
+
+            remove() {
+                this.isLoading = true
+                this.$inertia.delete(`/budget-income/${this.deleteId}`, {
+                    onSuccess: () => {},
+                    onError: () => {
+                        this.isLoading = false
                     },
                     onFinish: () => {
                         this.isLoading = false
                     },
                     preserveScroll: true,
-                }
-            )
+                })
+            },
         },
-
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/budget-income/' + this.income.id,
-                {
-                    description: this.income.description,
-                    value: this.income.value,
-                    date: this.income.date.format('YYYY-MM-DD'),
-                    remarks: this.income.remarks,
-                    tags: this.income.tags,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                    preserveScroll: true,
-                }
-            )
-        },
-
-        async confirmRemove(item) {
-            this.deleteId = item.id
-            if (await this.$refs.confirm.open(this.$t('budget-income.item'), this.$t('default.confirm-delete-item'))) {
-                this.remove()
-            }
-        },
-
-        remove() {
-            this.isLoading = true
-            this.$inertia.delete(`/budget-income/${this.deleteId}`, {
-                onSuccess: () => {},
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-                preserveScroll: true,
-            })
-        },
-    },
-}
+    }
 </script>

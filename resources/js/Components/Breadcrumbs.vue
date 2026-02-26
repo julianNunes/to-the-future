@@ -1,5 +1,5 @@
 <script setup>
-import { Link } from '@inertiajs/vue3'
+    import { Link } from '@inertiajs/vue3'
 </script>
 
 <template>
@@ -14,13 +14,13 @@ import { Link } from '@inertiajs/vue3'
 </template>
 
 <script>
-export default {
-    name: 'BreadcrumbsComponent',
-    props: {
-        items: {
-            type: Array,
-            required: true,
+    export default {
+        name: 'BreadcrumbsComponent',
+        props: {
+            items: {
+                type: Array,
+                required: true,
+            },
         },
-    },
-}
+    }
 </script>

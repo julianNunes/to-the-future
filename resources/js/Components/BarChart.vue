@@ -5,22 +5,22 @@
 </template>
 
 <script>
-import VueApexCharts from 'vue3-apexcharts'
+    import VueApexCharts from 'vue3-apexcharts'
 
-export default {
-    name: 'BarChart',
+    export default {
+        name: 'BarChart',
 
-    components: {
-        apexcharts: VueApexCharts,
-    },
-
-    props: {
-        options: {
-            type: Object,
+        components: {
+            apexcharts: VueApexCharts,
         },
-        series: {
-            type: Array,
+
+        props: {
+            options: {
+                type: Object,
+            },
+            series: {
+                type: Array,
+            },
         },
-    },
-}
+    }
 </script>

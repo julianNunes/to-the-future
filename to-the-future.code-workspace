@@ -2,8 +2,8 @@
     "folders": [
         {
             "name": "To The Future (Laravel+Inertia+Vue3)",
-            "path": "."
-        }
+            "path": ".",
+        },
     ],
     "settings": {
         // ===== CONFIGURAÇÕES ESPECÍFICAS DO WORKSPACE =====
@@ -20,11 +20,11 @@
         "editor.suggest.preview": true,
         "editor.codeActionsOnSave": {
             "source.fixAll": "explicit",
-            "source.organizeImports": "explicit"
+            "source.organizeImports": "explicit",
         },
         "editor.rulers": [120],
         "editor.wordWrap": "off",
-        "workbench.colorTheme": "Dracula Theme",
+        "workbench.colorTheme": "One Dark Pro Darker",
         "workbench.editor.enablePreview": false,
         "explorer.compactFolders": false,
         "explorer.confirmDelete": false,
@@ -36,7 +36,7 @@
             "*.vue": "vue",
             ".php-cs-fixer.php": "php",
             ".env*": "dotenv",
-            "*.php": "php"
+            "*.php": "php",
         },
         "files.exclude": {
             "**/node_modules": true,
@@ -44,20 +44,20 @@
             "**/.git": true,
             "**/.DS_Store": true,
             "**/storage/logs": true,
-            "**/storage/framework": true
+            "**/storage/framework": true,
         },
         "search.exclude": {
             "**/node_modules": true,
             "**/vendor": true,
             "**/storage/logs": true,
             "**/storage/framework": true,
-            "**/public/build": true
+            "**/public/build": true,
         },
 
         // ===== FORMATAÇÃO E VUE =====
         "emmet.includeLanguages": {
             "vue": "html",
-            "vue-html": "html"
+            "vue-html": "html",
         },
         "html.format.enable": true,
         "html.format.preserveNewLines": true,
@@ -85,7 +85,7 @@
             "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
             "editor.codeActionsOnSave": {
                 "source.fixAll": "explicit",
-                "source.organizeImports": "explicit"
+                "source.organizeImports": "explicit",
             },
             "files.insertFinalNewline": true,
             "files.trimTrailingWhitespace": true,
@@ -93,7 +93,7 @@
             "editor.wordWrap": "off",
             "editor.tabSize": 4,
             "editor.insertSpaces": true,
-            "editor.detectIndentation": false
+            "editor.detectIndentation": false,
         },
         "[vue]": {
             "editor.formatOnSave": true,
@@ -105,7 +105,7 @@
             "editor.wordWrap": "off",
             "editor.tabSize": 4,
             "editor.insertSpaces": true,
-            "editor.detectIndentation": false
+            "editor.detectIndentation": false,
         },
         "[javascript]": {
             "editor.formatOnSave": true,
@@ -113,8 +113,8 @@
             "editor.tabSize": 4,
             "editor.insertSpaces": true,
             "editor.codeActionsOnSave": {
-                "source.fixAll.eslint": "explicit"
-            }
+                "source.fixAll.eslint": "explicit",
+            },
         },
         "[typescript]": {
             "editor.formatOnSave": true,
@@ -122,30 +122,30 @@
             "editor.tabSize": 4,
             "editor.insertSpaces": true,
             "editor.codeActionsOnSave": {
-                "source.fixAll.eslint": "explicit"
-            }
+                "source.fixAll.eslint": "explicit",
+            },
         },
         "[json]": {
             "editor.formatOnSave": true,
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[jsonc]": {
             "editor.formatOnSave": true,
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[html]": {
             "editor.formatOnSave": true,
             "editor.defaultFormatter": "esbenp.prettier-vscode",
             "editor.tabSize": 4,
-            "editor.insertSpaces": true
+            "editor.insertSpaces": true,
         },
         "[css]": {
             "editor.formatOnSave": true,
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[scss]": {
             "editor.formatOnSave": true,
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
 
         // ===== PHP / INTELEPHENSE (CONFIGURADO PARA USAR PHP DO CONTAINER + VENDOR MONTADO) =====
@@ -167,7 +167,7 @@
             "${workspaceFolder}/storage",
             "${workspaceFolder}/tests",
             "${workspaceFolder}/vendor",
-            "${workspaceFolder}/_ide_helper.php"
+            "${workspaceFolder}/_ide_helper.php",
         ],
         "intelephense.files.associations": ["*.php", "*.phtml"],
         "intelephense.files.exclude": [
@@ -175,7 +175,7 @@
             "**/node_modules/**",
             "**/storage/logs/**",
             "**/storage/framework/**",
-            "**/public/build/**"
+            "**/public/build/**",
         ],
         "intelephense.stubs": [
             "Core",
@@ -204,7 +204,7 @@
             "json",
             "ldap",
             "libxml",
-            "zlib"
+            "zlib",
         ],
         "intelephense.files.maxSize": 10000000,
         "intelephense.completion.insertUseDeclaration": true,
@@ -261,7 +261,7 @@
         "terminal.integrated.defaultProfile.linux": "bash",
         "terminal.integrated.confirmOnExit": "hasChildProcesses",
         "terminal.integrated.env.linux": {
-            "COMPOSE_DOCKER_CLI_BUILD": "1"
+            "COMPOSE_DOCKER_CLI_BUILD": "1",
         },
 
         // ===== DOCKER =====
@@ -282,10 +282,10 @@
         // ===== GITHUB COPILOT =====
         "github.copilot.enable": {
             "*": true,
-            "scminput": false
+            "scminput": false,
         },
         "chat.tools.terminal.autoApprove": {
-            "allow": ["npm test", "npm run build", "git status"]
+            "allow": ["npm test", "npm run build", "git status"],
         },
         // Modelo automático otimizado
         // "github.copilot.chat.model": "auto",
@@ -307,8 +307,6 @@
         "github.copilot.editor.enableAutoCompletions": true,
         "github.copilot.chat.locale": "pt-BR",
 
-
-
         // ===== XDEBUG / PHP DEBUG (REQUER CONFIGURAÇÃO ADICIONAL) =====
         // NOTA: Para usar debug, é necessário instalar e configurar Xdebug no container
         // Para configurar: adicione Xdebug ao Dockerfile.dev e exponha a porta 9003
@@ -323,7 +321,7 @@
         // Path Intellisense
         "path-intellisense.mappings": {
             "@": "${workspaceFolder}/resources",
-            "~": "${workspaceFolder}/public"
+            "~": "${workspaceFolder}/public",
         },
 
         // ESLint
@@ -349,7 +347,7 @@
         "editor.minimap.showSlider": "mouseover",
         "workbench.reduceMotion": "on",
         "containers.containerCommand": "docker",
-        "containers.enableComposeLanguageService": true
+        "containers.enableComposeLanguageService": true,
     },
     "extensions": {
         "recommendations": [
@@ -372,9 +370,9 @@
             "christian-kohler.path-intellisense",
             "bradlc.vscode-tailwindcss",
             "ms-vscode.vscode-typescript-next",
-            "ms-vscode.vscode-eslint"
+            "ms-vscode.vscode-eslint",
         ],
-        "unwantedRecommendations": ["felixfbecker.php-intellisense"]
+        "unwantedRecommendations": ["felixfbecker.php-intellisense"],
     },
     "tasks": {
         "version": "2.0.0",
@@ -389,9 +387,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Laravel: Stop Development",
@@ -403,9 +401,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Laravel: Show Logs",
@@ -417,10 +415,10 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "new"
+                    "panel": "new",
                 },
                 "isBackground": true,
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Laravel: Status",
@@ -432,9 +430,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Artisan: Migration Run",
@@ -446,9 +444,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Artisan: Migration Rollback",
@@ -460,9 +458,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Artisan: Clear Cache",
@@ -474,9 +472,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Artisan: Route List",
@@ -488,9 +486,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Artisan: Tinker",
@@ -502,10 +500,10 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": true,
-                    "panel": "new"
+                    "panel": "new",
                 },
                 "isBackground": true,
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Composer: Install",
@@ -517,9 +515,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Composer: Update",
@@ -531,9 +529,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "NPM: Install",
@@ -545,9 +543,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Vite: Development Build",
@@ -559,10 +557,10 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "new"
+                    "panel": "new",
                 },
                 "isBackground": true,
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Vite: Build for Production",
@@ -574,9 +572,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Generate IDE Helpers",
@@ -587,9 +585,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "PHP CS Fixer: Fix All",
@@ -601,9 +599,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Docker: Clean",
@@ -615,9 +613,9 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
+                "problemMatcher": [],
             },
             {
                 "label": "Setup: Check Environment",
@@ -629,19 +627,19 @@
                     "echo": true,
                     "reveal": "always",
                     "focus": false,
-                    "panel": "shared"
+                    "panel": "shared",
                 },
-                "problemMatcher": []
-            }
+                "problemMatcher": [],
+            },
         ],
         "inputs": [
             {
                 "id": "artisanCommand",
                 "description": "Digite o comando Artisan",
                 "default": "list",
-                "type": "promptString"
-            }
-        ]
+                "type": "promptString",
+            },
+        ],
     },
     "launch": {
         "version": "0.2.0",
@@ -652,12 +650,10 @@
                 "request": "launch",
                 "port": 9003,
                 "pathMappings": {
-                    "/var/www/html": "${workspaceFolder}"
+                    "/var/www/html": "${workspaceFolder}",
                 },
                 "log": true,
-                "ignore": [
-                    "**/vendor/**/*.php"
-                ]
+                "ignore": ["**/vendor/**/*.php"],
             },
             {
                 "name": "🚀 Run Current PHP Script in Container",
@@ -666,7 +662,7 @@
                 "program": "${workspaceFolder}/scripts/php-wrapper.sh",
                 "args": ["${file}"],
                 "cwd": "${workspaceFolder}",
-                "console": "integratedTerminal"
+                "console": "integratedTerminal",
             },
             {
                 "name": "🧪 Run Laravel Artisan Command",
@@ -675,8 +671,8 @@
                 "program": "${workspaceFolder}/scripts/artisan.sh",
                 "args": ["${input:artisanCommand}"],
                 "cwd": "${workspaceFolder}",
-                "console": "integratedTerminal"
-            }
-        ]
-    }
+                "console": "integratedTerminal",
+            },
+        ],
+    },
 }

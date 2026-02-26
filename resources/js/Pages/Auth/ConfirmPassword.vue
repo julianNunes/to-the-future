@@ -1,24 +1,24 @@
 <script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue'
-import { Head, useForm } from '@inertiajs/vue3'
-import { ref } from 'vue'
+    import GuestLayout from '@/Layouts/GuestLayout.vue'
+    import { Head, useForm } from '@inertiajs/vue3'
+    import { ref } from 'vue'
 
-defineProps({
-    status: {
-        type: String,
-    },
-})
-
-const form = useForm({
-    password: '',
-})
-const showPassword = ref(false)
-
-const submit = () => {
-    form.post('/confirm-password', {
-        onFinish: () => form.reset(),
+    defineProps({
+        status: {
+            type: String,
+        },
     })
-}
+
+    const form = useForm({
+        password: '',
+    })
+    const showPassword = ref(false)
+
+    const submit = () => {
+        form.post('/confirm-password', {
+            onFinish: () => form.reset(),
+        })
+    }
 </script>
 
 <template>

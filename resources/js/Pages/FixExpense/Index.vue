@@ -1,8 +1,10 @@
 <template>
-    <Head title="Provision" />
+    <Head title="Fix Expense" />
     <AuthenticatedLayout>
         <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('fix-expense.title') }}</h5>
+            <h5 class="text-h5 font-weight-bold">
+                {{ $t('fix-expense.title') }}
+            </h5>
             <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
         </div>
 
@@ -11,7 +13,9 @@
             <v-card-text>
                 <v-row dense>
                     <v-col md="12">
-                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
+                        <v-btn color="primary" @click="newItem">
+                            {{ $t('default.new') }}
+                        </v-btn>
                     </v-col>
                     <v-col md="12">
                         <v-data-table
@@ -36,14 +40,18 @@
                             :items-per-page="50"
                             fixed-header
                         >
-                            <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                            <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                            <template #[`item.tags`]="{ item }">{{
-                                item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
-                            }}</template>
-                            <template #[`item.share_user_id`]="{ item }">{{
-                                item.share_user ? item.share_user.name : ''
-                            }}</template>
+                            <template #[`item.value`]="{ item }">
+                                {{ currencyField(item.value) }}
+                            </template>
+                            <template #[`item.share_value`]="{ item }">
+                                {{ currencyField(item.share_value) }}
+                            </template>
+                            <template #[`item.tags`]="{ item }">
+                                {{ item.tags.length ? item.tags.map((x) => x.name).join(' | ') : '' }}
+                            </template>
+                            <template #[`item.share_user_id`]="{ item }">
+                                {{ item.share_user ? item.share_user.name : '' }}
+                            </template>
                             <template #[`item.action`]="{ item }">
                                 <v-tooltip :text="$t('default.edit')" location="top">
                                     <template #activator="{ props }">
@@ -73,11 +81,15 @@
                             </template>
 
                             <template v-if="expenses.length" #tfoot>
-                                <tr class="green--text">
-                                    <th class="title"></th>
+                                <tr class="text-green">
+                                    <th class="title" />
                                     <th class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">{{ sumField(expenses, 'value') }}</th>
-                                    <th class="title text-right">{{ sumField(expenses, 'share_value') }}</th>
+                                    <th class="title text-right">
+                                        {{ sumField(expenses, 'value') }}
+                                    </th>
+                                    <th class="title text-right">
+                                        {{ sumField(expenses, 'share_value') }}
+                                    </th>
                                 </tr>
                             </template>
 
@@ -93,7 +105,7 @@
                                                 hide-details
                                                 clearable
                                                 @click:clear="search = null"
-                                            ></v-text-field>
+                                            />
                                         </v-col>
                                     </v-row>
                                 </v-toolbar>
@@ -121,7 +133,7 @@
                                     :rules="rules.textFieldRules"
                                     required
                                     density="comfortable"
-                                ></v-text-field>
+                                />
                             </v-col>
                             <v-col cols="12" sm="6" md="3">
                                 <vuetify-money
@@ -227,13 +239,13 @@
                                     prepend-icon="mdi-database-search"
                                     @update:search="searchTags"
                                     @update:model-value="searchTag = ''"
-                                ></v-autocomplete>
+                                />
                             </v-col>
                         </v-row>
                     </v-form>
                 </v-card-text>
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer />
                     <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
                         {{ $t('default.cancel') }}
                     </v-btn>
@@ -249,296 +261,318 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head } from '@inertiajs/vue3'
-import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import { sumField, currencyField, reverseFormatNumber } from '../../utils/utils.js'
+    import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { logger } from '@/utils/logger.js'
+    import { Head } from '@inertiajs/vue3'
+    import { currencyField, reverseFormatNumber, sumField } from '@/utils/utils.js'
 </script>
 
 <script>
-export default {
-    name: 'FixExpenseIndex',
-    props: {
-        expenses: {
-            type: Array,
+    export default {
+        name: 'FixExpenseIndex',
+        props: {
+            expenses: {
+                type: Array,
+            },
+            shareUsers: {
+                type: Array,
+            },
         },
-        shareUsers: {
-            type: Array,
-        },
-    },
 
-    data() {
-        return {
-            breadcrumbs: [
-                {
-                    title: this.$t('menus.dashboard'),
-                    disabled: false,
-                    href: '/dashboard',
-                },
-                {
-                    title: this.$t('menus.fix-expense'),
-                    disabled: true,
-                },
-            ],
-            headers: [
-                { title: this.$t('default.description'), align: 'start', key: 'description', groupable: false },
-                { title: this.$t('fix-expense.due-date'), align: 'center', key: 'due_date' },
-                { title: this.$t('default.value'), align: 'end', key: 'value' },
-                { title: this.$t('default.share-value'), align: 'end', key: 'share_value' },
-                { title: this.$t('default.share-user'), key: 'share_user_id' },
-                { title: this.$t('default.remarks'), key: 'remarks' },
-                { title: this.$t('default.tags'), key: 'tags' },
-                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false, width: 40 },
-            ],
-            rules: {
-                textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
-                currencyFieldRules: [
-                    (value) => {
-                        value = reverseFormatNumber(value)
-                        if (!value) return this.$t('rules.required-text-field')
-                        if (Number(value) <= 0) return this.$t('rules.required-currency-field')
-
-                        return true
+        data() {
+            return {
+                breadcrumbs: [
+                    {
+                        title: this.$t('menus.dashboard'),
+                        disabled: false,
+                        href: '/dashboard',
+                    },
+                    {
+                        title: this.$t('menus.fix-expense'),
+                        disabled: true,
                     },
                 ],
-            },
-            search: null,
-            editDialog: false,
-            isLoading: false,
-            deleteId: null,
-            modalEntryDateStart: false,
-            percentage: null,
-            expense: {
-                id: null,
-                description: null,
-                value: 0,
-                due_date: null,
-                remarks: null,
-                share_value: 0,
-                share_user_id: null,
-                tags: [],
-            },
-            dueDateList: [
-                '01',
-                '02',
-                '03',
-                '04',
-                '05',
-                '06',
-                '06',
-                '07',
-                '08',
-                '09',
-                '10',
-                '11',
-                '12',
-                '13',
-                '14',
-                '15',
-                '16',
-                '17',
-                '18',
-                '19',
-                '20',
-                '21',
-                '22',
-                '23',
-                '24',
-                '25',
-                '26',
-                '27',
-                '28',
-                '29',
-                '30',
-                '31',
-            ],
-            listTags: [],
-            searchFieldsData: [],
-            searchTag: '',
-            loadingData: false,
-        }
-    },
+                headers: [
+                    {
+                        title: this.$t('default.description'),
+                        align: 'start',
+                        key: 'description',
+                        groupable: false,
+                    },
+                    {
+                        title: this.$t('fix-expense.due-date'),
+                        align: 'center',
+                        key: 'due_date',
+                    },
+                    { title: this.$t('default.value'), align: 'end', key: 'value' },
+                    {
+                        title: this.$t('default.share-value'),
+                        align: 'end',
+                        key: 'share_value',
+                    },
+                    { title: this.$t('default.share-user'), key: 'share_user_id' },
+                    { title: this.$t('default.remarks'), key: 'remarks' },
+                    { title: this.$t('default.tags'), key: 'tags' },
+                    {
+                        title: this.$t('default.action'),
+                        align: 'center',
+                        key: 'action',
+                        sortable: false,
+                        width: 40,
+                    },
+                ],
+                rules: {
+                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+                    currencyFieldRules: [
+                        (value) => {
+                            value = reverseFormatNumber(value)
+                            if (!value) return this.$t('rules.required-text-field')
+                            if (Number(value) <= 0) return this.$t('rules.required-currency-field')
 
-    computed: {
-        itemsTags() {
-            return this.listTags
-        },
-    },
-
-    async created() {},
-
-    async mounted() {},
-
-    methods: {
-        calculeShareValue(evt) {
-            if (this.expense.value) {
-                this.expense.share_value = parseFloat((this.expense.value * evt.target.value) / 100).toFixed(2)
+                            return true
+                        },
+                    ],
+                },
+                search: null,
+                editDialog: false,
+                titleModal: '',
+                isLoading: false,
+                deleteId: null,
+                modalEntryDateStart: false,
+                percentage: null,
+                expense: {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    due_date: null,
+                    remarks: null,
+                    share_value: 0,
+                    share_user_id: null,
+                    tags: [],
+                },
+                dueDateList: [
+                    '01',
+                    '02',
+                    '03',
+                    '04',
+                    '05',
+                    '06',
+                    '07',
+                    '08',
+                    '09',
+                    '10',
+                    '11',
+                    '12',
+                    '13',
+                    '14',
+                    '15',
+                    '16',
+                    '17',
+                    '18',
+                    '19',
+                    '20',
+                    '21',
+                    '22',
+                    '23',
+                    '24',
+                    '25',
+                    '26',
+                    '27',
+                    '28',
+                    '29',
+                    '30',
+                    '31',
+                ],
+                listTags: [],
+                searchFieldsData: [],
+                searchTag: '',
+                loadingData: false,
             }
         },
 
-        async searchTags(val) {
-            if (this.loadingData) return
+        computed: {
+            itemsTags() {
+                return this.listTags
+            },
+        },
 
-            if (!val || val.length <= 1) {
-                this.listTags = []
+
+
+        methods: {
+            calculeShareValue(evt) {
+                if (this.expense.value) {
+                    this.expense.share_value = parseFloat((this.expense.value * evt.target.value) / 100).toFixed(2)
+                }
+            },
+
+            async searchTags(val) {
+                if (this.loadingData) return
+
+                if (!val || val.length <= 1) {
+                    this.listTags = []
+                    clearTimeout(this.timeOut)
+                    return
+                }
+
+                if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
+                    return
+                }
+
                 clearTimeout(this.timeOut)
-                return
-            }
+                this.timeOut = setTimeout(async () => {
+                    this.loadingData = true
+                    let searchFieldsData = []
+                    await window.axios
+                        .get('/tag/search/' + val)
+                        .then(function (response) {
+                            if (response.data && response.data.length > 0) {
+                                searchFieldsData = response.data
+                            }
 
-            if (this.expense.tags && this.expense.tags.length > 0 && this.expense.tags.find((x) => x.name == val)) {
-                return
-            }
+                            if (
+                                (searchFieldsData &&
+                                    searchFieldsData.length > 0 &&
+                                    !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
+                                !searchFieldsData ||
+                                searchFieldsData.length == 0
+                            ) {
+                                searchFieldsData.unshift({
+                                    name: val.toUpperCase(),
+                                })
+                            }
+                        })
+                        .catch(function (error) {
+                            logger.error('error', error)
+                        })
 
-            clearTimeout(this.timeOut)
-            this.timeOut = setTimeout(async () => {
-                this.loadingData = true
-                let searchFieldsData = []
-                await window.axios
-                    .get('/tag/search/' + val)
-                    .then(function (response) {
-                        if (response.data && response.data.length > 0) {
-                            searchFieldsData = response.data
-                        }
+                    this.listTags = searchFieldsData
+                    this.loadingData = false
+                }, 300)
+            },
 
-                        if (
-                            (searchFieldsData &&
-                                searchFieldsData.length > 0 &&
-                                !searchFieldsData.find((x) => x.name == val.toUpperCase())) ||
-                            !searchFieldsData ||
-                            searchFieldsData.length == 0
-                        ) {
-                            searchFieldsData.unshift({ name: val.toUpperCase() })
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log('error', error)
-                    })
-
-                this.listTags = searchFieldsData
-                this.loadingData = false
-            }, 300)
-        },
-
-        newItem() {
-            this.titleModal = this.$t('fix-expense.new-item')
-            this.editDialog = true
-            this.expense = {
-                id: null,
-                description: null,
-                value: 0,
-                due_date: null,
-                remarks: null,
-                share_value: 0,
-                share_user_id: null,
-                tags: [],
-            }
-            setTimeout(() => {
-                this.$refs.txtDescription.focus()
-            })
-        },
-
-        editItem(item) {
-            this.titleModal = this.$t('fix-expense.edit-item')
-            this.editDialog = true
-            this.expense = {
-                id: item.id,
-                description: item.description,
-                value: Number(item.value),
-                due_date: item.due_date,
-                remarks: item.remarks,
-                share_value: item.share_value ? Number(item.share_value) : 0,
-                share_user_id: item.share_user_id,
-                tags: item.tags,
-            }
-            setTimeout(() => {
-                this.$refs.txtDescription.focus()
-            })
-        },
-
-        closeItem() {
-            this.editDialog = false
-        },
-
-        async save() {
-            let validate = await this.$refs.form.validate()
-            if (validate.valid) {
-                if (this.expense.id) {
-                    await this.update()
-                } else {
-                    await this.create()
+            newItem() {
+                this.titleModal = this.$t('fix-expense.new-item')
+                this.editDialog = true
+                this.expense = {
+                    id: null,
+                    description: null,
+                    value: 0,
+                    due_date: null,
+                    remarks: null,
+                    share_value: 0,
+                    share_user_id: null,
+                    tags: [],
                 }
-            }
-        },
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
+                })
+            },
 
-        async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/fix-expense',
-                {
-                    description: this.expense.description,
-                    value: this.expense.value,
-                    due_date: this.expense.due_date,
-                    remarks: this.expense.remarks,
-                    share_value: this.expense.share_value,
-                    share_user_id: this.expense.share_user_id,
-                    tags: this.expense.tags,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
+            editItem(item) {
+                this.titleModal = this.$t('fix-expense.edit-item')
+                this.editDialog = true
+                this.expense = {
+                    id: item.id,
+                    description: item.description,
+                    value: Number(item.value),
+                    due_date: item.due_date,
+                    remarks: item.remarks,
+                    share_value: item.share_value ? Number(item.share_value) : 0,
+                    share_user_id: item.share_user_id,
+                    tags: item.tags,
+                }
+                setTimeout(() => {
+                    this.$refs.txtDescription.focus()
+                })
+            },
+
+            closeItem() {
+                this.editDialog = false
+            },
+
+            async save() {
+                let validate = await this.$refs.form.validate()
+                if (validate.valid) {
+                    if (this.expense.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
+                }
+            },
+
+            async create() {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/fix-expense',
+                    {
+                        description: this.expense.description,
+                        value: this.expense.value,
+                        due_date: this.expense.due_date,
+                        remarks: this.expense.remarks,
+                        share_value: this.expense.share_value,
+                        share_user_id: this.expense.share_user_id,
+                        tags: this.expense.tags,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
+
+            async update() {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/fix-expense/' + this.expense.id,
+                    {
+                        description: this.expense.description,
+                        value: this.expense.value,
+                        due_date: this.expense.due_date,
+                        remarks: this.expense.remarks,
+                        share_value: this.expense.share_value,
+                        share_user_id: this.expense.share_user_id,
+                        tags: this.expense.tags,
+                    },
+                    {
+                        onSuccess: () => {
+                            this.editDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
+
+            async confirmRemove(item) {
+                this.deleteId = item.id
+                if (
+                    await this.$refs.confirm.open(this.$t('fix-expense.item'), this.$t('default.confirm-delete-item'))
+                ) {
+                    this.remove()
+                }
+            },
+
+            remove() {
+                this.isLoading = true
+                this.$inertia.delete(`/fix-expense/${this.deleteId}`, {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {},
+                    onError: () => {
+                        this.isLoading = false
                     },
                     onFinish: () => {
                         this.isLoading = false
                     },
-                }
-            )
+                })
+            },
         },
-
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/fix-expense/' + this.expense.id,
-                {
-                    description: this.expense.description,
-                    value: this.expense.value,
-                    due_date: this.expense.due_date,
-                    remarks: this.expense.remarks,
-                    share_value: this.expense.share_value,
-                    share_user_id: this.expense.share_user_id,
-                    tags: this.expense.tags,
-                },
-                {
-                    onSuccess: () => {
-                        this.editDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
-        },
-
-        async confirmRemove(item) {
-            this.deleteId = item.id
-            if (await this.$refs.confirm.open(this.$t('fix-expense.item'), this.$t('default.confirm-delete-item'))) {
-                this.remove()
-            }
-        },
-
-        remove() {
-            this.isLoading = true
-            this.$inertia.delete(`/fix-expense/${this.deleteId}`, {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {},
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-            })
-        },
-    },
-}
+    }
 </script>

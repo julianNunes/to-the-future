@@ -26,43 +26,43 @@
 </template>
 
 <script>
-export default {
-    name: 'ConfirmDialog',
+    export default {
+        name: 'ConfirmDialog',
 
-    data: function () {
-        return {
-            dialog: false,
-            resolve: null,
-            reject: null,
-            message: null,
-            title: null,
-            options: {
-                color: 'primary',
-                width: 400,
-                zIndex: 200,
-                noconfirm: false,
+        data: function () {
+            return {
+                dialog: false,
+                resolve: null,
+                reject: null,
+                message: null,
+                title: null,
+                options: {
+                    color: 'primary',
+                    width: 400,
+                    zIndex: 200,
+                    noconfirm: false,
+                },
+            }
+        },
+        methods: {
+            open(title, message, options) {
+                this.dialog = true
+                this.title = title
+                this.message = message
+                this.options = Object.assign(this.options, options)
+                return new Promise((resolve, reject) => {
+                    this.resolve = resolve
+                    this.reject = reject
+                })
             },
-        }
-    },
-    methods: {
-        open(title, message, options) {
-            this.dialog = true
-            this.title = title
-            this.message = message
-            this.options = Object.assign(this.options, options)
-            return new Promise((resolve, reject) => {
-                this.resolve = resolve
-                this.reject = reject
-            })
+            agree() {
+                this.resolve(true)
+                this.dialog = false
+            },
+            cancel() {
+                this.resolve(false)
+                this.dialog = false
+            },
         },
-        agree() {
-            this.resolve(true)
-            this.dialog = false
-        },
-        cancel() {
-            this.resolve(false)
-            this.dialog = false
-        },
-    },
-}
+    }
 </script>

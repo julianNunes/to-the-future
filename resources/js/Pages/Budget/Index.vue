@@ -206,7 +206,7 @@
                             </v-col>
                             <v-col cols="6" sm="6" md="6">
                                 <v-date-input
-                                    ref="txtStartWeek1"
+                                    ref="txtEndWeek1"
                                     v-model="budget.end_week_1"
                                     :label="$t('budget.end_week_1')"
                                     prepend-icon=""
@@ -467,276 +467,275 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head, Link } from '@inertiajs/vue3'
-import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import { currencyField, formatDate } from '../../utils/utils.js'
-import moment from 'moment'
+    import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { Head, Link } from '@inertiajs/vue3'
+    import moment from 'moment'
+    import { currencyField, formatDate } from '@/utils/utils.js'
 </script>
 
 <script>
-export default {
-    name: 'BudgetIndex',
-    props: {
-        budgets: {
-            type: Array,
-        },
-        year: {
-            type: String,
-        },
-    },
-
-    data() {
-        return {
-            breadcrumbs: [
-                {
-                    title: this.$t('menus.dashboard'),
-                    disabled: false,
-                    href: '/dashboard',
-                },
-                {
-                    title: this.$t('menus.budget'),
-                    disabled: true,
-                },
-            ],
-            headers: [
-                { title: this.$t('default.year-month'), key: 'year_month' },
-                { title: this.$t('budget.total-expense'), key: 'total_expense', align: 'end' },
-                { title: this.$t('budget.total-income'), key: 'total_income', align: 'end' },
-                // { title: this.$t('default.closed'), key: 'closed', align: 'center' },
-                { title: this.$t('budget.start_week_1'), key: 'start_week_1', align: 'center' },
-                { title: this.$t('budget.end_week_1'), key: 'end_week_1', align: 'center' },
-                { title: this.$t('budget.start_week_2'), key: 'start_week_2', align: 'center' },
-                { title: this.$t('budget.end_week_2'), key: 'end_week_2', align: 'center' },
-                { title: this.$t('budget.start_week_3'), key: 'start_week_3', align: 'center' },
-                { title: this.$t('budget.end_week_3'), key: 'end_week_3', align: 'center' },
-                { title: this.$t('budget.start_week_4'), key: 'start_week_4', align: 'center' },
-                { title: this.$t('budget.end_week_4'), key: 'end_week_4', align: 'center' },
-                { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
-            ],
-            rules: {
-                textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+    export default {
+        name: 'BudgetIndex',
+        props: {
+            budgets: {
+                type: Array,
             },
-            search: null,
-            createDialog: false,
-            cloneDialog: false,
-            isLoading: false,
-            deleteId: null,
-            budget: {
-                yearMonth: null,
-                start_week_1: null,
-                end_week_1: null,
-                start_week_2: null,
-                end_week_2: null,
-                start_week_3: null,
-                end_week_3: null,
-                start_week_4: null,
-                end_week_4: null,
-                automaticGenerateYear: false,
-                includeFixExpenses: false,
-                includeProvisions: false,
+            year: {
+                type: String,
             },
-            cloneBudget: {
-                id: null,
-                yearMonth: null,
-                includeProvisions: false,
-                cloneBugdetExpenses: false,
-                cloneBugdetIncomes: false,
-                cloneBugdetGoals: false,
-            },
-        }
-    },
-
-    computed: {
-        yearModel() {
-            return this.year
-        },
-    },
-
-    async created() {},
-
-    async mounted() {},
-
-    methods: {
-        hrefBudgetShow(item) {
-            return '/budget/show/' + item.id
         },
 
-        changeYear(value) {
-            this.$inertia.get('/budget/' + value.target.value)
-        },
-
-        newItem() {
-            this.titleModal = this.$t('budget.new-item')
-            this.createDialog = true
-            this.budget = {
-                yearMonth: null,
-                start_week_1: null,
-                end_week_1: null,
-                start_week_2: null,
-                end_week_2: null,
-                start_week_3: null,
-                end_week_3: null,
-                start_week_4: null,
-                end_week_4: null,
-                automaticGenerateYear: false,
-                includeFixExpenses: false,
-                includeProvisions: false,
-            }
-            setTimeout(() => {
-                this.$refs.selectMonthYear.focus()
-            })
-        },
-
-        editItem(item) {
-            this.titleModal = this.$t('budget.edit-item')
-            this.createDialog = true
-            this.budget = {
-                id: item.id,
-                yearMonth: item.year + '-' + item.month,
-                start_week_1: moment(item.start_week_1, 'YYYY-MM-DD'),
-                end_week_1: moment(item.end_week_1, 'YYYY-MM-DD'),
-                start_week_2: moment(item.start_week_2, 'YYYY-MM-DD'),
-                end_week_2: moment(item.end_week_2, 'YYYY-MM-DD'),
-                start_week_3: moment(item.start_week_3, 'YYYY-MM-DD'),
-                end_week_3: moment(item.end_week_3, 'YYYY-MM-DD'),
-                start_week_4: moment(item.start_week_4, 'YYYY-MM-DD'),
-                end_week_4: moment(item.end_week_4, 'YYYY-MM-DD'),
-            }
-            setTimeout(() => {
-                this.$refs.txtStartWeek1.focus()
-            })
-        },
-
-        async save() {
-            let validate = await this.$refs.formCreate.validate()
-            if (validate.valid) {
-                if (this.budget.id) {
-                    await this.update()
-                } else {
-                    await this.create()
-                }
-            }
-        },
-
-        async create() {
-            this.isLoading = true
-            this.$inertia.post(
-                '/budget',
-                {
-                    year: this.budget.yearMonth.substring(0, 4),
-                    month: this.budget.yearMonth.substring(5, 7),
-                    start_week_1: this.budget.start_week_1.format('YYYY-MM-DD'),
-                    end_week_1: this.budget.end_week_1.format('YYYY-MM-DD'),
-                    start_week_2: this.budget.start_week_2.format('YYYY-MM-DD'),
-                    end_week_2: this.budget.end_week_2.format('YYYY-MM-DD'),
-                    start_week_3: this.budget.start_week_3.format('YYYY-MM-DD'),
-                    end_week_3: this.budget.end_week_3.format('YYYY-MM-DD'),
-                    start_week_4: this.budget.start_week_4.format('YYYY-MM-DD'),
-                    end_week_4: this.budget.end_week_4.format('YYYY-MM-DD'),
-                    automaticGenerateYear: this.budget.automaticGenerateYear,
-                    includeFixExpenses: this.budget.includeFixExpenses,
-                    includeProvisions: this.budget.includeProvisions,
-                },
-                {
-                    onSuccess: () => {
-                        this.createDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
-        },
-
-        async update() {
-            this.isLoading = true
-            this.$inertia.put(
-                '/budget/' + this.budget.id,
-                {
-                    start_week_1: this.budget.start_week_1.format('YYYY-MM-DD'),
-                    end_week_1: this.budget.end_week_1.format('YYYY-MM-DD'),
-                    start_week_2: this.budget.start_week_2.format('YYYY-MM-DD'),
-                    end_week_2: this.budget.end_week_2.format('YYYY-MM-DD'),
-                    start_week_3: this.budget.start_week_3.format('YYYY-MM-DD'),
-                    end_week_3: this.budget.end_week_3.format('YYYY-MM-DD'),
-                    start_week_4: this.budget.start_week_4.format('YYYY-MM-DD'),
-                    end_week_4: this.budget.end_week_4.format('YYYY-MM-DD'),
-                },
-                {
-                    onSuccess: () => {
-                        this.createDialog = false
-                    },
-                    onFinish: () => {
-                        this.isLoading = false
-                    },
-                }
-            )
-        },
-
-        cloneItem(item) {
-            this.titleModal = this.$t('budget.clone-item')
-            this.cloneDialog = true
-            this.cloneBudget = {
-                id: item.id,
-                yearMonth: null,
-                includeProvisions: false,
-                cloneBugdetExpenses: false,
-                cloneBugdetIncomes: false,
-                cloneBugdetGoals: false,
-            }
-            setTimeout(() => {
-                this.$refs.selectMonthYearClone.focus()
-            })
-        },
-
-        async clone() {
-            let validate = await this.$refs.formClone.validate()
-            if (validate.valid) {
-                this.isLoading = true
-                this.$inertia.put(
-                    '/budget/clone/' + this.cloneBudget.id,
+        data() {
+            return {
+                breadcrumbs: [
                     {
-                        year: this.cloneBudget.yearMonth.substring(0, 4),
-                        month: this.cloneBudget.yearMonth.substring(5, 7),
-                        includeProvisions: this.cloneBudget.includeProvisions,
-                        cloneBugdetExpenses: this.cloneBudget.cloneBugdetExpenses,
-                        cloneBugdetIncomes: this.cloneBudget.cloneBugdetIncomes,
-                        cloneBugdetGoals: this.cloneBudget.cloneBugdetGoals,
+                        title: this.$t('menus.dashboard'),
+                        disabled: false,
+                        href: '/dashboard',
+                    },
+                    {
+                        title: this.$t('menus.budget'),
+                        disabled: true,
+                    },
+                ],
+                headers: [
+                    { title: this.$t('default.year-month'), key: 'year_month' },
+                    { title: this.$t('budget.total-expense'), key: 'total_expense', align: 'end' },
+                    { title: this.$t('budget.total-income'), key: 'total_income', align: 'end' },
+                    // { title: this.$t('default.closed'), key: 'closed', align: 'center' },
+                    { title: this.$t('budget.start_week_1'), key: 'start_week_1', align: 'center' },
+                    { title: this.$t('budget.end_week_1'), key: 'end_week_1', align: 'center' },
+                    { title: this.$t('budget.start_week_2'), key: 'start_week_2', align: 'center' },
+                    { title: this.$t('budget.end_week_2'), key: 'end_week_2', align: 'center' },
+                    { title: this.$t('budget.start_week_3'), key: 'start_week_3', align: 'center' },
+                    { title: this.$t('budget.end_week_3'), key: 'end_week_3', align: 'center' },
+                    { title: this.$t('budget.start_week_4'), key: 'start_week_4', align: 'center' },
+                    { title: this.$t('budget.end_week_4'), key: 'end_week_4', align: 'center' },
+                    { title: this.$t('default.action'), align: 'center', key: 'action', sortable: false },
+                ],
+                rules: {
+                    textFieldRules: [(v) => !!v || this.$t('rules.required-text-field')],
+                },
+                search: null,
+                createDialog: false,
+                cloneDialog: false,
+                titleModal: '',
+                isLoading: false,
+                deleteId: null,
+                budget: {
+                    yearMonth: null,
+                    start_week_1: null,
+                    end_week_1: null,
+                    start_week_2: null,
+                    end_week_2: null,
+                    start_week_3: null,
+                    end_week_3: null,
+                    start_week_4: null,
+                    end_week_4: null,
+                    automaticGenerateYear: false,
+                    includeFixExpenses: false,
+                    includeProvisions: false,
+                },
+                cloneBudget: {
+                    id: null,
+                    yearMonth: null,
+                    includeProvisions: false,
+                    cloneBugdetExpenses: false,
+                    cloneBugdetIncomes: false,
+                    cloneBugdetGoals: false,
+                },
+            }
+        },
+
+        computed: {
+            yearModel() {
+                return this.year
+            },
+        },
+
+
+
+        methods: {
+            hrefBudgetShow(item) {
+                return '/budget/show/' + item.id
+            },
+
+            changeYear(value) {
+                this.$inertia.get('/budget/' + value.target.value)
+            },
+
+            newItem() {
+                this.titleModal = this.$t('budget.new-item')
+                this.createDialog = true
+                this.budget = {
+                    yearMonth: null,
+                    start_week_1: null,
+                    end_week_1: null,
+                    start_week_2: null,
+                    end_week_2: null,
+                    start_week_3: null,
+                    end_week_3: null,
+                    start_week_4: null,
+                    end_week_4: null,
+                    automaticGenerateYear: false,
+                    includeFixExpenses: false,
+                    includeProvisions: false,
+                }
+                setTimeout(() => {
+                    this.$refs.selectMonthYear.focus()
+                })
+            },
+
+            editItem(item) {
+                this.titleModal = this.$t('budget.edit-item')
+                this.createDialog = true
+                this.budget = {
+                    id: item.id,
+                    yearMonth: item.year + '-' + item.month,
+                    start_week_1: moment(item.start_week_1, 'YYYY-MM-DD'),
+                    end_week_1: moment(item.end_week_1, 'YYYY-MM-DD'),
+                    start_week_2: moment(item.start_week_2, 'YYYY-MM-DD'),
+                    end_week_2: moment(item.end_week_2, 'YYYY-MM-DD'),
+                    start_week_3: moment(item.start_week_3, 'YYYY-MM-DD'),
+                    end_week_3: moment(item.end_week_3, 'YYYY-MM-DD'),
+                    start_week_4: moment(item.start_week_4, 'YYYY-MM-DD'),
+                    end_week_4: moment(item.end_week_4, 'YYYY-MM-DD'),
+                }
+                setTimeout(() => {
+                    this.$refs.txtStartWeek1.focus()
+                })
+            },
+
+            async save() {
+                let validate = await this.$refs.formCreate.validate()
+                if (validate.valid) {
+                    if (this.budget.id) {
+                        await this.update()
+                    } else {
+                        await this.create()
+                    }
+                }
+            },
+
+            async create() {
+                this.isLoading = true
+                this.$inertia.post(
+                    '/budget',
+                    {
+                        year: this.budget.yearMonth.substring(0, 4),
+                        month: this.budget.yearMonth.substring(5, 7),
+                        start_week_1: this.budget.start_week_1.format('YYYY-MM-DD'),
+                        end_week_1: this.budget.end_week_1.format('YYYY-MM-DD'),
+                        start_week_2: this.budget.start_week_2.format('YYYY-MM-DD'),
+                        end_week_2: this.budget.end_week_2.format('YYYY-MM-DD'),
+                        start_week_3: this.budget.start_week_3.format('YYYY-MM-DD'),
+                        end_week_3: this.budget.end_week_3.format('YYYY-MM-DD'),
+                        start_week_4: this.budget.start_week_4.format('YYYY-MM-DD'),
+                        end_week_4: this.budget.end_week_4.format('YYYY-MM-DD'),
+                        automaticGenerateYear: this.budget.automaticGenerateYear,
+                        includeFixExpenses: this.budget.includeFixExpenses,
+                        includeProvisions: this.budget.includeProvisions,
                     },
                     {
                         onSuccess: () => {
-                            this.cloneDialog = false
+                            this.createDialog = false
                         },
                         onFinish: () => {
                             this.isLoading = false
                         },
                     }
                 )
-            }
-        },
+            },
 
-        async confirmRemove(item) {
-            this.deleteId = item.id
-            if (await this.$refs.confirm.open(this.$t('budget.budget'), this.$t('default.confirm-delete-item'))) {
-                this.remove()
-            }
-        },
+            async update() {
+                this.isLoading = true
+                this.$inertia.put(
+                    '/budget/' + this.budget.id,
+                    {
+                        start_week_1: this.budget.start_week_1.format('YYYY-MM-DD'),
+                        end_week_1: this.budget.end_week_1.format('YYYY-MM-DD'),
+                        start_week_2: this.budget.start_week_2.format('YYYY-MM-DD'),
+                        end_week_2: this.budget.end_week_2.format('YYYY-MM-DD'),
+                        start_week_3: this.budget.start_week_3.format('YYYY-MM-DD'),
+                        end_week_3: this.budget.end_week_3.format('YYYY-MM-DD'),
+                        start_week_4: this.budget.start_week_4.format('YYYY-MM-DD'),
+                        end_week_4: this.budget.end_week_4.format('YYYY-MM-DD'),
+                    },
+                    {
+                        onSuccess: () => {
+                            this.createDialog = false
+                        },
+                        onFinish: () => {
+                            this.isLoading = false
+                        },
+                    }
+                )
+            },
 
-        remove() {
-            this.isLoading = true
-            this.$inertia.delete(`/budget/${this.deleteId}`, {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {},
-                onError: () => {
-                    this.isLoading = false
-                },
-                onFinish: () => {
-                    this.isLoading = false
-                },
-            })
+            cloneItem(item) {
+                this.titleModal = this.$t('budget.clone-item')
+                this.cloneDialog = true
+                this.cloneBudget = {
+                    id: item.id,
+                    yearMonth: null,
+                    includeProvisions: false,
+                    cloneBugdetExpenses: false,
+                    cloneBugdetIncomes: false,
+                    cloneBugdetGoals: false,
+                }
+                setTimeout(() => {
+                    this.$refs.selectMonthYearClone.focus()
+                })
+            },
+
+            async clone() {
+                let validate = await this.$refs.formClone.validate()
+                if (validate.valid) {
+                    this.isLoading = true
+                    this.$inertia.put(
+                        '/budget/clone/' + this.cloneBudget.id,
+                        {
+                            year: this.cloneBudget.yearMonth.substring(0, 4),
+                            month: this.cloneBudget.yearMonth.substring(5, 7),
+                            includeProvisions: this.cloneBudget.includeProvisions,
+                            cloneBugdetExpenses: this.cloneBudget.cloneBugdetExpenses,
+                            cloneBugdetIncomes: this.cloneBudget.cloneBugdetIncomes,
+                            cloneBugdetGoals: this.cloneBudget.cloneBugdetGoals,
+                        },
+                        {
+                            onSuccess: () => {
+                                this.cloneDialog = false
+                            },
+                            onFinish: () => {
+                                this.isLoading = false
+                            },
+                        }
+                    )
+                }
+            },
+
+            async confirmRemove(item) {
+                this.deleteId = item.id
+                if (await this.$refs.confirm.open(this.$t('budget.budget'), this.$t('default.confirm-delete-item'))) {
+                    this.remove()
+                }
+            },
+
+            remove() {
+                this.isLoading = true
+                this.$inertia.delete(`/budget/${this.deleteId}`, {
+                    preserveState: true,
+                    preserveScroll: true,
+                    onSuccess: () => {},
+                    onError: () => {
+                        this.isLoading = false
+                    },
+                    onFinish: () => {
+                        this.isLoading = false
+                    },
+                })
+            },
         },
-    },
-}
+    }
 </script>

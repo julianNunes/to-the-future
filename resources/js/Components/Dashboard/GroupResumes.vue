@@ -11,28 +11,26 @@
 <script setup></script>
 
 <script>
-export default {
-    name: 'GroupResumes',
-    props: {
-        itens: {
-            type: Object,
+    export default {
+        name: 'GroupResumes',
+        props: {
+            itens: {
+                type: Object,
+            },
         },
-    },
 
-    data() {
-        return {
-            panel: 1,
-        }
-    },
-
-    computed: {
-        itemsResumeTags() {
-            return this.itens.resume_tags || []
+        data() {
+            return {
+                panel: 1,
+            }
         },
-    },
 
-    async created() {},
+        computed: {
+            itemsResumeTags() {
+                return this.itens.resume_tags || []
+            },
+        },
 
-    async mounted() {},
-}
+
+    }
 </script>

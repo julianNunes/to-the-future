@@ -1,5 +1,5 @@
 <script setup>
-import NavigationMenu from '@/Components/NavigationMenu.vue'
+    import NavigationMenu from '@/Components/NavigationMenu.vue'
 </script>
 
 <template>
@@ -29,38 +29,38 @@ import NavigationMenu from '@/Components/NavigationMenu.vue'
 </template>
 
 <script>
-import md5 from 'crypto-js/md5'
-import { useToast } from 'vue-toastification'
+    import md5 from 'crypto-js/md5'
+    import { useToast } from 'vue-toastification'
 
-export default {
-    data() {
-        return {
-            drawer: false,
-            rail: false,
-        }
-    },
-    computed: {
-        avatar() {
-            return `https://www.gravatar.com/avatar/${md5(this.$page.props.auth.user.email)}?s=200`
+    export default {
+        data() {
+            return {
+                drawer: false,
+                rail: false,
+            }
         },
-    },
-    watch: {
-        $page: {
-            handler() {
-                const toast = useToast()
-                const flash = this.$page.props.flash
-                if (flash.success) {
-                    toast.success(this.$t(flash.success))
-                } else if (flash.error) {
-                    toast.error(this.$t(flash.error))
-                } else if (this.$page.props.errors) {
-                    toast.error(this.$t(this.$page.props.errors.error))
-                }
+        computed: {
+            avatar() {
+                return `https://www.gravatar.com/avatar/${md5(this.$page.props.auth.user.email)}?s=200`
             },
         },
-    },
-    mounted() {
-        this.drawer = !this.$vuetify.display.mobile
-    },
-}
+        watch: {
+            $page: {
+                handler() {
+                    const toast = useToast()
+                    const flash = this.$page.props.flash
+                    if (flash.success) {
+                        toast.success(this.$t(flash.success))
+                    } else if (flash.error) {
+                        toast.error(this.$t(flash.error))
+                    } else if (this.$page.props.errors) {
+                        toast.error(this.$t(this.$page.props.errors.error))
+                    }
+                },
+            },
+        },
+        mounted() {
+            this.drawer = !this.$vuetify.display.mobile
+        },
+    }
 </script>

@@ -22,7 +22,6 @@
         "sucess-update": "Registro atualizado com sucesso",
         "sucess-delete": "Registro removido com sucesso",
 
-
         "month": "Mês",
         "year": "Ano",
         "year-month": "Mês/Ano",
@@ -264,7 +263,7 @@
         "period_week_4": "Periodo Semana 4",
         "range-week": "{start} até {end}"
     },
-    "budget-show" : {
+    "budget-show": {
         "title": "Visualização Orçamento",
         "my-budget": "Meu Orçamento",
         "include-fix-expense": "Incluir Despesas Fixas",

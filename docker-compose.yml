@@ -1,92 +1,82 @@
 services:
-  php:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-      args:
-        PUID: 1000 # Substitua pelo seu UID se for diferente
-        PGID: 1000 # Substitua pelo seu GID se for diferente
-        DOCKER_GID: 999
-    env_file:
-      - .env
-    ports:
-      - "9000:9000"
-    volumes:
-      # Monta o socket do Docker do host para que possamos usar comandos docker de dentro do container
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/var/www/html:cached
-      # Compartilha o volume vendor para melhor performance
-      - vendor:/var/www/html/vendor:delegated
-    depends_on:
-      db:
-        condition: service_healthy
-    mem_limit: 1g # Aumentado para suportar mais extensões
-    cpus: 1.5 # Aumentado para melhor performance
-    healthcheck:
-      test: ["CMD-SHELL", "lsof -i tcp:9000 || exit 1"] # Ou netstat -tln | grep 9000
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    php:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+            args:
+                PUID: 1000 # Substitua pelo seu UID se for diferente
+                PGID: 1000 # Substitua pelo seu GID se for diferente
+                DOCKER_GID: 999
+        env_file:
+            - .env
+        ports:
+            - '9000:9000'
+        volumes:
+            # Monta o socket do Docker do host para que possamos usar comandos docker de dentro do container
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ./:/var/www/html:cached
+            # Compartilha o volume vendor para melhor performance
+            - vendor:/var/www/html/vendor:delegated
+        depends_on:
+            db:
+                condition: service_healthy
+        mem_limit: 1g # Aumentado para suportar mais extensões
+        cpus: 1.5 # Aumentado para melhor performance
+        healthcheck:
+            test: ['CMD-SHELL', 'lsof -i tcp:9000 || exit 1'] # Ou netstat -tln | grep 9000
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
-  nginx:
-    image: nginx:alpine
-    depends_on:
-      php:
-        condition: service_healthy
-    ports:
-      - "8080:80"
-    volumes:
-      - ./:/var/www/html:ro
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    mem_limit: 128m
-    cpus: 0.2
+    nginx:
+        image: nginx:alpine
+        depends_on:
+            php:
+                condition: service_healthy
+        ports:
+            - '8080:80'
+        volumes:
+            - ./:/var/www/html:ro
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+        mem_limit: 128m
+        cpus: 0.2
 
-  vite:
-    profiles: ["vite-dev"] # Só ativa com profile específico
-    build:
-      context: .
-      dockerfile: Dockerfile.vite
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./:/app:cached
-    environment:
-      CHOKIDAR_USEPOLLING: "false"
-      VITE_HOST: "0.0.0.0"
-    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
-    mem_limit: 256m
-    cpus: 0.5
-    restart: unless-stopped
+    vite:
+        profiles: ['vite-dev'] # Só ativa com profile específico
+        build:
+            context: .
+            dockerfile: Dockerfile.vite
+        ports:
+            - '5173:5173'
+        volumes:
+            - ./:/app:cached
+        environment:
+            CHOKIDAR_USEPOLLING: 'false'
+            VITE_HOST: '0.0.0.0'
+        command: ['npm', 'run', 'dev', '--', '--host', '0.0.0.0']
+        mem_limit: 256m
+        cpus: 0.5
+        restart: unless-stopped
 
-  db:
-    image: mysql:8.0
-    restart: unless-stopped
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: root1234
-    volumes:
-      - db_data:/var/lib/mysql
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u",
-          "admin",
-          "-proot1234",
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
+    db:
+        image: mysql:8.0
+        restart: unless-stopped
+        ports:
+            - '3307:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: root123
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: admin
+            MYSQL_PASSWORD: root1234
+        volumes:
+            - db_data:/var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'admin', '-proot1234']
+            interval: 5s
+            timeout: 5s
+            retries: 5
+            start_period: 20s
 
 volumes:
-  vendor:
-  db_data:
+    vendor:
+    db_data:
