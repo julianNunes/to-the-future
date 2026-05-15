@@ -12,12 +12,15 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface
 };
 use App\Services\Interfaces\CreditCardServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 class CreditCardService implements CreditCardServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private CreditCardRepositoryInterface $creditCardRepository,
         private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
@@ -106,6 +109,8 @@ class CreditCardService implements CreditCardServiceInterface
             throw new Exception('credit-card.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($credit_card);
+
         if ($credit_card->due_date != $dueDate || $credit_card->closing_date != $closingDate) {
             $invoices = $this->creditCardInvoiceRepository->get(['closed' => false, 'credit_card_id' => $credit_card->id]);
 
@@ -150,6 +155,8 @@ class CreditCardService implements CreditCardServiceInterface
         if (!$credit_card) {
             throw new Exception('credit-card.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($credit_card);
 
         // Remove todos os vinculos
         foreach ($credit_card->invoices as $invoice) {

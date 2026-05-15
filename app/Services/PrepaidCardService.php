@@ -10,11 +10,14 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface
 };
 use App\Services\Interfaces\PrepaidCardServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 
 class PrepaidCardService implements PrepaidCardServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private PrepaidCardRepositoryInterface $prepaidCardRepository,
         private PrepaidCardExtractRepositoryInterface $prepaidCardExtractRepository,
@@ -91,6 +94,8 @@ class PrepaidCardService implements PrepaidCardServiceInterface
             throw new Exception('prepaid-card.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($prepaid_card);
+
         return $this->prepaidCardRepository->store([
             'name' => $name,
             'digits' => $digits,
@@ -116,6 +121,8 @@ class PrepaidCardService implements PrepaidCardServiceInterface
         if (!$prepaid_card) {
             throw new Exception('prepaid-card.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($prepaid_card);
 
         // Remove todos os vinculos
         foreach ($prepaid_card->extracts as $invoice) {

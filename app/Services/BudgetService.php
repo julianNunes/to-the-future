@@ -24,12 +24,15 @@ use App\Services\Interfaces\{
     BudgetProvisionServiceInterface,
     BudgetServiceInterface,
 };
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 
 class BudgetService implements BudgetServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         // Services
         private BudgetExpenseServiceInterface $budgetExpenseService,
@@ -391,6 +394,8 @@ class BudgetService implements BudgetServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         // \Log::info($budget->dd());
 
         $provisions = null;
@@ -440,11 +445,11 @@ class BudgetService implements BudgetServiceInterface
         if ($cloneBugdetIncome && $budget->incomes && $budget->incomes->count()) {
             foreach ($budget->incomes as $income) {
                 $this->budgetIncomeService->create(
+                    $new_budget->id,
                     $income->description,
                     Carbon::parse($income->date)->month($month)->format('y-m-d'),
                     $income->value,
                     $income->remarks,
-                    $new_budget->id,
                     $income->tags
                 );
             }
@@ -498,6 +503,8 @@ class BudgetService implements BudgetServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         return $this->budgetRepository->store([
             'start_week_1' => $startWeek1,
             'end_week_1' => $endWeek1,
@@ -530,6 +537,8 @@ class BudgetService implements BudgetServiceInterface
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         // Despesas
         foreach ($budget->expenses as $expense) {
@@ -578,6 +587,8 @@ class BudgetService implements BudgetServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         return $budget;
     }
 
@@ -603,6 +614,8 @@ class BudgetService implements BudgetServiceInterface
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         $date = Carbon::parse($budget->year . '-' . $budget->month . '-01');
 

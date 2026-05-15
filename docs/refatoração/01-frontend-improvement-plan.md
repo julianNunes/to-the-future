@@ -52,7 +52,7 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 - [x] 2.1 URL com dupla barra em `BudgetExpenseTagOptions.vue` foi corrigida; o componente ativo usa `useCrudOperations('/budget-expense-tag-option')`.
 - [x] 2.2 URL sem barra em `BudgetExpense.vue` foi corrigida para `/budget-expense/{id}/delete-all-portions`.
 - [x] 2.3 `titleModal` deixou de depender de `data()` e hoje é centralizado como `ref` em `useCrudOperations`.
-- [ ] 2.4 `<Head title>` está parcialmente corrigido; `FixExpense`, `Financing/Show`, `PrepaidCardExtract/Index`, `PrepaidCardExtract/Show` e `Auth/Register` estão corretos, mas `PrepaidCard/Index.vue` ainda usa `"Credit Card"`.
+- [x] 2.4 `<Head title>` foi corrigido nos arquivos críticos mapeados; `PrepaidCard/Index.vue` agora usa `"Prepaid Card"` e a pendência original foi encerrada.
 - [x] 2.5 A ref duplicada `txtStartWeek1` foi resolvida; há apenas um `ref="txtStartWeek1"` no arquivo ativo.
 - [x] 2.6 `dueDateList` foi normalizado com `Array.from(...)`, sem valor duplicado.
 - [x] 2.7 A duplicação acidental de `BudgetExpenseTags` foi removida; hoje existem duas instâncias com props diferentes (owner/share), não uma duplicata literal.
@@ -1141,11 +1141,13 @@ Adicionar no `AuthenticatedLayout.vue`:
 
 ### 11.1 Estado Atual
 
-- Playwright já está instalado (`@playwright/test`) e existe suíte em `tests/e2e`.
-- O arquivo funcional hoje é `playwright.config.js`, apontando para `./tests/e2e`.
-- Também existe `playwright.config.ts` com `testDir: './e2e'`; essa duplicidade deve ser resolvida para evitar confusão.
-- Ainda não existe suíte de testes unitários e de componentes no frontend.
-- `package.json` ainda não possui scripts dedicados para `test:unit`, `test:e2e` e agregação de testes.
+- Playwright permanece como base E2E e agora está consolidado apenas em `playwright.config.js`.
+- O runtime E2E foi ajustado para Alpine usando o Chromium do sistema e artefatos em `./.playwright/`.
+- `Vitest + @vue/test-utils + jsdom` já estão configurados no repositório.
+- `package.json` já expõe `test:unit`, `test:unit:watch`, `test:e2e`, `test:e2e:ui` e `test`.
+- Já existe o primeiro teste unitário frontend real em `resources/js/composables/__tests__/useShareCalculation.spec.js`.
+- Os specs Playwright agora usam helper compartilhado de autenticação e não dependem mais de credenciais pessoais hardcoded.
+- O comando `test:e2e` prepara massa previsível via `E2ESmokeSeeder` antes da execução.
 
 ### 11.2 Stack Recomendada Para Este Projeto
 

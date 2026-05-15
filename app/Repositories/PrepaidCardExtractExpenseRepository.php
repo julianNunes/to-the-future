@@ -31,6 +31,9 @@ class PrepaidCardExtractExpenseRepository extends AppRepository implements Prepa
             ])
             ->with(['tags'])
             ->where('description', 'LIKE', "%{$description}%")
+            ->whereHas('extract.prepaidCard', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
             ->orderBy('created_at', 'DESC')
             ->get()
             ->unique('description');

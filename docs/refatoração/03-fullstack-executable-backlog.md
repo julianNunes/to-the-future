@@ -69,41 +69,46 @@ Uma slice só pode ser marcada como concluída quando atender todos os critério
 ### Onda 0 — Fundação de Execução e Testes
 
 #### SLICE-0.1 — Infra de testes fullstack
-- [ ] Entregar base única de testes com Playwright consolidado, Vitest configurado e scripts oficiais no `package.json`.
+- [x] Entregar base única de testes com Playwright consolidado, Vitest configurado e scripts oficiais no `package.json`.
 - Frontend: consolidar `playwright.config.js` como configuração ativa, remover ambiguidade com `playwright.config.ts`, adicionar `Vitest + @vue/test-utils + jsdom`.
 - Backend: garantir execução previsível de `phpunit` via `./scripts/artisan.sh test`.
 - Testes mínimos: 1 unit frontend, 1 unit backend, 1 smoke E2E.
 - Validação mínima: `./scripts/npm.sh run test:unit`, `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 15/05/2026: concluída com `vitest.config.js`, scripts oficiais de teste, Playwright unificado em `playwright.config.js`, smoke de login verde e runtime E2E ajustado para Alpine.
 
 #### SLICE-0.2 — Ambiente de dados para teste
-- [ ] Preparar base mínima de factories, fixtures e massa de dados reutilizável para Budget, Credit Card, Invoice, Prepaid Card e Extract.
+- [x] Preparar base mínima de factories, fixtures e massa de dados reutilizável para Budget, Credit Card, Invoice, Prepaid Card e Extract.
 - Frontend: permitir smoke tests sem credenciais hardcoded.
 - Backend: adicionar factories e seeds mínimos do domínio principal.
 - Testes mínimos: 1 feature test de autenticação/navegação + 1 smoke E2E com massa previsível.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:e2e`.
+- Status em 15/05/2026: concluída com factories mínimas do domínio principal, `E2ESmokeSeeder`, helper compartilhado de auth para Playwright e suíte feature alinhada ao app real.
 
 ### Onda 1 — Bugs Críticos e Segurança
 
 #### SLICE-1.1 — Correções críticas de orçamento e rotas
-- [ ] Corrigir bugs críticos do backend e fechar a pendência crítica restante do frontend.
+- [x] Corrigir bugs críticos do backend e fechar a pendência crítica restante do frontend.
 - Backend: corrigir `BudgetService::clone()`, variável `$installments`, rotas duplicadas, `AppRepository::delete()` e binding de `BudgetExpenseTagOptionRepositoryInterface`.
 - Frontend: corrigir o `<Head title>` pendente em `PrepaidCard/Index.vue` e revisar os bugs críticos já marcados no checklist.
 - Testes mínimos: 1 unit/backend para clone ou service afetado, 1 feature test para rota duplicada removida ou página Budget Show, 1 verificação frontend da tela afetada.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`.
+- Status em 15/05/2026: concluída com correções em `BudgetService::clone()`, `BudgetShowData`, rotas duplicadas, `AppRepository::delete()`, binding de `BudgetExpenseTagOptionRepositoryInterface` e `<Head title>` de `PrepaidCard/Index.vue`, além de regressions backend dedicados.
 
 #### SLICE-1.2 — Auth baseline, payload compartilhado e navegação autenticada
-- [ ] Fechar o mínimo de segurança para as rotas de domínio e alinhar o frontend ao payload autenticado.
-- Backend: aplicar `auth`/`verified`, reduzir payload de `HandleInertiaRequests`, ajustar tratamento de exceções quando necessário.
+- [x] Fechar o mínimo de segurança para as rotas de domínio e alinhar o frontend ao payload autenticado.
+- Backend: aplicar `auth` nas rotas de domínio, reduzir payload de `HandleInertiaRequests`, ajustar tratamento de exceções quando necessário e manter `verified` adiado até existir UX real de verificação por e-mail.
 - Frontend: validar layout autenticado, menu, breadcrumbs e consumo do payload `auth.user` reduzido.
 - Testes mínimos: feature tests para guest redirect e acesso autenticado; Playwright smoke de login e dashboard.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:e2e`.
+- Status em 15/05/2026: concluída com rotas sensíveis protegidas por `auth`, payload `auth.user` reduzido para `id`, `name` e `email`, correção do `Handler` para preservar redirects/403 do framework e smoke E2E de login/dashboard verde.
 
 #### SLICE-1.3 — Ownership e IDOR
-- [ ] Garantir que recursos do domínio não possam ser acessados por usuários errados e refletir isso nas telas.
-- Backend: adicionar checagens de ownership ou policies para Budget e recursos adjacentes.
-- Frontend: tratar estados de erro/redirecionamento quando acesso for negado.
+- [x] Garantir que recursos do domínio não possam ser acessados por usuários errados e refletir isso nas telas.
+- Backend: adicionar checagens de ownership na camada `Service/Helper` para Budget e recursos adjacentes, além de escopo por usuário nos searches críticos.
+- Frontend: manter a navegação autenticada íntegra e aceitar o deny path padrão por HTTP `403` nesta baseline; UX dedicada para acesso negado permanece como refinamento futuro.
 - Testes mínimos: feature tests de IDOR para Budget; smoke frontend garantindo que a navegação normal siga funcionando.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:e2e`.
+- Status em 15/05/2026: concluída com guards compartilhados de ownership, cobertura de acesso cruzado para Budget, Goal, Credit Card, Invoice, Prepaid Card, Extract, Tag e side doors de expenses/search, além de smoke E2E sem regressão.
 
 ### Onda 2 — Contratos Compartilhados e Base de CRUD
 

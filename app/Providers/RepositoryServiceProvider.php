@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Repositories\{
     AppRepository,
     BudgetExpenseRepository,
+    BudgetExpenseTagOptionRepository,
     BudgetGoalRepository,
     BudgetIncomeRepository,
     BudgetProvisionRepository,
@@ -27,6 +28,7 @@ use App\Repositories\{
 use App\Repositories\Interfaces\{
     AppRepositoryInterface,
     BudgetExpenseRepositoryInterface,
+    BudgetExpenseTagOptionRepositoryInterface,
     BudgetGoalRepositoryInterface,
     BudgetIncomeRepositoryInterface,
     BudgetProvisionRepositoryInterface,
@@ -57,6 +59,7 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->app->bind(AppRepositoryInterface::class, AppRepository::class);
         $this->app->bind(BudgetExpenseRepositoryInterface::class, BudgetExpenseRepository::class);
+        $this->app->bind(BudgetExpenseTagOptionRepositoryInterface::class, BudgetExpenseTagOptionRepository::class);
         $this->app->bind(BudgetGoalRepositoryInterface::class, BudgetGoalRepository::class);
         $this->app->bind(BudgetIncomeRepositoryInterface::class, BudgetIncomeRepository::class);
         $this->app->bind(BudgetProvisionRepositoryInterface::class, BudgetProvisionRepository::class);

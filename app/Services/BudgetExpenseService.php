@@ -10,12 +10,15 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetExpenseServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\{Carbon, Collection};
 use Str;
 
 class BudgetExpenseService implements BudgetExpenseServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetExpenseRepositoryInterface $budgetExpenseRepository,
@@ -58,6 +61,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         $group_portion = Str::uuid(); // Gera um UUID para o grupo
 
@@ -159,6 +164,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         $expense = $this->budgetExpenseRepository->store([
             'description' => $description,
             'date' => $date,
@@ -209,6 +216,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         $change_share_user = ($shareUserId != $expense->share_user_id) || ($shareValue != $expense->share_value) ? true : false;
 
         // Atualiza Tags
@@ -250,6 +259,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         // Remove Tags
         $this->tagRepository->saveTagsToModel($expense);
 
@@ -266,7 +277,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
     }
 
     /**
-     * Delete all Expenses with Portion from a Budget 
+     * Delete all Expenses with Portion from a Budget
      * @param string $groupPortion
      * @return boolean
      */
@@ -284,6 +295,8 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             if (!$budget) {
                 throw new Exception('budget.not-found');
             }
+
+            $this->ensureOwnedByCurrentUser($budget);
 
             // Remove Tags
             $this->tagRepository->saveTagsToModel($expense);

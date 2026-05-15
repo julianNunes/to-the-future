@@ -1,16 +1,8 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import { captureDebugScreenshot, login } from './support/auth'
 
-test('invoice expense details page renders successfully', async ({ page }) => {
-    // Navigate to login page
-    await page.goto('/login')
-
-    // Fill the login form
-    await page.fill('input[type="email"]', 'eu_dinovu@hotmail.com')
-    await page.fill('input[type="password"]', 'password')
-    await page.click('button:has-text("LOGIN")')
-
-    // Wait for Dashboard to ensure login
-    await expect(page).toHaveURL(/.*\/dashboard/)
+test('invoice expense details page renders successfully', async ({ page }, testInfo) => {
+    await login(page)
 
     // Navigate to Credit Cards page to find a card
     await page.goto('/credit-card')
@@ -40,5 +32,5 @@ test('invoice expense details page renders successfully', async ({ page }) => {
     await expect(page.locator('#app')).toBeVisible()
 
     // Capture screenshot of the resulting page
-    await page.screenshot({ path: 'tests/e2e/debug-invoice-expense.png' })
+    await captureDebugScreenshot(page, testInfo, 'debug-invoice-expense.png')
 })

@@ -9,11 +9,14 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetGoalServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Collection;
 
 class BudgetGoalService implements BudgetGoalServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetGoalRepositoryInterface $budgetGoalRepository,
@@ -38,6 +41,14 @@ class BudgetGoalService implements BudgetGoalServiceInterface
         bool $countShare,
         ?string $group = null
     ): BudgetGoal {
+        $budget = $this->budgetRepository->show($budgetId);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $this->ensureOwnedByCurrentUser($budget);
+
         $goal = $this->budgetGoalRepository->store([
             'description' => $description,
             'value' => $value,
@@ -82,6 +93,8 @@ class BudgetGoalService implements BudgetGoalServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         // Atualiza Tag
         $this->tagRepository->saveTagsToModel($goal, $tags);
 
@@ -104,6 +117,14 @@ class BudgetGoalService implements BudgetGoalServiceInterface
         if (!$goal) {
             throw new Exception('budget-goal.not-found');
         }
+
+        $budget = $this->budgetRepository->show($goal->budget_id);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         // Remove Tags
         $this->tagRepository->saveTagsToModel($goal);

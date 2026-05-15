@@ -1,24 +1,13 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import { captureDebugScreenshot, login } from './support/auth'
 
-test('login flow works correctly', async ({ page }) => {
+test('login flow works correctly', async ({ page }, testInfo) => {
     page.on('requestfailed', (request) => {
         console.log(`Failed request: ${request.url()} - ${request.failure()?.errorText}`)
     })
 
-    // Navigate to login page
-    await page.goto('/login')
-    await page.waitForTimeout(5000)
-    await page.screenshot({ path: 'tests/e2e/debug-login.png' })
-
-    // Fill the login form
-    await page.fill('input[type="email"]', 'eu_dinovu@hotmail.com')
-    await page.fill('input[type="password"]', 'password')
-
-    // Submit
-    await page.click('button:has-text("LOGIN")')
-
-    // Allow time to redirect
-    await page.waitForTimeout(3000)
+    await login(page)
+    await captureDebugScreenshot(page, testInfo, 'debug-login.png')
 
     const currentUrl = page.url()
     console.log(`Current URL after login attempt: ${currentUrl}`)

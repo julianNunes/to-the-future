@@ -9,11 +9,14 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetExpenseTagOptionServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Collection;
 
 class BudgetExpenseTagOptionService implements BudgetExpenseTagOptionServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetExpenseTagOptionRepositoryInterface $budgetExpenseTagOptionRepository,
@@ -34,6 +37,14 @@ class BudgetExpenseTagOptionService implements BudgetExpenseTagOptionServiceInte
         bool $countShare,
         ?string $group = null
     ): BudgetExpenseTagOption {
+        $budget = $this->budgetRepository->show($budgetId);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $this->ensureOwnedByCurrentUser($budget);
+
         $goal = $this->budgetExpenseTagOptionRepository->store([
             'group' => $group,
             'count_share' => $countShare,
@@ -72,6 +83,8 @@ class BudgetExpenseTagOptionService implements BudgetExpenseTagOptionServiceInte
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         // Atualiza Tag
         $this->tagRepository->saveTagsToModel($goal, $tags);
 
@@ -92,6 +105,14 @@ class BudgetExpenseTagOptionService implements BudgetExpenseTagOptionServiceInte
         if (!$goal) {
             throw new Exception('budget-goal.not-found');
         }
+
+        $budget = $this->budgetRepository->show($goal->budget_id);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         // Remove Tags
         $this->tagRepository->saveTagsToModel($goal);

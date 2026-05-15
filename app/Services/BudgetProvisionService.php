@@ -10,11 +10,14 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetProvisionServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Collection;
 
 class BudgetProvisionService implements BudgetProvisionServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetProvisionRepositoryInterface $budgetProvisionRepository,
@@ -49,6 +52,8 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         $provision = $this->budgetProvisionRepository->store([
             'budget_id' => $budgetId,
@@ -102,6 +107,8 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         $change_share_user = ($shareUserId != $provision->share_user_id) || ($shareValue != $provision->share_value) ? true : false;
 
         // Atualiza Tags
@@ -133,6 +140,14 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         if (!$provision) {
             throw new Exception('budget-provision.not-found');
         }
+
+        $budget = $this->budgetRepository->show($provision->budget_id);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         $budget_id = $provision->budget_id;
         $share_user_id = $provision->share_user_id;

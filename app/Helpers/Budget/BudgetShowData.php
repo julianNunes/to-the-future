@@ -8,6 +8,7 @@ use App\Models\BudgetExpense;
 use App\Models\BudgetIncome;
 use App\Models\ShareUser;
 use App\Models\User;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use App\Repositories\Interfaces\{
     BudgetRepositoryInterface,
     CreditCardInvoiceRepositoryInterface,
@@ -19,6 +20,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class BudgetShowData implements BudgetShowDataInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         // Services
         private BudgetRepositoryInterface $budgetRepository,
@@ -76,19 +79,20 @@ class BudgetShowData implements BudgetShowDataInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         // Busca as parcelas de Financiamento em aberto para mostrar no select em tela
-        // $installments = $this->financingInstallmentRepository->get(
-        //     function (Builder $query) use ($budget) {
-        //         $query->whereHas('financing', function (Builder $query) use ($budget) {
-        //             $query->where('user_id', $budget->user_id);
-        //         })
-        //             ->doesntHave('budgetExpense')
-        //             ->where('paid', false);
-        //     },
-        //     [],
-        //     [],
-        //     ['financing:id,description']
-        // );
+        $installments = $this->financingInstallmentRepository->get(
+            function (Builder $query) use ($budget) {
+                $query->whereHas('financing', function (Builder $query) use ($budget) {
+                    $query->where('user_id', $budget->user_id);
+                })
+                    ->where('paid', false);
+            },
+            [],
+            [],
+            ['financing:id,description']
+        );
 
         $shareUsers = $this->shareUserRepository->get(['user_id' => $budget->user_id], [], [], ['shareUser', 'user']);
         $shareUser = null;
@@ -170,7 +174,7 @@ class BudgetShowData implements BudgetShowDataInterface
             $budget->incomes = collect();
         }
 
-        $this->mountExpensesIncomes($budget, $budgetShare, $shareUser->shareUser);
+        $this->mountExpensesIncomes($budget, $budgetShare, $shareUser?->shareUser);
 
         if ($shareUser && $budgetShare) {
             $this->mountExpensesIncomes($budgetShare, $budget, $shareUser->user);

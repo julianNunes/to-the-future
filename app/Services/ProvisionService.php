@@ -6,12 +6,15 @@ use App\Models\Provision;
 use App\Repositories\Interfaces\ProvisionRepositoryInterface;
 use App\Repositories\Interfaces\ShareUserRepositoryInterface;
 use App\Services\Interfaces\ProvisionServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Collection;
 use TagService;
 
 class ProvisionService implements ProvisionServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private ProvisionRepositoryInterface $provisionRepository,
         private ShareUserRepositoryInterface $shareUserRepository
@@ -104,6 +107,8 @@ class ProvisionService implements ProvisionServiceInterface
             throw new Exception('provision.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($provision);
+
         // Atualiza Tags
         TagService::saveTagsToModel($provision, $tags);
 
@@ -129,6 +134,8 @@ class ProvisionService implements ProvisionServiceInterface
         if (!$provision) {
             throw new Exception('provision.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($provision);
 
         // Remove Tags
         TagService::saveTagsToModel($provision);

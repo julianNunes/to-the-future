@@ -13,6 +13,8 @@ RUN apk add --no-cache \
     sudo docker-cli docker-compose shadow netcat-openbsd \
     # Dependências para Node.js e NPM, necessárias para as ferramentas de front-end
     nodejs npm \
+    # Navegador do sistema para Playwright em Alpine
+    chromium nss harfbuzz ca-certificates ttf-freefont \
     # Dependências de runtime para extensões PHP
     libpng libjpeg-turbo freetype libzip \
     # Dependências de build para extensões PHP (serão removidas depois)

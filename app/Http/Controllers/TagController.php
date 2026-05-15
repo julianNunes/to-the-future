@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Tag\StoreTagRequest;
+use App\Http\Requests\Tag\UpdateTagRequest;
 use App\Services\Interfaces\TagServiceInterface;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class TagController extends Controller
@@ -24,16 +25,11 @@ class TagController extends Controller
 
     /**
      * Create a new Tag
-     * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreTagRequest $request)
     {
-        $this->validate($request, [
-            'name' => ['required'],
-        ]);
-
         $this->tagService->create(
-            $request->name,
+            $request->validated()['name'],
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -41,19 +37,14 @@ class TagController extends Controller
 
     /**
      * Update a Tag
-     * @param Request $request
      * @param integer $id
      * @return void
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateTagRequest $request, int $id)
     {
-        $this->validate($request, [
-            'name' => ['required'],
-        ]);
-
         $this->tagService->update(
             $id,
-            $request->name,
+            $request->validated()['name'],
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }

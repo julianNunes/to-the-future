@@ -149,6 +149,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 **Exemplo:** `GET /budget/show/123` — o ID 123 pode pertencer a outro usuário.
 
+**Status em 15/05/2026:** baseline de mitigação entregue na camada `Service/Helper`, com `AuthorizationException` explícita para acesso cruzado, escopo por usuário nos searches críticos e cobertura por feature tests de guest redirect e ownership/IDOR. A adoção formal de Policies continua recomendada como evolução de longo prazo.
+
 **Correção 1 — Scoping por usuário nos services:**
 ```php
 // Em todos os services, adicionar verificação:
@@ -1014,12 +1016,13 @@ Route::get('/budget/{budget}', 'show');
 ### 10.1 Estado Atual
 
 - PHPUnit 10 já está configurado em `phpunit.xml`.
-- Já existem feature tests base vindos do Laravel Breeze, principalmente em `tests/Feature/Auth/*` e `tests/Feature/ProfileTest.php`.
-- A suíte de unit tests existe, mas hoje só possui `tests/Unit/ExampleTest.php` como placeholder.
-- O projeto já usa `RefreshDatabase`, `actingAs()` e assertions HTTP nas suítes existentes.
-- Hoje só existem `UserFactory` e `PeopleFactory`; o domínio principal ainda não possui factories próprias.
-- O `phpunit.xml` ainda mantém comentada a configuração de SQLite em memória.
-- Em resumo: a base de testes existe, mas a cobertura real do domínio financeiro ainda é muito baixa.
+- A suíte de feature foi alinhada aos fluxos realmente expostos pelo produto; testes legados do Breeze acoplados ao fluxo inexistente de `profile` foram removidos da suíte ativa.
+- A suíte de unit tests já possui um teste real de service em `tests/Unit/Services/BudgetGoalServiceTest.php` além do placeholder inicial.
+- O projeto usa `RefreshDatabase`, `actingAs()` e assertions HTTP, com `VerifyCsrfToken` desativado no bootstrap de testes para permitir os POSTs esperados pela suíte feature.
+- O domínio principal agora possui factories para `Budget`, `CreditCard`, `CreditCardInvoice`, `PrepaidCard` e `PrepaidCardExtract`.
+- `E2ESmokeSeeder` fornece massa previsível para autenticação e navegação básica entre backend feature e frontend E2E.
+- O `phpunit.xml` ainda mantém comentada a configuração de SQLite em memória; por enquanto a execução previsível segue no caminho MySQL/container do projeto.
+- Em resumo: a base de testes existe, a fundação da onda 0 ficou executável e a cobertura real do domínio financeiro começou a sair do zero.
 
 ### 10.2 Ferramentas Recomendadas
 

@@ -6,12 +6,15 @@ use App\Models\FixExpense;
 use App\Repositories\Interfaces\FixExpenseRepositoryInterface;
 use App\Repositories\Interfaces\ShareUserRepositoryInterface;
 use App\Services\Interfaces\FixExpenseServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Collection;
 use TagService;
 
 class FixExpenseService implements FixExpenseServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private FixExpenseRepositoryInterface $fixExpenseRepository,
         private ShareUserRepositoryInterface $shareUserRepository
@@ -104,6 +107,8 @@ class FixExpenseService implements FixExpenseServiceInterface
             throw new Exception('fix-expense.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($expense);
+
         // Atualiza Tags
         TagService::saveTagsToModel($expense, $tags);
 
@@ -129,6 +134,8 @@ class FixExpenseService implements FixExpenseServiceInterface
         if (!$expense) {
             throw new Exception('fix-expense.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($expense);
 
         // Remove Tags
         TagService::saveTagsToModel($expense);

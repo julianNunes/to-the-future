@@ -14,11 +14,14 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface
 };
 use App\Services\Interfaces\CreditCardInvoiceServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Carbon;
 
 class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private CreditCardRepositoryInterface $creditCardRepository,
         private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
@@ -38,6 +41,13 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
     public function index(int $creditCardId): array
     {
         $creditCard = $this->creditCardRepository->show($creditCardId, ['invoices']);
+
+        if (!$creditCard) {
+            throw new Exception('credit-card.not-found');
+        }
+
+        $this->ensureOwnedByCurrentUser($creditCard);
+
         return [
             'creditCard' => $creditCard,
             'invoices' => $creditCard->invoices,
@@ -117,6 +127,8 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
             throw new Exception('credit-card.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($credit_card);
+
         $credit_card_invoice = $this->creditCardInvoiceRepository->getOne(['year' => $year, 'month' => $month, 'credit_card_id' => $creditCardId]);
 
         if ($credit_card_invoice) {
@@ -145,6 +157,10 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
             throw new Exception('credit-card-invoice.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser(
+            $this->creditCardRepository->show($credit_card_invoice->credit_card_id)
+        );
+
         return $this->creditCardInvoiceRepository->store(['closed' => $closed], $credit_card_invoice);
     }
 
@@ -167,6 +183,10 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
         if (!$credit_card_invoice) {
             throw new Exception('credit-card-invoice.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser(
+            $this->creditCardRepository->show($credit_card_invoice->credit_card_id)
+        );
 
         // Remove todos os vinculos
         foreach ($credit_card_invoice->expenses as $expense) {
@@ -209,6 +229,8 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
         if (!$credit_card_invoice) {
             throw new Exception('credit-card-inovice.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($credit_card_invoice->creditCard, 'user_id');
 
         $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
 

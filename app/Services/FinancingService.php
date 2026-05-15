@@ -7,11 +7,14 @@ use App\Models\FinancingInstallment;
 use App\Repositories\Interfaces\FinancingInstallmentRepositoryInterface;
 use App\Repositories\Interfaces\FinancingRepositoryInterface;
 use App\Services\Interfaces\FinancingServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Illuminate\Support\Carbon;
 use Exception;
 
 class FinancingService implements FinancingServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private FinancingRepositoryInterface $financingRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository
@@ -104,6 +107,8 @@ class FinancingService implements FinancingServiceInterface
             throw new Exception('financing.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($financing);
+
         if ($valueInstallment) {
             foreach ($financing->installments as $installment) {
                 if (!$installment->paid) {
@@ -132,6 +137,8 @@ class FinancingService implements FinancingServiceInterface
         if (!$financing) {
             throw new Exception('financing.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($financing);
 
         // Remove todos os vinculos
         foreach ($financing->installments as $installment) {

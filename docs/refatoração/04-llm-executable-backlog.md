@@ -113,7 +113,7 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
 ## 6. Ordem Executável das Tasks
 
 ### TASK-00 — Preparar a base de testes fullstack
-- [ ] Referência: `SLICE-0.1` e `SLICE-0.2`.
+- [x] Referência: `SLICE-0.1` e `SLICE-0.2`.
 - Objetivo: deixar frontend e backend com base previsível de testes antes de mudanças funcionais maiores.
 - Passos:
 1. Consolidar Playwright em uma configuração única.
@@ -130,14 +130,20 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - configuração única de Playwright;
   - `vitest.config.js` criado;
   - base de factories do domínio iniciada.
+- Status em 15/05/2026:
+  - `playwright.config.js` consolidado e ajustado para usar o Chromium do Alpine;
+  - `Vitest + @vue/test-utils + jsdom` ativos no frontend;
+  - factories mínimas de `Budget`, `CreditCard`, `CreditCardInvoice`, `PrepaidCard` e `PrepaidCardExtract` criadas;
+  - `E2ESmokeSeeder` integrado ao `test:e2e`;
+  - suíte feature alinhada aos fluxos realmente expostos pelo produto.
 
 ### TASK-01 — Fechar bugs críticos e baseline de segurança
-- [ ] Referência: `SLICE-1.1`, `SLICE-1.2` e `SLICE-1.3`.
+- [x] Referência: `SLICE-1.1`, `SLICE-1.2` e `SLICE-1.3`.
 - Objetivo: remover erros críticos e garantir o mínimo seguro de autenticação/autorização antes de expandir features.
 - Passos:
 1. Corrigir bugs críticos do backend listados no arquivo `02`.
 2. Corrigir o bug crítico frontend ainda pendente em `PrepaidCard/Index.vue`.
-3. Proteger rotas com `auth`/`verified`.
+3. Proteger rotas de domínio com `auth` e deixar `verified` explicitamente adiado até existir fluxo real de verificação por e-mail.
 4. Reduzir payload compartilhado do usuário no Inertia.
 5. Adicionar testes de guest redirect e ownership/IDOR.
 6. Garantir smoke E2E de login/dashboard.
@@ -146,6 +152,12 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/artisan.sh test --testsuite=Unit`
   - `./scripts/npm.sh run test:unit`
   - `./scripts/npm.sh run test:e2e`
+- Status em 15/05/2026:
+  - `SLICE-1.1`, `SLICE-1.2` e `SLICE-1.3` concluídas.
+  - Bugs críticos corrigidos em Budget/rotas/repositório/binding e `PrepaidCard/Index.vue`.
+  - Rotas de domínio protegidas por `auth`, payload compartilhado reduzido e tratamento de exceções alinhado para preservar redirects/`403` do framework.
+  - Ownership/IDOR fechado no backend com guard compartilhado em `Service/Helper`, bloqueio de side doors em invoice/extract expenses e escopo por usuário nos searches críticos.
+  - Validação executada e verde: `./scripts/artisan.sh test --testsuite=Feature` (32 testes), `./scripts/artisan.sh test --testsuite=Unit` (6 testes), `./scripts/npm.sh run test:unit` (2 testes) e `./scripts/npm.sh run test:e2e` (4 testes).
 
 ### TASK-02 — Consolidar contratos compartilhados
 - [ ] Referência: `SLICE-2.1`, `SLICE-2.2` e `SLICE-2.3`.

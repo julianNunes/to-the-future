@@ -10,12 +10,15 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface,
 };
 use App\Services\Interfaces\BudgetIncomeServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Collection;
 use App\Services\Facades\BudgetService;
 
 class BudgetIncomeService implements BudgetIncomeServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private BudgetRepositoryInterface $budgetRepository,
         private BudgetIncomeRepositoryInterface $budgetIncomeRepository,
@@ -46,6 +49,8 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         if (!$budget) {
             throw new Exception('budget.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         $income = $this->budgetIncomeRepository->store([
             'description' => $description,
@@ -93,6 +98,8 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
             throw new Exception('budget.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($budget);
+
         // Atualiza Tags
         $this->tagRepository->saveTagsToModel($income, $tags);
 
@@ -120,6 +127,14 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         if (!$income) {
             throw new Exception('budget-expense.not-found');
         }
+
+        $budget = $this->budgetRepository->show($income->budget_id);
+
+        if (!$budget) {
+            throw new Exception('budget.not-found');
+        }
+
+        $this->ensureOwnedByCurrentUser($budget);
 
         // Remove Tags
         $this->tagRepository->saveTagsToModel($income);

@@ -32,6 +32,9 @@ class CreditCardInvoiceExpenseRepository extends AppRepository implements Credit
             ])
             ->with(['tags'])
             ->where('description', 'LIKE', "%{$description}%")
+            ->whereHas('invoice.creditCard', function (Builder $query) {
+                $query->where('user_id', auth()->id());
+            })
             ->orderBy('created_at', 'DESC')
             ->get()
             ->unique('description');

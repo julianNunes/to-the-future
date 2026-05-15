@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Tag;
 use App\Repositories\Interfaces\TagRepositoryInterface;
 use App\Services\Interfaces\TagServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,8 @@ use Illuminate\Support\Collection;
 
 class TagService implements TagServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(private TagRepositoryInterface $tagRepository) {}
 
     /**
@@ -69,6 +72,8 @@ class TagService implements TagServiceInterface
             throw new Exception('tag.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($tag);
+
         return $this->tagRepository->store([
             'name'    => $name,
             'user_id' => auth()->user()->id,
@@ -87,6 +92,8 @@ class TagService implements TagServiceInterface
         if (!$tag) {
             throw new Exception('tag.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser($tag);
 
         return $this->tagRepository->delete($id);
     }

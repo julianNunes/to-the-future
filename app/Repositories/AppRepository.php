@@ -132,6 +132,6 @@ class AppRepository implements AppRepositoryInterface
      */
     public function delete($id): bool
     {
-        return $this->model->where('id', $id)->delete($id);
+        return (bool) $this->model->where('id', $id)->delete();
     }
 }

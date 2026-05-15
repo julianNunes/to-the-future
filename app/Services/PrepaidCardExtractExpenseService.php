@@ -12,12 +12,15 @@ use App\Repositories\Interfaces\{
     TagRepositoryInterface
 };
 use App\Services\Interfaces\PrepaidCardExtractExpenseServiceInterface;
+use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServiceInterface
 {
+    use EnsuresResourceOwnership;
+
     public function __construct(
         private PrepaidCardRepositoryInterface $prepaidCardRepository,
         private PrepaidCardExtractRepositoryInterface $prepaidCardExtractRepository,
@@ -59,11 +62,17 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
             throw new Exception('prepaid-card.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($prepaid_card);
+
         $prepaid_card_extract = $this->prepaidCardExtractRepository->show($extractId);
 
         if (!$prepaid_card_extract) {
             throw new Exception('prepaid-card-extract.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser(
+            $this->prepaidCardRepository->show($prepaid_card_extract->prepaid_card_id)
+        );
 
         $prepaid_card_extract_expense = $this->prepaidCardExtractExpenseRepository->store([
             'description' => $description,
@@ -121,17 +130,29 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
             throw new Exception('prepaid-card.not-found');
         }
 
+        $this->ensureOwnedByCurrentUser($prepaid_card);
+
         $prepaid_card_extract = $this->prepaidCardExtractRepository->show($extractId);
 
         if (!$prepaid_card_extract) {
             throw new Exception('prepaid-card-extract.not-found');
         }
 
-        $prepaid_card_extract_expense = $this->prepaidCardExtractExpenseRepository->show($id);
+        $this->ensureOwnedByCurrentUser(
+            $this->prepaidCardRepository->show($prepaid_card_extract->prepaid_card_id)
+        );
+
+        $prepaid_card_extract_expense = $this->prepaidCardExtractExpenseRepository->show($id, [
+            'extract:id,prepaid_card_id',
+        ]);
 
         if (!$prepaid_card_extract_expense) {
             throw new Exception('prepaid-card-extract-expense.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser(
+            $this->prepaidCardRepository->show($prepaid_card_extract_expense->extract->prepaid_card_id)
+        );
 
         $change_share_user = ($shareUserId != $prepaid_card_extract_expense->share_user_id) || ($shareValue != $prepaid_card_extract_expense->share_value) ? true : false;
 
@@ -163,13 +184,17 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
     public function delete(int $id): bool
     {
         $prepaid_card_extract_expense = $this->prepaidCardExtractExpenseRepository->show($id, [
-            'extract:id,budget_id',
+            'extract:id,budget_id,prepaid_card_id',
             'tags'
         ]);
 
         if (!$prepaid_card_extract_expense) {
             throw new Exception('prepaid-card-extract-expense.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser(
+            $this->prepaidCardRepository->show($prepaid_card_extract_expense->extract->prepaid_card_id)
+        );
 
         $budget_id = $prepaid_card_extract_expense->extract->budget_id;
         $share_user_id = $prepaid_card_extract_expense->share_user_id;
@@ -198,6 +223,10 @@ class PrepaidCardExtractExpenseService implements PrepaidCardExtractExpenseServi
         if (!$prepaid_card_extract) {
             throw new Exception('prepaid-card-extract.not-found');
         }
+
+        $this->ensureOwnedByCurrentUser(
+            $this->prepaidCardRepository->show($prepaid_card_extract->prepaid_card_id)
+        );
 
         foreach ($data as $expense) {
             $this->create(

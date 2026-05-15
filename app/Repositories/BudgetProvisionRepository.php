@@ -31,6 +31,9 @@ class BudgetProvisionRepository extends AppRepository implements BudgetProvision
             ])
             ->with(['tags'])
             ->where('description', 'LIKE', "%{$description}%")
+            ->whereHas('budget', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
             ->orderBy('created_at', 'DESC')
             ->get()
             ->unique('description');

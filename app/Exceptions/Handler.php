@@ -2,8 +2,12 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -29,7 +33,23 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (Throwable $e) {
-            DB::rollBack();
+            if (
+                $e instanceof AuthenticationException
+                || $e instanceof AuthorizationException
+                || $e instanceof ValidationException
+                || $e instanceof HttpExceptionInterface
+            ) {
+                return null;
+            }
+
+            if (app()->environment('testing')) {
+                return null;
+            }
+
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+
             return back()->withErrors(['error' => $e->getMessage()]);
         });
     }
