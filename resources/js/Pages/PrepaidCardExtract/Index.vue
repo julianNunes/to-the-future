@@ -1,377 +1,310 @@
 <template>
+
     <Head title="Prepaid Card Extract" />
-    <AuthenticatedLayout>
-        <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('prepaid-card-extract.title-index') }}</h5>
-            <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
-        </div>
+    <div class="mb-5">
+        <h5 class="text-h5 font-weight-bold">{{ $t('prepaid-card-extract.title-index') }}</h5>
+        <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
+    </div>
 
-        <!-- Dados do cartão de credito -->
-        <v-card>
-            <v-card-title class="bg-primary">
-                <span class="text-h6">{{ $t('prepaid-card-extract.prepaid-card-title') }}</span>
-            </v-card-title>
-            <v-card-text class="pa-4">
-                <v-row dense>
-                    <v-col cols="12" sm="12" md="4">
-                        <v-text-field
-                            ref="txtName"
-                            v-model="prepaid_card.name"
-                            :label="$t('default.name')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="prepaid_card.digits"
-                            :label="$t('prepaid-card.4-digits')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="isActive"
-                            :label="$t('default.active')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
-            </v-card-text>
-        </v-card>
+    <!-- Dados do cartão de credito -->
+    <v-card>
+        <v-card-title class="bg-primary">
+            <span class="text-h6">{{ $t('prepaid-card-extract.prepaid-card-title') }}</span>
+        </v-card-title>
+        <v-card-text class="pa-4">
+            <v-row dense>
+                <v-col cols="12" sm="12" md="4">
+                    <v-text-field ref="txtName" v-model="prepaid_card.name" :label="$t('default.name')" :readonly="true"
+                        density="comfortable"></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="2">
+                    <v-text-field v-model="prepaid_card.digits" :label="$t('prepaid-card.4-digits')" :readonly="true"
+                        density="comfortable"></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="6" md="2">
+                    <v-text-field v-model="isActive" :label="$t('default.active')" :readonly="true"
+                        density="comfortable"></v-text-field>
+                </v-col>
+            </v-row>
+        </v-card-text>
+    </v-card>
 
-        <v-card class="mt-4">
-            <v-card-title class="bg-primary">
-                <span class="text-h6">{{ $t('prepaid-card-extract.title-extracts') }}</span>
-            </v-card-title>
-            <v-card-text class="pa-4">
-                <v-row dense>
-                    <v-col md="12">
-                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-                    </v-col>
-                    <v-col md="12">
-                        <v-data-table
-                            :headers="headers"
-                            :items="extracts"
-                            :sort-by="[{ key: 'due_date', order: 'asc' }]"
-                            :search="search"
-                            :loading="isLoading"
-                            :loading-text="$t('default.loading-text-table')"
-                            class="elevation-3"
-                            density="compact"
-                            :total-items="extracts.length"
-                            :no-data-text="$t('default.no-data-text')"
-                            :no-results-text="$t('default.no-data-text')"
-                            :footer-props="{
-                                'items-per-page-text': $t('default.itens-per-page'),
-                                'page-text': $t('default.page-text'),
-                            }"
-                            :header-props="{
+    <v-card class="mt-4">
+        <v-card-title class="bg-primary">
+            <span class="text-h6">{{ $t('prepaid-card-extract.title-extracts') }}</span>
+        </v-card-title>
+        <v-card-text class="pa-4">
+            <v-row dense>
+                <v-col md="12">
+                    <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
+                </v-col>
+                <v-col md="12">
+                    <v-data-table :headers="headers" :items="extracts" :sort-by="[{ key: 'due_date', order: 'asc' }]"
+                        :search="search" :loading="isLoading" :loading-text="$t('default.loading-text-table')"
+                        class="elevation-3" density="compact" :total-items="extracts.length"
+                        :no-data-text="$t('default.no-data-text')" :no-results-text="$t('default.no-data-text')"
+                        :footer-props="{
+                            'items-per-page-text': $t('default.itens-per-page'),
+                            'page-text': $t('default.page-text'),
+                        }" :header-props="{
                                 sortByText: $t('default.sort-by'),
-                            }"
-                            fixed-header
-                        >
-                            <template #[`item.credit_date`]="{ item }">{{
-                                moment(item.credit_date).format('DD/MM/YYYY')
-                            }}</template>
-                            <template #[`item.credit`]="{ item }">{{ currencyField(item.credit) }}</template>
-                            <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('default.show')" location="top">
-                                    <template #activator="{ props }">
-                                        <Link :href="hrefExtractShow(item)" class="v-breadcrumbs-item--link">
-                                            <v-icon v-bind="props" color="warning" icon="mdi-eye" size="small">
-                                            </v-icon>
-                                        </Link>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('default.edit')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            class="ml-1"
-                                            color="warning"
-                                            icon="mdi-pencil"
-                                            size="small"
-                                            @click="editItem(item)"
-                                        >
+                            }" fixed-header>
+                        <template #[`item.credit_date`]="{ item }">{{
+                            moment(item.credit_date).format('DD/MM/YYYY')
+                        }}</template>
+                        <template #[`item.credit`]="{ item }">{{ currencyField(item.credit) }}</template>
+                        <template #[`item.action`]="{ item }">
+                            <v-tooltip :text="$t('default.show')" location="top">
+                                <template #activator="{ props }">
+                                    <Link :href="hrefExtractShow(item)" class="v-breadcrumbs-item--link">
+                                        <v-icon v-bind="props" color="warning" icon="mdi-eye" size="small">
                                         </v-icon>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('default.delete')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            class="ml-1"
-                                            color="error"
-                                            icon="mdi-delete"
-                                            size="small"
-                                            @click="confirmRemove(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                            </template>
+                                    </Link>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip :text="$t('default.edit')" location="top">
+                                <template #activator="{ props }">
+                                    <v-icon v-bind="props" class="ml-1" color="warning" icon="mdi-pencil" size="small"
+                                        @click="editItem(item)">
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip :text="$t('default.delete')" location="top">
+                                <template #activator="{ props }">
+                                    <v-icon v-bind="props" class="ml-1" color="error" icon="mdi-delete" size="small"
+                                        @click="confirmRemove(item)">
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
+                        </template>
 
-                            <template #top>
-                                <v-toolbar density="comfortable">
-                                    <v-row dense>
-                                        <v-col cols="12" lg="12" md="12" sm="12">
-                                            <v-text-field
-                                                v-model="search"
-                                                :label="$t('default.search')"
-                                                append-icon="mdi-magnify"
-                                                single-line
-                                                hide-details
-                                                clearable
-                                                @click:clear="search = null"
-                                            ></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                </v-toolbar>
-                            </template>
-                        </v-data-table>
-                    </v-col>
-                </v-row>
+                        <template #top>
+                            <v-toolbar density="comfortable">
+                                <v-row dense>
+                                    <v-col cols="12" lg="12" md="12" sm="12">
+                                        <v-text-field v-model="search" :label="$t('default.search')"
+                                            append-icon="mdi-magnify" single-line hide-details clearable
+                                            @click:clear="search = null"></v-text-field>
+                                    </v-col>
+                                </v-row>
+                            </v-toolbar>
+                        </template>
+                    </v-data-table>
+                </v-col>
+            </v-row>
+        </v-card-text>
+    </v-card>
+
+    <!-- Dialog Criacao/Edicao -->
+    <v-dialog v-model="editDialog" persistent width="800">
+        <v-card>
+            <v-card-title>
+                <span class="text-h5">{{ titleModal }}</span>
+            </v-card-title>
+            <v-card-text>
+                <v-form ref="form" @submit.prevent>
+                    <v-row dense>
+                        <v-col cols="12" md="4">
+                            <v-text-field ref="selectMonthYear" v-model="extract.year_month" type="month"
+                                :label="$t('prepaid-card-extract.year-month')" clearable :rules="rules.textFieldRules"
+                                density="comfortable" :disabled="extract.id ? true : false"></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                            <vuetify-money v-model="extract.credit" :label="$t('prepaid-card-extract.credit')"
+                                density="comfortable" :rules="rules.currencyFieldRules" :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }" />
+                        </v-col>
+                        <v-col cols="12" sm="6" md="4">
+                            <v-date-input v-model="extract.credit_date" :label="$t('financing.start-date')"
+                                prepend-icon="" prepend-inner-icon="$calendar" required :rules="rules.textFieldRules"
+                                density="comfortable" :show-adjacent-months="true" :show-week="true"
+                                :display-format="(date) => formatDate(date, 'DD/MM/YYYY')" placeholder="DD/MM/YYYY"
+                                :update-on="['enter']"></v-date-input>
+                        </v-col>
+                        <v-col cols="12" md="12">
+                            <v-textarea v-model="extract.remarks" :label="$t('default.remarks')"
+                                density="comfortable"></v-textarea>
+                        </v-col>
+                    </v-row>
+                </v-form>
             </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
+                    {{ $t('default.cancel') }}
+                </v-btn>
+                <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
+                    {{ $t('default.save') }}
+                </v-btn>
+            </v-card-actions>
         </v-card>
+    </v-dialog>
 
-        <!-- Dialog Criacao/Edicao -->
-        <v-dialog v-model="editDialog" persistent width="800">
-            <v-card>
-                <v-card-title>
-                    <span class="text-h5">{{ titleModal }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-form ref="form" @submit.prevent>
-                        <v-row dense>
-                            <v-col cols="12" md="4">
-                                <v-text-field
-                                    ref="selectMonthYear"
-                                    v-model="extract.year_month"
-                                    type="month"
-                                    :label="$t('prepaid-card-extract.year-month')"
-                                    clearable
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                    :disabled="extract.id ? true : false"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <vuetify-money
-                                    v-model="extract.credit"
-                                    :label="$t('prepaid-card-extract.credit')"
-                                    density="comfortable"
-                                    :rules="rules.currencyFieldRules"
-                                    :options="{
-                                        locale: 'pt-BR',
-                                        prefix: 'R$',
-                                        suffix: '',
-                                        length: 11,
-                                        precision: 2,
-                                    }"
-                                />
-                            </v-col>
-                            <v-col cols="12" sm="6" md="4">
-                                <v-date-input
-                                    v-model="extract.credit_date"
-                                    :label="$t('financing.start-date')"
-                                    prepend-icon=""
-                                    prepend-inner-icon="$calendar"
-                                    required
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                    :show-adjacent-months="true"
-                                    :show-week="true"
-                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
-                                    placeholder="DD/MM/YYYY"
-                                    :update-on="['enter']"
-                                ></v-date-input>
-                            </v-col>
-                            <v-col cols="12" md="12">
-                                <v-textarea
-                                    v-model="extract.remarks"
-                                    :label="$t('default.remarks')"
-                                    density="comfortable"
-                                ></v-textarea>
-                            </v-col>
-                        </v-row>
-                    </v-form>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
-                        {{ $t('default.cancel') }}
-                    </v-btn>
-                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
-                        {{ $t('default.save') }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <ConfirmDialog ref="confirm" />
-    </AuthenticatedLayout>
+    <ConfirmDialog ref="confirm" />
 </template>
 
 <script setup>
-    import { ref, computed, nextTick } from 'vue'
-    import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
-    import { Head, Link, router } from '@inertiajs/vue3'
-    import moment from 'moment'
-    import { currencyField, formatDate, reverseFormatNumber } from '@/utils/utils.js'
-    import { useI18n } from 'vue-i18n'
-    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+import { ref, computed, nextTick } from 'vue'
+import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
+import { Head, Link, router } from '@inertiajs/vue3'
+import moment from 'moment'
+import { currencyField, formatDate, reverseFormatNumber } from '@/utils/utils.js'
+import { useI18n } from 'vue-i18n'
+import { useCrudOperations } from '@/composables/useCrudOperations.js'
 
-    defineOptions({ name: 'PrepaidCardExtractIndex' })
+defineOptions({ name: 'PrepaidCardExtractIndex', layout: AuthenticatedLayout })
 
-    const props = defineProps({
-        prepaidCard: { type: Object },
-        extracts: { type: Array },
-    })
+const props = defineProps({
+    prepaidCard: { type: Object },
+    extracts: { type: Array },
+})
 
-    const { t } = useI18n()
+const { t } = useI18n()
 
-    const {
-        isLoading,
-        editDialog,
-        titleModal,
-        confirmRemove: crudConfirmRemove,
-    } = useCrudOperations('/prepaid-card/extract')
+const {
+    isLoading,
+    editDialog,
+    titleModal,
+    confirmRemove: crudConfirmRemove,
+} = useCrudOperations('/prepaid-card/extract')
 
-    const prepaid_card = ref({ ...props.prepaidCard })
-    const search = ref(null)
-    const selectMonthYear = ref(null)
-    const form = ref(null)
-    const confirm = ref(null)
+const prepaid_card = ref({ ...props.prepaidCard })
+const search = ref(null)
+const selectMonthYear = ref(null)
+const form = ref(null)
+const confirm = ref(null)
 
-    const extract = ref({
+const extract = ref({
+    id: null,
+    year_month: null,
+    credit: 0,
+    credit_date: null,
+    remarks: null,
+    prepaid_card_id: null,
+})
+
+const breadcrumbs = computed(() => [
+    { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
+    { title: t('menus.prepaid-card'), disabled: false, href: '/prepaid-card' },
+    { title: t('prepaid-card-extract.title-index'), disabled: true },
+])
+
+const headers = computed(() => [
+    { title: t('default.year-month'), key: 'year_month' },
+    { title: t('prepaid-card-extract.credit-date'), key: 'credit_date' },
+    { title: t('prepaid-card-extract.credit'), key: 'credit' },
+    { title: t('default.remarks'), key: 'remarks' },
+    { title: t('default.action'), align: 'center', key: 'action', sortable: false },
+])
+
+const rules = {
+    textFieldRules: [(v) => !!v || t('rules.required-text-field')],
+    currencyFieldRules: [
+        (value) => {
+            value = reverseFormatNumber(value)
+            if (!value) return t('rules.required-text-field')
+            if (Number(value) <= 0) return t('rules.required-currency-field')
+            return true
+        },
+    ],
+}
+
+const isActive = computed(() => (prepaid_card.value.is_active ? t('default.yes') : t('default.no')))
+
+function hrefExtractShow(item) {
+    return '/prepaid-card/extract/' + item.id
+}
+
+function newItem() {
+    titleModal.value = t('prepaid-card-extract.new-item')
+    editDialog.value = true
+    extract.value = {
         id: null,
         year_month: null,
         credit: 0,
         credit_date: null,
         remarks: null,
-        prepaid_card_id: null,
-    })
-
-    const breadcrumbs = computed(() => [
-        { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
-        { title: t('menus.prepaid-card'), disabled: false, href: '/prepaid-card' },
-        { title: t('prepaid-card-extract.title-index'), disabled: true },
-    ])
-
-    const headers = computed(() => [
-        { title: t('default.year-month'), key: 'year_month' },
-        { title: t('prepaid-card-extract.credit-date'), key: 'credit_date' },
-        { title: t('prepaid-card-extract.credit'), key: 'credit' },
-        { title: t('default.remarks'), key: 'remarks' },
-        { title: t('default.action'), align: 'center', key: 'action', sortable: false },
-    ])
-
-    const rules = {
-        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
-        currencyFieldRules: [
-            (value) => {
-                value = reverseFormatNumber(value)
-                if (!value) return t('rules.required-text-field')
-                if (Number(value) <= 0) return t('rules.required-currency-field')
-                return true
-            },
-        ],
+        prepaid_card_id: props.prepaidCard.id,
     }
+    nextTick(() => selectMonthYear.value?.focus())
+}
 
-    const isActive = computed(() => (prepaid_card.value.is_active ? t('default.yes') : t('default.no')))
-
-    function hrefExtractShow(item) {
-        return '/prepaid-card/extract/' + item.id
+function editItem(item) {
+    titleModal.value = t('prepaid-card-extract.edit-item')
+    editDialog.value = true
+    extract.value = {
+        id: item.id,
+        year_month: item.year + '-' + item.month,
+        credit: item.credit,
+        credit_date: moment(item.credit_date, 'YYYY-MM-DD').toDate(),
+        remarks: item.remarks,
+        prepaid_card_id: item.prepaid_card_id,
     }
+    nextTick(() => selectMonthYear.value?.focus())
+}
 
-    function newItem() {
-        titleModal.value = t('prepaid-card-extract.new-item')
-        editDialog.value = true
-        extract.value = {
-            id: null,
-            year_month: null,
-            credit: 0,
-            credit_date: null,
-            remarks: null,
-            prepaid_card_id: props.prepaidCard.id,
-        }
-        nextTick(() => selectMonthYear.value?.focus())
-    }
-
-    function editItem(item) {
-        titleModal.value = t('prepaid-card-extract.edit-item')
-        editDialog.value = true
-        extract.value = {
-            id: item.id,
-            year_month: item.year + '-' + item.month,
-            credit: item.credit,
-            credit_date: moment(item.credit_date, 'YYYY-MM-DD').toDate(),
-            remarks: item.remarks,
-            prepaid_card_id: item.prepaid_card_id,
-        }
-        nextTick(() => selectMonthYear.value?.focus())
-    }
-
-    async function save() {
-        const validate = await form.value.validate()
-        if (validate.valid) {
-            if (extract.value.id) {
-                await _update()
-            } else {
-                await _create()
-            }
+async function save() {
+    const validate = await form.value.validate()
+    if (validate.valid) {
+        if (extract.value.id) {
+            await _update()
+        } else {
+            await _create()
         }
     }
+}
 
-    async function _create() {
-        isLoading.value = true
-        router.post(
-            '/prepaid-card/extract',
-            {
-                year: extract.value.year_month.substring(0, 4),
-                month: extract.value.year_month.substring(5, 7),
-                credit: extract.value.credit,
-                credit_date: moment(extract.value.credit_date).format('YYYY-MM-DD'),
-                remarks: extract.value.remarks,
-                prepaid_card_id: extract.value.prepaid_card_id,
+async function _create() {
+    isLoading.value = true
+    router.post(
+        '/prepaid-card/extract',
+        {
+            year: extract.value.year_month.substring(0, 4),
+            month: extract.value.year_month.substring(5, 7),
+            credit: extract.value.credit,
+            credit_date: moment(extract.value.credit_date).format('YYYY-MM-DD'),
+            remarks: extract.value.remarks,
+            prepaid_card_id: extract.value.prepaid_card_id,
+        },
+        {
+            onSuccess: () => {
+                editDialog.value = false
             },
-            {
-                onSuccess: () => {
-                    editDialog.value = false
-                },
-                onFinish: () => {
-                    isLoading.value = false
-                },
-            }
-        )
-    }
-
-    async function _update() {
-        isLoading.value = true
-        router.put(
-            '/prepaid-card/extract/' + extract.value.id,
-            {
-                credit: extract.value.credit,
-                credit_date: moment(extract.value.credit_date).format('YYYY-MM-DD'),
-                remarks: extract.value.remarks,
+            onFinish: () => {
+                isLoading.value = false
             },
-            {
-                onSuccess: () => {
-                    editDialog.value = false
-                },
-                onFinish: () => {
-                    isLoading.value = false
-                },
-            }
-        )
-    }
+        }
+    )
+}
 
-    function confirmRemove(item) {
-        crudConfirmRemove(item, confirm.value, t('prepaid-card-extract.title-show'), t('default.confirm-delete-item'))
-    }
+async function _update() {
+    isLoading.value = true
+    router.put(
+        '/prepaid-card/extract/' + extract.value.id,
+        {
+            credit: extract.value.credit,
+            credit_date: moment(extract.value.credit_date).format('YYYY-MM-DD'),
+            remarks: extract.value.remarks,
+        },
+        {
+            onSuccess: () => {
+                editDialog.value = false
+            },
+            onFinish: () => {
+                isLoading.value = false
+            },
+        }
+    )
+}
+
+function confirmRemove(item) {
+    crudConfirmRemove(item, confirm.value, t('prepaid-card-extract.title-show'), t('default.confirm-delete-item'))
+}
 </script>

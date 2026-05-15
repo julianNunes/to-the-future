@@ -8,15 +8,14 @@ export function useCrudOperations(baseUrl) {
     const titleModal = ref('')
 
     function create(data, options = {}) {
-        isLoading.value = true
         router.post(baseUrl, data, {
             preserveScroll: true,
+            onStart: () => {
+                isLoading.value = true
+            },
             onSuccess: () => {
                 editDialog.value = false
                 options.onSuccess?.()
-            },
-            onError: () => {
-                isLoading.value = false
             },
             onFinish: () => {
                 isLoading.value = false
@@ -25,15 +24,14 @@ export function useCrudOperations(baseUrl) {
     }
 
     function update(id, data, options = {}) {
-        isLoading.value = true
         router.put(`${baseUrl}/${id}`, data, {
             preserveScroll: true,
+            onStart: () => {
+                isLoading.value = true
+            },
             onSuccess: () => {
                 editDialog.value = false
                 options.onSuccess?.()
-            },
-            onError: () => {
-                isLoading.value = false
             },
             onFinish: () => {
                 isLoading.value = false
@@ -42,12 +40,10 @@ export function useCrudOperations(baseUrl) {
     }
 
     function remove() {
-        isLoading.value = true
         router.delete(`${baseUrl}/${deleteId.value}`, {
             preserveScroll: true,
-            onSuccess: () => {},
-            onError: () => {
-                isLoading.value = false
+            onStart: () => {
+                isLoading.value = true
             },
             onFinish: () => {
                 isLoading.value = false

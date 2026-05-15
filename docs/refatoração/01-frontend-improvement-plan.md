@@ -1,6 +1,7 @@
 # Plano de Melhorias Frontend — Vue.js 3 & Inertia.js
 
 > Documento gerado em: 20/02/2026  
+> Última validação do status: 15/05/2026  
 > Escopo: Análise completa do frontend (Vue 3 + Inertia.js v2 + Vuetify 3)  
 > Total de arquivos analisados: ~45 componentes Vue, plugins, utils, configs e layouts
 
@@ -18,9 +19,10 @@
 8. [Fase 6 — Performance e Bundle Size](#8-fase-6--performance-e-bundle-size)
 9. [Fase 7 — Qualidade de Código e DX](#9-fase-7--qualidade-de-código-e-dx)
 10. [Fase 8 — Acessibilidade](#10-fase-8--acessibilidade)
-11. [Resumo de Impacto por Fase](#11-resumo-de-impacto-por-fase)
-12. [Apêndice A — Inventário de Componentes](#12-apêndice-a--inventário-de-componentes)
-13. [Apêndice B — Mapa de Duplicação de Código](#13-apêndice-b--mapa-de-duplicação-de-código)
+11. [Fase 9 — Testes Automatizados](#11-fase-9--testes-automatizados)
+12. [Resumo de Impacto por Fase](#12-resumo-de-impacto-por-fase)
+13. [Apêndice A — Inventário de Componentes](#13-apêndice-a--inventário-de-componentes)
+14. [Apêndice B — Mapa de Duplicação de Código](#14-apêndice-b--mapa-de-duplicação-de-código)
 
 ---
 
@@ -39,7 +41,99 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 | Qualidade de código | 🟡 Baixa | 12 |
 | Acessibilidade | 🟡 Baixa | 7 |
 
-**Estimativa total: 8 fases incrementais, aplicáveis independentemente.**
+**Estimativa total: 9 fases incrementais, aplicáveis independentemente.**
+
+> Atualização de status em 15/05/2026: o corpo deste documento mantém o diagnóstico original de 20/02/2026. O checklist abaixo reflete o estado atual dos arquivos ativos do frontend (`resources/js/**/*.{js,vue}`); arquivos `.backup` foram desconsiderados por não entrarem na build.
+
+## Checklist de Validação — 15/05/2026
+
+### Bugs Críticos
+
+- [x] 2.1 URL com dupla barra em `BudgetExpenseTagOptions.vue` foi corrigida; o componente ativo usa `useCrudOperations('/budget-expense-tag-option')`.
+- [x] 2.2 URL sem barra em `BudgetExpense.vue` foi corrigida para `/budget-expense/{id}/delete-all-portions`.
+- [x] 2.3 `titleModal` deixou de depender de `data()` e hoje é centralizado como `ref` em `useCrudOperations`.
+- [ ] 2.4 `<Head title>` está parcialmente corrigido; `FixExpense`, `Financing/Show`, `PrepaidCardExtract/Index`, `PrepaidCardExtract/Show` e `Auth/Register` estão corretos, mas `PrepaidCard/Index.vue` ainda usa `"Credit Card"`.
+- [x] 2.5 A ref duplicada `txtStartWeek1` foi resolvida; há apenas um `ref="txtStartWeek1"` no arquivo ativo.
+- [x] 2.6 `dueDateList` foi normalizado com `Array.from(...)`, sem valor duplicado.
+- [x] 2.7 A duplicação acidental de `BudgetExpenseTags` foi removida; hoje existem duas instâncias com props diferentes (owner/share), não uma duplicata literal.
+- [x] 2.8 O conflito de `name` entre `InvoiceExpense` e `ExtractExpense` deixou de existir nos arquivos ativos, que foram migrados para `script setup` sem esse nome duplicado.
+
+### Fase 1 — Quick Wins
+
+- [x] 3.1 `console.log` saiu dos arquivos ativos e foi encapsulado em `resources/js/utils/logger.js`.
+- [x] 3.2 Lifecycle hooks vazios não aparecem mais nos arquivos ativos.
+- [x] 3.3 Defaults mutáveis foram corrigidos nos componentes críticos (`BudgetExpense`, `BudgetIncome`, `BudgetProvision`).
+- [ ] 3.4 Padronização completa de `required` e `default` em props ainda não foi concluída; vários `defineProps` continuam sem `required: true`.
+- [x] 3.5 Imports relativos `../../` foram eliminados dos arquivos ativos em favor do alias `@/`.
+- [x] 3.6 O registro redundante via `components: {}` foi eliminado nos componentes ativos migrados para `script setup`.
+- [ ] 3.7 Remoção de código morto está parcial; `resources/js/Configs/navigation.js` continua separado do `NavigationMenu.vue` e `GroupResumes.vue` segue como stub.
+- [ ] 3.8 Ainda existem classes antigas do Vuetify 2 em `ConfirmDialog.vue` (`grey--text`, `black--text`).
+
+### Fase 2 — Composables
+
+- [x] 4.1 `useTagSearch()` foi criado.
+- [x] 4.2 `useDescriptionSearch()` foi criado.
+- [x] 4.3 `useShareCalculation()` foi criado.
+- [x] 4.4 `useFormConstants()` foi criado.
+- [x] 4.5 `useCrudOperations()` foi criado e já está em uso amplo.
+- [ ] 4.6 `useExcelImport()` ainda não existe; a lógica continua embutida em `InvoiceExpense.vue` e `ExtractExpense.vue`.
+- [ ] 4.7 A estrutura de `resources/js/composables/` está quase completa, mas ainda falta `useExcelImport.js`.
+
+### Fase 3 — Modernização do Inertia.js v2
+
+- [x] 5.1 `this.$inertia.*` não aparece mais nos arquivos ativos; a navegação foi migrada para `router` e `form.post()`.
+- [ ] 5.2 `useForm()` foi adotado só parcialmente; auth pages e `CreditCardInvoice/Index.vue` já usam, mas a maior parte dos CRUDs ainda opera com formulário manual.
+- [x] 5.3 O layout persistente via `defineOptions({ layout: AuthenticatedLayout })` já está aplicado nas páginas autenticadas.
+- [ ] 5.4 Ziggy e rotas nomeadas no frontend ainda não foram adotados.
+
+### Fase 4 — Padronização de API Style
+
+- [x] 6.1 O cenário híbrido descrito no diagnóstico original foi superado nos arquivos ativos.
+- [x] 6.3 A migração para Composition API com `script setup` foi efetivamente executada no frontend ativo.
+- [x] 6.4 A estratégia incremental de migração foi absorvida na base atual; os arquivos ativos não usam mais o padrão híbrido antigo.
+
+### Fase 5 — Componentização
+
+- [ ] 7.1 `InvoiceExpense.vue` continua monolítico.
+- [ ] 7.2 `BudgetExpense.vue` continua monolítico.
+- [ ] 7.3 `ExtractExpense.vue` continua monolítico.
+- [ ] 7.4 `DataTableToolbar.vue` ainda não existe.
+- [ ] 7.5 `FormDialog.vue` ainda não existe.
+- [x] 7.6 A deduplicação dos cálculos de semanas em `Budget/Show.vue` avançou com `buildWeeks()` e `weekLabel()`.
+- [ ] 7.7 `WeekDateInputs.vue` ainda não existe.
+
+### Fase 6 — Performance e Bundle
+
+- [ ] 8.1 O tree-shaking real do Vuetify ainda não foi feito; `resources/js/Plugins/vuetify.js` continua importando `components`, `labsComponents` e `directives`.
+- [ ] 8.2 `moment` segue como biblioteca de datas principal.
+- [ ] 8.3 Não há lazy loading dos componentes pesados propostos.
+- [ ] 8.4 `ConfirmDialog` continua registrado globalmente em `app.js` e instanciado localmente nas páginas e componentes.
+- [ ] 8.5 O build target segue em `es2015`.
+- [ ] 8.6 `sourcemap` segue `false` em `vite.config.js`.
+
+### Fase 7 — Qualidade e DX
+
+- [ ] 9.1 A estratégia de lint está parcial: existe script `lint` no `package.json`, mas o `vite-plugin-eslint` continua desabilitado.
+- [ ] 9.2 Husky e `lint-staged` ainda não foram configurados.
+- [ ] 9.3 O debounce foi centralizado em alguns composables, mas ainda há `setTimeout` manual em telas como `FixExpense/Index.vue`.
+- [ ] 9.4 A codificação de URLs de busca está parcial; `useDescriptionSearch()` já usa `encodeURIComponent`, mas `useTagSearch()` ainda concatena `val` sem encode.
+- [x] 9.5 O tratamento de flash messages em `AuthenticatedLayout.vue` já foi melhorado com `useToast()` no setup e null checks.
+- [ ] 9.6 A base não tem mais `this.timeOut`, mas ainda existem timeouts manuais fora dos composables; a consolidação total ainda está pendente.
+
+### Fase 8 — Acessibilidade
+
+- [ ] 10.1 Botões de ação ainda usam `v-icon` clicável sem `aria-label`.
+- [ ] 10.2 `ConfirmDialog` ainda não recebeu as melhorias adicionais de acessibilidade propostas.
+- [ ] 10.3 Ainda não existe skip link no layout autenticado.
+- [ ] 10.4 Ainda existem `tfoot` com `th`, como em `FixExpense/Index.vue`.
+- [ ] 10.5 O logout continua implementado com `<Link method="post">`, não com botão ou formulário dedicado.
+
+### Testes
+
+- [x] Já existe base de E2E com Playwright em `tests/e2e`.
+- [ ] Ainda não existe suíte de testes unitários e de componentes para o frontend.
+- [ ] Ainda não existem scripts de teste no `package.json`.
+- [ ] Existem duas configs de Playwright no repositório; o ideal é consolidar em uma só configuração ativa.
 
 ---
 
@@ -1041,7 +1135,113 @@ Adicionar no `AuthenticatedLayout.vue`:
 
 ---
 
-## 11. Resumo de Impacto por Fase
+## 11. Fase 9 — Testes Automatizados
+
+**Esforço:** ~10-16 horas | **Impacto:** Alto | **Risco:** Baixo
+
+### 11.1 Estado Atual
+
+- Playwright já está instalado (`@playwright/test`) e existe suíte em `tests/e2e`.
+- O arquivo funcional hoje é `playwright.config.js`, apontando para `./tests/e2e`.
+- Também existe `playwright.config.ts` com `testDir: './e2e'`; essa duplicidade deve ser resolvida para evitar confusão.
+- Ainda não existe suíte de testes unitários e de componentes no frontend.
+- `package.json` ainda não possui scripts dedicados para `test:unit`, `test:e2e` e agregação de testes.
+
+### 11.2 Stack Recomendada Para Este Projeto
+
+**Recomendação principal:** manter Playwright para E2E e adicionar Vitest + `@vue/test-utils` para testes de unidade e de componentes.
+
+```text
+Frontend unit/componente: Vitest + @vue/test-utils + jsdom
+Frontend E2E: Playwright
+```
+
+**Por que essa combinação faz sentido aqui:**
+
+- `Vitest` é a opção mais natural para projetos com Vite e Vue 3.
+- `@vue/test-utils` é a ferramenta mais consolidada para montar componentes Vue em testes.
+- `Playwright` já está presente no repositório, então não há motivo para introduzir Cypress agora.
+- Para alguém começando com testes, essa pilha reduz atrito e reaproveita o que já existe.
+
+> `@testing-library/vue` pode ser adotado depois como complemento, mas não é necessário na primeira etapa.
+
+### 11.3 Matriz de Cobertura Recomendada
+
+| Camada | Ferramenta | Objetivo | Primeiros alvos |
+|:------:|------------|----------|-----------------|
+| Unit | Vitest | Regras puras, helpers e composables | `useShareCalculation`, `useDescriptionSearch`, `useTagSearch`, `useCrudOperations`, `utils.js` |
+| Component | Vitest + `@vue/test-utils` | Formulários, diálogos e comportamento local | `ConfirmDialog`, `AuthenticatedLayout`, `CreditCardInvoice/Index`, `BudgetExpense`, `BudgetProvision` |
+| E2E | Playwright | Fluxos reais do usuário | login, budget show, invoice detail, extract detail |
+
+### 11.4 Estrutura de Diretórios Sugerida
+
+```text
+resources/js/
+├── composables/
+│   └── __tests__/
+├── Components/
+│   └── **/__tests__/
+├── Layouts/
+│   └── __tests__/
+tests/
+├── e2e/
+└── frontend/
+    └── setup/
+vitest.config.js
+```
+
+### 11.5 Dependências e Scripts Recomendados
+
+```bash
+./scripts/npm.sh install -D vitest @vue/test-utils jsdom
+```
+
+```json
+"scripts": {
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:e2e": "playwright test -c playwright.config.js",
+    "test:e2e:ui": "playwright test --ui -c playwright.config.js",
+    "test": "npm run test:unit && npm run test:e2e"
+}
+```
+
+### 11.6 Primeiros Testes a Implementar
+
+1. `useShareCalculation` para validar percentuais e arredondamento.
+2. `useDescriptionSearch` com `window.axios` mockado.
+3. `useTagSearch` cobrindo debounce, retorno vazio e criação de tag não encontrada.
+4. `useCrudOperations` com mock de `router.post`, `router.put` e `router.delete`.
+5. `AuthenticatedLayout.vue` para mensagens flash e tratamento de erro.
+6. `CreditCardInvoice/Index.vue` para fluxo de criação com `useForm`.
+7. `BudgetExpense.vue` para garantir a rota correta de exclusão de parcelas.
+
+### 11.7 Exemplo Inicial de Teste Unitário
+
+```js
+import { describe, expect, it } from 'vitest'
+import { useShareCalculation } from '@/composables/useShareCalculation'
+
+describe('useShareCalculation', () => {
+    it('calcula o valor compartilhado em percentual', () => {
+        const { calculateShareValue } = useShareCalculation()
+
+        expect(calculateShareValue('100', '35')).toBe('35.00')
+        expect(calculateShareValue('250', '10')).toBe('25.00')
+    })
+})
+```
+
+### 11.8 Ajustes Recomendados na Base de E2E Atual
+
+- Consolidar o projeto em uma única configuração Playwright.
+- Remover `waitForTimeout()` sempre que possível e preferir asserts por estado/locators.
+- Substituir credenciais hardcoded por usuário de teste criado via seed ou factory.
+- Garantir um comando único de execução no container (`./scripts/npm.sh run test:e2e`).
+
+---
+
+## 12. Resumo de Impacto por Fase
 
 | Fase | Descrição | Esforço | Impacto | Risco | Dependências |
 |:----:|-----------|:-------:|:-------:|:-----:|:------------:|
@@ -1054,14 +1254,15 @@ Adicionar no `AuthenticatedLayout.vue`:
 | 6 | Performance/Bundle | 4-6h | Médio | Baixo | Nenhuma |
 | 7 | Qualidade/DX | 4-6h | Médio | Baixo | Nenhuma |
 | 8 | Acessibilidade | 6-8h | Baixo-Médio | Baixo | Nenhuma |
+| 9 | Testes Automatizados | 10-16h | Alto | Baixo | Fases 2 e 3 (recomendado) |
 
-**Ordem recomendada:** Bugs → Fase 1 → Fase 6 → Fase 2 → Fase 3 → Fase 5 → Fase 7 → Fase 4 → Fase 8
+**Ordem recomendada:** Bugs → Fase 1 → Fase 6 → Fase 2 → Fase 3 → Fase 9 → Fase 5 → Fase 7 → Fase 4 → Fase 8
 
-**Tempo total estimado:** ~55-78 horas de desenvolvimento
+**Tempo total estimado:** ~65-94 horas de desenvolvimento
 
 ---
 
-## 12. Apêndice A — Inventário de Componentes
+## 13. Apêndice A — Inventário de Componentes
 
 ### Páginas (Pages/)
 
@@ -1106,7 +1307,7 @@ Adicionar no `AuthenticatedLayout.vue`:
 
 ---
 
-## 13. Apêndice B — Mapa de Duplicação de Código
+## 14. Apêndice B — Mapa de Duplicação de Código
 
 ```
 ┌─────────────────────────────┬───────────────────────────────────────────────────────────┐

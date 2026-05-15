@@ -1,266 +1,242 @@
 <template>
+
     <Head title="Financing" />
-    <AuthenticatedLayout>
-        <div class="mb-5">
-            <h5 class="text-h5 font-weight-bold">{{ $t('financing.title') }}</h5>
-            <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
-        </div>
+    <div class="mb-5">
+        <h5 class="text-h5 font-weight-bold">{{ $t('financing.title') }}</h5>
+        <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
+    </div>
 
-        <!-- Tabela com dados -->
-        <v-card>
-            <v-card-text>
-                <v-row dense>
-                    <v-col md="12">
-                        <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
-                    </v-col>
-                    <v-col md="12">
-                        <v-data-table
-                            :headers="headers"
-                            :items="financings"
-                            :sort-by="[{ key: 'created_at', order: 'asc' }]"
-                            :search="search"
-                            :loading="isLoading"
-                            :loading-text="$t('default.loading-text-table')"
-                            class="elevation-3"
-                            density="compact"
-                            :total-items="financings.length"
-                            :no-data-text="$t('default.no-data-text')"
-                            :no-results-text="$t('default.no-data-text')"
-                            :footer-props="{
-                                'items-per-page-text': $t('default.itens-per-page'),
-                                'page-text': $t('default.page-text'),
-                            }"
-                            :header-props="{
+    <!-- Tabela com dados -->
+    <v-card>
+        <v-card-text>
+            <v-row dense>
+                <v-col md="12">
+                    <v-btn color="primary" @click="newItem">{{ $t('default.new') }}</v-btn>
+                </v-col>
+                <v-col md="12">
+                    <v-data-table :headers="headers" :items="financings"
+                        :sort-by="[{ key: 'created_at', order: 'asc' }]" :search="search" :loading="isLoading"
+                        :loading-text="$t('default.loading-text-table')" class="elevation-3" density="compact"
+                        :total-items="financings.length" :no-data-text="$t('default.no-data-text')"
+                        :no-results-text="$t('default.no-data-text')" :footer-props="{
+                            'items-per-page-text': $t('default.itens-per-page'),
+                            'page-text': $t('default.page-text'),
+                        }" :header-props="{
                                 sortByText: $t('default.sort-by'),
-                            }"
-                            fixed-header
-                        >
-                            <template #[`item.start_date`]="{ item }">{{
-                                moment(item.start_date).format('DD/MM/YYYY')
-                            }}</template>
-                            <template #[`item.total`]="{ item }">{{ currencyField(item.total) }}</template>
-                            <template #[`item.fees_monthly`]="{ item }">{{ percentField(item.fees_monthly) }}</template>
+                            }" fixed-header>
+                        <template #[`item.start_date`]="{ item }">{{
+                            moment(item.start_date).format('DD/MM/YYYY')
+                        }}</template>
+                        <template #[`item.total`]="{ item }">{{ currencyField(item.total) }}</template>
+                        <template #[`item.fees_monthly`]="{ item }">{{ percentField(item.fees_monthly) }}</template>
 
-                            <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('financing.installments-show')" location="top">
-                                    <template #activator="{ props }">
-                                        <Link :href="hrefInstalmment(item)" class="v-breadcrumbs-item--link">
-                                            <v-icon v-bind="props" color="warning" icon="mdi-checkbook" size="small">
-                                            </v-icon>
-                                        </Link>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('default.edit')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            class="ml-1"
-                                            color="warning"
-                                            icon="mdi-pencil"
-                                            size="small"
-                                            @click="editItem(item)"
-                                        >
+                        <template #[`item.action`]="{ item }">
+                            <v-tooltip :text="$t('financing.installments-show')" location="top">
+                                <template #activator="{ props }">
+                                    <Link :href="hrefInstalmment(item)" class="v-breadcrumbs-item--link">
+                                        <v-icon v-bind="props" color="warning" icon="mdi-checkbook" size="small">
                                         </v-icon>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('default.delete')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            class="ml-1"
-                                            color="error"
-                                            icon="mdi-delete"
-                                            size="small"
-                                            @click="confirmRemove(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                            </template>
+                                    </Link>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip :text="$t('default.edit')" location="top">
+                                <template #activator="{ props }">
+                                    <v-icon v-bind="props" class="ml-1" color="warning" icon="mdi-pencil" size="small"
+                                        @click="editItem(item)">
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
+                            <v-tooltip :text="$t('default.delete')" location="top">
+                                <template #activator="{ props }">
+                                    <v-icon v-bind="props" class="ml-1" color="error" icon="mdi-delete" size="small"
+                                        @click="confirmRemove(item)">
+                                    </v-icon>
+                                </template>
+                            </v-tooltip>
+                        </template>
 
-                            <template #top>
-                                <v-toolbar density="comfortable">
-                                    <v-row dense>
-                                        <v-col cols="12" lg="12" md="12" sm="12">
-                                            <v-text-field
-                                                v-model="search"
-                                                :label="$t('default.search')"
-                                                append-icon="mdi-magnify"
-                                                single-line
-                                                hide-details
-                                                clearable
-                                                @click:clear="search = null"
-                                            ></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                </v-toolbar>
-                            </template>
-                        </v-data-table>
-                    </v-col>
-                </v-row>
+                        <template #top>
+                            <v-toolbar density="comfortable">
+                                <v-row dense>
+                                    <v-col cols="12" lg="12" md="12" sm="12">
+                                        <v-text-field v-model="search" :label="$t('default.search')"
+                                            append-icon="mdi-magnify" single-line hide-details clearable
+                                            @click:clear="search = null"></v-text-field>
+                                    </v-col>
+                                </v-row>
+                            </v-toolbar>
+                        </template>
+                    </v-data-table>
+                </v-col>
+            </v-row>
+        </v-card-text>
+    </v-card>
+
+    <!-- Dialog Criacao/Edicao -->
+    <v-dialog v-model="editDialog" persistent width="800">
+        <v-card>
+            <v-card-title>
+                <span class="text-h5">{{ titleModal }}</span>
+            </v-card-title>
+            <v-card-text>
+                <v-form ref="form" @submit.prevent>
+                    <v-row dense>
+                        <v-col cols="12" sm="12" md="12">
+                            <v-text-field ref="txtDescription" v-model="financing.description"
+                                :label="$t('default.description')" :rules="rules.textFieldRules" required
+                                density="comfortable"></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <v-date-input v-model="financing.start_date" :label="$t('financing.start-date')"
+                                prepend-icon="" prepend-inner-icon="$calendar" required :rules="rules.textFieldRules"
+                                density="comfortable" :show-adjacent-months="true" :show-week="true"
+                                :display-format="(date) => formatDate(date, 'DD/MM/YYYY')" placeholder="DD/MM/YYYY"
+                                :update-on="['enter']"></v-date-input>
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <vuetify-money v-model="financing.total" :label="$t('default.total')" density="comfortable"
+                                :rules="rules.currencyFieldRules" :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }" />
+                        </v-col>
+                        <v-col cols="12" sm="6" md="3">
+                            <vuetify-money v-model="financing.fees_monthly" :label="$t('financing.fees-monthly')"
+                                density="comfortable" :rules="rules.currencyFieldRules" :options="{
+                                    locale: 'pt-BR',
+                                    prefix: '',
+                                    suffix: '%',
+                                    length: 11,
+                                    precision: 2,
+                                }" />
+                        </v-col>
+                        <v-col v-if="!financing.id" cols="12" sm="6" md="3">
+                            <v-text-field v-model="financing.portion_total" type="number"
+                                :label="$t('financing.portion-total')" min="2" required :rules="rules.numberFieldRules"
+                                density="comfortable"></v-text-field>
+                        </v-col>
+                        <v-col v-if="!financing.id" cols="12" sm="6" md="3">
+                            <v-date-input v-model="financing.start_date_installment" :label="$t('financing.start-date')"
+                                prepend-icon="" prepend-inner-icon="$calendar" required :rules="rules.textFieldRules"
+                                density="comfortable" :show-adjacent-months="true" :show-week="true"
+                                :display-format="(date) => formatDate(date, 'DD/MM/YYYY')" placeholder="DD/MM/YYYY"
+                                :update-on="['enter']"></v-date-input>
+                        </v-col>
+                        <v-col v-if="!financing.id" cols="12" sm="6" md="3">
+                            <vuetify-money v-model="financing.value_installment"
+                                :label="$t('financing.installment-value')" density="comfortable"
+                                :rules="rules.currencyFieldRules" :options="{
+                                    locale: 'pt-BR',
+                                    prefix: 'R$',
+                                    suffix: '',
+                                    length: 11,
+                                    precision: 2,
+                                }" />
+                        </v-col>
+                        <v-col cols="12" md="12">
+                            <v-text-field v-model="financing.remarks" :label="$t('default.remarks')"
+                                density="comfortable"></v-text-field>
+                        </v-col>
+                    </v-row>
+                </v-form>
             </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
+                    {{ $t('default.cancel') }}
+                </v-btn>
+                <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
+                    {{ $t('default.save') }}
+                </v-btn>
+            </v-card-actions>
         </v-card>
+    </v-dialog>
 
-        <!-- Dialog Criacao/Edicao -->
-        <v-dialog v-model="editDialog" persistent width="800">
-            <v-card>
-                <v-card-title>
-                    <span class="text-h5">{{ titleModal }}</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-form ref="form" @submit.prevent>
-                        <v-row dense>
-                            <v-col cols="12" sm="12" md="12">
-                                <v-text-field
-                                    ref="txtDescription"
-                                    v-model="financing.description"
-                                    :label="$t('default.description')"
-                                    :rules="rules.textFieldRules"
-                                    required
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="3">
-                                <v-date-input
-                                    v-model="financing.start_date"
-                                    :label="$t('financing.start-date')"
-                                    prepend-icon=""
-                                    prepend-inner-icon="$calendar"
-                                    required
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                    :show-adjacent-months="true"
-                                    :show-week="true"
-                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
-                                    placeholder="DD/MM/YYYY"
-                                    :update-on="['enter']"
-                                ></v-date-input>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="3">
-                                <vuetify-money
-                                    v-model="financing.total"
-                                    :label="$t('default.total')"
-                                    density="comfortable"
-                                    :rules="rules.currencyFieldRules"
-                                    :options="{
-                                        locale: 'pt-BR',
-                                        prefix: 'R$',
-                                        suffix: '',
-                                        length: 11,
-                                        precision: 2,
-                                    }"
-                                />
-                            </v-col>
-                            <v-col cols="12" sm="6" md="3">
-                                <vuetify-money
-                                    v-model="financing.fees_monthly"
-                                    :label="$t('financing.fees-monthly')"
-                                    density="comfortable"
-                                    :rules="rules.currencyFieldRules"
-                                    :options="{
-                                        locale: 'pt-BR',
-                                        prefix: '',
-                                        suffix: '%',
-                                        length: 11,
-                                        precision: 2,
-                                    }"
-                                />
-                            </v-col>
-                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
-                                <v-text-field
-                                    v-model="financing.portion_total"
-                                    type="number"
-                                    :label="$t('financing.portion-total')"
-                                    min="2"
-                                    required
-                                    :rules="rules.numberFieldRules"
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
-                                <v-date-input
-                                    v-model="financing.start_date_installment"
-                                    :label="$t('financing.start-date')"
-                                    prepend-icon=""
-                                    prepend-inner-icon="$calendar"
-                                    required
-                                    :rules="rules.textFieldRules"
-                                    density="comfortable"
-                                    :show-adjacent-months="true"
-                                    :show-week="true"
-                                    :display-format="(date) => formatDate(date, 'DD/MM/YYYY')"
-                                    placeholder="DD/MM/YYYY"
-                                    :update-on="['enter']"
-                                ></v-date-input>
-                            </v-col>
-                            <v-col v-if="!financing.id" cols="12" sm="6" md="3">
-                                <vuetify-money
-                                    v-model="financing.value_installment"
-                                    :label="$t('financing.installment-value')"
-                                    density="comfortable"
-                                    :rules="rules.currencyFieldRules"
-                                    :options="{
-                                        locale: 'pt-BR',
-                                        prefix: 'R$',
-                                        suffix: '',
-                                        length: 11,
-                                        precision: 2,
-                                    }"
-                                />
-                            </v-col>
-                            <v-col cols="12" md="12">
-                                <v-text-field
-                                    v-model="financing.remarks"
-                                    :label="$t('default.remarks')"
-                                    density="comfortable"
-                                ></v-text-field>
-                            </v-col>
-                        </v-row>
-                    </v-form>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
-                        {{ $t('default.cancel') }}
-                    </v-btn>
-                    <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
-                        {{ $t('default.save') }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <ConfirmDialog ref="confirm" />
-    </AuthenticatedLayout>
+    <ConfirmDialog ref="confirm" />
 </template>
 
 <script setup>
-    import { ref, computed, nextTick } from 'vue'
-    import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
-    import { Head, Link, router } from '@inertiajs/vue3'
-    import moment from 'moment'
-    import { currencyField, formatDate, percentField } from '@/utils/utils.js'
-    import { useI18n } from 'vue-i18n'
-    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+import { ref, computed, nextTick } from 'vue'
+import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
+import { Head, Link, router } from '@inertiajs/vue3'
+import moment from 'moment'
+import { currencyField, formatDate, percentField } from '@/utils/utils.js'
+import { useI18n } from 'vue-i18n'
+import { useCrudOperations } from '@/composables/useCrudOperations.js'
 
-    defineOptions({ name: 'FinancingIndex' })
+defineOptions({ name: 'FinancingIndex', layout: AuthenticatedLayout })
 
-    defineProps({
-        financings: { type: Array },
-    })
+defineProps({
+    financings: { type: Array },
+})
 
-    const { t } = useI18n()
+const { t } = useI18n()
 
-    const { isLoading, editDialog, titleModal, confirmRemove: crudConfirmRemove } = useCrudOperations('/financing')
+const { isLoading, editDialog, titleModal, confirmRemove: crudConfirmRemove } = useCrudOperations('/financing')
 
-    const search = ref(null)
-    const txtDescription = ref(null)
-    const form = ref(null)
-    const confirm = ref(null)
+const search = ref(null)
+const txtDescription = ref(null)
+const form = ref(null)
+const confirm = ref(null)
 
-    const financing = ref({
+const financing = ref({
+    id: null,
+    description: null,
+    start_date: null,
+    total: 0,
+    fees_monthly: 0,
+    portion_total: 0,
+    remarks: null,
+    start_date_installment: null,
+    value_installment: 0,
+})
+
+const breadcrumbs = computed(() => [
+    { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
+    { title: t('menus.financing'), disabled: true },
+])
+
+const headers = computed(() => [
+    { title: t('default.description'), align: 'start', key: 'description' },
+    { title: t('financing.start-date'), align: 'center', key: 'start_date' },
+    { title: t('financing.fees-monthly'), align: 'end', key: 'fees_monthly' },
+    { title: t('financing.portion-total'), align: 'end', key: 'portion_total' },
+    { title: t('default.total'), align: 'end', key: 'total' },
+    { title: t('default.remarks'), key: 'remarks' },
+    { title: t('default.action'), align: 'center', key: 'action', sortable: false },
+])
+
+const rules = {
+    textFieldRules: [(v) => !!v || t('rules.required-text-field')],
+    numberFieldRules: [
+        (value) => {
+            if (!value) return t('rules.required-text-field')
+            if (Number(value) <= 0) return t('rules.required-currency-field')
+            return true
+        },
+    ],
+    currencyFieldRules: [
+        (value) => {
+            if (!value) return t('rules.required-text-field')
+            if (Number(value) <= 0) return t('rules.required-currency-field')
+            return true
+        },
+    ],
+}
+
+function hrefInstalmment(item) {
+    return '/financing/' + item.id + '/installment'
+}
+
+function newItem() {
+    titleModal.value = t('financing.new-item')
+    editDialog.value = true
+    financing.value = {
         id: null,
         description: null,
         start_date: null,
@@ -270,136 +246,84 @@
         remarks: null,
         start_date_installment: null,
         value_installment: 0,
-    })
-
-    const breadcrumbs = computed(() => [
-        { title: t('menus.dashboard'), disabled: false, href: '/dashboard' },
-        { title: t('menus.financing'), disabled: true },
-    ])
-
-    const headers = computed(() => [
-        { title: t('default.description'), align: 'start', key: 'description' },
-        { title: t('financing.start-date'), align: 'center', key: 'start_date' },
-        { title: t('financing.fees-monthly'), align: 'end', key: 'fees_monthly' },
-        { title: t('financing.portion-total'), align: 'end', key: 'portion_total' },
-        { title: t('default.total'), align: 'end', key: 'total' },
-        { title: t('default.remarks'), key: 'remarks' },
-        { title: t('default.action'), align: 'center', key: 'action', sortable: false },
-    ])
-
-    const rules = {
-        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
-        numberFieldRules: [
-            (value) => {
-                if (!value) return t('rules.required-text-field')
-                if (Number(value) <= 0) return t('rules.required-currency-field')
-                return true
-            },
-        ],
-        currencyFieldRules: [
-            (value) => {
-                if (!value) return t('rules.required-text-field')
-                if (Number(value) <= 0) return t('rules.required-currency-field')
-                return true
-            },
-        ],
     }
+    nextTick(() => txtDescription.value?.focus())
+}
 
-    function hrefInstalmment(item) {
-        return '/financing/' + item.id + '/installment'
+function editItem(item) {
+    titleModal.value = t('financing.edit-item')
+    editDialog.value = true
+    financing.value = {
+        id: item.id,
+        description: item.description,
+        start_date: moment(item.start_date, 'YYYY-MM-DD').toDate(),
+        total: Number(item.total),
+        fees_monthly: item.fees_monthly ? Number(item.fees_monthly) : 0,
+        portion_total: Number(item.portion_total),
+        remarks: item.remarks,
     }
+    nextTick(() => txtDescription.value?.focus())
+}
 
-    function newItem() {
-        titleModal.value = t('financing.new-item')
-        editDialog.value = true
-        financing.value = {
-            id: null,
-            description: null,
-            start_date: null,
-            total: 0,
-            fees_monthly: 0,
-            portion_total: 0,
-            remarks: null,
-            start_date_installment: null,
-            value_installment: 0,
-        }
-        nextTick(() => txtDescription.value?.focus())
-    }
-
-    function editItem(item) {
-        titleModal.value = t('financing.edit-item')
-        editDialog.value = true
-        financing.value = {
-            id: item.id,
-            description: item.description,
-            start_date: moment(item.start_date, 'YYYY-MM-DD').toDate(),
-            total: Number(item.total),
-            fees_monthly: item.fees_monthly ? Number(item.fees_monthly) : 0,
-            portion_total: Number(item.portion_total),
-            remarks: item.remarks,
-        }
-        nextTick(() => txtDescription.value?.focus())
-    }
-
-    async function save() {
-        const validate = await form.value.validate()
-        if (validate.valid) {
-            if (financing.value.id) {
-                await _update()
-            } else {
-                await _create()
-            }
+async function save() {
+    const validate = await form.value.validate()
+    if (validate.valid) {
+        if (financing.value.id) {
+            await _update()
+        } else {
+            await _create()
         }
     }
+}
 
-    async function _create() {
-        isLoading.value = true
-        router.post(
-            '/financing',
-            {
-                description: financing.value.description,
-                start_date: moment(financing.value.start_date).format('YYYY-MM-DD'),
-                total: financing.value.total,
-                fees_monthly: financing.value.fees_monthly,
-                portion_total: financing.value.portion_total,
-                remarks: financing.value.remarks,
-                start_date_installment: moment(financing.value.start_date_installment).format('YYYY-MM-DD'),
-                value_installment: financing.value.value_installment,
+async function _create() {
+    isLoading.value = true
+    router.post(
+        '/financing',
+        {
+            description: financing.value.description,
+            start_date: moment(financing.value.start_date).format('YYYY-MM-DD'),
+            total: financing.value.total,
+            fees_monthly: financing.value.fees_monthly,
+            portion_total: financing.value.portion_total,
+            remarks: financing.value.remarks,
+            start_date_installment: moment(financing.value.start_date_installment).format('YYYY-MM-DD'),
+            value_installment: financing.value.value_installment,
+        },
+        {
+            onSuccess: () => {
+                editDialog.value = false
             },
-            {
-                onSuccess: () => {
-                    editDialog.value = false
-                },
-                onFinish: () => {
-                    isLoading.value = false
-                },
-            }
-        )
-    }
-
-    async function _update() {
-        isLoading.value = true
-        router.put(
-            '/financing/' + financing.value.id,
-            {
-                description: financing.value.description,
-                start_date: moment(financing.value.start_date).format('YYYY-MM-DD'),
-                total: financing.value.total,
-                fees_monthly: financing.value.fees_monthly,
-                remarks: financing.value.remarks,
+            onFinish: () => {
+                isLoading.value = false
             },
-            {
-                onSuccess: () => {
-                    editDialog.value = false
-                },
-                onFinish: () => {
-                    isLoading.value = false
-                },
-            }
-        )
-    }
+        }
+    )
+}
 
-    function confirmRemove(item) {
-        crudConfirmRemove(item, confirm.value, t('financing.item'), t('default.confirm-delete-item'))
-    }
+async function _update() {
+    isLoading.value = true
+    router.put(
+        '/financing/' + financing.value.id,
+        {
+            description: financing.value.description,
+            start_date: moment(financing.value.start_date).format('YYYY-MM-DD'),
+            total: financing.value.total,
+            fees_monthly: financing.value.fees_monthly,
+            remarks: financing.value.remarks,
+        },
+        {
+            onSuccess: () => {
+                editDialog.value = false
+            },
+            onFinish: () => {
+                isLoading.value = false
+            },
+        }
+    )
+}
+
+function confirmRemove(item) {
+    crudConfirmRemove(item, confirm.value, t('financing.item'), t('default.confirm-delete-item'))
+}
 </script>

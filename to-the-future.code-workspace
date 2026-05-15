@@ -24,7 +24,7 @@
         },
         "editor.rulers": [120],
         "editor.wordWrap": "off",
-        "workbench.colorTheme": "One Dark Pro Darker",
+        "workbench.colorTheme": "Monokai Dimmed",
         "workbench.editor.enablePreview": false,
         "explorer.compactFolders": false,
         "explorer.confirmDelete": false,
@@ -301,7 +301,7 @@
         "chat.fontFamily": "Fira Code",
         "chat.fontSize": 14,
         // Notificações de conclusão
-        "chat.notifyWindowOnResponseReceived": true,
+        "chat.notifyWindowOnResponseReceived": "windowNotFocused",
         "task.notifyWindowOnTaskCompletion": true,
         "github.copilot.inlineSuggest.enable": true,
         "github.copilot.editor.enableAutoCompletions": true,

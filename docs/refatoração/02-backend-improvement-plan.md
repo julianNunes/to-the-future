@@ -1013,21 +1013,53 @@ Route::get('/budget/{budget}', 'show');
 
 ### 10.1 Estado Atual
 
-- PHPUnit configurado (`phpunit.xml`)
-- Estrutura de diretórios existe (`tests/Feature`, `tests/Unit`)
-- **Zero testes existem**
+- PHPUnit 10 já está configurado em `phpunit.xml`.
+- Já existem feature tests base vindos do Laravel Breeze, principalmente em `tests/Feature/Auth/*` e `tests/Feature/ProfileTest.php`.
+- A suíte de unit tests existe, mas hoje só possui `tests/Unit/ExampleTest.php` como placeholder.
+- O projeto já usa `RefreshDatabase`, `actingAs()` e assertions HTTP nas suítes existentes.
+- Hoje só existem `UserFactory` e `PeopleFactory`; o domínio principal ainda não possui factories próprias.
+- O `phpunit.xml` ainda mantém comentada a configuração de SQLite em memória.
+- Em resumo: a base de testes existe, mas a cobertura real do domínio financeiro ainda é muito baixa.
 
-### 10.2 Prioridade de Testes
+### 10.2 Ferramentas Recomendadas
+
+**Recomendação principal para o backend:** manter PHPUnit 10 como padrão do repositório e complementar com Mockery para isolamento de services e helpers.
+
+```text
+Backend unit/feature: PHPUnit 10 + Mockery + utilitários de teste do Laravel
+Frontend unit/componente: Vitest + @vue/test-utils + jsdom
+Frontend E2E: Playwright
+```
+
+**Por que manter PHPUnit aqui:**
+
+- já está instalado e configurado no projeto;
+- os testes atuais já seguem esse estilo;
+- a documentação do Laravel cobre muito bem esse fluxo;
+- introduzir Pest agora criaria duas convenções de teste sem ganho proporcional imediato.
+
+> Pest continua sendo uma opção válida no ecossistema Laravel, mas para este repositório a escolha mais pragmática e consolidada é continuar em PHPUnit.
+
+### 10.3 Matriz de Testes Integrada com o Frontend
+
+| Camada | Ferramenta | Objetivo | Primeiros alvos |
+|:------:|------------|----------|-----------------|
+| Backend Unit | PHPUnit + Mockery | Regras de negócio isoladas | services CRUD pequenos, validações de exceção, helpers, DTOs com lógica |
+| Backend Feature | PHPUnit + Laravel TestCase | Rotas, autenticação, autorização, persistência | auth, ownership/IDOR, CRUD principal |
+| Frontend Unit/Component | Vitest + `@vue/test-utils` | Composables, componentes e layout | `useShareCalculation`, `useTagSearch`, `useCrudOperations`, `AuthenticatedLayout` |
+| Frontend E2E | Playwright | Fluxos completos do usuário | login, budget, invoice, extract |
+
+### 10.4 Prioridade de Testes Backend
 
 | Prioridade | Tipo | Cobertura |
 |:----------:|------|-----------|
-| 1 | Feature Tests | Autenticação e autorização (testar IDOR) |
-| 2 | Unit Tests | Services (BudgetService, especialmente `clone()`, `createComplete()`) |
-| 3 | Unit Tests | Helpers (BudgetCalculate, BudgetShowData) |
-| 4 | Feature Tests | CRUD endpoints completos |
-| 5 | Unit Tests | DTOs e Form Requests |
+| 1 | Feature Tests | Autenticação, middleware `auth` e cenários de IDOR/ownership |
+| 2 | Unit Tests | `BudgetService` (`clone()`, `createComplete()`), `BudgetExpenseService`, `CreditCardInvoiceExpenseService` |
+| 3 | Unit Tests | Helpers e classes de cálculo (`BudgetCalculate`, `BudgetShowData`, futuros extratos como `BudgetTagMatcher`) |
+| 4 | Feature Tests | CRUDs principais com flash messages, validação e autorização |
+| 5 | Unit/Integration Tests | Repositories, tags, transações e factories do domínio |
 
-### 10.3 Configuração Recomendada
+### 10.5 Configuração Recomendada
 
 ```php
 // phpunit.xml — Usar SQLite in-memory para testes:
@@ -1035,42 +1067,80 @@ Route::get('/budget/{budget}', 'show');
 <env name="DB_DATABASE" value=":memory:"/>
 ```
 
-### 10.4 Padrão de Teste Sugerido
+**Recomendação prática para o repositório:**
+
+- descomentar a configuração de SQLite em memória no `phpunit.xml` ou mover isso para um `.env.testing` dedicado;
+- criar factories para as entidades centrais do domínio antes de expandir a cobertura;
+- separar a execução por suíte para feedback rápido;
+- manter todos os comandos via scripts do projeto.
+
+```bash
+./scripts/artisan.sh test
+./scripts/artisan.sh test --testsuite=Unit
+./scripts/artisan.sh test --testsuite=Feature
+```
+
+### 10.6 Exemplo de Unit Test Sugerido
 
 ```php
-class BudgetServiceTest extends TestCase
+use App\Repositories\Interfaces\BudgetGoalRepositoryInterface;
+use App\Repositories\Interfaces\BudgetRepositoryInterface;
+use App\Repositories\Interfaces\TagRepositoryInterface;
+use App\Services\BudgetGoalService;
+use Exception;
+use Mockery;
+use Tests\TestCase;
+
+class BudgetGoalServiceTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function test_create_complete_creates_budget_with_all_relations(): void
+    public function test_delete_throws_when_goal_does_not_exist(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
+        $budgetRepository = Mockery::mock(BudgetRepositoryInterface::class);
+        $goalRepository = Mockery::mock(BudgetGoalRepositoryInterface::class);
+        $tagRepository = Mockery::mock(TagRepositoryInterface::class);
 
-        $dto = CreateBudgetDTO::fromArray([...]);
-        $budget = $this->budgetService->createComplete($dto);
+        $goalRepository->shouldReceive('show')->once()->with(10)->andReturn(null);
+        $tagRepository->shouldNotReceive('saveTagsToModel');
+        $goalRepository->shouldNotReceive('delete');
 
-        $this->assertDatabaseHas('budgets', ['user_id' => $user->id]);
-        $this->assertCount(12, Budget::where('user_id', $user->id)->get());
-    }
-    
-    public function test_user_cannot_access_other_users_budget(): void
-    {
-        $user1 = User::factory()->create();
-        $user2 = User::factory()->create();
-        $budget = Budget::factory()->create(['user_id' => $user1->id]);
+        $service = new BudgetGoalService($budgetRepository, $goalRepository, $tagRepository);
 
-        $this->actingAs($user2);
-        $this->get("/budget/show/{$budget->id}")->assertForbidden();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('budget-goal.not-found');
+
+        $service->delete(10);
     }
 }
 ```
 
-### 10.5 Factories Necessárias
+Esse padrão é o que deve crescer junto com o frontend: regras de negócio isoladas no backend e comportamento/interação no frontend.
+
+### 10.7 Exemplo de Feature Test Sugerido
+
+```php
+class BudgetAuthorizationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_guest_is_redirected_when_trying_to_access_budget_index(): void
+    {
+        $this->get('/budget/2026')->assertRedirect('/login');
+    }
+}
+```
+
+### 10.8 Factories Necessárias
 
 Criar factories para todos os models de domínio:
 - `BudgetFactory`, `BudgetExpenseFactory`, `CreditCardFactory`, `CreditCardInvoiceFactory`, etc.
-- A `UserFactory` padrão do Laravel já existe.
+- `UserFactory` e `PeopleFactory` já existem.
+
+### 10.9 Ordem Recomendada Para Caminhar Junto com o Frontend
+
+1. Cobrir no backend os services menores e cenários de autorização mais críticos.
+2. Cobrir no frontend os composables e componentes que dependem dessas mesmas regras.
+3. Fechar o ciclo com Playwright nos fluxos completos já existentes (`login`, `budget`, `invoice`, `extract`).
+4. Só depois expandir para os monólitos maiores e cenários complexos de importação, parcelamento e clone.
 
 ---
 
