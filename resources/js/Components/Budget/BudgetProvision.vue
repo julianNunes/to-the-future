@@ -295,16 +295,16 @@
 </template>
 
 <script setup>
-    import { ref, computed, nextTick } from 'vue'
-    import { router } from '@inertiajs/vue3'
-    import { useI18n } from 'vue-i18n'
     import { currencyField, sumField, sumGroup } from '@/utils/utils.js'
+import { router } from '@inertiajs/vue3'
+import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-    import { useValidationRules } from '@/composables/useFormConstants.js'
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
-    import { useTagSearch } from '@/composables/useTagSearch.js'
-    import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
-    import { useShareCalculation } from '@/composables/useShareCalculation.js'
+import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
+import { useValidationRules } from '@/composables/useFormConstants.js'
+import { useShareCalculation } from '@/composables/useShareCalculation.js'
+import { useTagSearch } from '@/composables/useTagSearch.js'
 
     defineOptions({ name: 'BudgetProvision' })
 
@@ -326,8 +326,11 @@
     const { isLoading, editDialog, titleModal } = useCrudOperations('/budget-provision')
 
     const { tags: listTags, isSearching: isTagSearching, searchTags: doSearchTags } = useTagSearch()
-    const { descriptions: listDescriptions, isSearching: isDescriptionSearching, searchDescriptions: doSearchDescriptions } =
-        useDescriptionSearch('budget-provision')
+    const {
+        descriptions: listDescriptions,
+        isSearching: isDescriptionSearching,
+        searchDescriptions: doSearchDescriptions,
+    } = useDescriptionSearch('budget-provision')
     const { calculateShareValue } = useShareCalculation()
 
     const search = ref(null)

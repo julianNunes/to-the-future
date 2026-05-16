@@ -375,19 +375,19 @@
 </template>
 
 <script setup>
-    import { ref, computed, nextTick } from 'vue'
-    import { router } from '@inertiajs/vue3'
-    import { useI18n } from 'vue-i18n'
-    import moment from 'moment'
-    import readXlsxFile from 'read-excel-file'
-    import { useToast } from 'vue-toastification'
     import { currencyField, formatDate, reverseFormatNumber, sumField, sumGroup } from '@/utils/utils.js'
+import { router } from '@inertiajs/vue3'
+import moment from 'moment'
+import readXlsxFile from 'read-excel-file'
+import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
 
-    import { useValidationRules } from '@/composables/useFormConstants.js'
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
-    import { useTagSearch } from '@/composables/useTagSearch.js'
-    import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
-    import { useShareCalculation } from '@/composables/useShareCalculation.js'
+import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
+import { useValidationRules } from '@/composables/useFormConstants.js'
+import { useShareCalculation } from '@/composables/useShareCalculation.js'
+import { useTagSearch } from '@/composables/useTagSearch.js'
 
     const componentProps = defineProps({
         extract: { type: Object },
@@ -405,8 +405,11 @@
     const { isLoading, editDialog, titleModal } = useCrudOperations('/prepaid-card/extract/expense')
 
     const { tags: listTags, isSearching: isTagSearching, searchTags: doSearchTags } = useTagSearch()
-    const { descriptions: listDescriptions, isSearching: isDescriptionSearching, searchDescriptions: doSearchDescriptions } =
-        useDescriptionSearch('prepaid-card/extract/expense')
+    const {
+        descriptions: listDescriptions,
+        isSearching: isDescriptionSearching,
+        searchDescriptions: doSearchDescriptions,
+    } = useDescriptionSearch('prepaid-card/extract/expense')
     const { calculateShareValue } = useShareCalculation()
 
     const headers = [

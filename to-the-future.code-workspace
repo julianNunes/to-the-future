@@ -24,7 +24,7 @@
         },
         "editor.rulers": [120],
         "editor.wordWrap": "off",
-        "workbench.colorTheme": "Monokai Dimmed",
+        "workbench.colorTheme": "Dracula Theme Soft",
         "workbench.editor.enablePreview": false,
         "explorer.compactFolders": false,
         "explorer.confirmDelete": false,

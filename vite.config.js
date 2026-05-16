@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import laravel from 'laravel-vite-plugin'
 import vue from '@vitejs/plugin-vue'
+import laravel from 'laravel-vite-plugin'
+import { defineConfig } from 'vite'
 import vuetify from 'vite-plugin-vuetify'
 // import eslintPlugin from 'vite-plugin-eslint' // Temporariamente desabilitado
 import path from 'path'

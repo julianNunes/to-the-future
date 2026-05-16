@@ -95,11 +95,11 @@ import { useI18n } from 'vue-i18n'
     ])
 
     function applyFilters() {
-        router.get(
-            '/people',
-            search.value ? { search: search.value } : {},
-            { preserveState: true, preserveScroll: true, replace: true }
-        )
+        router.get('/people', search.value ? { search: search.value } : {}, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        })
     }
 
     function clearFilters() {

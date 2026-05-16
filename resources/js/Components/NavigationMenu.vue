@@ -19,10 +19,10 @@
 </template>
 
 <script setup>
-    import { computed } from 'vue'
     import { Link } from '@inertiajs/vue3'
-    import moment from 'moment'
-    import { useI18n } from 'vue-i18n'
+import moment from 'moment'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
     defineOptions({ name: 'NavigationMenu' })
 

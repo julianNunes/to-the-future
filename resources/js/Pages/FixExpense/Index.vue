@@ -259,8 +259,13 @@ import { useI18n } from 'vue-i18n'
     const { t } = useI18n()
 
     const { isLoading, editDialog, titleModal, confirmRemove: crudConfirmRemove } = useCrudOperations('/fix-expense')
-    const { tags: listTags, tagSearch: searchTag, isSearching: loadingData, searchTags: doSearchTags, clearTags } =
-        useTagSearch()
+    const {
+        tags: listTags,
+        tagSearch: searchTag,
+        isSearching: loadingData,
+        searchTags: doSearchTags,
+        clearTags,
+    } = useTagSearch()
 
     const search = ref(null)
     const percentage = ref(null)
