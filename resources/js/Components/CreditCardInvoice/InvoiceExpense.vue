@@ -754,8 +754,8 @@
 
     const { isLoading, editDialog, titleModal } = useCrudOperations('/credit-card/invoice/expense')
 
-    const { tags: listTags, searchTags: doSearchTags } = useTagSearch()
-    const { descriptions: listDescriptions, searchDescriptions: doSearchDescriptions } =
+    const { tags: listTags, isSearching: isTagSearching, searchTags: doSearchTags } = useTagSearch()
+    const { descriptions: listDescriptions, isSearching: isDescriptionSearching, searchDescriptions: doSearchDescriptions } =
         useDescriptionSearch('credit-card/invoice/expense')
     const { calculateShareValue } = useShareCalculation()
 
@@ -797,7 +797,6 @@
     const titleDivisionModal = ref('')
     const deleteDialog = ref(false)
     const deleteDivisionDialog = ref(false)
-    const loadingData = ref(false)
     const deleteId = ref(null)
     const editedIndex = ref(-1)
     const deleteAllPortions = ref(false)
@@ -843,6 +842,7 @@
 
     const isClosed = computed(() => (componentProps.invoice.closed ? true : false))
     const isClosedName = computed(() => (componentProps.invoice.closed ? t('default.yes') : t('default.no')))
+    const loadingData = computed(() => isTagSearching.value || isDescriptionSearching.value)
 
     const itemsTags = computed(() => listTags.value)
     const itemsDescriptions = computed(() => {
@@ -906,20 +906,12 @@
     }
 
     async function searchTags(val) {
-        loadingData.value = true
         const existing = expense.value.tags ? expense.value.tags : []
         doSearchTags(val, existing)
-        setTimeout(() => {
-            loadingData.value = false
-        }, 350)
     }
 
     async function searchDescriptions(val) {
-        loadingData.value = true
         doSearchDescriptions(val)
-        setTimeout(() => {
-            loadingData.value = false
-        }, 400)
     }
 
     async function selectedDescription(item) {

@@ -1,0 +1,14 @@
+
+> test:e2e
+> npm run test:e2e:prepare && playwright test -c playwright.config.js --reporter=list
+
+
+> test:e2e:prepare
+> rm -f public/hot && php artisan db:seed --class=E2ESmokeSeeder --force
+
+
+   INFO  Seeding database.  
+
+
+Running 6 tests using 6 workers
+

@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
+use App\Helpers\ShareUser\Interfaces\ShareUserOptionsInterface;
 use App\Models\PrepaidCardExtract;
 use App\Repositories\Interfaces\{
     BudgetRepositoryInterface,
     PrepaidCardExtractExpenseRepositoryInterface,
     PrepaidCardExtractRepositoryInterface,
     PrepaidCardRepositoryInterface,
-    ShareUserRepositoryInterface,
     TagRepositoryInterface
 };
 use App\Services\Interfaces\PrepaidCardExtractServiceInterface;
@@ -25,7 +25,7 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
         private PrepaidCardExtractRepositoryInterface $prepaidCardExtractRepository,
         private PrepaidCardExtractExpenseRepositoryInterface $prepaidCardExtractExpenseRepository,
         private TagRepositoryInterface $tagRepository,
-        private ShareUserRepositoryInterface $shareUserRepository,
+        private ShareUserOptionsInterface $shareUserOptions,
         private BudgetRepositoryInterface $budgetRepository,
     ) {}
 
@@ -180,16 +180,7 @@ class PrepaidCardExtractService implements PrepaidCardExtractServiceInterface
 
         $this->ensureOwnedByCurrentUser($prepaid_card_extract->prepaidCard, 'user_id');
 
-        $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
-
-        if ($shareUsers && $shareUsers->count()) {
-            $shareUsers = $shareUsers->map(function ($item) {
-                return [
-                    'share_user_id' => $item->share_user_id,
-                    'share_user_name' => $item->shareUser->name
-                ];
-            });
-        }
+        $shareUsers = $this->shareUserOptions->resolveForUser(auth()->user()->id)['options'];
 
         return [
             'extract' => $prepaid_card_extract,

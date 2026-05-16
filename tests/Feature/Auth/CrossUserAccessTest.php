@@ -189,6 +189,32 @@ class CrossUserAccessTest extends TestCase
         ]);
     }
 
+    public function testTagSearchReturnsOnlyOwnedAndSharedTags(): void
+    {
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        Tag::query()->create([
+            'name' => 'OWN TRAVEL',
+            'user_id' => $owner->id,
+        ]);
+        Tag::query()->create([
+            'name' => 'SHARED TRAVEL',
+            'user_id' => null,
+        ]);
+        Tag::query()->create([
+            'name' => 'OTHER TRAVEL',
+            'user_id' => $otherUser->id,
+        ]);
+
+        $this->actingAs($owner)
+            ->get('/tag/search/TRAVEL')
+            ->assertOk()
+            ->assertJsonFragment(['name' => 'OWN TRAVEL'])
+            ->assertJsonFragment(['name' => 'SHARED TRAVEL'])
+            ->assertJsonMissing(['name' => 'OTHER TRAVEL']);
+    }
+
     public function testUserCannotCreateExpenseForAnotherUsersInvoice(): void
     {
         $owner = User::factory()->create();

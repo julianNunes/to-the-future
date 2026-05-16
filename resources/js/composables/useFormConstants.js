@@ -18,6 +18,22 @@ export function useValidationRules() {
         ],
         booleanFieldRules: [(v) => v !== null || t('rules.required-text-field')],
         selectFieldRules: [(v) => !!v || t('rules.required-text-field')],
+        numberFieldRules: [
+            (value) => {
+                if (!value) return t('rules.required-text-field')
+                if (Number(value) <= 0) return t('rules.required-currency-field')
+                return true
+            },
+        ],
+        digitsFieldRules: [
+            (value) => {
+                if (!value) return t('rules.required-text-field')
+                if (!/^\d+$/.test(value)) return t('rules.only-numbers')
+                if (String(value).length !== 4) return t('rules.required-text-field')
+
+                return true
+            },
+        ],
     }
 }
 

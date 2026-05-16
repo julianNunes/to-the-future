@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreditCard\StoreCreditCardRequest;
+use App\Http\Requests\CreditCard\UpdateCreditCardRequest;
 use App\Services\Interfaces\CreditCardServiceInterface;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CreditCardController extends Controller
@@ -24,24 +25,17 @@ class CreditCardController extends Controller
 
     /**
      * Create new Credit Card
-     * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreCreditCardRequest $request)
     {
-        $this->validate($request, [
-            'name' => ['required'],
-            'digits' => ['required'],
-            'due_date' => ['required'],
-            'closing_date' => ['required'],
-            'is_active' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->creditCardService->create(
-            $request->name,
-            $request->digits,
-            $request->due_date,
-            $request->closing_date,
-            $request->is_active == '1'
+            $data['name'],
+            $data['digits'],
+            $data['due_date'],
+            $data['closing_date'],
+            $data['is_active']
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -49,26 +43,19 @@ class CreditCardController extends Controller
 
     /**
      * Update a Credit Card
-     * @param Request $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateCreditCardRequest $request, int $id)
     {
-        $this->validate($request, [
-            'name' => ['required'],
-            'digits' => ['required'],
-            'due_date' => ['required'],
-            'closing_date' => ['required'],
-            'is_active' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->creditCardService->update(
             $id,
-            $request->name,
-            $request->digits,
-            $request->due_date,
-            $request->closing_date,
-            $request->is_active == '1'
+            $data['name'],
+            $data['digits'],
+            $data['due_date'],
+            $data['closing_date'],
+            $data['is_active']
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }

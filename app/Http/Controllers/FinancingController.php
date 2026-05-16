@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\FinancingService;
+use App\Http\Requests\Financing\StoreFinancingRequest;
+use App\Http\Requests\Financing\UpdateFinancingRequest;
 use App\Services\Interfaces\FinancingServiceInterface;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FinancingController extends Controller
@@ -28,29 +28,20 @@ class FinancingController extends Controller
 
     /**
      * Create a new Financing amd your installments
-     * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreFinancingRequest $request)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'start_date' => ['required'],
-            'total' => ['required'],
-            'portion_total' => ['required'],
-            // 'remarks' => ['required'],
-            'start_date_installment' => ['required'],
-            'value_installment' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->financingService->create(
-            $request->description,
-            $request->start_date,
-            floatval($request->total),
-            $request->fees_monthly ? floatval($request->fees_monthly) : null,
-            intval($request->portion_total),
-            $request->start_date_installment,
-            floatval($request->value_installment),
-            $request->remarks
+            $data['description'],
+            $data['start_date'],
+            $data['total'],
+            $data['fees_monthly'],
+            $data['portion_total'],
+            $data['start_date_installment'],
+            $data['value_installment'],
+            $data['remarks'] ?? null
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -59,26 +50,20 @@ class FinancingController extends Controller
     /**
      * Edit a Financing. Only some data are available.
      * Updating of installments will only occur in installments that are open
-     * @param Request $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateFinancingRequest $request, int $id)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'start_date' => ['required'],
-            'total' => ['required'],
-            // 'remarks' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->financingService->update(
             $id,
-            $request->description,
-            $request->start_date,
-            floatval($request->total),
-            $request->fees_monthly ? floatval($request->fees_monthly) : null,
-            $request->value_installment ? floatval($request->value_installment) : null,
-            $request->remarks
+            $data['description'],
+            $data['start_date'],
+            $data['total'],
+            $data['fees_monthly'],
+            $data['value_installment'] ?? null,
+            $data['remarks'] ?? null
         );
 
         return redirect()->back()->with('success', 'default.sucess-update');

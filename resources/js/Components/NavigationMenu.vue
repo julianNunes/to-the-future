@@ -51,6 +51,11 @@
             to: '/fix-expense',
         },
         {
+            title: t('menus.people'),
+            icon: 'mdi-account-group',
+            to: '/people',
+        },
+        {
             title: t('menus.financing'),
             icon: 'mdi-cash-multiple',
             to: '/financing',

@@ -15,6 +15,7 @@ use App\Services\Interfaces\{
     FinancingInstallmentServiceInterface,
     FinancingServiceInterface,
     FixExpenseServiceInterface,
+    PeopleServiceInterface,
     PrepaidCardExtractExpenseServiceInterface,
     PrepaidCardExtractServiceInterface,
     PrepaidCardServiceInterface,
@@ -34,6 +35,7 @@ use App\Services\{
     FinancingInstallmentService,
     FinancingService,
     FixExpenseService,
+    PeopleService,
     PrepaidCardExtractExpenseService,
     PrepaidCardExtractService,
     PrepaidCardService,
@@ -70,6 +72,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(FinancingServiceInterface::class, FinancingService::class);
         $this->app->bind(FinancingInstallmentServiceInterface::class, FinancingInstallmentService::class);
         $this->app->bind(FixExpenseServiceInterface::class, FixExpenseService::class);
+        $this->app->bind(PeopleServiceInterface::class, PeopleService::class);
         $this->app->bind(ProvisionServiceInterface::class, ProvisionService::class);
         $this->app->bind(TagServiceInterface::class, TagService::class);
     }

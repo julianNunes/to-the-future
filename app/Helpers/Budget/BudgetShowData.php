@@ -3,6 +3,7 @@
 namespace App\Helpers\Budget;
 
 use App\Helpers\Budget\Interfaces\BudgetShowDataInterface;
+use App\Helpers\ShareUser\Interfaces\ShareUserOptionsInterface;
 use App\Models\Budget;
 use App\Models\BudgetExpense;
 use App\Models\BudgetIncome;
@@ -13,7 +14,6 @@ use App\Repositories\Interfaces\{
     BudgetRepositoryInterface,
     CreditCardInvoiceRepositoryInterface,
     FinancingInstallmentRepositoryInterface,
-    ShareUserRepositoryInterface,
 };
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,7 +27,7 @@ class BudgetShowData implements BudgetShowDataInterface
         private BudgetRepositoryInterface $budgetRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
         private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
-        private ShareUserRepositoryInterface $shareUserRepository,
+        private ShareUserOptionsInterface $shareUserOptions,
     ) {}
 
     /**
@@ -94,18 +94,9 @@ class BudgetShowData implements BudgetShowDataInterface
             ['financing:id,description']
         );
 
-        $shareUsers = $this->shareUserRepository->get(['user_id' => $budget->user_id], [], [], ['shareUser', 'user']);
-        $shareUser = null;
-
-        if ($shareUsers && $shareUsers->count()) {
-            $shareUser = $shareUsers->first();
-            $shareUsers = $shareUsers->map(function ($item) {
-                return [
-                    'share_user_id' => $item->share_user_id,
-                    'share_user_name' => $item->shareUser->name
-                ];
-            });
-        }
+        $shareUsersData = $this->shareUserOptions->resolveForUser($budget->user_id);
+        $shareUsers = $shareUsersData['options'];
+        $shareUser = $shareUsersData['records']->first();
 
         $budgetShare = null;
 

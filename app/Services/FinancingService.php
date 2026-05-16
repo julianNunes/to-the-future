@@ -56,7 +56,7 @@ class FinancingService implements FinancingServiceInterface
     ): Financing {
         $financing = $this->financingRepository->store([
             'description' => $description,
-            'start_date' => Carbon::parse($startDate)->format('y-m-d'),
+            'start_date' => Carbon::parse($startDate)->format('Y-m-d'),
             'total' => $total,
             'fees_monthly' => $feesMonthly,
             'portion_total' => $portionTotal,
@@ -119,9 +119,9 @@ class FinancingService implements FinancingServiceInterface
 
         return $this->financingRepository->store([
             'description' => $description,
-            'start_date' => Carbon::parse($startDate)->format('y-m-d'),
+            'start_date' => Carbon::parse($startDate)->format('Y-m-d'),
             'total' => $total,
-            'feesMonthly' => $feesMonthly,
+            'fees_monthly' => $feesMonthly,
             'remarks' => $remarks,
         ], $financing);
     }

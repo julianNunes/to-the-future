@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\ShareUser\Interfaces\ShareUserOptionsInterface;
 use App\Models\CreditCardInvoice;
 use App\Repositories\Interfaces\{
     BudgetRepositoryInterface,
@@ -10,7 +11,6 @@ use App\Repositories\Interfaces\{
     CreditCardInvoiceFileRepositoryInterface,
     CreditCardInvoiceRepositoryInterface,
     CreditCardRepositoryInterface,
-    ShareUserRepositoryInterface,
     TagRepositoryInterface
 };
 use App\Services\Interfaces\CreditCardInvoiceServiceInterface;
@@ -29,7 +29,7 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
         private CreditCardInvoiceExpenseDivisionRepositoryInterface $creditCardInvoiceExpenseDivisionRepository,
         private CreditCardInvoiceFileRepositoryInterface $creditCardInvoiceFileRepository,
         private TagRepositoryInterface $tagRepository,
-        private ShareUserRepositoryInterface $shareUserRepository,
+        private ShareUserOptionsInterface $shareUserOptions,
         private BudgetRepositoryInterface $budgetRepository,
     ) {
     }
@@ -232,16 +232,7 @@ class CreditCardInvoiceService implements CreditCardInvoiceServiceInterface
 
         $this->ensureOwnedByCurrentUser($credit_card_invoice->creditCard, 'user_id');
 
-        $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
-
-        if ($shareUsers && $shareUsers->count()) {
-            $shareUsers = $shareUsers->map(function ($item) {
-                return [
-                    'share_user_id' => $item->share_user_id,
-                    'share_user_name' => $item->shareUser->name
-                ];
-            });
-        }
+        $shareUsers = $this->shareUserOptions->resolveForUser(auth()->user()->id)['options'];
 
         return [
             'invoice' => $credit_card_invoice,

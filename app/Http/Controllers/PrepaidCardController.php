@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PrepaidCard\StorePrepaidCardRequest;
+use App\Http\Requests\PrepaidCard\UpdatePrepaidCardRequest;
 use App\Services\Interfaces\PrepaidCardServiceInterface;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PrepaidCardController extends Controller
@@ -24,20 +25,15 @@ class PrepaidCardController extends Controller
 
     /**
      * Create new Prepaid Card
-     * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StorePrepaidCardRequest $request)
     {
-        $this->validate($request, [
-            'name' => ['required'],
-            'digits' => ['required'],
-            'is_active' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->prepaidCardService->create(
-            $request->name,
-            $request->digits,
-            $request->is_active == '1'
+            $data['name'],
+            $data['digits'],
+            $data['is_active']
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -45,22 +41,17 @@ class PrepaidCardController extends Controller
 
     /**
      * Update a Prepaid Card
-     * @param Request $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdatePrepaidCardRequest $request, int $id)
     {
-        $this->validate($request, [
-            'name' => ['required'],
-            'digits' => ['required'],
-            'is_active' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->prepaidCardService->update(
             $id,
-            $request->name,
-            $request->digits,
-            $request->is_active == '1'
+            $data['name'],
+            $data['digits'],
+            $data['is_active']
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }

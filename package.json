@@ -8,7 +8,7 @@
         "format": "prettier . --write",
         "test:unit": "vitest run",
         "test:unit:watch": "vitest",
-        "test:e2e:prepare": "php artisan db:seed --class=E2ESmokeSeeder --force",
+        "test:e2e:prepare": "rm -f public/hot && php artisan db:seed --class=E2ESmokeSeeder --force",
         "test:e2e": "npm run test:e2e:prepare && playwright test -c playwright.config.js",
         "test:e2e:ui": "npm run test:e2e:prepare && playwright test --ui -c playwright.config.js",
         "test": "npm run test:unit && npm run test:e2e"

@@ -160,18 +160,20 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - Validação executada e verde: `./scripts/artisan.sh test --testsuite=Feature` (32 testes), `./scripts/artisan.sh test --testsuite=Unit` (6 testes), `./scripts/npm.sh run test:unit` (2 testes) e `./scripts/npm.sh run test:e2e` (4 testes).
 
 ### TASK-02 — Consolidar contratos compartilhados
-- [ ] Referência: `SLICE-2.1`, `SLICE-2.2` e `SLICE-2.3`.
+- [x] Referência: `SLICE-2.1`, `SLICE-2.2` e `SLICE-2.3`.
 - Objetivo: alinhar validação, tags, descrições, people e share users antes das slices centrais.
+- Status em 15/05/2026: concluída com `SLICE-2.1`, `SLICE-2.2` e `SLICE-2.3` fechadas. O ciclo entregou Form Requests e `useForm` nos CRUDs alvo, consolidou `useTagSearch`/`useDescriptionSearch` com encode e testes, adicionou smokes Playwright de `FixExpense` e `CreditCard`, extraiu `ShareUserOptions` e migrou `PeopleController` para a arquitetura padrão com superfície Inertia completa.
 - Passos:
-1. Introduzir Form Requests e começar a remover casting manual.
-2. Alinhar `useForm`, `useTagSearch`, `useDescriptionSearch` e encode de URLs.
-3. Migrar `PeopleController` para a arquitetura padrão.
-4. Consolidar carregamento de share users.
-5. Adicionar testes unitários e de feature/component para esses contratos.
+1. [x] Introduzir Form Requests e começar a remover casting manual.
+2. [x] Alinhar `useForm`, `useTagSearch`, `useDescriptionSearch` e encode de URLs.
+3. [x] Migrar `PeopleController` para a arquitetura padrão.
+4. [x] Consolidar carregamento de share users.
+5. [x] Adicionar testes unitários e de feature/component para esses contratos.
 - Validação mínima:
   - `./scripts/artisan.sh test --testsuite=Feature`
   - `./scripts/artisan.sh test --testsuite=Unit`
   - `./scripts/npm.sh run test:unit`
+  - `./scripts/npm.sh run test:e2e -- --workers=1 --reporter=list`
 
 ### TASK-03 — Fechar a slice Budget
 - [ ] Referência: `SLICE-3.1`, `SLICE-3.2` e `SLICE-3.3`.

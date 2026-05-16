@@ -18,6 +18,7 @@ use App\Repositories\{
     FinancingInstallmentRepository,
     FinancingRepository,
     FixExpenseRepository,
+    PeopleRepository,
     PrepaidCardExtractExpenseRepository,
     PrepaidCardExtractRepository,
     PrepaidCardRepository,
@@ -41,6 +42,7 @@ use App\Repositories\Interfaces\{
     FinancingInstallmentRepositoryInterface,
     FinancingRepositoryInterface,
     FixExpenseRepositoryInterface,
+    PeopleRepositoryInterface,
     PrepaidCardExtractExpenseRepositoryInterface,
     PrepaidCardExtractRepositoryInterface,
     PrepaidCardRepositoryInterface,
@@ -75,6 +77,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(FinancingInstallmentRepositoryInterface::class, FinancingInstallmentRepository::class);
         $this->app->bind(FinancingRepositoryInterface::class, FinancingRepository::class);
         $this->app->bind(FixExpenseRepositoryInterface::class, FixExpenseRepository::class);
+        $this->app->bind(PeopleRepositoryInterface::class, PeopleRepository::class);
         $this->app->bind(ProvisionRepositoryInterface::class, ProvisionRepository::class);
         $this->app->bind(TagRepositoryInterface::class, TagRepository::class);
         $this->app->bind(ShareUserRepositoryInterface::class, ShareUserRepository::class);

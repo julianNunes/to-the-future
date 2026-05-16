@@ -190,6 +190,8 @@ class BudgetPolicy
 
 **Arquivo:** `app/Http/Controllers/PeopleController.php` (~L42)
 
+**Status em 15/05/2026:** corrigido. O `PeopleController` agora valida a entrada no controller, delega persistência ao `PeopleService` e não usa mais `$request->all()`.
+
 ```php
 $people = People::create($request->all());  // ❌ Aceita QUALQUER campo
 ```
@@ -528,6 +530,21 @@ app/Http/Requests/
 ├── CreditCard/
 │   ├── StoreCreditCardRequest.php
 │   └── UpdateCreditCardRequest.php
+├── Financing/
+│   ├── StoreFinancingRequest.php
+│   └── UpdateFinancingRequest.php
+├── FixExpense/
+│   ├── StoreFixExpenseRequest.php
+│   └── UpdateFixExpenseRequest.php
+├── PrepaidCard/
+│   ├── StorePrepaidCardRequest.php
+│   └── UpdatePrepaidCardRequest.php
+├── Provision/
+│   ├── StoreProvisionRequest.php
+│   └── UpdateProvisionRequest.php
+├── Tag/
+│   ├── StoreTagRequest.php
+│   └── UpdateTagRequest.php
 ├── CreditCardInvoiceExpense/
 │   ├── StoreInvoiceExpenseRequest.php
 │   ├── UpdateInvoiceExpenseRequest.php
@@ -541,7 +558,6 @@ app/Http/Requests/
 - `BudgetController.php` — regra de `closed` comentada
 - `BudgetExpenseController.php` — regras de `paid` e `budget_id` comentadas
 - `BudgetIncomeController.php` — regra de `budget_id` comentada
-- `FinancingController.php` — regra de `remarks` comentada
 
 **Ação:** Remover linhas comentadas ou reativar caso sejam necessárias.
 
@@ -926,8 +942,6 @@ Tipos comuns: `Response` (Inertia::render), `RedirectResponse` (redirect), `Json
 |-----------|---------------------|
 | `BudgetIncomeController` | `use App\Services\BudgetIncomeService` (classe concreta, só usa interface) |
 | `BudgetProvisionController` | `use App\Services\BudgetProvisionService` |
-| `FinancingController` | `use App\Services\FinancingService` |
-| `ProvisionController` | `use App\Services\ProvisionService` |
 | `CreditCardInvoiceController` | `use Illuminate\Support\Facades\Log` |
 | `BudgetExpenseTagOption` (model) | `use Attribute`, `use MorphOne` |
 | `BudgetGoal` (model) | `use Attribute`, `use MorphOne` |
@@ -1000,6 +1014,8 @@ Route::get('/budget/{budget}', 'show');
 4. Registrar bindings em `AppServiceProvider` e `RepositoryServiceProvider`
 5. Usar chaves de tradução em vez de strings inglês hardcoded
 
+**Status em 15/05/2026:** concluído com `PeopleService`, `PeopleRepository`, interfaces e bindings registrados, controller magro e cobertura feature para index com filtros e CRUD completo.
+
 ### 9.10 Docblocks — Corrigir Copy-Paste
 
 **Exemplos:**
@@ -1021,6 +1037,7 @@ Route::get('/budget/{budget}', 'show');
 - O projeto usa `RefreshDatabase`, `actingAs()` e assertions HTTP, com `VerifyCsrfToken` desativado no bootstrap de testes para permitir os POSTs esperados pela suíte feature.
 - O domínio principal agora possui factories para `Budget`, `CreditCard`, `CreditCardInvoice`, `PrepaidCard` e `PrepaidCardExtract`.
 - `E2ESmokeSeeder` fornece massa previsível para autenticação e navegação básica entre backend feature e frontend E2E.
+- A suíte feature já cobre ownership no search de tags e o fluxo de `PeopleController`; a suíte unit/frontend cobre os contratos compartilhados de busca no lado Vue.
 - O `phpunit.xml` ainda mantém comentada a configuração de SQLite em memória; por enquanto a execução previsível segue no caminho MySQL/container do projeto.
 - Em resumo: a base de testes existe, a fundação da onda 0 ficou executável e a cobertura real do domínio financeiro começou a sair do zero.
 
@@ -1241,9 +1258,11 @@ Criar factories para todos os models de domínio:
 ┌─────────────────────────────────┬──────────────────────────────────────────────────┐
 │ Código Duplicado                 │ Arquivos Afetados                                │
 ├─────────────────────────────────┼──────────────────────────────────────────────────┤
-│ shareUsers loading pattern      │ CreditCardInvoiceService, FixExpenseService,     │
-│                                 │ ProvisionService, PrepaidCardExtractService,     │
-│                                 │ BudgetShowData (5 arquivos)                      │
+│ shareUsers loading pattern      │ Extraído para `ShareUserOptions`; a duplicação   │
+│                                 │ original em CreditCardInvoiceService,            │
+│                                 │ FixExpenseService, ProvisionService,             │
+│                                 │ PrepaidCardExtractService e BudgetShowData foi   │
+│                                 │ removida em 15/05/2026                           │
 ├─────────────────────────────────┼──────────────────────────────────────────────────┤
 │ Cascading delete pattern        │ CreditCardService, CreditCardInvoiceService,     │
 │                                 │ PrepaidCardService, PrepaidCardExtractService (4) │

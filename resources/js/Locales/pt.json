@@ -39,6 +39,10 @@
         "month-12": "Dezembro",
 
         "name": "Nome",
+        "email": "E-mail",
+        "phone": "Telefone",
+        "address": "Endereço",
+        "gender": "Gênero",
         "description": "Descrição",
         "date": "Data",
         "value": "Valor",
@@ -84,8 +88,16 @@
         "credit-card": "Cartões de Crédito",
         "prepaid-card": "Cartões Pré-Pago",
         "fix-expense": "Despesas Fixas",
+        "people": "Pessoas",
         "financing": "Financiamentos",
         "budget": "Orçamentos"
+    },
+    "people": {
+        "title-index": "Gerenciamento de Pessoas",
+        "title-create": "Nova Pessoa",
+        "title-edit": "Editar Pessoa",
+        "female": "Feminino",
+        "male": "Masculino"
     },
     "provision": {
         "title": "Provisionamentos Padrão",

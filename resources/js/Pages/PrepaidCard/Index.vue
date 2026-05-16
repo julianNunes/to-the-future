@@ -165,8 +165,9 @@
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
 import ConfirmDialog from '@/Components/ConfirmDialog.vue'
 import { useCrudOperations } from '@/composables/useCrudOperations.js'
+import { useIsActiveOptions, useValidationRules } from '@/composables/useFormConstants.js'
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import { computed, nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -201,38 +202,22 @@ import { useI18n } from 'vue-i18n'
         { title: t('default.action'), align: 'center', key: 'action', sortable: false },
     ])
 
-    const rules = {
-        textFieldRules: [(v) => !!v || t('rules.required-text-field')],
-        booleanFieldRules: [(v) => v !== null || t('rules.required-text-field')],
-        digitsFieldRules: [
-            (value) => {
-                if (!value) return t('rules.required-text-field')
-                if (!/^\d+$/.test(value)) return t('rules.only-numbers')
-
-                return true
-            },
-        ],
-    }
+    const rules = useValidationRules()
 
     const search = ref(null)
 
-    const prepaidCard = ref({
-        id: null,
-        name: null,
-        digits: null,
-        is_active: null,
-    })
+    function createEmptyPrepaidCard() {
+        return {
+            id: null,
+            name: null,
+            digits: null,
+            is_active: null,
+        }
+    }
 
-    const isActiveOptions = computed(() => [
-        {
-            name: t('default.no'),
-            value: 0,
-        },
-        {
-            name: t('default.yes'),
-            value: 1,
-        },
-    ])
+    const prepaidCardForm = useForm(createEmptyPrepaidCard())
+
+    const isActiveOptions = computed(() => [...useIsActiveOptions()].reverse())
 
     const form = ref(null)
     const confirm = ref(null)
@@ -245,12 +230,9 @@ import { useI18n } from 'vue-i18n'
     function newItem() {
         titleModal.value = t('prepaid-card.new-item')
         editDialog.value = true
-        prepaidCard.value = {
-            id: null,
-            name: null,
-            digits: null,
-            is_active: null,
-        }
+        Object.assign(prepaidCardForm, createEmptyPrepaidCard())
+        prepaidCardForm.clearErrors()
+        form.value?.resetValidation()
         nextTick(() => {
             txtName.value?.focus()
         })
@@ -259,66 +241,41 @@ import { useI18n } from 'vue-i18n'
     function editItem(item) {
         titleModal.value = t('prepaid-card.edit-item')
         editDialog.value = true
-        prepaidCard.value = {
+        Object.assign(prepaidCardForm, createEmptyPrepaidCard(), {
             id: item.id,
             name: item.name,
             digits: item.digits,
             is_active: item.is_active,
-        }
+        })
+        prepaidCardForm.clearErrors()
+        form.value?.resetValidation()
         nextTick(() => {
             txtName.value?.focus()
         })
     }
 
     async function save() {
-        let validate = await form.value.validate()
+        const validate = await form.value.validate()
         if (validate.valid) {
-            if (prepaidCard.value.id) {
-                await update()
+            if (prepaidCardForm.id) {
+                prepaidCardForm.put(`/prepaid-card/${prepaidCardForm.id}`, {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        editDialog.value = false
+                        prepaidCardForm.clearErrors()
+                    },
+                })
             } else {
-                await create()
+                prepaidCardForm.post('/prepaid-card', {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        editDialog.value = false
+                        Object.assign(prepaidCardForm, createEmptyPrepaidCard())
+                        prepaidCardForm.clearErrors()
+                    },
+                })
             }
         }
-    }
-
-    async function create() {
-        isLoading.value = true
-        router.post(
-            '/prepaid-card',
-            {
-                name: prepaidCard.value.name,
-                digits: prepaidCard.value.digits,
-                is_active: prepaidCard.value.is_active,
-            },
-            {
-                onSuccess: () => {
-                    editDialog.value = false
-                },
-                onFinish: () => {
-                    isLoading.value = false
-                },
-            }
-        )
-    }
-
-    async function update() {
-        isLoading.value = true
-        router.put(
-            '/prepaid-card/' + prepaidCard.value.id,
-            {
-                name: prepaidCard.value.name,
-                digits: prepaidCard.value.digits,
-                is_active: prepaidCard.value.is_active,
-            },
-            {
-                onSuccess: () => {
-                    editDialog.value = false
-                },
-                onFinish: () => {
-                    isLoading.value = false
-                },
-            }
-        )
     }
 
     function confirmRemove(item) {

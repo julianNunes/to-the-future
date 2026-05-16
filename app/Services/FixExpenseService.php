@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Helpers\ShareUser\Interfaces\ShareUserOptionsInterface;
 use App\Models\FixExpense;
 use App\Repositories\Interfaces\FixExpenseRepositoryInterface;
-use App\Repositories\Interfaces\ShareUserRepositoryInterface;
 use App\Services\Interfaces\FixExpenseServiceInterface;
 use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
@@ -17,7 +17,7 @@ class FixExpenseService implements FixExpenseServiceInterface
 
     public function __construct(
         private FixExpenseRepositoryInterface $fixExpenseRepository,
-        private ShareUserRepositoryInterface $shareUserRepository
+        private ShareUserOptionsInterface $shareUserOptions
     ) {}
 
     /**
@@ -27,16 +27,7 @@ class FixExpenseService implements FixExpenseServiceInterface
     public function index(): array
     {
         $expenses = $this->fixExpenseRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser', 'tags']);
-        $shareUsers = $this->shareUserRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser']);
-
-        if ($shareUsers && $shareUsers->count()) {
-            $shareUsers = $shareUsers->map(function ($item) {
-                return [
-                    'share_user_id' => $item->share_user_id,
-                    'share_user_name' => $item->shareUser->name
-                ];
-            });
-        }
+        $shareUsers = $this->shareUserOptions->resolveForUser(auth()->user()->id)['options'];
 
         return [
             'expenses' => $expenses,

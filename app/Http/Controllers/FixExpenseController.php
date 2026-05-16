@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FixExpense\StoreFixExpenseRequest;
+use App\Http\Requests\FixExpense\UpdateFixExpenseRequest;
 use App\Services\Interfaces\FixExpenseServiceInterface;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FixExpenseController extends Controller
@@ -24,24 +25,19 @@ class FixExpenseController extends Controller
 
     /**
      * Create a new Fix Expense
-     * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreFixExpenseRequest $request)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'due_date' => ['required'],
-            'value' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->fixExpenseService->create(
-            $request->description,
-            $request->due_date,
-            floatval($request->value),
-            $request->remarks,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['description'],
+            $data['due_date'],
+            $data['value'],
+            $data['remarks'] ?? null,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -49,26 +45,21 @@ class FixExpenseController extends Controller
 
     /**
      * Update a Fix Expense
-     * @param Request $request
      * @param int $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateFixExpenseRequest $request, int $id)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'due_date' => ['required'],
-            'value' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->fixExpenseService->update(
             $id,
-            $request->description,
-            $request->due_date,
-            floatval($request->value),
-            $request->remarks,
-            $request->share_value,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['description'],
+            $data['due_date'],
+            $data['value'],
+            $data['remarks'] ?? null,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }

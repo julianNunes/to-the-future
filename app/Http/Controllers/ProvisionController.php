@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Provision\StoreProvisionRequest;
+use App\Http\Requests\Provision\UpdateProvisionRequest;
 use App\Services\Interfaces\ProvisionServiceInterface;
-use App\Services\ProvisionService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProvisionController extends Controller
@@ -25,24 +25,19 @@ class ProvisionController extends Controller
 
     /**
      * Create a new Provision
-     * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreProvisionRequest $request)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'value' => ['required'],
-            'group' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->provisionService->create(
-            $request->description,
-            floatval($request->value),
-            $request->group,
-            $request->remarks,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['description'],
+            $data['value'],
+            $data['group'],
+            $data['remarks'] ?? null,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -50,26 +45,21 @@ class ProvisionController extends Controller
 
     /**
      * Update a Provision
-     * @param Request $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateProvisionRequest $request, int $id)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'value' => ['required'],
-            'group' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->provisionService->update(
             $id,
-            $request->description,
-            floatval($request->value),
-            $request->group,
-            $request->remarks,
-            $request->share_value,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['description'],
+            $data['value'],
+            $data['group'],
+            $data['remarks'] ?? null,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }

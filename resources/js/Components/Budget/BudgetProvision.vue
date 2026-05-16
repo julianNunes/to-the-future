@@ -325,8 +325,8 @@
 
     const { isLoading, editDialog, titleModal } = useCrudOperations('/budget-provision')
 
-    const { tags: listTags, searchTags: doSearchTags } = useTagSearch()
-    const { descriptions: listDescriptions, searchDescriptions: doSearchDescriptions } =
+    const { tags: listTags, isSearching: isTagSearching, searchTags: doSearchTags } = useTagSearch()
+    const { descriptions: listDescriptions, isSearching: isDescriptionSearching, searchDescriptions: doSearchDescriptions } =
         useDescriptionSearch('budget-provision')
     const { calculateShareValue } = useShareCalculation()
 
@@ -334,7 +334,6 @@
     const panel = ref(1)
     const percentage = ref(null)
     const deleteId = ref(null)
-    const loadingData = ref(false)
     const searchTag = ref('')
     const searchDescription = ref('')
 
@@ -363,6 +362,7 @@
     const form = ref(null)
     const confirm = ref(null)
 
+    const loadingData = computed(() => isTagSearching.value || isDescriptionSearching.value)
     const itemsTags = computed(() => listTags.value)
 
     const itemsDescriptions = computed(() => {
@@ -426,20 +426,12 @@
     }
 
     async function searchTags(val) {
-        loadingData.value = true
         const existing = provision.value.tags ? provision.value.tags : []
         doSearchTags(val, existing)
-        setTimeout(() => {
-            loadingData.value = false
-        }, 300)
     }
 
     async function searchDescriptions(val) {
-        loadingData.value = true
         doSearchDescriptions(val)
-        setTimeout(() => {
-            loadingData.value = false
-        }, 400)
     }
 
     async function selectedDescription(item) {

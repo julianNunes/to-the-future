@@ -404,8 +404,8 @@
 
     const { isLoading, editDialog, titleModal } = useCrudOperations('/prepaid-card/extract/expense')
 
-    const { tags: listTags, searchTags: doSearchTags } = useTagSearch()
-    const { descriptions: listDescriptions, searchDescriptions: doSearchDescriptions } =
+    const { tags: listTags, isSearching: isTagSearching, searchTags: doSearchTags } = useTagSearch()
+    const { descriptions: listDescriptions, isSearching: isDescriptionSearching, searchDescriptions: doSearchDescriptions } =
         useDescriptionSearch('prepaid-card/extract/expense')
     const { calculateShareValue } = useShareCalculation()
 
@@ -431,7 +431,6 @@
     const search = ref(null)
     const searchTag = ref('')
     const searchDescription = ref('')
-    const loadingData = ref(false)
     const deleteId = ref(null)
     const percentage = ref(null)
 
@@ -456,6 +455,7 @@
     const confirm = ref(null)
 
     const itemsTags = computed(() => listTags.value)
+    const loadingData = computed(() => isTagSearching.value || isDescriptionSearching.value)
     const itemsDescriptions = computed(() => {
         let result = []
         if (listDescriptions.value?.length) {
@@ -500,20 +500,12 @@
     }
 
     async function searchTags(val) {
-        loadingData.value = true
         const existing = expense.value.tags ? expense.value.tags : []
         doSearchTags(val, existing)
-        setTimeout(() => {
-            loadingData.value = false
-        }, 300)
     }
 
     async function searchDescriptions(val) {
-        loadingData.value = true
         doSearchDescriptions(val)
-        setTimeout(() => {
-            loadingData.value = false
-        }, 400)
     }
 
     async function selectedDescription(item) {

@@ -113,25 +113,28 @@ Uma slice só pode ser marcada como concluída quando atender todos os critério
 ### Onda 2 — Contratos Compartilhados e Base de CRUD
 
 #### SLICE-2.1 — Requests, casting e normalização de entrada
-- [ ] Introduzir a base de validação formal no backend e alinhar tipagem/transformações no frontend.
+- [x] Introduzir a base de validação formal no backend e alinhar tipagem/transformações no frontend.
 - Backend: iniciar Form Requests nos CRUDs mais usados e reduzir casting manual nos controllers.
 - Frontend: avançar no uso de `useForm`, regras compartilhadas e normalização de payload.
 - Testes mínimos: feature tests de validação backend + component/unit tests dos formulários/composables afetados.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`.
+- Status em 15/05/2026: concluída no piloto e rollout de `Tag`, `FixExpense`, `Provision`, `Financing`, `CreditCard` e `PrepaidCard`, com Form Requests, normalização de entrada, `useForm` nas páginas alvo, regressions backend dedicados, component tests Vue e suites integradas (`Feature`, `test:unit` e smoke E2E existente) verdes.
 
 #### SLICE-2.2 — Domínios compartilhados de tags e busca
-- [ ] Consolidar a busca de tags/descrições, o contrato de payload e a cobertura mínima dos fluxos de autocomplete.
+- [x] Consolidar a busca de tags/descrições, o contrato de payload e a cobertura mínima dos fluxos de autocomplete.
 - Backend: validar endpoints de busca, payloads e comportamento de tags.
 - Frontend: concluir `useTagSearch`, `useDescriptionSearch`, encode de URLs e estados de erro.
 - Testes mínimos: unit tests dos composables + feature tests dos endpoints de busca.
 - Validação mínima: `./scripts/npm.sh run test:unit`, `./scripts/artisan.sh test --testsuite=Feature`.
+- Status em 15/05/2026: concluída com `useTagSearch()` e `useDescriptionSearch()` consolidados, encode de URLs via `encodeURIComponent`, limpeza de loading manual nos consumidores principais, testes unitários dedicados dos composables e coverage backend de ownership no search de tags.
 
 #### SLICE-2.3 — People, share users e contratos auxiliares
-- [ ] Alinhar entidades auxiliares usadas em múltiplos módulos antes das slices maiores.
+- [x] Alinhar entidades auxiliares usadas em múltiplos módulos antes das slices maiores.
 - Backend: migrar `PeopleController` para a arquitetura padrão e consolidar carregamento de share users.
 - Frontend: alinhar selects e fluxos que dependem de `shareUsers`.
 - Testes mínimos: unit/backend para loader compartilhado + feature/controller tests + component tests dos selects dependentes.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`.
+- Status em 15/05/2026: concluída com `PeopleController` migrado para `Service + Repository`, páginas Inertia `People/Index`, `People/Create` e `People/Edit` entregues, helper `ShareUserOptions` extraído e integrado aos serviços consumidores, além de feature tests do fluxo de `People` e regressão integrada verde.
 
 ### Onda 3 — Slice Budget
 

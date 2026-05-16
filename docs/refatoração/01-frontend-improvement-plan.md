@@ -82,7 +82,7 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 ### Fase 3 — Modernização do Inertia.js v2
 
 - [x] 5.1 `this.$inertia.*` não aparece mais nos arquivos ativos; a navegação foi migrada para `router` e `form.post()`.
-- [ ] 5.2 `useForm()` foi adotado só parcialmente; auth pages e `CreditCardInvoice/Index.vue` já usam, mas a maior parte dos CRUDs ainda opera com formulário manual.
+- [ ] 5.2 `useForm()` avançou para `Tag/Index.vue`, `FixExpense/Index.vue`, `Provision/Index.vue`, `Financing/Index.vue`, `CreditCard/Index.vue` e `PrepaidCard/Index.vue`, mas os fluxos centrais de Budget, invoices e extracts ainda mantêm formulários híbridos.
 - [x] 5.3 O layout persistente via `defineOptions({ layout: AuthenticatedLayout })` já está aplicado nas páginas autenticadas.
 - [ ] 5.4 Ziggy e rotas nomeadas no frontend ainda não foram adotados.
 
@@ -115,8 +115,8 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 
 - [ ] 9.1 A estratégia de lint está parcial: existe script `lint` no `package.json`, mas o `vite-plugin-eslint` continua desabilitado.
 - [ ] 9.2 Husky e `lint-staged` ainda não foram configurados.
-- [ ] 9.3 O debounce foi centralizado em alguns composables, mas ainda há `setTimeout` manual em telas como `FixExpense/Index.vue`.
-- [ ] 9.4 A codificação de URLs de busca está parcial; `useDescriptionSearch()` já usa `encodeURIComponent`, mas `useTagSearch()` ainda concatena `val` sem encode.
+- [ ] 9.3 O debounce foi centralizado em `useTagSearch()` e `useDescriptionSearch()`, e `FixExpense/Index.vue`/`Provision/Index.vue` já não carregam timeout manual para autocomplete, mas ainda existem timeouts pontuais fora desses fluxos.
+- [x] 9.4 A codificação de URLs de busca foi consolidada; `useDescriptionSearch()` e `useTagSearch()` usam `encodeURIComponent`.
 - [x] 9.5 O tratamento de flash messages em `AuthenticatedLayout.vue` já foi melhorado com `useToast()` no setup e null checks.
 - [ ] 9.6 A base não tem mais `this.timeOut`, mas ainda existem timeouts manuais fora dos composables; a consolidação total ainda está pendente.
 
@@ -131,9 +131,9 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 ### Testes
 
 - [x] Já existe base de E2E com Playwright em `tests/e2e`.
-- [ ] Ainda não existe suíte de testes unitários e de componentes para o frontend.
-- [ ] Ainda não existem scripts de teste no `package.json`.
-- [ ] Existem duas configs de Playwright no repositório; o ideal é consolidar em uma só configuração ativa.
+- [x] Já existe suíte de testes unitários e de componentes para o frontend com cobertura real de composables e páginas.
+- [x] Já existem scripts de teste no `package.json`.
+- [x] A configuração ativa do Playwright foi consolidada em `playwright.config.js`; `playwright.config.ts` permanece apenas como legado do repositório.
 
 ---
 
@@ -1145,9 +1145,10 @@ Adicionar no `AuthenticatedLayout.vue`:
 - O runtime E2E foi ajustado para Alpine usando o Chromium do sistema e artefatos em `./.playwright/`.
 - `Vitest + @vue/test-utils + jsdom` já estão configurados no repositório.
 - `package.json` já expõe `test:unit`, `test:unit:watch`, `test:e2e`, `test:e2e:ui` e `test`.
-- Já existe o primeiro teste unitário frontend real em `resources/js/composables/__tests__/useShareCalculation.spec.js`.
+- Já existe uma suíte frontend real cobrindo `useShareCalculation`, `useTagSearch`, `useDescriptionSearch` e páginas como `FixExpense/Index.vue` e `Provision/Index.vue`.
 - Os specs Playwright agora usam helper compartilhado de autenticação e não dependem mais de credenciais pessoais hardcoded.
 - O comando `test:e2e` prepara massa previsível via `E2ESmokeSeeder` antes da execução.
+- Os fluxos E2E de `FixExpense`, `CreditCard`, `InvoiceExpense` e `ExtractExpense` já possuem smokes/regressões executáveis.
 
 ### 11.2 Stack Recomendada Para Este Projeto
 
@@ -1274,17 +1275,17 @@ describe('useShareCalculation', () => {
 | Welcome.vue | ~15 | Hybrid | ❌ | ❌ | ❌ |
 | Budget/Index.vue | ~743 | Hybrid | ❌ | ❌ | ❌ |
 | Budget/Show.vue | ~517 | Hybrid | ❌ | ❌ | ❌ |
-| CreditCard/Index.vue | ~460 | Hybrid | ❌ | ❌ | ❌ |
+| CreditCard/Index.vue | ~460 | Hybrid | ✅ | ❌ | ✅ |
 | CreditCardInvoice/Index.vue | ~440 | Hybrid | ❌ | ❌ | ❌ |
 | CreditCardInvoice/Show.vue | ~200 | Hybrid | ❌ | ❌ | ❌ |
-| Financing/Index.vue | ~480 | Hybrid | ❌ | ❌ | ❌ |
+| Financing/Index.vue | ~480 | Hybrid | ✅ | ❌ | ✅ |
 | Financing/Show.vue | ~475 | Hybrid | ❌ | ❌ | ❌ |
-| FixExpense/Index.vue | ~545 | Hybrid | ❌ | ❌ | ❌ |
-| PrepaidCard/Index.vue | ~430 | Hybrid | ❌ | ❌ | ❌ |
+| FixExpense/Index.vue | ~545 | Hybrid | ✅ | ❌ | ✅ |
+| PrepaidCard/Index.vue | ~430 | Hybrid | ✅ | ❌ | ✅ |
 | PrepaidCardExtract/Index.vue | ~480 | Hybrid | ❌ | ❌ | ❌ |
 | PrepaidCardExtract/Show.vue | ~400 | Hybrid | ❌ | ❌ | ❌ |
-| Provision/Index.vue | ~564 | Hybrid | ❌ | ❌ | ❌ |
-| Tag/Index.vue | ~305 | Hybrid | ❌ | ❌ | ❌ |
+| Provision/Index.vue | ~564 | Hybrid | ✅ | ❌ | ✅ |
+| Tag/Index.vue | ~305 | Hybrid | ✅ | ❌ | ✅ |
 
 ### Componentes (Components/)
 
@@ -1343,11 +1344,6 @@ describe('useShareCalculation', () => {
 │ Dialog structure template   │ Todos os CRUD forms (12+)                                  │
 ├─────────────────────────────┼───────────────────────────────────────────────────────────┤
 │ Breadcrumbs data            │ Todas as páginas autenticadas (15)                          │
-├─────────────────────────────┼───────────────────────────────────────────────────────────┤
-│ days/dueDateList array      │ CreditCard/Index, FixExpense/Index (2)                      │
-├─────────────────────────────┼───────────────────────────────────────────────────────────┤
-│ isActiveOptions             │ CreditCard/Index, PrepaidCard/Index (2)                     │
-├─────────────────────────────┼───────────────────────────────────────────────────────────┤
 │ budgetWeeks/budgetShareWeeks│ Budget/Show.vue internamente (4 computed × 2 = 8 blocos)    │
 ├─────────────────────────────┼───────────────────────────────────────────────────────────┤
 │ Excel import logic          │ InvoiceExpense, ExtractExpense (2)                          │
