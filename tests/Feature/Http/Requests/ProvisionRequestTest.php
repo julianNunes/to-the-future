@@ -28,6 +28,23 @@ class ProvisionRequestTest extends TestCase
         $this->assertDatabaseCount('provisions', 0);
     }
 
+    public function testStoreRejectsInvalidGroup(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->from('/provision')
+            ->post('/provision', [
+                'description' => 'Travel Reserve',
+                'value' => '150',
+                'group' => 'YEARLY',
+            ])
+            ->assertRedirect('/provision')
+            ->assertSessionHasErrors(['group']);
+
+        $this->assertDatabaseCount('provisions', 0);
+    }
+
     public function testStoreNormalizesAndPersistsProvisionPayload(): void
     {
         $user = User::factory()->create();

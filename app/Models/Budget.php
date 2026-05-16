@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @mixin IdeHelperBudget
@@ -40,6 +40,24 @@ class Budget extends Model
      */
     protected $appends = ['year_month'];
 
+    protected $casts = [
+        'year' => 'string',
+        'month' => 'string',
+        'start_week_1' => 'date:Y-m-d',
+        'end_week_1' => 'date:Y-m-d',
+        'start_week_2' => 'date:Y-m-d',
+        'end_week_2' => 'date:Y-m-d',
+        'start_week_3' => 'date:Y-m-d',
+        'end_week_3' => 'date:Y-m-d',
+        'start_week_4' => 'date:Y-m-d',
+        'end_week_4' => 'date:Y-m-d',
+        'total_expense' => 'decimal:2',
+        'total_income' => 'decimal:2',
+        'closed' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     /**
      * Accessors
      */
@@ -51,9 +69,9 @@ class Budget extends Model
         );
     }
 
-    public function user(): HasOne
+    public function user(): BelongsTo
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function expenses(): HasMany

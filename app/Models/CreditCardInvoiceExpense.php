@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
@@ -32,9 +31,21 @@ class CreditCardInvoiceExpense extends Model
         'share_user_id',
     ];
 
-    public function shareUser(): HasOne
+    protected $casts = [
+        'date' => 'date:Y-m-d',
+        'value' => 'decimal:2',
+        'group' => 'string',
+        'group_portion' => 'string',
+        'portion' => 'integer',
+        'portion_total' => 'integer',
+        'share_value' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function shareUser(): BelongsTo
     {
-        return $this->hasOne(User::class, 'id', 'share_user_id');
+        return $this->belongsTo(User::class, 'share_user_id', 'id');
     }
 
     public function invoice(): BelongsTo

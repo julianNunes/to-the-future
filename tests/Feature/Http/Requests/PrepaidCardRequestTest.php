@@ -44,7 +44,7 @@ class PrepaidCardRequestTest extends TestCase
         $this->assertSame('Wallet', $card->name);
         $this->assertSame('1234', $card->digits);
         $this->assertSame($user->id, $card->user_id);
-        $this->assertTrue((bool) $card->is_active);
+        $this->assertTrue($card->is_active);
     }
 
     public function testUpdateRejectsNonNumericDigits(): void
@@ -86,6 +86,6 @@ class PrepaidCardRequestTest extends TestCase
 
         $this->assertSame('Updated Wallet', $card->name);
         $this->assertSame('9876', $card->digits);
-        $this->assertFalse((bool) $card->is_active);
+        $this->assertFalse($card->is_active);
     }
 }

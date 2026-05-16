@@ -30,6 +30,18 @@ class CreditCardInvoice extends Model
         'budget_id'
     ];
 
+    protected $casts = [
+        'due_date' => 'date:Y-m-d',
+        'closing_date' => 'date:Y-m-d',
+        'year' => 'string',
+        'month' => 'string',
+        'total' => 'decimal:2',
+        'total_paid' => 'decimal:2',
+        'closed' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function creditCard(): BelongsTo
     {
         return $this->belongsTo(CreditCard::class, 'credit_card_id', 'id');

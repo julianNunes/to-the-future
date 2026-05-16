@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PrepaidCardExtractExpense\StoreImportPrepaidCardExtractExpenseRequest;
+use App\Http\Requests\PrepaidCardExtractExpense\StorePrepaidCardExtractExpenseRequest;
+use App\Http\Requests\PrepaidCardExtractExpense\UpdatePrepaidCardExtractExpenseRequest;
 use App\Services\Interfaces\PrepaidCardExtractExpenseServiceInterface;
-use Illuminate\Http\Request;
 
 class PrepaidCardExtractExpenseController extends Controller
 {
@@ -12,29 +14,23 @@ class PrepaidCardExtractExpenseController extends Controller
 
     /**
      * Create a new Expense Prepaid Card
-     * @param Request $request
+     * @param StorePrepaidCardExtractExpenseRequest $request
      */
-    public function store(Request $request)
+    public function store(StorePrepaidCardExtractExpenseRequest $request)
     {
-        $this->validate($request, [
-            'prepaid_card_id' => ['required'],
-            'extract_id' => ['required'],
-            'description' => ['required'],
-            'date' => ['required'],
-            'value' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->prepaidCardExtractExpenseService->create(
-            $request->prepaid_card_id,
-            $request->extract_id,
-            $request->description,
-            $request->date,
-            floatval($request->value),
-            $request->group,
-            $request->remarks,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['prepaid_card_id'],
+            $data['extract_id'],
+            $data['description'],
+            $data['date'],
+            $data['value'],
+            $data['group'],
+            $data['remarks'] ?? null,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -42,31 +38,25 @@ class PrepaidCardExtractExpenseController extends Controller
 
     /**
      * Update a Expense Prepaid Card
-     * @param Request $request
+     * @param UpdatePrepaidCardExtractExpenseRequest $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdatePrepaidCardExtractExpenseRequest $request, int $id)
     {
-        $this->validate($request, [
-            'prepaid_card_id' => ['required'],
-            'extract_id' => ['required'],
-            'description' => ['required'],
-            'date' => ['required'],
-            'value' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->prepaidCardExtractExpenseService->update(
             $id,
-            $request->prepaid_card_id,
-            $request->extract_id,
-            $request->description,
-            $request->date,
-            floatval($request->value),
-            $request->group,
-            $request->remarks,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['prepaid_card_id'],
+            $data['extract_id'],
+            $data['description'],
+            $data['date'],
+            $data['value'],
+            $data['group'],
+            $data['remarks'] ?? null,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -84,16 +74,13 @@ class PrepaidCardExtractExpenseController extends Controller
 
     /**
      * Read data from Excel and save the Expenses
-     * @param Request $request
+     * @param StoreImportPrepaidCardExtractExpenseRequest $request
      */
-    public function storeImportExcel(Request $request)
+    public function storeImportExcel(StoreImportPrepaidCardExtractExpenseRequest $request)
     {
-        $this->validate($request, [
-            'data' => ['required'],
-            'extract_id' => ['required'],
-        ]);
+        $data = $request->validated();
 
-        $this->prepaidCardExtractExpenseService->storeImportExcel(intval($request->extract_id), collect($request->data));
+        $this->prepaidCardExtractExpenseService->storeImportExcel($data['extract_id'], collect($data['data']));
         return redirect()->back()->with('success', 'default.sucess-save');
     }
 

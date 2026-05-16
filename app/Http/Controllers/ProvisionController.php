@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Provision\StoreProvisionRequest;
 use App\Http\Requests\Provision\UpdateProvisionRequest;
 use App\Services\Interfaces\ProvisionServiceInterface;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ProvisionController extends Controller
 {
@@ -17,7 +19,7 @@ class ProvisionController extends Controller
     /**
      * Returns data to Provision Management
      */
-    public function index()
+    public function index(): Response
     {
         $data = $this->provisionService->index();
         return Inertia::render('Provision/Index', $data);
@@ -26,7 +28,7 @@ class ProvisionController extends Controller
     /**
      * Create a new Provision
      */
-    public function store(StoreProvisionRequest $request)
+    public function store(StoreProvisionRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
@@ -47,7 +49,7 @@ class ProvisionController extends Controller
      * Update a Provision
      * @param integer $id
      */
-    public function update(UpdateProvisionRequest $request, int $id)
+    public function update(UpdateProvisionRequest $request, int $id): RedirectResponse
     {
         $data = $request->validated();
 
@@ -69,7 +71,7 @@ class ProvisionController extends Controller
      * @param integer $id
      * @return void
      */
-    public function delete(int $id)
+    public function delete(int $id): RedirectResponse
     {
         $this->provisionService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');

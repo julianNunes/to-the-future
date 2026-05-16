@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PrepaidCardExtract\StorePrepaidCardExtractRequest;
+use App\Http\Requests\PrepaidCardExtract\UpdatePrepaidCardExtractRequest;
 use App\Services\Interfaces\PrepaidCardExtractServiceInterface;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PrepaidCardExtractController extends Controller
@@ -26,26 +27,20 @@ class PrepaidCardExtractController extends Controller
 
     /**
      * Create a new Extract
-     * @param Request $request
+     * @param StorePrepaidCardExtractRequest $request
      * @return void
      */
-    public function store(Request $request)
+    public function store(StorePrepaidCardExtractRequest $request)
     {
-        $this->validate($request, [
-            'year' => ['required'],
-            'month' => ['required'],
-            'credit' => ['required'],
-            'credit_date' => ['required'],
-            'prepaid_card_id' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->prepaidCardExtractService->create(
-            $request->prepaid_card_id,
-            $request->year,
-            $request->month,
-            floatval($request->credit),
-            $request->credit_date,
-            $request->remarks
+            $data['prepaid_card_id'],
+            $data['year'],
+            $data['month'],
+            $data['credit'],
+            $data['credit_date'],
+            $data['remarks'] ?? null,
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -53,21 +48,18 @@ class PrepaidCardExtractController extends Controller
 
     /**
      * Update a Extract
-     * @param Request $request
+     * @param UpdatePrepaidCardExtractRequest $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdatePrepaidCardExtractRequest $request, int $id)
     {
-        $this->validate($request, [
-            'credit' => ['required'],
-            'credit_date' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->prepaidCardExtractService->update(
             $id,
-            floatval($request->credit),
-            $request->credit_date,
-            $request->remarks,
+            $data['credit'],
+            $data['credit_date'],
+            $data['remarks'] ?? null,
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }

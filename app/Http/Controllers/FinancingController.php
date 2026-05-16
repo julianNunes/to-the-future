@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Financing\StoreFinancingRequest;
 use App\Http\Requests\Financing\UpdateFinancingRequest;
 use App\Services\Interfaces\FinancingServiceInterface;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class FinancingController extends Controller
 {
@@ -17,7 +19,7 @@ class FinancingController extends Controller
     /**
      * Returns data to Financial Management
      */
-    public function index()
+    public function index(): Response
     {
         $data = $this->financingService->index();
         return Inertia::render('Financing/Index', $data);
@@ -29,7 +31,7 @@ class FinancingController extends Controller
     /**
      * Create a new Financing amd your installments
      */
-    public function store(StoreFinancingRequest $request)
+    public function store(StoreFinancingRequest $request): RedirectResponse
     {
         $data = $request->validated();
 
@@ -52,7 +54,7 @@ class FinancingController extends Controller
      * Updating of installments will only occur in installments that are open
      * @param integer $id
      */
-    public function update(UpdateFinancingRequest $request, int $id)
+    public function update(UpdateFinancingRequest $request, int $id): RedirectResponse
     {
         $data = $request->validated();
 
@@ -73,7 +75,7 @@ class FinancingController extends Controller
      * Deleta a Financing
      * @param integer $id
      */
-    public function delete(int $id)
+    public function delete(int $id): RedirectResponse
     {
         $this->financingService->delete($id);
         return redirect()->back()->with('success', 'default.sucess-delete');

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Financing\UpdateFinancingInstallmentRequest;
 use App\Services\Interfaces\FinancingInstallmentServiceInterface;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class FinancingInstallmentController extends Controller
 {
@@ -18,7 +20,7 @@ class FinancingInstallmentController extends Controller
      * Returns data for Financing Installment Management
      * @param integer $financingId
      */
-    public function index(int $financingId)
+    public function index(int $financingId): Response
     {
         $data = $this->financingInstallmentService->index($financingId);
         return Inertia::render('Financing/Show', $data);
@@ -26,26 +28,21 @@ class FinancingInstallmentController extends Controller
 
     /**
      * Update a Installment of Financing
-     * @param Request $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateFinancingInstallmentRequest $request, int $id): RedirectResponse
     {
-        $this->validate($request, [
-            'date' => ['required'],
-            'value' => ['required'],
-            'paid' => ['required'],
-            // 'paid_value' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->financingInstallmentService->update(
             $id,
-            $request->date,
-            floatval($request->value),
-            $request->paid == 1 ? true : false,
-            $request->payment_date,
-            $request->paid_value ? floatval($request->paid_value) : null,
+            $data['date'],
+            $data['value'],
+            $data['paid'],
+            $data['payment_date'] ?? null,
+            $data['paid_value'] ?? null,
         );
+
         return redirect()->back()->with('success', 'default.sucess-update');
     }
 }

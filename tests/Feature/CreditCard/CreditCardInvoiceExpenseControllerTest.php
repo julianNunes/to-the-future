@@ -79,7 +79,7 @@ class CreditCardInvoiceExpenseControllerTest extends TestCase
         $expense = CreditCardInvoiceExpense::query()->with(['tags', 'divisions.tags'])->firstOrFail();
 
         $this->assertSame('Market Purchase', $expense->description);
-        $this->assertSame('2026-05-10', $expense->date);
+        $this->assertSame('2026-05-10', $expense->date?->toDateString());
         $this->assertSame('WEEK_1', $expense->group);
         $this->assertSame('Shared', $expense->remarks);
         $this->assertSame($shareUser->id, $expense->share_user_id);
@@ -196,7 +196,7 @@ class CreditCardInvoiceExpenseControllerTest extends TestCase
         $expense->refresh()->load(['tags', 'divisions.tags']);
 
         $this->assertSame('Updated Expense', $expense->description);
-        $this->assertSame('2026-05-12', $expense->date);
+        $this->assertSame('2026-05-12', $expense->date?->toDateString());
         $this->assertSame('WEEK_2', $expense->group);
         $this->assertSame('Updated note', $expense->remarks);
         $this->assertSame($shareUser->id, $expense->share_user_id);
@@ -246,7 +246,7 @@ class CreditCardInvoiceExpenseControllerTest extends TestCase
         $expense = CreditCardInvoiceExpense::query()->with('tags')->firstOrFail();
 
         $this->assertSame('Imported Expense', $expense->description);
-        $this->assertSame('2026-05-09', $expense->date);
+        $this->assertSame('2026-05-09', $expense->date?->toDateString());
         $this->assertSame('Imported', $expense->remarks);
         $this->assertSame('WEEK_3', $expense->group);
         $this->assertSame($shareUser->id, $expense->share_user_id);

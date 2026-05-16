@@ -29,7 +29,7 @@ class StoreProvisionRequest extends FormRequest
         return [
             'description' => ['required', 'string'],
             'value' => ['required', 'numeric', 'gt:0'],
-            'group' => ['required', 'string'],
+            'group' => ['required', 'string', 'in:MONTHLY,WEEK_1,WEEK_2,WEEK_3,WEEK_4'],
             'remarks' => ['nullable', 'string'],
             'share_value' => ['nullable', 'numeric', 'gt:0', 'required_with:share_user_id'],
             'share_user_id' => ['nullable', 'integer', 'required_with:share_value'],

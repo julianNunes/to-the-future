@@ -201,6 +201,9 @@
         "new-item": "Nova Despesa",
         "edit-item": "Editar Despesa",
         "item": "Despesa",
+        "download-template": "Download Template",
+        "import-excel": "Importar Excel",
+        "open-extract": "Abrir Extrato",
         "edit-item-division": "Editar Divisão de Despesa",
         "not-found": "Despesa não encontrada",
         "excel": {

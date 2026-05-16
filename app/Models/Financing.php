@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @mixin IdeHelperFinancing
@@ -26,9 +26,18 @@ class Financing extends Model
         'user_id',
     ];
 
-    public function user(): HasOne
+    protected $casts = [
+        'start_date' => 'date:Y-m-d',
+        'total' => 'decimal:2',
+        'fees_monthly' => 'decimal:2',
+        'portion_total' => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function user(): BelongsTo
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function installments(): HasMany

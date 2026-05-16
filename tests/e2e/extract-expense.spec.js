@@ -1,34 +1,53 @@
 import { expect, test } from '@playwright/test'
 import { captureDebugScreenshot, login } from './support/auth'
 
-test('extract expense details page renders successfully', async ({ page }, testInfo) => {
-    await login(page)
+async function getActiveDialog(page) {
+    const dialog = page.locator('[role="dialog"]:visible').last()
+    await expect(dialog).toBeVisible()
+    return dialog
+}
 
-    // Navigate to Prepaid Cards page to find a card
+async function openExtractShowPage(page, cardName = 'E2E Prepaid Card') {
     await page.goto('/prepaid-card')
-    await page.waitForTimeout(2000)
-
-    // Wait and find any links starting with /prepaid-card/ and ending with /extract
-    const extractLinks = page.locator('a[href$="/extract"]')
-    const count = await extractLinks.count()
-
-    if (count > 0) {
-        // Click the first card's extracts link
-        await extractLinks.first().click()
-        await page.waitForTimeout(2000)
-
-        // Find links to view specific extracts (/prepaid-card/extract/{id})
-        const detailLinks = page.locator('a[href*="/prepaid-card/extract/"]')
-        const detailsCount = await detailLinks.count()
-        if (detailsCount > 0) {
-            await detailLinks.first().click()
-            await page.waitForTimeout(3000)
-        }
-    }
-
-    // Verify the page didn't crash (id="app" exists) and test completes
     await expect(page.locator('#app')).toBeVisible()
 
-    // Capture screenshot of the resulting page
+    const row = page.locator('tbody tr', { hasText: cardName }).first()
+    await expect(row).toBeVisible({ timeout: 10000 })
+
+    const extractIndexHref = await row.locator('a[href$="/extract"]').first().getAttribute('href')
+
+    if (!extractIndexHref) {
+        throw new Error(`Prepaid card extract link not found for ${cardName}`)
+    }
+
+    await page.goto(extractIndexHref)
+    await expect(page).toHaveURL(/\/prepaid-card\/\d+\/extract/)
+
+    const firstRow = page.locator('tbody tr').first()
+    await expect(firstRow).toBeVisible({ timeout: 10000 })
+
+    const showHref = await firstRow.locator('a[href*="/prepaid-card/extract/"]').first().getAttribute('href')
+
+    if (!showHref) {
+        throw new Error('Extract show link not found on extract index')
+    }
+
+    await page.goto(showHref)
+    await expect(page).toHaveURL(/\/prepaid-card\/extract\/\d+/)
+}
+
+test('extract expense show page opens a new expense dialog', async ({ page }, testInfo) => {
+    await login(page)
+    await openExtractShowPage(page)
+
+    await expect(page.getByText('Extrato do Cartão Pré-Pago').first()).toBeVisible({ timeout: 10000 })
+    await expect(page.getByRole('button', { name: 'Importar Excel' })).toBeVisible({ timeout: 10000 })
+
+    await page.getByRole('button', { name: 'Novo' }).first().click()
+    const dialog = await getActiveDialog(page)
+
+    await expect(dialog.getByRole('button', { name: 'Salvar' })).toBeVisible()
+    await expect(dialog.getByRole('button', { name: 'Cancelar' })).toBeVisible()
+
     await captureDebugScreenshot(page, testInfo, 'debug-extract-expense.png')
 })

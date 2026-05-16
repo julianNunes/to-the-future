@@ -5,11 +5,11 @@ namespace App\Services;
 use App\Helpers\ShareUser\Interfaces\ShareUserOptionsInterface;
 use App\Models\Provision;
 use App\Repositories\Interfaces\ProvisionRepositoryInterface;
+use App\Repositories\Interfaces\TagRepositoryInterface;
 use App\Services\Interfaces\ProvisionServiceInterface;
 use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Collection;
-use TagService;
 
 class ProvisionService implements ProvisionServiceInterface
 {
@@ -17,6 +17,7 @@ class ProvisionService implements ProvisionServiceInterface
 
     public function __construct(
         private ProvisionRepositoryInterface $provisionRepository,
+        private TagRepositoryInterface $tagRepository,
         private ShareUserOptionsInterface $shareUserOptions
     ) {}
 
@@ -66,7 +67,7 @@ class ProvisionService implements ProvisionServiceInterface
         ]);
 
         // Atualiza Tags
-        TagService::saveTagsToModel($provision, $tags);
+        $this->tagRepository->saveTagsToModel($provision, $tags);
         return $provision;
     }
 
@@ -101,7 +102,7 @@ class ProvisionService implements ProvisionServiceInterface
         $this->ensureOwnedByCurrentUser($provision);
 
         // Atualiza Tags
-        TagService::saveTagsToModel($provision, $tags);
+        $this->tagRepository->saveTagsToModel($provision, $tags);
 
         return $this->provisionRepository->store([
             'description' => $description,
@@ -129,7 +130,7 @@ class ProvisionService implements ProvisionServiceInterface
         $this->ensureOwnedByCurrentUser($provision);
 
         // Remove Tags
-        TagService::saveTagsToModel($provision);
+        $this->tagRepository->saveTagsToModel($provision);
 
         return $this->provisionRepository->delete($id);
     }

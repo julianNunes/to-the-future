@@ -165,50 +165,56 @@ Uma slice só pode ser marcada como concluída quando atender todos os critério
 ### Onda 4 — Slice Credit Card e Invoice
 
 #### SLICE-4.1 — Credit Card e invoices
-- [ ] Fechar o fluxo de cartão de crédito e listagem de faturas ponta a ponta.
+- [x] Fechar o fluxo de cartão de crédito e listagem de faturas ponta a ponta.
 - Backend: validação, factories e cobertura dos CRUDs de cartão e invoice.
 - Frontend: concluir `useForm` em `CreditCard/Index.vue` e `CreditCardInvoice/Index.vue`.
 - Testes mínimos: feature tests de CRUD, component tests de index pages e Playwright smoke de navegação.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída com `StoreCreditCardInvoiceRequest`/`UpdateCreditCardInvoiceRequest`, `CreditCardInvoiceController` migrado para payload validado, `CreditCardInvoice/Index.vue` estabilizado em `useForm` com split de `yearMonth`, feature tests dedicados e smoke Playwright de card -> invoice -> show verde.
 
 #### SLICE-4.2 — InvoiceExpense, portions e importação
-- [ ] Fechar a fatia mais complexa de invoice expense antes de iniciar refatoração estrutural.
+- [x] Fechar a fatia mais complexa de invoice expense antes de iniciar refatoração estrutural.
 - Backend: cobrir parcelamento, importação e recálculo com tests.
 - Frontend: proteger comportamento atual de `InvoiceExpense.vue` com testes antes da componentização.
 - Testes mínimos: unit/backend dos services críticos + component tests do componente atual + E2E do fluxo principal.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída com Requests tipadas de create/update/import, factories de `CreditCardInvoiceExpense` e `Division`, feature tests cobrindo create/update/import/delete/deletePortions, spec de `InvoiceExpense.vue` e smoke E2E estável na fronteira show/dialog.
 
 ### Onda 5 — Slice Prepaid Card e Extract
 
 #### SLICE-5.1 — Prepaid Card e extracts
-- [ ] Fechar o fluxo de cartão pré-pago e listagem de extratos ponta a ponta.
+- [x] Fechar o fluxo de cartão pré-pago e listagem de extratos ponta a ponta.
 - Backend: validar CRUDs, factories e contratos do domínio.
 - Frontend: corrigir títulos restantes, concluir `useForm` onde necessário e manter paridade com credit card.
 - Testes mínimos: feature tests de CRUD, component tests das páginas e Playwright smoke de navegação.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída com `StorePrepaidCardExtractRequest`/`UpdatePrepaidCardExtractRequest`, `PrepaidCardExtractController` migrado para payload validado, `PrepaidCardExtract/Index.vue` consolidado com `useForm`, feature tests dedicados, spec da página e smoke Playwright estável para index -> show do extrato.
 
 #### SLICE-5.2 — ExtractExpense, importação e compartilhamento
-- [ ] Fechar o fluxo de despesas de extrato e alinhá-lo ao padrão de invoice expense.
+- [x] Fechar o fluxo de despesas de extrato e alinhá-lo ao padrão de invoice expense.
 - Backend: cobrir service, importação e parcelamento equivalente, se houver.
 - Frontend: proteger `ExtractExpense.vue` com testes antes de quebrar em subcomponentes.
 - Testes mínimos: unit/backend + component tests do fluxo principal + E2E do detalhe do extrato.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída com Requests tipadas de create/update/import para `PrepaidCardExtractExpense`, factory dedicada, feature tests cobrindo CRUD/import/search, spec de `ExtractExpense.vue`, correção do botão `viewOnly`/labels copiados de invoice e smoke Playwright estável para show -> abertura do diálogo de nova despesa. O domínio prepaid permaneceu sem portions/divisions porque essa feature não existe nessa superfície.
 
 ### Onda 6 — Domínios Compartilhados e Supporting CRUDs
 
 #### SLICE-6.1 — FixExpense, Provision e Financing
-- [ ] Fechar os supporting CRUDs que alimentam budget e planejamento financeiro.
+- [x] Fechar os supporting CRUDs que alimentam budget e planejamento financeiro.
 - Backend: remover Facades onde necessário, consolidar DI, validação e cobertura mínima.
 - Frontend: concluir `useForm`, padronização de props e testes de formulários/listas.
 - Testes mínimos: feature tests dos CRUDs, unit/backend dos services e component tests das páginas.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`.
+- Status em 16/05/2026: concluída com `FixExpenseService` e `ProvisionService` alinhados à DI/repository layer para tags, `StoreProvisionRequest` e contracts de Financing endurecidos, `UpdateFinancingInstallmentRequest` tipado, controllers com return types explícitos, feature tests cobrindo ownership/delete/update de `FixExpense`, `Provision`, `Financing` e `FinancingInstallment`, além de smoke Playwright estável para Provision create e Financing index -> show -> dialog.
 
 #### SLICE-6.2 — Models, casts e relacionamentos
-- [ ] Atualizar models centrais sem quebrar a UI consumidora.
+- [x] Atualizar models centrais sem quebrar a UI consumidora.
 - Backend: adicionar casts, corrigir relações `BelongsTo`, melhorar `User`, revisar naming e `fillable`.
 - Frontend: validar formatos consumidos pelas telas após mudança de casts e payloads.
 - Testes mínimos: unit/integration tests de model/serialization + smoke das páginas mais sensíveis.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída com `$casts` e correções de `BelongsTo` aplicados nos domínios de suporte e nos models financeiros centrais (`Budget`, `BudgetExpense`, `BudgetIncome`, `BudgetProvision`, `CreditCard`, `CreditCardInvoice`, `CreditCardInvoiceExpense`, `CreditCardInvoiceExpenseDivision`, `Financing`, `FinancingInstallment`, `FixExpense`, `PrepaidCard`, `PrepaidCardExtract`, `PrepaidCardExtractExpense`, `Provision`, `ShareUser`), novos testes unitários de model serialization/casts por domínio e ajustes mínimos dos feature tests afetados por datas e flags tipadas. A checagem dos consumidores Inertia confirmou que não houve necessidade de mudar frontend porque datas permaneceram serializadas em `Y-m-d` e flags já eram consumidas por truthiness.
 
 ### Onda 7 — Refatoração, Performance, DX e Acessibilidade
 

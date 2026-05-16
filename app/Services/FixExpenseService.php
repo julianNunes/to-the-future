@@ -5,11 +5,12 @@ namespace App\Services;
 use App\Helpers\ShareUser\Interfaces\ShareUserOptionsInterface;
 use App\Models\FixExpense;
 use App\Repositories\Interfaces\FixExpenseRepositoryInterface;
+use App\Repositories\Interfaces\TagRepositoryInterface;
 use App\Services\Interfaces\FixExpenseServiceInterface;
 use App\Support\Concerns\EnsuresResourceOwnership;
 use Exception;
 use Illuminate\Support\Collection;
-use TagService;
+use Illuminate\Support\Facades\Auth;
 
 class FixExpenseService implements FixExpenseServiceInterface
 {
@@ -17,7 +18,8 @@ class FixExpenseService implements FixExpenseServiceInterface
 
     public function __construct(
         private FixExpenseRepositoryInterface $fixExpenseRepository,
-        private ShareUserOptionsInterface $shareUserOptions
+        private TagRepositoryInterface $tagRepository,
+        private ShareUserOptionsInterface $shareUserOptions,
     ) {}
 
     /**
@@ -26,8 +28,9 @@ class FixExpenseService implements FixExpenseServiceInterface
      */
     public function index(): array
     {
-        $expenses = $this->fixExpenseRepository->get(['user_id' => auth()->user()->id], [], [], ['shareUser', 'tags']);
-        $shareUsers = $this->shareUserOptions->resolveForUser(auth()->user()->id)['options'];
+        $userId = (int) Auth::id();
+        $expenses = $this->fixExpenseRepository->get(['user_id' => $userId], [], [], ['shareUser', 'tags']);
+        $shareUsers = $this->shareUserOptions->resolveForUser($userId)['options'];
 
         return [
             'expenses' => $expenses,
@@ -53,7 +56,7 @@ class FixExpenseService implements FixExpenseServiceInterface
         ?string $remarks = null,
         ?float $shareValue = null,
         ?int $shareUserId = null,
-        ?Collection $tags = null,
+        Collection|null $tags = null,
     ): FixExpense {
         $expense = $this->fixExpenseRepository->store([
             'description' => $description,
@@ -62,11 +65,11 @@ class FixExpenseService implements FixExpenseServiceInterface
             'remarks' => $remarks,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
-            'user_id' => auth()->user()->id
+            'user_id' => (int) Auth::id()
         ]);
 
         // Salva Tags
-        TagService::saveTagsToModel($expense, $tags);
+        $this->tagRepository->saveTagsToModel($expense, $tags);
         return $expense;
     }
 
@@ -90,7 +93,7 @@ class FixExpenseService implements FixExpenseServiceInterface
         ?string $remarks = null,
         ?float $shareValue = null,
         ?int $shareUserId = null,
-        ?Collection $tags = null,
+        Collection|null $tags = null,
     ): FixExpense {
         $expense = $this->fixExpenseRepository->show($id);
 
@@ -101,7 +104,7 @@ class FixExpenseService implements FixExpenseServiceInterface
         $this->ensureOwnedByCurrentUser($expense);
 
         // Atualiza Tags
-        TagService::saveTagsToModel($expense, $tags);
+        $this->tagRepository->saveTagsToModel($expense, $tags);
 
         return $this->fixExpenseRepository->store([
             'description' => $description,
@@ -110,7 +113,7 @@ class FixExpenseService implements FixExpenseServiceInterface
             'remarks' => $remarks,
             'share_value' => $shareValue,
             'share_user_id' => $shareUserId,
-            'user_id' => auth()->user()->id
+            'user_id' => (int) Auth::id()
         ], $expense);
     }
 
@@ -129,7 +132,7 @@ class FixExpenseService implements FixExpenseServiceInterface
         $this->ensureOwnedByCurrentUser($expense);
 
         // Remove Tags
-        TagService::saveTagsToModel($expense);
+        $this->tagRepository->saveTagsToModel($expense);
 
         return $this->fixExpenseRepository->delete($id);
     }

@@ -5,9 +5,12 @@ namespace Database\Seeders;
 use App\Models\Budget;
 use App\Models\CreditCard;
 use App\Models\CreditCardInvoice;
+use App\Models\Financing;
+use App\Models\FinancingInstallment;
 use App\Models\PrepaidCard;
 use App\Models\PrepaidCardExtract;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
@@ -51,6 +54,7 @@ class E2ESmokeSeeder extends Seeder
         );
 
         $budget = $this->seedBudget($user);
+        $this->seedFinancing($user, $budget);
         $creditCard = $this->seedCreditCard($user);
         $this->seedInvoice($creditCard, $budget);
         $prepaidCard = $this->seedPrepaidCard($user);
@@ -112,6 +116,66 @@ class E2ESmokeSeeder extends Seeder
             ],
             $attributes,
         );
+    }
+
+    protected function seedFinancing(User $user, Budget $budget): Financing
+    {
+        $startDate = CarbonImmutable::createFromDate((int) $budget->year, (int) $budget->month, 1)->startOfMonth();
+
+        $financing = Financing::query()->updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'description' => 'E2E Financing',
+            ],
+            [
+                'start_date' => $startDate->toDateString(),
+                'total' => 18000,
+                'fees_monthly' => 1.25,
+                'portion_total' => '012',
+                'remarks' => 'E2E Smoke Financing',
+            ],
+        );
+
+        $installments = [
+            1 => [
+                'value' => 1500,
+                'paid_value' => null,
+                'date' => $startDate->day(10)->toDateString(),
+                'payment_date' => null,
+                'paid' => false,
+            ],
+            2 => [
+                'value' => 1500,
+                'paid_value' => null,
+                'date' => $startDate->addMonth()->day(10)->toDateString(),
+                'payment_date' => null,
+                'paid' => false,
+            ],
+            3 => [
+                'value' => 1500,
+                'paid_value' => null,
+                'date' => $startDate->addMonths(2)->day(10)->toDateString(),
+                'payment_date' => null,
+                'paid' => false,
+            ],
+        ];
+
+        FinancingInstallment::query()
+            ->where('financing_id', $financing->id)
+            ->whereNotIn('portion', array_keys($installments))
+            ->delete();
+
+        foreach ($installments as $portion => $attributes) {
+            FinancingInstallment::query()->updateOrCreate(
+                [
+                    'financing_id' => $financing->id,
+                    'portion' => $portion,
+                ],
+                $attributes,
+            );
+        }
+
+        return $financing;
     }
 
     protected function seedInvoice(CreditCard $creditCard, Budget $budget): CreditCardInvoice

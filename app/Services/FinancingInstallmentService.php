@@ -72,10 +72,10 @@ class FinancingInstallmentService implements FinancingInstallmentServiceInterfac
         $this->ensureOwnedByCurrentUser($financing);
 
         return $this->financingInstallmentRepository->store([
-            'date' => Carbon::parse($date)->format('y-m-d'),
+            'date' => Carbon::parse($date)->format('Y-m-d'),
             'value' => $value,
             'paid' => $paid,
-            'payment_date' => $paymentDate ? Carbon::parse($paymentDate)->format('y-m-d') : null,
+            'payment_date' => $paymentDate ? Carbon::parse($paymentDate)->format('Y-m-d') : null,
             'paid_value' => $paidValue,
         ], $installment);
     }

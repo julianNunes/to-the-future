@@ -2,7 +2,7 @@
 
 > Arquivo operacional complementar a [03-fullstack-executable-backlog.md](03-fullstack-executable-backlog.md)  
 > Objetivo: permitir que qualquer LLM execute o backlog fullstack em ciclos pequenos, auditáveis e testáveis  
-> Última atualização: 15/05/2026
+> Última atualização: 16/05/2026
 
 ---
 
@@ -195,8 +195,9 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - Validação executada com `BudgetControllerTest`, `BudgetEntryControllerTest`, specs de `Budget/Index`, `Budget/Show` e subfluxos, além de `tests/e2e/budget.spec.js` verde.
 
 ### TASK-04 — Fechar a slice Credit Card/Invoice
-- [ ] Referência: `SLICE-4.1` e `SLICE-4.2`.
+- [x] Referência: `SLICE-4.1` e `SLICE-4.2`.
 - Objetivo: estabilizar o fluxo de cartão de crédito e invoice expense antes da componentização.
+- Status em 16/05/2026: concluída com Form Requests de invoice e invoice expense/import, factories novas, `CreditCardInvoice/Index.vue` e `InvoiceExpense.vue` protegidos por specs, smokes Playwright dedicados para invoice/index e invoice/show, além de validação ampla verde na rodada de fechamento da task.
 - Passos:
 1. Fechar CRUD de cartão e invoices.
 2. Cobrir `InvoiceExpense` nos fluxos de create, update, delete, portions e importação.
@@ -208,8 +209,9 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/npm.sh run test:e2e`
 
 ### TASK-05 — Fechar a slice Prepaid Card/Extract
-- [ ] Referência: `SLICE-5.1` e `SLICE-5.2`.
+- [x] Referência: `SLICE-5.1` e `SLICE-5.2`.
 - Objetivo: manter paridade de comportamento entre cartão de crédito e cartão pré-pago.
+- Status em 16/05/2026: concluída com Form Requests de extract e extract expense/import, `PrepaidCardExtract/Index.vue` migrado para `useForm`, `ExtractExpense.vue` coberto por spec e corrigido no modo `viewOnly`, factory nova de `PrepaidCardExtractExpense`, smokes Playwright estáveis para index/show de extract e show/dialog de extract expense, e validação ampla final verde com `Feature`, `Unit`, `test:unit`, `build` e `test:e2e`.
 - Passos:
 1. Fechar CRUD de prepaid card e extracts.
 2. Cobrir `ExtractExpense` antes da refatoração estrutural.
@@ -221,8 +223,9 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/npm.sh run test:e2e`
 
 ### TASK-06 — Fechar domínios de suporte e modelos
-- [ ] Referência: `SLICE-6.1` e `SLICE-6.2`.
+- [x] Referência: `SLICE-6.1` e `SLICE-6.2`.
 - Objetivo: limpar supporting CRUDs e modelagem do domínio sem quebrar slices já estabilizadas.
+- Status em 16/05/2026: concluída com supporting CRUDs de `FixExpense`, `Provision` e `Financing` alinhados à arquitetura em camadas e cobertos por feature tests de ownership/update/delete, model hardening nos domínios financeiros centrais com `$casts` e `BelongsTo`, verificação de compatibilidade dos payloads Inertia sem necessidade de ajuste frontend e validação ampla verde com `./scripts/artisan.sh test` (117 testes, 712 assertions), `./scripts/npm.sh run test:unit` (16 arquivos, 62 testes) e `./scripts/npm.sh run test:e2e` (12 testes após estabilização do smoke de Provision).
 - Passos:
 1. Fechar `FixExpense`, `Provision` e `Financing` com DI, validação e testes.
 2. Adicionar casts e relacionamentos corretos nos models principais.

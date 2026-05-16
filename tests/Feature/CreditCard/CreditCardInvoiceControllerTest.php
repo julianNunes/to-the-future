@@ -55,12 +55,12 @@ class CreditCardInvoiceControllerTest extends TestCase
 
         $invoice = CreditCardInvoice::query()->firstOrFail();
 
-        $this->assertSame('2026-05-10', $invoice->due_date);
-        $this->assertSame('2026-05-05', $invoice->closing_date);
+        $this->assertSame('2026-05-10', $invoice->due_date?->toDateString());
+        $this->assertSame('2026-05-05', $invoice->closing_date?->toDateString());
         $this->assertSame('2026', $invoice->year);
         $this->assertSame('05', $invoice->month);
         $this->assertSame($card->id, $invoice->credit_card_id);
-        $this->assertFalse((bool) $invoice->closed);
+        $this->assertFalse($invoice->closed);
     }
 
     public function testInvoiceStoreRejectsDuplicatePeriodForSameCard(): void
@@ -110,6 +110,6 @@ class CreditCardInvoiceControllerTest extends TestCase
 
         $invoice->refresh();
 
-        $this->assertTrue((bool) $invoice->closed);
+        $this->assertTrue($invoice->closed);
     }
 }

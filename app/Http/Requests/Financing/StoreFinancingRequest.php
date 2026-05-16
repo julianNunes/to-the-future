@@ -29,23 +29,33 @@ class StoreFinancingRequest extends FormRequest
     {
         return [
             'description' => ['required', 'string'],
-            'start_date' => ['required', 'date'],
+            'start_date' => ['required', 'date_format:Y-m-d'],
             'total' => ['required', 'numeric', 'gt:0'],
             'fees_monthly' => ['required', 'numeric', 'gt:0'],
             'portion_total' => ['required', 'integer', 'min:1'],
             'remarks' => ['nullable', 'string'],
-            'start_date_installment' => ['required', 'date'],
+            'start_date_installment' => ['required', 'date_format:Y-m-d', 'after_or_equal:start_date'],
             'value_installment' => ['required', 'numeric', 'gt:0'],
         ];
     }
 
     protected function normalizeDate(mixed $value): mixed
     {
-        if ($value === null || $value === '') {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        $value = trim($value);
+
+        if ($value === '') {
             return null;
         }
 
-        return trim((string) $value);
+        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $value, $matches) === 1) {
+            return sprintf('%04d-%02d-%02d', (int) $matches[1], (int) $matches[2], (int) $matches[3]);
+        }
+
+        return $value;
     }
 
     protected function normalizeInteger(mixed $value): ?int

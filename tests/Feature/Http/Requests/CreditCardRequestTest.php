@@ -53,7 +53,7 @@ class CreditCardRequestTest extends TestCase
         $this->assertSame('5', $card->due_date);
         $this->assertSame('25', $card->closing_date);
         $this->assertSame($user->id, $card->user_id);
-        $this->assertTrue((bool) $card->is_active);
+        $this->assertTrue($card->is_active);
     }
 
     public function testUpdateRejectsNonNumericDigits(): void
@@ -103,6 +103,6 @@ class CreditCardRequestTest extends TestCase
         $this->assertSame('9876', $card->digits);
         $this->assertSame('12', $card->due_date);
         $this->assertSame('28', $card->closing_date);
-        $this->assertFalse((bool) $card->is_active);
+        $this->assertFalse($card->is_active);
     }
 }

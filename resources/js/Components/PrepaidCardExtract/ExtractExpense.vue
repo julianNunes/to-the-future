@@ -58,14 +58,14 @@
                             download
                             :disabled="viewOnly"
                         >
-                            {{ $t('credit-card-invoice.download-template') }}
+                            {{ $t('prepaid-card-extract-expense.download-template') }}
                         </v-btn>
                         <v-btn color="info" class="ml-1" :disabled="viewOnly" @click="clickImportFile">{{
-                            $t('credit-card-invoice.import-excel')
+                            $t('prepaid-card-extract-expense.import-excel')
                         }}</v-btn>
-                        <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
-                        <v-btn v-if="viewOnly" color="warning" class="ml-1" @click="updateInvoice(false)">
-                            {{ $t('credit-card-invoice.open-invoice') }}
+                        <input ref="fileInput" type="file" class="d-none" accept=".xlsx,.xls" @change="selectFile" />
+                        <v-btn v-if="viewOnly" color="warning" class="ml-1" @click="openExtract">
+                            {{ $t('prepaid-card-extract-expense.open-extract') }}
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -657,6 +657,10 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
         fileInput.value.click()
     }
 
+    function openExtract() {
+        router.get('/prepaid-card/extract/' + componentProps.extract.id)
+    }
+
     async function selectFile(event) {
         const file = event.target.files[0]
         if (file) {
@@ -751,4 +755,3 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
         )
     }
 </script>
-function updateInvoice(val) {}

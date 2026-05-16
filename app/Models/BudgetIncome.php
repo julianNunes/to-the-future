@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
@@ -23,6 +22,13 @@ class BudgetIncome extends Model
         'value',
         'remarks',
         'budget_id',
+    ];
+
+    protected $casts = [
+        'date' => 'date:Y-m-d',
+        'value' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function budget(): BelongsTo

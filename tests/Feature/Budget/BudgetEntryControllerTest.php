@@ -75,14 +75,14 @@ class BudgetEntryControllerTest extends TestCase
         $expense->refresh()->load('tags');
 
         $this->assertSame('Updated Market', $expense->description);
-        $this->assertSame('2026-05-12', $expense->date);
+        $this->assertSame('2026-05-12', $expense->date?->toDateString());
         $this->assertSame('INDIVIDUAL', $expense->group);
         $this->assertSame('Shared', $expense->remarks);
         $this->assertSame($shareUser->id, $expense->share_user_id);
         $this->assertSame(['FOOD'], $expense->tags->pluck('name')->all());
         $this->assertEquals(222.40, (float) $expense->value);
         $this->assertEquals(111.20, (float) $expense->share_value);
-        $this->assertTrue((bool) $expense->paid);
+        $this->assertTrue($expense->paid);
     }
 
     public function testBudgetIncomeStoreRequiresCoreFields(): void
@@ -135,7 +135,7 @@ class BudgetEntryControllerTest extends TestCase
         $income->refresh()->load('tags');
 
         $this->assertSame('Updated Salary', $income->description);
-        $this->assertSame('2026-05-06', $income->date);
+        $this->assertSame('2026-05-06', $income->date?->toDateString());
         $this->assertSame('Main income', $income->remarks);
         $this->assertSame(['WORK'], $income->tags->pluck('name')->all());
         $this->assertEquals(3200.45, (float) $income->value);

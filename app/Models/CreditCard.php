@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * App\Models\CreditCard
@@ -52,9 +52,17 @@ class CreditCard extends Model
         'user_id',
     ];
 
-    public function user(): HasOne
+    protected $casts = [
+        'due_date' => 'string',
+        'closing_date' => 'string',
+        'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    public function user(): BelongsTo
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function invoices(): HasMany

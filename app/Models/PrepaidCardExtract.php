@@ -33,6 +33,15 @@ class PrepaidCardExtract extends Model
      */
     protected $appends = ['year_month'];
 
+    protected $casts = [
+        'year' => 'string',
+        'month' => 'string',
+        'credit' => 'decimal:2',
+        'credit_date' => 'date:Y-m-d',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     /**
      * Accessors
      */

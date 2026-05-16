@@ -60,16 +60,36 @@ class FinancingRequestTest extends TestCase
         $financing = Financing::query()->with('installments')->firstOrFail();
 
         $this->assertSame('House Loan', $financing->description);
-        $this->assertSame('2026-05-15', $financing->start_date);
+        $this->assertSame('2026-05-15', $financing->start_date?->toDateString());
         $this->assertSame('Initial contract', $financing->remarks);
         $this->assertSame($user->id, $financing->user_id);
         $this->assertEquals(1200.50, (float) $financing->total);
         $this->assertEquals(1.75, (float) $financing->fees_monthly);
         $this->assertSame(3, (int) $financing->portion_total);
         $this->assertCount(3, $financing->installments);
-        $this->assertSame('2026-06-01', $financing->installments[0]->date);
-        $this->assertSame('2026-07-01', $financing->installments[1]->date);
+        $this->assertSame('2026-06-01', $financing->installments[0]->date?->toDateString());
+        $this->assertSame('2026-07-01', $financing->installments[1]->date?->toDateString());
         $this->assertEquals(400.17, (float) $financing->installments[0]->value);
+    }
+
+    public function testStoreRejectsInstallmentStartDateEarlierThanFinancingStartDate(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->from('/financing')
+            ->post('/financing', [
+                'description' => 'House Loan',
+                'start_date' => '2026-05-15',
+                'total' => 'R$ 1.200,50',
+                'fees_monthly' => '1,75%',
+                'portion_total' => '3',
+                'remarks' => 'Initial contract',
+                'start_date_installment' => '2026-05-14',
+                'value_installment' => 'R$ 400,17',
+            ])
+            ->assertRedirect('/financing')
+            ->assertSessionHasErrors(['start_date_installment']);
     }
 
     public function testUpdateRequiresCoreFields(): void
@@ -143,7 +163,7 @@ class FinancingRequestTest extends TestCase
         $paidInstallment->refresh();
 
         $this->assertSame('Renegotiated Loan', $financing->description);
-        $this->assertSame('2026-01-15', $financing->start_date);
+        $this->assertSame('2026-01-15', $financing->start_date?->toDateString());
         $this->assertSame('Updated contract', $financing->remarks);
         $this->assertEquals(4500.00, (float) $financing->total);
         $this->assertEquals(3.50, (float) $financing->fees_monthly);

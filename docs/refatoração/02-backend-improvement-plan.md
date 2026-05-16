@@ -347,6 +347,8 @@ protected $middlewareGroups = [
 
 **Esforço:** ~4-6 horas | **Impacto:** Alto | **Risco:** Baixo
 
+**Status em 16/05/2026:** a rodada da `TASK-06` entregou `$casts` e correções de `BelongsTo` nos models financeiros centrais e de suporte (`Budget`, `BudgetExpense`, `BudgetIncome`, `BudgetProvision`, `CreditCard`, `CreditCardInvoice`, `CreditCardInvoiceExpense`, `CreditCardInvoiceExpenseDivision`, `Financing`, `FinancingInstallment`, `FixExpense`, `PrepaidCard`, `PrepaidCardExtract`, `PrepaidCardExtractExpense`, `Provision` e `ShareUser`), com testes unitários de model serialization/casts por domínio e regressão ampla verde. Os follow-ups remanescentes desta fase ficaram reduzidos a pontos fora da onda atual, como relationships adicionais em `User` e eventuais ajustes secundários de naming/fillable.
+
 ### 5.1 Adicionar `$casts` em Todos os Models
 
 **Problema:** 19 de 23 models não têm `$casts`. Valores retornam como strings do MySQL, causando comparações incorretas e problemas de serialização JSON.
