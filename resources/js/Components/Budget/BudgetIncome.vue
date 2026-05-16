@@ -213,14 +213,14 @@
 
 <script setup>
     import { currencyField, formatDate, sumField } from '@/utils/utils.js'
-import { router, useForm } from '@inertiajs/vue3'
-import moment from 'moment'
-import { computed, nextTick, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+    import { router, useForm } from '@inertiajs/vue3'
+    import moment from 'moment'
+    import { computed, nextTick, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
 
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
-import { useValidationRules } from '@/composables/useFormConstants.js'
-import { useTagSearch } from '@/composables/useTagSearch.js'
+    import { useValidationRules } from '@/composables/useFormConstants.js'
+    import { useTagSearch } from '@/composables/useTagSearch.js'
 
     defineOptions({ name: 'BudgetIncome' })
 

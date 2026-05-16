@@ -21,6 +21,10 @@
         "sucess-save": "Registro criado com sucesso",
         "sucess-update": "Registro atualizado com sucesso",
         "sucess-delete": "Registro removido com sucesso",
+        "skip-to-content": "Pular para o conteúdo",
+        "open-navigation": "Abrir navegação",
+        "toggle-navigation": "Alternar navegação",
+        "logout": "Sair",
 
         "month": "Mês",
         "year": "Ano",

@@ -13,57 +13,14 @@
                 </template>
             </v-expansion-panel-title>
             <v-expansion-panel-text class="pa-4">
-                <v-row dense>
-                    <v-col cols="12" sm="12" md="2">
-                        <v-text-field
-                            ref="txtName"
-                            v-model="creditCardname"
-                            :label="$t('default.credit-card')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="invoiceDueDate"
-                            :label="$t('credit-card.due-date')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="invoiceClosindDate"
-                            :label="$t('credit-card.closing-date')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="invoiceTotal"
-                            :label="$t('default.total')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="invoiceTotalPaid"
-                            :label="$t('default.total-paid')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="isClosedName"
-                            :label="$t('default.closed')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
+                <InvoiceExpenseSummary
+                    :credit-card-name="creditCardname"
+                    :due-date="invoiceDueDate"
+                    :closing-date="invoiceClosindDate"
+                    :total="invoiceTotal"
+                    :total-paid="invoiceTotalPaid"
+                    :closed-name="isClosedName"
+                />
                 <!-- <v-row dense>
                     <v-col md="12">
                         <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
@@ -71,151 +28,23 @@
                         <v-divider :thickness="3" class="border-opacity-90" color="black"></v-divider>
                     </v-col>
                 </v-row> -->
-                <v-row v-show="!viewOnly" dense>
-                    <v-col md="12">
-                        <v-btn color="primary" :disabled="isClosed" @click="newItem">{{ $t('default.new') }}</v-btn>
-                        <v-btn
-                            color="info"
-                            class="ml-1"
-                            href="/storage/template/template-despesas.xlsx"
-                            download
-                            :disabled="viewOnly || isClosed"
-                        >
-                            {{ $t('credit-card-invoice.download-template') }}
-                        </v-btn>
-                        <v-btn color="info" class="ml-1" :disabled="isClosed" @click="clickImportFile">{{
-                            $t('credit-card-invoice.import-excel')
-                        }}</v-btn>
-                        <input ref="fileInput" type="file" class="d-none" accept="xlxs/*" @change="selectFile" />
-                        <v-btn v-if="isClosed" color="warning" class="ml-1" @click="updateInvoice(false)">
-                            {{ $t('credit-card-invoice.open-invoice') }}
-                        </v-btn>
-                        <v-btn v-else color="warning" class="ml-1" @click="updateInvoice(true)">{{
-                            $t('credit-card-invoice.close-invoice')
-                        }}</v-btn>
-                    </v-col>
-                </v-row>
-                <v-row dense>
-                    <v-col md="12">
-                        <v-data-table
-                            :group-by="[{ key: 'group', order: 'asc' }]"
-                            :headers="headers"
-                            :items="invoice.expenses"
-                            :sort-by="[{ key: 'created_at', order: 'asc' }]"
-                            :search="search"
-                            :loading="isLoading"
-                            :loading-text="$t('default.loading-text-table')"
-                            class="elevation-3"
-                            density="compact"
-                            :total-items="invoice.expenses"
-                            :no-data-text="$t('default.no-data-text')"
-                            :no-results-text="$t('default.no-data-text')"
-                            :footer-props="{
-                                'items-per-page-text': $t('default.itens-per-page'),
-                                'page-text': $t('default.page-text'),
-                            }"
-                            :header-props="{
-                                sortByText: $t('default.sort-by'),
-                            }"
-                            :items-per-page="50"
-                            fixed-header
-                        >
-                            <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                            <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                            <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
-                            <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
-                            <template #[`item.tags`]="{ item }">{{
-                                item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
-                            }}</template>
-                            <template #[`item.portion`]="{ item }">{{
-                                item.portion ? item.portion + '/' + item.portion_total : ''
-                            }}</template>
-                            <template #[`item.share_user_id`]="{ item }">{{
-                                item.share_user ? item.share_user.name : ''
-                            }}</template>
-                            <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('default.edit')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            color="warning"
-                                            icon="mdi-pencil"
-                                            size="small"
-                                            class="me-2"
-                                            :disabled="viewOnly"
-                                            @click="editItem(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('default.delete')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            class="ml-2"
-                                            color="error"
-                                            icon="mdi-delete"
-                                            size="small"
-                                            :disabled="viewOnly"
-                                            @click="confirmRemove(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                            </template>
-
-                            <template #group-header="{ item, toggleGroup, isGroupOpen }">
-                                <tr>
-                                    <th class="title" style="width: auto">
-                                        <VBtn
-                                            size="small"
-                                            variant="text"
-                                            :icon="isGroupOpen(item) ? '$expand' : '$next'"
-                                            @click="toggleGroup(item)"
-                                        >
-                                        </VBtn>
-                                        {{ convertGroup(item.value) }}
-                                    </th>
-                                    <th :colspan="2" class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">
-                                        {{ sumGroup(invoice.expenses, item.key, item.value, 'value') }}
-                                    </th>
-                                    <th class="title text-right">
-                                        {{ sumGroup(invoice.expenses, item.key, item.value, 'share_value') }}
-                                    </th>
-                                    <th :colspan="6"></th>
-                                </tr>
-                            </template>
-
-                            <template v-if="invoice.expenses.length" #tfoot>
-                                <tr class="text-green">
-                                    <th class="title"></th>
-                                    <th colspan="2" class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">{{ sumField(invoice.expenses, 'value') }}</th>
-                                    <th class="title text-right">{{ sumField(invoice.expenses, 'share_value') }}</th>
-                                </tr>
-                            </template>
-
-                            <template #top>
-                                <v-toolbar density="comfortable">
-                                    <v-row dense>
-                                        <v-col cols="12" lg="12" md="12" sm="12">
-                                            <v-text-field
-                                                v-model="search"
-                                                :label="$t('default.search')"
-                                                append-icon="mdi-magnify"
-                                                single-line
-                                                hide-details
-                                                clearable
-                                                @click:clear="search = null"
-                                            ></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                </v-toolbar>
-                            </template>
-                        </v-data-table>
-                    </v-col>
-                </v-row>
+                <InvoiceExpenseActions
+                    :view-only="viewOnly"
+                    :is-closed="isClosed"
+                    @new="newItem"
+                    @select-file="selectFile"
+                    @update-invoice="updateInvoice"
+                />
+                <InvoiceExpenseTable
+                    v-model:search="search"
+                    :headers="headers"
+                    :expenses="invoice.expenses"
+                    :is-loading="isLoading"
+                    :view-only="viewOnly"
+                    :group-label="convertGroup"
+                    @edit="editItem"
+                    @remove="confirmRemove"
+                />
             </v-expansion-panel-text>
         </v-expansion-panel>
     </v-expansion-panels>
@@ -445,117 +274,15 @@
                         <v-btn color="primary" @click="newItemDivision">{{ $t('default.new') }}</v-btn>
                     </v-col>
                 </v-row>
-                <v-row v-show="hasDivisions" dense>
-                    <v-col md="12">
-                        <v-data-table
-                            :headers="headersDivision"
-                            :items="expense.divisions"
-                            :loading-text="$t('default.loading-text-table')"
-                            class="elevation-3"
-                            density="compact"
-                            :total-items="expense.divisions"
-                            :no-data-text="$t('default.no-data-text')"
-                            :no-results-text="$t('default.no-data-text')"
-                            :footer-props="{
-                                'items-per-page-text': $t('default.itens-per-page'),
-                                'page-text': $t('default.page-text'),
-                            }"
-                            :header-props="{
-                                sortByText: $t('default.sort-by'),
-                            }"
-                            fixed-header
-                        >
-                            <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                            <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                            <template #[`item.tags`]="{ item }">{{
-                                item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
-                            }}</template>
-
-                            <template #[`item.share_user_id`]="{ item }">{{
-                                item.share_user ? item.share_user.name : ''
-                            }}</template>
-                            <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('default.edit')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            color="warning"
-                                            icon="mdi-pencil"
-                                            size="small"
-                                            class="me-2"
-                                            @click="editDivisionItem(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('default.delete')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            class="ml-2"
-                                            color="error"
-                                            icon="mdi-delete"
-                                            size="small"
-                                            @click="confirmDivisionRemove(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                            </template>
-
-                            <template #group-header="{ item, toggleGroup, isGroupOpen }">
-                                <tr>
-                                    <th class="title" style="width: auto">
-                                        <VBtn
-                                            size="small"
-                                            variant="text"
-                                            :icon="isGroupOpen(item) ? '$expand' : '$next'"
-                                            @click="toggleGroup(item)"
-                                        >
-                                        </VBtn>
-                                        {{ convertGroup(item.value) }}
-                                    </th>
-                                    <th :colspan="2" class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">
-                                        {{ sumGroup(expense.divisions, item.key, item.value, 'value') }}
-                                    </th>
-                                    <th class="title text-right">
-                                        {{ sumGroup(expense.divisions, item.key, item.value, 'share_value') }}
-                                    </th>
-                                    <th :colspan="6"></th>
-                                </tr>
-                            </template>
-
-                            <template v-if="expense.divisions.length" #tfoot>
-                                <tr class="text-green">
-                                    <th :colspan="2" class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">{{ sumField(expense.divisions, 'value') }}</th>
-                                    <th class="title text-right">
-                                        {{ sumField(expense.divisions, 'share_value') }}
-                                    </th>
-                                </tr>
-                            </template>
-
-                            <template #top>
-                                <v-toolbar density="comfortable">
-                                    <v-row dense>
-                                        <v-col cols="12" lg="12" md="12" sm="12">
-                                            <v-text-field
-                                                v-model="search"
-                                                :label="$t('default.search')"
-                                                append-icon="mdi-magnify"
-                                                single-line
-                                                hide-details
-                                                clearable
-                                                @click:clear="search = null"
-                                            ></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                </v-toolbar>
-                            </template>
-                        </v-data-table>
-                    </v-col>
-                </v-row>
+                <InvoiceExpenseDivisionTable
+                    v-show="hasDivisions"
+                    v-model:search="search"
+                    :headers="headersDivision"
+                    :divisions="expense.divisions"
+                    :group-label="convertGroup"
+                    @edit="editDivisionItem"
+                    @remove="confirmDivisionRemove"
+                />
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
@@ -725,13 +452,18 @@
     </v-row>
 </template>
 <script setup>
-    import { currencyField, formatDate, reverseFormatNumber, sumField, sumGroup } from '@/utils/utils.js'
+    import { currencyField, formatDate, reverseFormatNumber } from '@/utils/utils.js'
 import { router } from '@inertiajs/vue3'
 import moment from 'moment'
 import readXlsxFile from 'read-excel-file'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
+
+    import InvoiceExpenseActions from './InvoiceExpenseActions.vue'
+import InvoiceExpenseDivisionTable from './InvoiceExpenseDivisionTable.vue'
+import InvoiceExpenseSummary from './InvoiceExpenseSummary.vue'
+import InvoiceExpenseTable from './InvoiceExpenseTable.vue'
 
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
 import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
@@ -835,9 +567,7 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
     })
 
     // Refs for template
-    const txtName = ref(null)
     const txtDescription = ref(null)
-    const fileInput = ref(null)
     const form = ref(null)
     const formDivision = ref(null)
     const confirm = ref(null)
@@ -1192,10 +922,6 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
     function deleteeDivision() {
         expense.value.divisions.splice(editedIndex.value, 1)
         deleteDivisionDialog.value = false
-    }
-
-    function clickImportFile() {
-        fileInput.value.click()
     }
 
     async function selectFile(event) {

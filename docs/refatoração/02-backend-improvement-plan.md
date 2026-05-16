@@ -680,6 +680,8 @@ app/Helpers/Budget/
     └── ... novas interfaces
 ```
 
+**Status em 16/05/2026:** primeira extração concluída com `BudgetShowRelations`, centralizando os eager loads usados por `BudgetShowData::dataShow()` para o orçamento principal e compartilhado. Cobertura adicionada em `BudgetShowRelationsTest`.
+
 ### 8.2 Extrair `BudgetTagMatcher` (Eliminar Duplicação Massiva)
 
 **Problema:** O pattern de matching de tags é repetido **~20 vezes** dentro de `BudgetShowData`:
@@ -717,6 +719,8 @@ class BudgetTagMatcher
 1. Extrair `BudgetCloneService` — lógica de clone (~100 linhas)
 2. Extrair `BudgetCreationService` — lógica de `createComplete()` (~140 linhas)
 3. Manter `BudgetService` para CRUD simples
+
+**Status em 16/05/2026:** primeira extração concluída com `BudgetRelationPeriodBinder`, removendo a duplicação de vínculo de faturas/extratos soltos em `createComplete()`. A divisão completa em `BudgetCloneService`/`BudgetCreationService` permanece como evolução maior.
 
 ### 8.4 Dividir `CreditCardInvoiceExpenseService` (393 linhas, 8 dependências)
 
@@ -877,6 +881,8 @@ CreditCardInvoiceExpense::whereIn('credit_card_invoice_id', $invoiceIds)->delete
 $existingTags = $this->model->whereIn('id', $tagIds)->get()->keyBy('id');
 ```
 
+**Status em 16/05/2026:** concluído com busca única por `whereIn('name', ...)`, criação apenas das tags faltantes e teste em `TagRepositoryTest` validando sync de tags existentes/novas.
+
 ### 10.4 Habilitar `preventLazyLoading()` em Development
 
 ```php
@@ -888,6 +894,8 @@ public function boot(): void
 ```
 
 Isso lançará exceções quando N+1 queries forem detectadas em dev.
+
+**Status em 16/05/2026:** guard habilitado em ambientes não produtivos com handler de log para expor lazy loading sem quebrar os fluxos atuais enquanto a correção de N+1 é incremental.
 
 ### 10.5 `auth()->user()->id` Chamado Repetidamente
 

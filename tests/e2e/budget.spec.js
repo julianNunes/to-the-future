@@ -89,7 +89,6 @@ test('budget create and show flow works correctly', async ({ page }, testInfo) =
     }
 
     const createStatus = createResponse.status()
-    const createRequestBody = createResponse.request().postData() ?? 'no-body'
 
     expect(createStatus).toBeLessThan(500)
     await page.waitForTimeout(1000)
@@ -143,7 +142,6 @@ test('budget clone flow works correctly', async ({ page }, testInfo) => {
     }
 
     const cloneStatus = cloneResponse.status()
-    const cloneRequestBody = cloneResponse.request().postData() ?? 'no-body'
 
     expect(cloneStatus).toBeLessThan(500)
     await page.waitForTimeout(1000)

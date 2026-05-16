@@ -1,11 +1,11 @@
 <script setup>
-    import { ref, computed, watch, onMounted } from 'vue'
     import NavigationMenu from '@/Components/NavigationMenu.vue'
-    import md5 from 'crypto-js/md5'
-    import { useToast } from 'vue-toastification'
-    import { usePage } from '@inertiajs/vue3'
-    import { useI18n } from 'vue-i18n'
-    import { useDisplay } from 'vuetify'
+import { usePage } from '@inertiajs/vue3'
+import md5 from 'crypto-js/md5'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
+import { useDisplay } from 'vuetify'
 
     const drawer = ref(false)
     const rail = ref(false)
@@ -41,6 +41,7 @@
 
 <template>
     <v-app class="bg-grey-lighten-4">
+        <a class="skip-link" href="#main-content">{{ t('default.skip-to-content') }}</a>
         <v-navigation-drawer v-model="drawer" :rail="rail" permanent>
             <v-list>
                 <v-list-item
@@ -53,11 +54,15 @@
             <NavigationMenu />
         </v-navigation-drawer>
         <v-app-bar color="light-green">
-            <v-app-bar-nav-icon v-if="$vuetify.display.mobile" @click.stop="drawer = !drawer" />
-            <v-app-bar-nav-icon v-else @click.stop="rail = !rail" />
+            <v-app-bar-nav-icon
+                v-if="$vuetify.display.mobile"
+                :aria-label="t('default.open-navigation')"
+                @click.stop="drawer = !drawer"
+            />
+            <v-app-bar-nav-icon v-else :aria-label="t('default.toggle-navigation')" @click.stop="rail = !rail" />
             <v-toolbar-title text="To the Future" />
         </v-app-bar>
-        <v-main>
+        <v-main id="main-content" tabindex="-1">
             <v-container id="v-container">
                 <slot />
             </v-container>

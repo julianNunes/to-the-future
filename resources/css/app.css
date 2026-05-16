@@ -4,6 +4,23 @@
     }
 }
 
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 3000;
+    padding: 8px 12px;
+    color: #ffffff;
+    background: #1b5e20;
+    border-radius: 4px;
+    transform: translateY(-140%);
+    transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
 .v-expansion-panel-text__wrapper {
     padding: 0 !important;
 }

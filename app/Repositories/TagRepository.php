@@ -46,27 +46,39 @@ class TagRepository extends AppRepository implements TagRepositoryInterface
      * @param Collection|null $tags
      * @return void
      */
-    public function saveTagsToModel(Model $model, ?Collection $tags = null)
+    public function saveTagsToModel(Model $model, ?Collection $tags = null): void
     {
         if ($tags && $tags->count()) {
-            $tags_sync = collect();
+            $tagNames = $tags->pluck('name')->filter()->unique()->values();
 
-            // Busca as Tags no banco
-            foreach ($tags as $tag) {
-                $new_tag = $this->getOne(['name' => $tag['name']]);
+            if (!$tagNames->count()) {
+                $model->tags()->detach();
+                return;
+            }
 
-                if (!$new_tag) {
-                    $new_tag = $this->store([
-                        'name' => $tag['name'],
+            $existingTags = $this->model
+                ->newQuery()
+                ->whereIn('name', $tagNames->all())
+                ->get()
+                ->keyBy('name');
+
+            $tagsSync = collect();
+
+            foreach ($tagNames as $tagName) {
+                $newTag = $existingTags->get($tagName);
+
+                if (!$newTag) {
+                    $newTag = $this->store([
+                        'name' => $tagName,
                         'user_id' => auth()->user()->id
                     ]);
                 }
 
-                $tags_sync->push($new_tag);
+                $tagsSync->push($newTag);
             }
 
-            if ($tags_sync->count()) {
-                $model->tags()->sync($tags_sync->pluck('id')->toArray());
+            if ($tagsSync->count()) {
+                $model->tags()->sync($tagsSync->pluck('id')->toArray());
             } else {
                 $model->tags()->detach();
             }

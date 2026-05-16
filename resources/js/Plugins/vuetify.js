@@ -1,18 +1,14 @@
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as labsComponents from 'vuetify/labs/components'
-import * as directives from 'vuetify/directives'
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import MomentAdapter from '@date-io/moment'
+import '@mdi/font/css/materialdesignicons.css'
+import { createVuetify } from 'vuetify'
+import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import { VDateInput } from 'vuetify/labs/VDateInput'
+import 'vuetify/styles'
 
 const vuetify = createVuetify({
     components: {
-        ...components,
-        ...labsComponents,
+        VDateInput,
     },
-    directives,
     icons: {
         defaultSet: 'mdi',
         aliases,

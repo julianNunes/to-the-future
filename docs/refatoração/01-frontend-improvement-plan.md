@@ -94,9 +94,9 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 
 ### Fase 5 — Componentização
 
-- [ ] 7.1 `InvoiceExpense.vue` continua monolítico.
-- [ ] 7.2 `BudgetExpense.vue` continua monolítico.
-- [ ] 7.3 `ExtractExpense.vue` continua monolítico.
+- [x] 7.1 `InvoiceExpense.vue` foi dividido em resumo, ações, tabela principal e tabela de divisões, com testes de componente.
+- [x] 7.2 `BudgetExpense.vue` teve a lista/tabela extraída para componente dedicado, com teste de eventos.
+- [x] 7.3 `ExtractExpense.vue` foi dividido em resumo, ações e tabela, com testes dos subcomponentes.
 - [ ] 7.4 `DataTableToolbar.vue` ainda não existe.
 - [ ] 7.5 `FormDialog.vue` ainda não existe.
 - [x] 7.6 A deduplicação dos cálculos de semanas em `Budget/Show.vue` avançou com `buildWeeks()` e `weekLabel()`.
@@ -104,7 +104,7 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 
 ### Fase 6 — Performance e Bundle
 
-- [ ] 8.1 O tree-shaking real do Vuetify ainda não foi feito; `resources/js/Plugins/vuetify.js` continua importando `components`, `labsComponents` e `directives`.
+- [x] 8.1 O tree-shaking do Vuetify foi ativado removendo imports globais de `components`, `labsComponents` e `directives`; `VDateInput` fica registrado explicitamente.
 - [ ] 8.2 `moment` segue como biblioteca de datas principal.
 - [ ] 8.3 Não há lazy loading dos componentes pesados propostos.
 - [ ] 8.4 `ConfirmDialog` continua registrado globalmente em `app.js` e instanciado localmente nas páginas e componentes.
@@ -113,7 +113,7 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 
 ### Fase 7 — Qualidade e DX
 
-- [ ] 9.1 A estratégia de lint está parcial: existe script `lint` no `package.json`, mas o `vite-plugin-eslint` continua desabilitado.
+- [x] 9.1 O script `lint` executa com 0 erros; o `vite-plugin-eslint` permanece desabilitado por decisão de performance em dev.
 - [ ] 9.2 Husky e `lint-staged` ainda não foram configurados.
 - [ ] 9.3 O debounce foi centralizado em `useTagSearch()` e `useDescriptionSearch()`, e `FixExpense/Index.vue`/`Provision/Index.vue` já não carregam timeout manual para autocomplete, mas ainda existem timeouts pontuais fora desses fluxos.
 - [x] 9.4 A codificação de URLs de busca foi consolidada; `useDescriptionSearch()` e `useTagSearch()` usam `encodeURIComponent`.
@@ -124,9 +124,9 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 
 - [ ] 10.1 Botões de ação ainda usam `v-icon` clicável sem `aria-label`.
 - [ ] 10.2 `ConfirmDialog` ainda não recebeu as melhorias adicionais de acessibilidade propostas.
-- [ ] 10.3 Ainda não existe skip link no layout autenticado.
+- [x] 10.3 O layout autenticado possui skip link para `#main-content` com teste de componente.
 - [ ] 10.4 Ainda existem `tfoot` com `th`, como em `FixExpense/Index.vue`.
-- [ ] 10.5 O logout continua implementado com `<Link method="post">`, não com botão ou formulário dedicado.
+- [x] 10.5 O logout continua via `<Link method="post">`, mas recebeu `role="button"`, `tabindex`, `aria-label` e handlers de teclado cobertos por teste.
 
 ### Testes
 

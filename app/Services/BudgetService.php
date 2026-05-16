@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\Budget\Interfaces\BudgetCalculateInterface;
+use App\Helpers\Budget\Interfaces\BudgetRelationPeriodBinderInterface;
 use App\Helpers\Budget\Interfaces\BudgetShowDataInterface;
 use App\Models\Budget;
 use App\Repositories\Interfaces\{
@@ -27,7 +28,6 @@ use App\Services\Interfaces\{
 use App\Support\Concerns\EnsuresResourceOwnership;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
 
 class BudgetService implements BudgetServiceInterface
 {
@@ -41,6 +41,7 @@ class BudgetService implements BudgetServiceInterface
         private BudgetGoalServiceInterface $budgetGoalService,
         private BudgetShowDataInterface $budgetShowData,
         private BudgetCalculateInterface $budgetCalculate,
+        private BudgetRelationPeriodBinderInterface $budgetRelationPeriodBinder,
         // Repositories
         private FixExpenseRepositoryInterface $fixExpenseRepository,
         private ProvisionRepositoryInterface $provisionRepository,
@@ -120,41 +121,7 @@ class BudgetService implements BudgetServiceInterface
         $provisions = null;
         $date = Carbon::parse($year . '-' . $month . '-01');
 
-        // Verificar se existem faturas ja criadas para o mes/ano do orçamento
-        $credit_card_invoices = $this->creditCardInvoiceRepository->get(
-            function (Builder $query) use ($budget) {
-                $query
-                    ->where(['year' => $budget->year, 'month' => $budget->month, 'budget_id' => null])
-                    ->whereHas('creditCard', function (Builder $query) use ($budget) {
-                        $query->where('user_id', $budget->user_id)->where('is_active', true);
-                    });
-            },
-            [],
-            [],
-            []
-        );
-
-        foreach ($credit_card_invoices as $invoice) {
-            $this->creditCardInvoiceRepository->store(['budget_id' => $budget->id], $invoice);
-        }
-
-        // Verificar se existem extratos de cartão pre pago ja criadas para o mes/ano do orçamento
-        $prepaid_card_extracts = $this->prepaidCardExtractRepository->get(
-            function (Builder $query) use ($budget) {
-                $query
-                    ->where(['year' => $budget->year, 'month' => $budget->month, 'budget_id' => null])
-                    ->whereHas('prepaidCard', function (Builder $query) use ($budget) {
-                        $query->where('user_id', $budget->user_id)->where('is_active', true);
-                    });
-            },
-            [],
-            [],
-            []
-        );
-
-        foreach ($prepaid_card_extracts as $extract) {
-            $this->prepaidCardExtractRepository->store(['budget_id' => $budget->id], $extract);
-        }
+        $this->budgetRelationPeriodBinder->bindUnlinkedRelations($budget);
 
         if ($includeFixExpense) {
             $fix_expenses = $this->fixExpenseRepository->get(['user_id' => $userId], [], [], ['tags']);
@@ -212,41 +179,7 @@ class BudgetService implements BudgetServiceInterface
                         'user_id' => $userId
                     ]);
 
-                    // Verificar se existem faturas ja criadas para o mes/ano do orçamento
-                    $credit_card_invoices = $this->creditCardInvoiceRepository->get(
-                        function (Builder $query) use ($new_budget) {
-                            $query
-                                ->where(['year' => $new_budget->year, 'month' => $new_budget->month, 'budget_id' => null])
-                                ->whereHas('creditCard', function (Builder $query) use ($new_budget) {
-                                    $query->where('user_id', $new_budget->user_id)->where('is_active', true);
-                                });
-                        },
-                        [],
-                        [],
-                        []
-                    );
-
-                    foreach ($credit_card_invoices as $invoice) {
-                        $this->creditCardInvoiceRepository->store(['budget_id' => $new_budget->id], $invoice);
-                    }
-
-                    // Verificar se existem extratos de cartão pre pago ja criadas para o mes/ano do orçamento
-                    $prepaid_card_extracts = $this->prepaidCardExtractRepository->get(
-                        function (Builder $query) use ($new_budget) {
-                            $query
-                                ->where(['year' => $new_budget->year, 'month' => $new_budget->month, 'budget_id' => null])
-                                ->whereHas('prepaidCard', function (Builder $query) use ($new_budget) {
-                                    $query->where('user_id', $new_budget->user_id)->where('is_active', true);
-                                });
-                        },
-                        [],
-                        [],
-                        []
-                    );
-
-                    foreach ($prepaid_card_extracts as $extract) {
-                        $this->prepaidCardExtractRepository->store(['budget_id' => $new_budget->id], $extract);
-                    }
+                    $this->budgetRelationPeriodBinder->bindUnlinkedRelations($new_budget);
 
                     if ($includeFixExpense && $fix_expenses && $fix_expenses->count()) {
                         foreach ($fix_expenses as $expense) {

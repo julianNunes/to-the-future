@@ -73,9 +73,9 @@
 
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head, Link, useForm } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+    import { Head, Link, useForm } from '@inertiajs/vue3'
+    import { computed, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
 
     defineOptions({ name: 'PeopleCreate', layout: AuthenticatedLayout })
 

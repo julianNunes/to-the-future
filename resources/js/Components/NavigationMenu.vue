@@ -12,8 +12,17 @@
         </Link>
 
         <!-- Log Out -->
-        <Link href="/logout" method="post" as="div">
-            <v-list-item prepend-icon="mdi-exit-to-app" title="Log Out" link />
+        <Link
+            href="/logout"
+            method="post"
+            as="div"
+            role="button"
+            tabindex="0"
+            :aria-label="$t('default.logout')"
+            @keydown.enter.prevent="$event.currentTarget.click()"
+            @keydown.space.prevent="$event.currentTarget.click()"
+        >
+            <v-list-item prepend-icon="mdi-exit-to-app" :title="$t('default.logout')" link />
         </Link>
     </v-list>
 </template>

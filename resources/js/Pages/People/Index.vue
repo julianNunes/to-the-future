@@ -65,11 +65,11 @@
 
 <script setup>
     import ConfirmDialog from '@/Components/ConfirmDialog.vue'
-import { useCrudOperations } from '@/composables/useCrudOperations.js'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { Head, Link, router } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { Head, Link, router } from '@inertiajs/vue3'
+    import { computed, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
 
     defineOptions({ name: 'PeopleIndex', layout: AuthenticatedLayout })
 

@@ -1,5 +1,4 @@
 <template>
-
     <Head title="Dashboard" />
     <div class="mb-5">
         <h5 class="text-h5 font-weight-bold">Dashboard</h5>
@@ -16,13 +15,13 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import { Head } from '@inertiajs/vue3'
-// import GroupResumes from '../Components/Dashboard/GroupResumes.vue'
+    import { computed } from 'vue'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import { Head } from '@inertiajs/vue3'
+    // import GroupResumes from '../Components/Dashboard/GroupResumes.vue'
 
-defineOptions({ name: 'DashboardPage', layout: AuthenticatedLayout })
+    defineOptions({ name: 'DashboardPage', layout: AuthenticatedLayout })
 
-const breadcrumbs = computed(() => [{ title: 'Dashboard', disabled: true }])
+    const breadcrumbs = computed(() => [{ title: 'Dashboard', disabled: true }])
 </script>

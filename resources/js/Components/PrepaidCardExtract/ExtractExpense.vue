@@ -13,179 +13,28 @@
                 </template>
             </v-expansion-panel-title>
             <v-expansion-panel-text class="pa-4">
-                <v-row dense>
-                    <v-col cols="12" sm="12" md="2">
-                        <v-text-field
-                            ref="txtName"
-                            v-model="prepaidCardName"
-                            :label="$t('prepaid-card.item')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="2">
-                        <v-text-field
-                            v-model="extractYearMonth"
-                            :label="$t('prepaid-card-extract.year-month')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="extractCreditDate"
-                            :label="$t('prepaid-card-extract.credit-date')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="2">
-                        <v-text-field
-                            v-model="extractCredit"
-                            :label="$t('prepaid-card-extract.credit')"
-                            :readonly="true"
-                            density="comfortable"
-                        ></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row dense>
-                    <v-col md="12">
-                        <v-btn color="primary" :disabled="viewOnly" @click="newItem">{{ $t('default.new') }}</v-btn>
-                        <v-btn
-                            color="info"
-                            class="ml-1"
-                            href="/storage/template/template-prepaid-card.xlsx"
-                            download
-                            :disabled="viewOnly"
-                        >
-                            {{ $t('prepaid-card-extract-expense.download-template') }}
-                        </v-btn>
-                        <v-btn color="info" class="ml-1" :disabled="viewOnly" @click="clickImportFile">{{
-                            $t('prepaid-card-extract-expense.import-excel')
-                        }}</v-btn>
-                        <input ref="fileInput" type="file" class="d-none" accept=".xlsx,.xls" @change="selectFile" />
-                        <v-btn v-if="viewOnly" color="warning" class="ml-1" @click="openExtract">
-                            {{ $t('prepaid-card-extract-expense.open-extract') }}
-                        </v-btn>
-                    </v-col>
-                </v-row>
-                <v-row dense>
-                    <v-col md="12">
-                        <v-data-table
-                            :group-by="[{ key: 'group', order: 'asc' }]"
-                            :headers="headers"
-                            :items="extract.expenses"
-                            :sort-by="[{ key: 'created_at', order: 'asc' }]"
-                            :search="search"
-                            :loading="isLoading"
-                            :loading-text="$t('default.loading-text-table')"
-                            class="elevation-3"
-                            density="compact"
-                            :total-items="extract.expenses"
-                            :no-data-text="$t('default.no-data-text')"
-                            :no-results-text="$t('default.no-data-text')"
-                            :footer-props="{
-                                'items-per-page-text': $t('default.itens-per-page'),
-                                'page-text': $t('default.page-text'),
-                            }"
-                            :header-props="{
-                                sortByText: $t('default.sort-by'),
-                            }"
-                            :items-per-page="50"
-                            fixed-header
-                        >
-                            <template #[`item.value`]="{ item }">{{ currencyField(item.value) }}</template>
-                            <template #[`item.share_value`]="{ item }">{{ currencyField(item.share_value) }}</template>
-                            <template #[`item.date`]="{ item }">{{ moment(item.date).format('DD/MM/YYYY') }}</template>
-                            <template #[`item.group`]="{ item }">{{ convertGroup(item.group) }}</template>
-                            <template #[`item.tags`]="{ item }">{{
-                                item.tags.length ? item.tags.map((x) => x.name).join(' | ') : ''
-                            }}</template>
-                            <template #[`item.share_user_id`]="{ item }">{{
-                                item.share_user ? item.share_user.name : ''
-                            }}</template>
-                            <template #[`item.action`]="{ item }">
-                                <v-tooltip :text="$t('default.edit')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            color="warning"
-                                            icon="mdi-pencil"
-                                            size="small"
-                                            class="me-2"
-                                            :disabled="viewOnly"
-                                            @click="editItem(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                                <v-tooltip :text="$t('default.delete')" location="top">
-                                    <template #activator="{ props }">
-                                        <v-icon
-                                            v-bind="props"
-                                            class="ml-2"
-                                            color="error"
-                                            icon="mdi-delete"
-                                            size="small"
-                                            :disabled="viewOnly"
-                                            @click="confirmRemove(item)"
-                                        >
-                                        </v-icon>
-                                    </template>
-                                </v-tooltip>
-                            </template>
-
-                            <template #group-header="{ item, toggleGroup, isGroupOpen }">
-                                <tr>
-                                    <th class="title" style="width: auto">
-                                        <VBtn
-                                            size="small"
-                                            variant="text"
-                                            :icon="isGroupOpen(item) ? '$expand' : '$next'"
-                                            @click="toggleGroup(item)"
-                                        ></VBtn>
-                                        {{ convertGroup(item.value) }}
-                                    </th>
-                                    <th :colspan="2" class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">
-                                        {{ sumGroup(extract.expenses, item.key, item.value, 'value') }}
-                                    </th>
-                                    <th class="title text-right">
-                                        {{ sumGroup(extract.expenses, item.key, item.value, 'share_value') }}
-                                    </th>
-                                    <th :colspan="6"></th>
-                                </tr>
-                            </template>
-
-                            <template v-if="extract.expenses.length" #tfoot>
-                                <tr class="text-green">
-                                    <th class="title"></th>
-                                    <th colspan="2" class="title font-weight-bold text-right">Total</th>
-                                    <th class="title text-right">{{ sumField(extract.expenses, 'value') }}</th>
-                                    <th class="title text-right">{{ sumField(extract.expenses, 'share_value') }}</th>
-                                </tr>
-                            </template>
-
-                            <template #top>
-                                <v-toolbar density="comfortable">
-                                    <v-row dense>
-                                        <v-col cols="12" lg="12" md="12" sm="12">
-                                            <v-text-field
-                                                v-model="search"
-                                                :label="$t('default.search')"
-                                                append-icon="mdi-magnify"
-                                                single-line
-                                                hide-details
-                                                clearable
-                                                @click:clear="search = null"
-                                            ></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                </v-toolbar>
-                            </template>
-                        </v-data-table>
-                    </v-col>
-                </v-row>
+                <ExtractExpenseSummary
+                    :prepaid-card-name="prepaidCardName"
+                    :year-month="extractYearMonth"
+                    :credit-date="extractCreditDate"
+                    :credit="extractCredit"
+                />
+                <ExtractExpenseActions
+                    :view-only="viewOnly"
+                    @new="newItem"
+                    @select-file="selectFile"
+                    @open="openExtract"
+                />
+                <ExtractExpenseTable
+                    v-model:search="search"
+                    :headers="headers"
+                    :expenses="extract.expenses"
+                    :is-loading="isLoading"
+                    :view-only="viewOnly"
+                    :group-label="convertGroup"
+                    @edit="editItem"
+                    @remove="confirmRemove"
+                />
             </v-expansion-panel-text>
         </v-expansion-panel>
     </v-expansion-panels>
@@ -375,13 +224,17 @@
 </template>
 
 <script setup>
-    import { currencyField, formatDate, reverseFormatNumber, sumField, sumGroup } from '@/utils/utils.js'
+    import { currencyField, formatDate, reverseFormatNumber } from '@/utils/utils.js'
 import { router } from '@inertiajs/vue3'
 import moment from 'moment'
 import readXlsxFile from 'read-excel-file'
 import { computed, nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
+
+    import ExtractExpenseActions from './ExtractExpenseActions.vue'
+import ExtractExpenseSummary from './ExtractExpenseSummary.vue'
+import ExtractExpenseTable from './ExtractExpenseTable.vue'
 
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
 import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
@@ -451,9 +304,7 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
     })
 
     // Refs for template
-    const txtName = ref(null)
     const txtDescription = ref(null)
-    const fileInput = ref(null)
     const form = ref(null)
     const confirm = ref(null)
 
@@ -651,10 +502,6 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
             },
             preserveScroll: true,
         })
-    }
-
-    function clickImportFile() {
-        fileInput.value.click()
     }
 
     function openExtract() {

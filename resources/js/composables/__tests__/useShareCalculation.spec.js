@@ -1,4 +1,5 @@
 import { useShareCalculation } from '@/composables/useShareCalculation.js'
+import { describe, expect, it } from 'vitest'
 
 describe('useShareCalculation', () => {
     it('calculates a percentage-based share value', () => {

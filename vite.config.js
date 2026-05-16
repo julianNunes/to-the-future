@@ -5,8 +5,6 @@ import vuetify from 'vite-plugin-vuetify'
 // import eslintPlugin from 'vite-plugin-eslint' // Temporariamente desabilitado
 import path from 'path'
 
-const isProduction = process.env.NODE_ENV === 'production'
-
 export default defineConfig({
     plugins: [
         laravel({
@@ -22,7 +20,7 @@ export default defineConfig({
             },
         }),
         vuetify({ autoImport: true }),
-        // !isProduction && eslintPlugin(), // Temporariamente desabilitado
+        // eslintPlugin(), // Temporariamente desabilitado
     ].filter(Boolean),
     resolve: {
         alias: {

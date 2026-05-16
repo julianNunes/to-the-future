@@ -1,0 +1,22 @@
+
+> test:e2e
+> npm run test:e2e:prepare && playwright test -c playwright.config.js .
+
+
+> test:e2e:prepare
+> rm -f public/hot && php artisan db:seed --class=E2ESmokeSeeder --force
+
+
+   INFO  Seeding database.  
+
+
+Running 12 tests using 10 workers
+
+[1A[2K[1/12] [chromium] › tests/e2e/login.spec.js:4:1 › login flow works correctly
+[1A[2K[2/12] [chromium] › tests/e2e/prepaid-card-extract-smoke.spec.js:22:1 › prepaid card extract index and show flow works correctly
+[1A[2K[3/12] [chromium] › tests/e2e/provision-smoke.spec.js:41:1 › provision create flow works correctly
+[1A[2K[4/12] [chromium] › tests/e2e/fix-expense-smoke.spec.js:35:1 › fix expense create flow works correctly
+[1A[2K[5/12] [chromium] › tests/e2e/budget.spec.js:66:1 › budget create and show flow works correctly
+[1A[2K[6/12] [chromium] › tests/e2e/credit-card-smoke.spec.js:41:1 › credit card create flow works correctly
+[1A[2K[7/12] [chromium] › tests/e2e/financing-smoke.spec.js:24:1 › financing installments page opens the first installment edit dialog
+[1A[2K[8/12] [chromium] › tests/e2e/invoice-expense.spec.js:36:1 › invoice expense show page opens the new expense dialog correctly

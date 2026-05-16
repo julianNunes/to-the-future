@@ -42,6 +42,7 @@ use App\Services\{
     ProvisionService,
     TagService
 };
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -82,6 +83,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Model::preventLazyLoading(! $this->app->isProduction());
+        Model::handleLazyLoadingViolationUsing(function (Model $model, string $relation): void {
+            logger()->warning('Attempted to lazy load an Eloquent relation.', [
+                'model' => $model::class,
+                'relation' => $relation,
+            ]);
+        });
     }
 }

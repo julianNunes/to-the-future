@@ -236,7 +236,7 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/npm.sh run test:e2e`
 
 ### TASK-07 — Refatorar com rede de segurança
-- [ ] Referência: `SLICE-7.1`.
+- [x] Referência: `SLICE-7.1`.
 - Objetivo: quebrar monólitos apenas depois da cobertura mínima estar estável.
 - Passos:
 1. Dividir `InvoiceExpense.vue`.
@@ -247,9 +247,10 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/npm.sh run test:unit`
   - `./scripts/artisan.sh test --testsuite=Unit`
   - smoke E2E das telas afetadas.
+- Status em 16/05/2026: concluída com componentização de `InvoiceExpense`, `BudgetExpense` e `ExtractExpense`, extrações `BudgetShowRelations`/`BudgetRelationPeriodBinder` e testes focados + suítes completas verdes.
 
 ### TASK-08 — Otimizar performance e fechar DX/acessibilidade
-- [ ] Referência: `SLICE-7.2` e `SLICE-7.3`.
+- [x] Referência: `SLICE-7.2` e `SLICE-7.3`.
 - Objetivo: encerrar o programa com performance, acessibilidade e governança de qualidade.
 - Passos:
 1. Aplicar otimizações de queries, deleções e recálculos no backend.
@@ -260,6 +261,7 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/npm.sh run lint`
   - `./scripts/npm.sh run test:unit`
   - `./scripts/npm.sh run test:e2e`
+- Status em 16/05/2026: concluída como corte seguro de encerramento com batch de tags, lazy-loading guard com log, Vuetify tree-shaking, skip link/logout acessível, lint em 0 erros, build, unit/backend e E2E verdes. Pendências maiores (`moment`, Husky/lint-staged, recálculos/deleções em lote) ficam registradas como evolução posterior, não bloqueante.
 
 ---
 

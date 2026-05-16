@@ -3,6 +3,7 @@
 namespace App\Helpers\Budget;
 
 use App\Helpers\Budget\Interfaces\BudgetShowDataInterface;
+use App\Helpers\Budget\Interfaces\BudgetShowRelationsInterface;
 use App\Helpers\ShareUser\Interfaces\ShareUserOptionsInterface;
 use App\Models\Budget;
 use App\Models\BudgetExpense;
@@ -12,7 +13,6 @@ use App\Models\User;
 use App\Support\Concerns\EnsuresResourceOwnership;
 use App\Repositories\Interfaces\{
     BudgetRepositoryInterface,
-    CreditCardInvoiceRepositoryInterface,
     FinancingInstallmentRepositoryInterface,
 };
 use Exception;
@@ -26,8 +26,8 @@ class BudgetShowData implements BudgetShowDataInterface
         // Services
         private BudgetRepositoryInterface $budgetRepository,
         private FinancingInstallmentRepositoryInterface $financingInstallmentRepository,
-        private CreditCardInvoiceRepositoryInterface $creditCardInvoiceRepository,
         private ShareUserOptionsInterface $shareUserOptions,
+        private BudgetShowRelationsInterface $budgetShowRelations,
     ) {}
 
     /**
@@ -39,41 +39,7 @@ class BudgetShowData implements BudgetShowDataInterface
     {
         // Busca o budget do id
         // com despesas, receitas e provisionamento
-        $budget = $this->budgetRepository->show($id, [
-            'expenses' => [
-                'tags',
-                'shareUser',
-                // 'financingInstallment' => [
-                //     'financing:id,description'
-                // ]
-            ],
-            'incomes.tags',
-            'provisions' => [
-                'tags',
-                'shareUser',
-            ],
-            'goals.tags',
-            'expenseTagOptions.tags',
-            'invoices' => [
-                'creditCard',
-                'file',
-                'expenses' => [
-                    'tags',
-                    'shareUser',
-                    'divisions' => [
-                        'tags',
-                        'shareUser'
-                    ]
-                ]
-            ],
-            'extracts' => [
-                'prepaidCard',
-                'expenses' => [
-                    'tags',
-                    'shareUser',
-                ]
-            ]
-        ]);
+        $budget = $this->budgetRepository->show($id, $this->budgetShowRelations->relations());
 
         if (!$budget) {
             throw new Exception('budget.not-found');
@@ -108,41 +74,7 @@ class BudgetShowData implements BudgetShowDataInterface
                 ['year' => $budget->year, 'month' => $budget->month, 'user_id' => $shareUser->share_user_id],
                 [],
                 [],
-                [
-                    'expenses' => [
-                        'tags',
-                        'shareUser',
-                        // 'financingInstallment' => [
-                        //     'financing:id,description'
-                        // ]
-                    ],
-                    'incomes.tags',
-                    'provisions' => [
-                        'tags',
-                        'shareUser',
-                    ],
-                    'goals.tags',
-                    'expenseTagOptions.tags',
-                    'invoices' => [
-                        'creditCard',
-                        'file',
-                        'expenses' => [
-                            'tags',
-                            'shareUser',
-                            'divisions' => [
-                                'tags',
-                                'shareUser'
-                            ]
-                        ]
-                    ],
-                    'extracts' => [
-                        'prepaidCard',
-                        'expenses' => [
-                            'tags',
-                            'shareUser',
-                        ]
-                    ]
-                ]
+                $this->budgetShowRelations->relations()
             );
 
             if ($budgetShare) {

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services;
 
 use App\Helpers\Budget\Interfaces\BudgetCalculateInterface;
+use App\Helpers\Budget\Interfaces\BudgetRelationPeriodBinderInterface;
 use App\Helpers\Budget\Interfaces\BudgetShowDataInterface;
 use App\Models\Budget;
 use App\Models\BudgetIncome;
@@ -45,6 +46,7 @@ class BudgetServiceTest extends TestCase
         $budgetGoalService = Mockery::mock(BudgetGoalServiceInterface::class);
         $budgetShowData = Mockery::mock(BudgetShowDataInterface::class);
         $budgetCalculate = Mockery::mock(BudgetCalculateInterface::class);
+        $budgetRelationPeriodBinder = Mockery::mock(BudgetRelationPeriodBinderInterface::class);
         $fixExpenseRepository = Mockery::mock(FixExpenseRepositoryInterface::class);
         $provisionRepository = Mockery::mock(ProvisionRepositoryInterface::class);
         $budgetRepository = Mockery::mock(BudgetRepositoryInterface::class);
@@ -124,6 +126,7 @@ class BudgetServiceTest extends TestCase
             $budgetGoalService,
             $budgetShowData,
             $budgetCalculate,
+            $budgetRelationPeriodBinder,
             $fixExpenseRepository,
             $provisionRepository,
             $budgetRepository,

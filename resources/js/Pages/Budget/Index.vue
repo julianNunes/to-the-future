@@ -469,14 +469,14 @@
 
 <script setup>
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import ConfirmDialog from '@/Components/ConfirmDialog.vue'
-import { useCrudOperations } from '@/composables/useCrudOperations.js'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { currencyField, formatDate } from '@/utils/utils.js'
-import { Head, Link, router, useForm } from '@inertiajs/vue3'
-import moment from 'moment'
-import { computed, nextTick, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { currencyField, formatDate } from '@/utils/utils.js'
+    import { Head, Link, router, useForm } from '@inertiajs/vue3'
+    import moment from 'moment'
+    import { computed, nextTick, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
 
     defineOptions({ name: 'BudgetIndex', layout: AuthenticatedLayout })
 

@@ -1,15 +1,14 @@
-import './bootstrap'
 import '../css/app.css'
+import './bootstrap'
 
-import { createApp, h } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
-import vuetify from './Plugins/vuetify'
-import toast from './Plugins/toast'
-import i18n from './Locales/i18n'
-import ConfirmDialog from './Components/ConfirmDialog.vue'
-import { VDateInput } from 'vuetify/labs/VDateInput'
+import { createApp, h } from 'vue'
 import VuetifyMoney from 'vuetify-money-3'
+import ConfirmDialog from './Components/ConfirmDialog.vue'
+import i18n from './Locales/i18n'
+import toast from './Plugins/toast'
+import vuetify from './Plugins/vuetify'
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'To the Future'
 
@@ -22,7 +21,6 @@ createInertiaApp({
             .use(vuetify)
             .use(toast)
             .use(i18n)
-            .use(VDateInput)
             .use(VuetifyMoney)
             .component('ConfirmDialog', ConfirmDialog)
             .mount(el)

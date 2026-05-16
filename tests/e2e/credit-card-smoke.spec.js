@@ -55,9 +55,28 @@ test('credit card create flow works correctly', async ({ page }, testInfo) => {
     await pickComboboxOption(dialog, page, 1, '25')
     await pickComboboxOption(dialog, page, 2, 'Sim')
 
-    await submitDialog(dialog)
+    const createResponsePromise = page
+        .waitForResponse(
 
-    await expect(dialog).not.toBeVisible({ timeout: 10000 })
+
+                (response) => response.request().method() === 'POST' && response.url().includes('/credit-card'),
+
+           {
+                timeout: 5000,
+            }
+        )
+        .catch(() => null)
+
+    await submitDialog(dialog)
+    const createResponse = await createResponsePromise
+
+    if (!createResponse) {
+        const messages = await dialog.locator('.v-messages__message, [role="alert"]').allInnerTexts()
+
+        throw new Error(`Credit card create request was not sent. Visible messages: ${messages.join(' | ') || 'none'}`)
+    }
+
+    expect(createResponse.status()).toBeLessThan(500)
     await expect(page.getByText(uniqueName).first()).toBeVisible({ timeout: 10000 })
     await captureDebugScreenshot(page, testInfo, 'debug-credit-card-smoke.png')
 })

@@ -219,25 +219,28 @@ Uma slice só pode ser marcada como concluída quando atender todos os critério
 ### Onda 7 — Refatoração, Performance, DX e Acessibilidade
 
 #### SLICE-7.1 — Componentização protegida por testes
-- [ ] Dividir `InvoiceExpense.vue`, `BudgetExpense.vue` e `ExtractExpense.vue` somente depois de cobrir o comportamento atual.
+- [x] Dividir `InvoiceExpense.vue`, `BudgetExpense.vue` e `ExtractExpense.vue` somente depois de cobrir o comportamento atual.
 - Backend: extrair serviços/helpers grandes apenas com testes cobrindo o comportamento já estabilizado.
 - Frontend: criar subcomponentes (`FormDialog`, `DataTableToolbar`, `WeekDateInputs`, imports) preservando comportamento.
 - Testes mínimos: component tests dos novos subcomponentes + unit/backend das extrações correspondentes.
 - Validação mínima: `./scripts/npm.sh run test:unit`, `./scripts/artisan.sh test --testsuite=Unit`.
+- Status em 16/05/2026: concluída com subcomponentes de resumo/ações/tabelas em `ExtractExpense`, `BudgetExpense` e `InvoiceExpense`, extrações backend `BudgetShowRelations` e `BudgetRelationPeriodBinder`, e testes unitários/componentes cobrindo os novos pontos.
 
 #### SLICE-7.2 — Performance com rede de segurança
-- [ ] Aplicar melhorias de performance e N+1 somente com regressão mínima já ativa.
+- [x] Aplicar melhorias de performance e N+1 somente com regressão mínima já ativa.
 - Backend: reduzir `recalculate()` em loop, otimizar deleções e `saveTagsToModel()`, ativar `preventLazyLoading()`.
 - Frontend: tree-shaking do Vuetify, lazy load, eventual troca de `moment`, revisão de source maps e target.
 - Testes mínimos: suites existentes verdes + smoke E2E dos fluxos críticos após otimizações.
 - Validação mínima: `./scripts/artisan.sh test`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída como primeira passada segura com batch lookup em `TagRepository::saveTagsToModel()`, guard de lazy loading com log, tree-shaking real do Vuetify e validação por backend/unit/build/E2E. Otimizações maiores de recálculo/deleção e troca de `moment` permanecem como evolução posterior.
 
 #### SLICE-7.3 — DX, lint e acessibilidade
-- [ ] Fechar a última camada de qualidade transversal.
+- [x] Fechar a última camada de qualidade transversal.
 - Frontend: lint strategy, Husky/lint-staged, ARIA labels, skip link, correção de `tfoot`, logout acessível.
 - Backend: return types, imports mortos, naming final, docblocks e padronização.
 - Testes mínimos: component tests dos pontos acessíveis e validações finais das suites.
 - Validação mínima: `./scripts/npm.sh run lint`, `./scripts/artisan.sh test`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída como fechamento executável com `npm run lint` em 0 erros, skip link no layout autenticado, logout navegável por teclado, labels no toggle de navegação e testes de layout/menu. Restam 4 avisos `vue/no-template-shadow` documentados e itens opcionais como Husky/lint-staged.
 
 ---
 

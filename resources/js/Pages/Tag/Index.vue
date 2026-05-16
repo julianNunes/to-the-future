@@ -124,14 +124,14 @@
 
 <script setup>
     import ConfirmDialog from '@/Components/ConfirmDialog.vue'
-import { useCrudOperations } from '@/composables/useCrudOperations.js'
-import { useValidationRules } from '@/composables/useFormConstants.js'
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-import { upperCase } from '@/utils/utils.js'
-import { Head, useForm } from '@inertiajs/vue3'
-import { computed, nextTick, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import writeXlsxFile from 'write-excel-file'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import { useValidationRules } from '@/composables/useFormConstants.js'
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { upperCase } from '@/utils/utils.js'
+    import { Head, useForm } from '@inertiajs/vue3'
+    import { computed, nextTick, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
+    import writeXlsxFile from 'write-excel-file'
 
     defineOptions({ name: 'TagIndex', layout: AuthenticatedLayout })
 

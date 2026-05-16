@@ -313,15 +313,15 @@
 
 <script setup>
     import { currencyField, sumField, sumGroup } from '@/utils/utils.js'
-import { router, useForm } from '@inertiajs/vue3'
-import { computed, nextTick, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+    import { router, useForm } from '@inertiajs/vue3'
+    import { computed, nextTick, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
 
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
-import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
-import { useValidationRules } from '@/composables/useFormConstants.js'
-import { useShareCalculation } from '@/composables/useShareCalculation.js'
-import { useTagSearch } from '@/composables/useTagSearch.js'
+    import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
+    import { useValidationRules } from '@/composables/useFormConstants.js'
+    import { useShareCalculation } from '@/composables/useShareCalculation.js'
+    import { useTagSearch } from '@/composables/useTagSearch.js'
 
     defineOptions({ name: 'BudgetProvision' })
 
