@@ -139,25 +139,28 @@ Uma slice só pode ser marcada como concluída quando atender todos os critério
 ### Onda 3 — Slice Budget
 
 #### SLICE-3.1 — Budget create/edit/clone
-- [ ] Fechar a fatia de criação, edição e clone de budget ponta a ponta.
+- [x] Fechar a fatia de criação, edição e clone de budget ponta a ponta.
 - Backend: aplicar validação formal, DTOs iniciais e correções do fluxo `createComplete()`/`clone()`.
 - Frontend: concluir `useForm` e ajustes de `Budget/Index.vue`, incluindo datas de semanas.
 - Testes mínimos: feature tests de CRUD e clone; component test de `Budget/Index.vue`; smoke E2E do fluxo principal.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída com `StoreBudgetRequest`, `UpdateBudgetRequest` e `CloneBudgetRequest`, `BudgetController` migrado para payload validado, `Budget/Index.vue` consolidado com `useForm`, feature tests dedicados e smoke E2E verde para create/show/clone.
 
 #### SLICE-3.2 — Budget show, resumo e dados agregados
-- [ ] Fechar a tela de visualização do budget com contrato estável e dados confiáveis.
+- [x] Fechar a tela de visualização do budget com contrato estável e dados confiáveis.
 - Backend: estabilizar `BudgetShowData`, remover variáveis inválidas e preparar o terreno para futuras extrações.
 - Frontend: consolidar `Budget/Show.vue`, cálculo de semanas, tags e painéis dependentes.
 - Testes mínimos: unit/backend para helper ou builder afetado + component test do `Budget/Show.vue` + smoke E2E da página.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
+- Status em 16/05/2026: concluída com hardening de `BudgetShowData`, carga segura de `shareUser`, `Budget/Show.vue` sem logs frágeis e com aba compartilhada condicionada ao orçamento compartilhado real, além de feature test do contrato owner/share e spec dedicada da página.
 
 #### SLICE-3.3 — Expenses, incomes e provisions do budget
-- [ ] Fechar os subfluxos de Budget Expense, Budget Income e Budget Provision com contrato, formulário e regressão mínima.
+- [x] Fechar os subfluxos de Budget Expense, Budget Income e Budget Provision com contrato, formulário e regressão mínima.
 - Backend: Requests/DTOs parciais, correção de loops críticos e testes dos services principais.
 - Frontend: avançar `useForm`, composables reutilizados e correção das rotas de delete/delete-all-portions.
 - Testes mínimos: unit tests de composables e services; feature tests dos endpoints; component tests dos formulários.
 - Validação mínima: `./scripts/artisan.sh test --testsuite=Unit`, `./scripts/artisan.sh test --testsuite=Feature`, `./scripts/npm.sh run test:unit`.
+- Status em 16/05/2026: concluída com Form Requests para `BudgetExpense`, `BudgetIncome` e `BudgetProvision`, correção do desalinhamento de argumentos em `BudgetProvisionController::update()`, componentes migrados para `useForm` com binding de erros backend, spec dos três formulários e smoke E2E de `Budget/Show` cobrindo criação de receita.
 
 ### Onda 4 — Slice Credit Card e Invoice
 

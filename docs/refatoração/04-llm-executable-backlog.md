@@ -176,7 +176,7 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/npm.sh run test:e2e -- --workers=1 --reporter=list`
 
 ### TASK-03 — Fechar a slice Budget
-- [ ] Referência: `SLICE-3.1`, `SLICE-3.2` e `SLICE-3.3`.
+- [x] Referência: `SLICE-3.1`, `SLICE-3.2` e `SLICE-3.3`.
 - Objetivo: estabilizar o domínio principal antes de atacar refatorações pesadas.
 - Passos:
 1. Fechar create/edit/clone de Budget com Requests/DTOs iniciais.
@@ -188,6 +188,11 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/artisan.sh test --testsuite=Unit`
   - `./scripts/npm.sh run test:unit`
   - `./scripts/npm.sh run test:e2e`
+- Status em 16/05/2026:
+  - Requests tipadas e normalização aplicadas em `BudgetController`, `BudgetExpenseController`, `BudgetIncomeController` e `BudgetProvisionController`.
+  - `BudgetShowData` e `Budget/Show.vue` estabilizados para owner/share sem null-access.
+  - `BudgetExpense.vue`, `BudgetIncome.vue` e `BudgetProvision.vue` migrados para `useForm` com erros backend visíveis.
+  - Validação executada com `BudgetControllerTest`, `BudgetEntryControllerTest`, specs de `Budget/Index`, `Budget/Show` e subfluxos, além de `tests/e2e/budget.spec.js` verde.
 
 ### TASK-04 — Fechar a slice Credit Card/Invoice
 - [ ] Referência: `SLICE-4.1` e `SLICE-4.2`.

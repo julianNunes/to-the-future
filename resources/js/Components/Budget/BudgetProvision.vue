@@ -141,6 +141,9 @@
                                 v-model="provision.description"
                                 v-model:search="searchDescription"
                                 :label="$t('default.description')"
+                                :error-messages="
+                                    provisionForm.errors.description ? [provisionForm.errors.description] : []
+                                "
                                 :rules="rules.textFieldRules"
                                 required
                                 density="comfortable"
@@ -171,6 +174,7 @@
                             <vuetify-money
                                 v-model="provision.value"
                                 :label="$t('default.value')"
+                                :error-messages="provisionForm.errors.value ? [provisionForm.errors.value] : []"
                                 density="comfortable"
                                 :rules="rules.currencyFieldRules"
                                 :options="{
@@ -186,6 +190,7 @@
                             <v-select
                                 v-model="provision.group"
                                 :label="$t('default.group')"
+                                :error-messages="provisionForm.errors.group ? [provisionForm.errors.group] : []"
                                 :items="groupList"
                                 item-title="name"
                                 item-value="value"
@@ -207,6 +212,9 @@
                             <vuetify-money
                                 v-model="provision.share_value"
                                 :label="$t('default.share-value')"
+                                :error-messages="
+                                    provisionForm.errors.share_value ? [provisionForm.errors.share_value] : []
+                                "
                                 density="comfortable"
                                 :rules="[
                                     (value) => {
@@ -231,6 +239,9 @@
                             <v-select
                                 v-model="provision.share_user_id"
                                 :label="$t('default.share-user')"
+                                :error-messages="
+                                    provisionForm.errors.share_user_id ? [provisionForm.errors.share_user_id] : []
+                                "
                                 :items="shareUsers"
                                 item-title="share_user_name"
                                 item-value="share_user_id"
@@ -281,10 +292,16 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
+                <v-btn color="error" flat :loading="isLoading || provisionForm.processing" @click="editDialog = false">
                     {{ $t('default.cancel') }}
                 </v-btn>
-                <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
+                <v-btn
+                    color="primary"
+                    flat
+                    :loading="isLoading || provisionForm.processing"
+                    type="submit"
+                    @click="save"
+                >
                     {{ $t('default.save') }}
                 </v-btn>
             </v-card-actions>
@@ -296,7 +313,7 @@
 
 <script setup>
     import { currencyField, sumField, sumGroup } from '@/utils/utils.js'
-import { router } from '@inertiajs/vue3'
+import { router, useForm } from '@inertiajs/vue3'
 import { computed, nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -352,6 +369,21 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
         budget_id: null,
     })
 
+    function createProvisionFormData() {
+        return {
+            description: null,
+            value: 0,
+            group: null,
+            remarks: null,
+            share_value: 0,
+            share_user_id: null,
+            tags: [],
+            budget_id: componentProps.budgetId,
+        }
+    }
+
+    const provisionForm = useForm(createProvisionFormData())
+
     const groupList = [
         { name: t('default.monthly'), value: 'MONTHLY' },
         { name: t('default.week-1'), value: 'WEEK_1' },
@@ -367,6 +399,32 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
 
     const loadingData = computed(() => isTagSearching.value || isDescriptionSearching.value)
     const itemsTags = computed(() => listTags.value)
+
+    function resetProvisionState(data = createProvisionFormData()) {
+        provision.value = data
+        provisionForm.clearErrors()
+    }
+
+    function normalizeProvisionDescription(value) {
+        if (value && typeof value === 'object') {
+            return value.description ?? null
+        }
+
+        return value
+    }
+
+    function buildProvisionPayload() {
+        return {
+            description: normalizeProvisionDescription(provision.value.description),
+            value: provision.value.value,
+            group: provision.value.group,
+            remarks: provision.value.remarks,
+            share_value: provision.value.share_value,
+            share_user_id: provision.value.share_user_id,
+            tags: provision.value.tags || [],
+            budget_id: provision.value.budget_id,
+        }
+    }
 
     const itemsDescriptions = computed(() => {
         let result = []
@@ -450,7 +508,7 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
     function newItem() {
         titleModal.value = t('budget-provision.new-item')
         editDialog.value = true
-        provision.value = {
+        resetProvisionState({
             id: null,
             description: null,
             value: 0,
@@ -460,7 +518,7 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
             share_user_id: null,
             tags: [],
             budget_id: componentProps.budgetId,
-        }
+        })
         nextTick(() => {
             if (txtDescription.value) txtDescription.value.focus()
         })
@@ -469,7 +527,7 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
     function editItem(item) {
         titleModal.value = t('budget-provision.edit-item')
         editDialog.value = true
-        provision.value = {
+        resetProvisionState({
             id: item.id,
             description: item.description?.description || item.description,
             value: Number(item.value),
@@ -479,7 +537,7 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
             share_user_id: item.share_user_id,
             tags: item.tags || [],
             budget_id: componentProps.budgetId,
-        }
+        })
         nextTick(() => {
             if (txtDescription.value) txtDescription.value.focus()
         })
@@ -498,19 +556,9 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
 
     async function createData() {
         isLoading.value = true
-        router.post(
-            '/budget-provision',
-            {
-                description: provision.value.description?.description || provision.value.description,
-                value: provision.value.value,
-                group: provision.value.group,
-                remarks: provision.value.remarks,
-                share_value: provision.value.share_value,
-                share_user_id: provision.value.share_user_id,
-                tags: provision.value.tags,
-                budget_id: provision.value.budget_id,
-            },
-            {
+        provisionForm
+            .transform(() => buildProvisionPayload())
+            .post('/budget-provision', {
                 onSuccess: () => {
                     editDialog.value = false
                 },
@@ -518,25 +566,14 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
                     isLoading.value = false
                 },
                 preserveScroll: true,
-            }
-        )
+            })
     }
 
     async function updateData() {
         isLoading.value = true
-        router.put(
-            '/budget-provision/' + provision.value.id,
-            {
-                description: provision.value.description?.description || provision.value.description,
-                value: provision.value.value,
-                group: provision.value.group,
-                remarks: provision.value.remarks,
-                share_value: provision.value.share_value,
-                share_user_id: provision.value.share_user_id,
-                tags: provision.value.tags,
-                budget_id: provision.value.budget_id,
-            },
-            {
+        provisionForm
+            .transform(() => buildProvisionPayload())
+            .put('/budget-provision/' + provision.value.id, {
                 onSuccess: () => {
                     editDialog.value = false
                 },
@@ -544,8 +581,7 @@ import { useTagSearch } from '@/composables/useTagSearch.js'
                     isLoading.value = false
                 },
                 preserveScroll: true,
-            }
-        )
+            })
     }
 
     async function confirmRemove(item) {

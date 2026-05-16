@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BudgetIncomeService;
+use App\Http\Requests\BudgetIncome\StoreBudgetIncomeRequest;
+use App\Http\Requests\BudgetIncome\UpdateBudgetIncomeRequest;
 use App\Services\Interfaces\BudgetIncomeServiceInterface;
-use Illuminate\Http\Request;
 
 class BudgetIncomeController extends Controller
 {
@@ -18,22 +18,17 @@ class BudgetIncomeController extends Controller
      * Create a new Income to Budget
      * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreBudgetIncomeRequest $request)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'date' => ['required'],
-            'value' => ['required'],
-            'budget_id' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->budgetIncomeSevice->create(
-            intval($request->budget_id),
-            $request->description,
-            $request->date,
-            floatval($request->value),
-            $request->remarks,
-            collect($request->tags)
+            $data['budget_id'],
+            $data['description'],
+            $data['date'],
+            $data['value'],
+            $data['remarks'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -44,22 +39,17 @@ class BudgetIncomeController extends Controller
      * @param Request $request
      * @param int $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateBudgetIncomeRequest $request, int $id)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'date' => ['required'],
-            'value' => ['required'],
-            // 'budget_id' => ['budget_id'],
-        ]);
+        $data = $request->validated();
 
         $this->budgetIncomeSevice->update(
             $id,
-            $request->description,
-            $request->date,
-            floatval($request->value),
-            $request->remarks,
-            collect($request->tags)
+            $data['description'],
+            $data['date'],
+            $data['value'],
+            $data['remarks'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-update');

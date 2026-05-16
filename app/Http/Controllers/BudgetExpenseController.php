@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BudgetExpense\StoreBudgetExpenseRequest;
+use App\Http\Requests\BudgetExpense\UpdateBudgetExpenseRequest;
 use App\Services\Interfaces\BudgetExpenseServiceInterface;
-use Illuminate\Http\Request;
 
 class BudgetExpenseController extends Controller
 {
@@ -12,44 +13,37 @@ class BudgetExpenseController extends Controller
     /**
      * Create a new Expense to Budget
      */
-    public function store(Request $request)
+    public function store(StoreBudgetExpenseRequest $request)
     {
-        $this->validate($request, [
-            'budget_id' => ['required'],
-            'description' => ['required'],
-            'date' => ['required'],
-            'value' => ['required'],
-            'group' => ['required'],
-            'paid' => ['required'],
-        ]);
+        $data = $request->validated();
 
-        if ($request->portion_total && intval($request->portion_total) >= 2) {
+        if (($data['portion_total'] ?? null) && $data['portion_total'] >= 2) {
             $this->budgetExpenseSevice->createWithPortions(
-                intval($request->budget_id),
-                $request->description,
-                $request->date,
-                floatval($request->value),
-                $request->portion ? intval($request->portion) : null,
-                $request->portion_total ? intval($request->portion_total) : null,
-                $request->group,
-                $request->remarks,
-                $request->paid == 1 ? true : false,
-                $request->share_value ? floatval($request->share_value) : null,
-                $request->share_user_id,
-                collect($request->tags)
+                $data['budget_id'],
+                $data['description'],
+                $data['date'],
+                $data['value'],
+                $data['portion'] ?? null,
+                $data['portion_total'] ?? null,
+                $data['group'],
+                $data['remarks'] ?? null,
+                $data['paid'],
+                $data['share_value'] ?? null,
+                $data['share_user_id'] ?? null,
+                collect($data['tags'] ?? [])
             );
         } else {
             $this->budgetExpenseSevice->create(
-                intval($request->budget_id),
-                $request->description,
-                $request->date,
-                floatval($request->value),
-                $request->group,
-                $request->remarks,
-                $request->paid == 1 ? true : false,
-                $request->share_value ? floatval($request->share_value) : null,
-                $request->share_user_id,
-                collect($request->tags)
+                $data['budget_id'],
+                $data['description'],
+                $data['date'],
+                $data['value'],
+                $data['group'],
+                $data['remarks'] ?? null,
+                $data['paid'],
+                $data['share_value'] ?? null,
+                $data['share_user_id'] ?? null,
+                collect($data['tags'] ?? [])
             );
         }
 
@@ -59,28 +53,21 @@ class BudgetExpenseController extends Controller
     /**
      * Update a Expense to Budget
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateBudgetExpenseRequest $request, int $id)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'date' => ['required'],
-            'value' => ['required'],
-            'group' => ['required'],
-            // 'paid' => ['required'],
-            // 'budget_id' => ['budget_id'],
-        ]);
+        $data = $request->validated();
 
         $this->budgetExpenseSevice->update(
             $id,
-            $request->description,
-            $request->date,
-            floatval($request->value),
-            $request->group,
-            $request->remarks,
-            $request->paid == 1 ? true : false,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['description'],
+            $data['date'],
+            $data['value'],
+            $data['group'],
+            $data['remarks'] ?? null,
+            $data['paid'] ?? false,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-update');
@@ -96,7 +83,7 @@ class BudgetExpenseController extends Controller
     }
 
     /**
-     * Delete all Expenses with Portion from a Budget 
+     * Delete all Expenses with Portion from a Budget
      *
      * @param string $groupPortion
      * @return void

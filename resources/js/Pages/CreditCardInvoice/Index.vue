@@ -163,6 +163,7 @@
                                 v-model="invoiceForm.yearMonth"
                                 type="month"
                                 :label="$t('credit-card-invoice.year-month')"
+                                :error-messages="invoiceYearMonthErrors"
                                 clearable
                                 :rules="rules.textFieldRules"
                                 density="comfortable"
@@ -194,14 +195,14 @@
 
 <script setup>
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-    import ConfirmDialog from '@/Components/ConfirmDialog.vue'
-    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
-    import { useCrudOperations } from '@/composables/useCrudOperations.js'
-    import { currencyField } from '@/utils/utils.js'
-    import { Head, Link, useForm } from '@inertiajs/vue3'
-    import moment from 'moment'
-    import { computed, nextTick, ref } from 'vue'
-    import { useI18n } from 'vue-i18n'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+import { useCrudOperations } from '@/composables/useCrudOperations.js'
+import { currencyField } from '@/utils/utils.js'
+import { Head, Link, useForm } from '@inertiajs/vue3'
+import moment from 'moment'
+import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
     defineOptions({ name: 'CreditCardInvoiceIndex', layout: AuthenticatedLayout })
 
@@ -271,6 +272,16 @@
     const confirm = ref(null)
     const selectMonthYear = ref(null)
 
+    const invoiceYearMonthErrors = computed(() => {
+        return [
+            invoiceForm.errors.year,
+            invoiceForm.errors.month,
+            invoiceForm.errors.due_date,
+            invoiceForm.errors.closing_date,
+            invoiceForm.errors.error,
+        ].filter(Boolean)
+    })
+
     const isActive = computed(() => {
         return credit_card.value.is_active ? t('default.yes') : t('default.no')
     })
@@ -279,10 +290,32 @@
         return '/credit-card/invoice/' + item.id
     }
 
+    function padDay(value) {
+        return String(value).padStart(2, '0')
+    }
+
+    function resetInvoiceForm() {
+        invoiceForm.reset()
+        invoiceForm.clearErrors()
+    }
+
+    function buildInvoicePayload() {
+        const [year, month] = (invoiceForm.yearMonth ?? '').split('-')
+
+        return {
+            due_date: year && month ? `${year}-${month}-${padDay(credit_card.value.due_date)}` : null,
+            closing_date: year && month ? `${year}-${month}-${padDay(credit_card.value.closing_date)}` : null,
+            year: year ?? null,
+            month: month ?? null,
+            credit_card_id: componentProps.creditCard.id,
+            automatic_generate: Boolean(invoiceForm.automatic_generate),
+        }
+    }
+
     function newItem() {
         titleModal.value = t('credit-card-invoice.new-item')
         editDialog.value = true
-        invoiceForm.reset()
+        resetInvoiceForm()
         nextTick(() => {
             selectMonthYear.value?.focus()
         })
@@ -291,17 +324,15 @@
     async function save() {
         let validate = await form.value.validate()
         if (validate.valid) {
-            invoiceForm.due_date = invoiceForm.yearMonth + '-' + credit_card.value.due_date
-            invoiceForm.closing_date = invoiceForm.yearMonth + '-' + credit_card.value.closing_date
-            invoiceForm.year = invoiceForm.yearMonth.substring(0, 4)
-            invoiceForm.month = invoiceForm.yearMonth.substring(5, 7)
-
-            invoiceForm.post('/credit-card/invoice', {
-                onSuccess: () => {
-                    editDialog.value = false
-                    invoiceForm.reset()
-                },
-            })
+            invoiceForm
+                .transform(() => buildInvoicePayload())
+                .post('/credit-card/invoice', {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        editDialog.value = false
+                        resetInvoiceForm()
+                    },
+                })
         }
     }
 

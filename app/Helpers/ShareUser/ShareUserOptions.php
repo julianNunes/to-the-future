@@ -14,7 +14,7 @@ class ShareUserOptions implements ShareUserOptionsInterface
 
     public function resolveForUser(int $userId): array
     {
-        $records = $this->shareUserRepository->get(['user_id' => $userId], [], [], ['shareUser']);
+        $records = $this->shareUserRepository->get(['user_id' => $userId], [], [], ['shareUser', 'user']);
 
         return [
             'records' => $records,
@@ -28,11 +28,14 @@ class ShareUserOptions implements ShareUserOptionsInterface
             return collect();
         }
 
-        return $shareUsers->map(function ($item) {
-            return [
-                'share_user_id' => $item->share_user_id,
-                'share_user_name' => $item->shareUser->name,
-            ];
-        });
+        return $shareUsers
+            ->filter(fn ($item) => $item->shareUser !== null)
+            ->values()
+            ->map(function ($item) {
+                return [
+                    'share_user_id' => $item->share_user_id,
+                    'share_user_name' => $item->shareUser->name,
+                ];
+            });
     }
 }

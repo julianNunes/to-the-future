@@ -1,36 +1,55 @@
 import { expect, test } from '@playwright/test'
 import { captureDebugScreenshot, login } from './support/auth'
 
-test('invoice expense details page renders successfully', async ({ page }, testInfo) => {
-    await login(page)
+async function getActiveDialog(page) {
+    const dialog = page.locator('[role="dialog"]:visible').last()
+    await expect(dialog).toBeVisible()
+    return dialog
+}
 
-    // Navigate to Credit Cards page to find a card
+async function openInvoiceShow(page, cardName = 'E2E Credit Card') {
     await page.goto('/credit-card')
-    await page.waitForTimeout(2000)
-
-    // Wait and find any links starting with /credit-card/ and ending with /invoice
-    const invoiceLinks = page.locator('a[href$="/invoice"]')
-    const count = await invoiceLinks.count()
-
-    if (count > 0) {
-        // Click the first card's invoices link
-        await invoiceLinks.first().click()
-        await page.waitForTimeout(2000)
-
-        // Find links to view specific invoices (/credit-card/invoice/{id})
-        // Wait, normally invoices are rendered in the same page or there is an action button.
-        // If there's a link to the invoice detail, click it.
-        const detailLinks = page.locator('a[href*="/credit-card/invoice/"]')
-        const detailsCount = await detailLinks.count()
-        if (detailsCount > 0) {
-            await detailLinks.first().click()
-            await page.waitForTimeout(3000)
-        }
-    }
-
-    // Verify the page didn't crash (id="app" exists) and test completes
     await expect(page.locator('#app')).toBeVisible()
 
-    // Capture screenshot of the resulting page
-    await captureDebugScreenshot(page, testInfo, 'debug-invoice-expense.png')
+    const row = page.locator('tbody tr', { hasText: cardName }).first()
+    await expect(row).toBeVisible({ timeout: 10000 })
+
+    const invoiceIndexHref = await row.locator('a[href$="/invoice"]').first().getAttribute('href')
+
+    if (!invoiceIndexHref) {
+        throw new Error(`Invoice index link not found for ${cardName}`)
+    }
+
+    await page.goto(invoiceIndexHref)
+    await expect(page).toHaveURL(/\/credit-card\/\d+\/invoice/)
+
+    const showHref = await page.locator('a[href*="/credit-card/invoice/"]').first().getAttribute('href')
+
+    if (!showHref) {
+        throw new Error('Invoice show link not found on invoice index page')
+    }
+
+    await page.goto(showHref)
+    await expect(page).toHaveURL(/\/credit-card\/invoice\/\d+/)
+}
+
+test('invoice expense show page opens the new expense dialog correctly', async ({ page }, testInfo) => {
+    await login(page)
+    await openInvoiceShow(page)
+
+    const openInvoiceButton = page.getByRole('button', { name: 'Abrir Fatura' })
+    if (await openInvoiceButton.count()) {
+        await openInvoiceButton.click()
+        await page.waitForResponse(
+            (response) => response.request().method() === 'PUT' && /\/credit-card\/invoice\/\d+$/.test(response.url()),
+            { timeout: 5000 }
+        )
+    }
+
+    await page.getByRole('button', { name: 'Novo' }).first().click()
+    const dialog = await getActiveDialog(page)
+
+    await expect(dialog.locator('button:has-text("Salvar")').first()).toBeVisible({ timeout: 10000 })
+    await expect(dialog.locator('button:has-text("Cancelar")').first()).toBeVisible({ timeout: 10000 })
+    await captureDebugScreenshot(page, testInfo, 'debug-invoice-expense-dialog-smoke.png')
 })

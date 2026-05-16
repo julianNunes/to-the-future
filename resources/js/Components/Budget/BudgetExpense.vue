@@ -165,6 +165,7 @@
                                 ref="txtDescription"
                                 v-model="expense.description"
                                 :label="$t('default.description')"
+                                :error-messages="expenseForm.errors.description ? [expenseForm.errors.description] : []"
                                 :rules="rules.textFieldRules"
                                 required
                                 density="comfortable"
@@ -175,6 +176,7 @@
                                 ref="inputDate"
                                 v-model="expense.date"
                                 :label="$t('default.date')"
+                                :error-messages="expenseForm.errors.date ? [expenseForm.errors.date] : []"
                                 prepend-icon=""
                                 prepend-inner-icon="$calendar"
                                 required
@@ -193,6 +195,7 @@
                             <vuetify-money
                                 v-model="expense.value"
                                 :label="$t('default.value')"
+                                :error-messages="expenseForm.errors.value ? [expenseForm.errors.value] : []"
                                 density="comfortable"
                                 :rules="rules.currencyFieldRules"
                                 :options="{
@@ -209,6 +212,7 @@
                                 v-model="expense.portion"
                                 type="number"
                                 :label="$t('default.portion')"
+                                :error-messages="expenseForm.errors.portion ? [expenseForm.errors.portion] : []"
                                 :disabled="expense.id ? true : false"
                                 min="0"
                                 step="1"
@@ -221,6 +225,9 @@
                                 v-model="expense.portion_total"
                                 type="number"
                                 :label="$t('default.portion-total')"
+                                :error-messages="
+                                    expenseForm.errors.portion_total ? [expenseForm.errors.portion_total] : []
+                                "
                                 :disabled="expense.id ? true : false"
                                 min="0"
                                 step="1"
@@ -242,6 +249,7 @@
                             <v-select
                                 v-model="expense.group"
                                 :label="$t('default.group')"
+                                :error-messages="expenseForm.errors.group ? [expenseForm.errors.group] : []"
                                 :items="groupList"
                                 item-title="name"
                                 item-value="value"
@@ -254,6 +262,7 @@
                             <v-select
                                 v-model="expense.paid"
                                 label="Status"
+                                :error-messages="expenseForm.errors.paid ? [expenseForm.errors.paid] : []"
                                 :items="listStatus"
                                 item-title="name"
                                 item-value="value"
@@ -275,6 +284,7 @@
                             <vuetify-money
                                 v-model="expense.share_value"
                                 :label="$t('default.share-value')"
+                                :error-messages="expenseForm.errors.share_value ? [expenseForm.errors.share_value] : []"
                                 density="comfortable"
                                 :rules="[
                                     (value) => {
@@ -299,6 +309,9 @@
                             <v-select
                                 v-model="expense.share_user_id"
                                 :label="$t('default.share-user')"
+                                :error-messages="
+                                    expenseForm.errors.share_user_id ? [expenseForm.errors.share_user_id] : []
+                                "
                                 :items="shareUsers"
                                 item-title="share_user_name"
                                 item-value="share_user_id"
@@ -349,10 +362,10 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
+                <v-btn color="error" flat :loading="isLoading || expenseForm.processing" @click="editDialog = false">
                     {{ $t('default.cancel') }}
                 </v-btn>
-                <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
+                <v-btn color="primary" flat :loading="isLoading || expenseForm.processing" type="submit" @click="save">
                     {{ $t('default.save') }}
                 </v-btn>
             </v-card-actions>
@@ -363,17 +376,17 @@
 </template>
 
 <script setup>
-    import { ref, computed, nextTick } from 'vue'
-    import { router } from '@inertiajs/vue3'
-    import { useI18n } from 'vue-i18n'
-    import moment from 'moment'
+    import { router, useForm } from '@inertiajs/vue3'
+import moment from 'moment'
+import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
     import { currencyField, formatDate, reverseFormatNumber, sumField } from '@/utils/utils.js'
 
-    import { useValidationRules } from '@/composables/useFormConstants.js'
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
-    import { useTagSearch } from '@/composables/useTagSearch.js'
-    import { useShareCalculation } from '@/composables/useShareCalculation.js'
+import { useValidationRules } from '@/composables/useFormConstants.js'
+import { useShareCalculation } from '@/composables/useShareCalculation.js'
+import { useTagSearch } from '@/composables/useTagSearch.js'
 
     defineOptions({ name: 'BudgetExpense' })
 
@@ -423,6 +436,25 @@
         tags: [],
     })
 
+    function createExpenseFormData() {
+        return {
+            description: null,
+            date: null,
+            value: 0,
+            portion: null,
+            portion_total: null,
+            group: null,
+            paid: 0,
+            remarks: null,
+            share_value: 0,
+            share_user_id: null,
+            budget_id: componentProps.budgetId,
+            tags: [],
+        }
+    }
+
+    const expenseForm = useForm(createExpenseFormData())
+
     const listInstallments = ref([])
 
     const listStatus = [
@@ -471,6 +503,38 @@
 
     const monthToDateInput = computed(() => moment(componentProps.yearMonth + '-01').month())
     const yearToDateInput = computed(() => moment(componentProps.yearMonth + '-01').year())
+
+    function resetExpenseState(data = createExpenseFormData()) {
+        expense.value = data
+        expenseForm.clearErrors()
+    }
+
+    function normalizeExpenseDate(value) {
+        if (!value) {
+            return null
+        }
+
+        const normalized = moment(value)
+
+        return normalized.isValid() ? normalized.format('YYYY-MM-DD') : null
+    }
+
+    function buildExpensePayload() {
+        return {
+            description: expense.value.description,
+            date: normalizeExpenseDate(expense.value.date),
+            value: expense.value.value,
+            portion: expense.value.portion ? Number(expense.value.portion) : null,
+            portion_total: expense.value.portion_total ? Number(expense.value.portion_total) : null,
+            paid: Boolean(expense.value.paid),
+            group: expense.value.group,
+            remarks: expense.value.remarks,
+            share_value: expense.value.share_value,
+            share_user_id: expense.value.share_user_id,
+            budget_id: expense.value.budget_id,
+            tags: expense.value.tags || [],
+        }
+    }
 
     function calculeShareValue(evt) {
         if (expense.value.value) {
@@ -523,7 +587,7 @@
         titleModal.value = t('budget-expense.new-item')
         editDialog.value = true
         listInstallments.value = componentProps.installments || []
-        expense.value = {
+        resetExpenseState({
             id: null,
             description: null,
             value: 0,
@@ -537,7 +601,7 @@
             share_user_id: null,
             tags: [],
             budget_id: componentProps.budgetId,
-        }
+        })
         nextTick(() => {
             if (txtDescription.value) txtDescription.value.focus()
         })
@@ -553,7 +617,7 @@
         }
 
         listInstallments.value = data
-        expense.value = {
+        resetExpenseState({
             id: item.id,
             description: item.description,
             value: Number(item.value),
@@ -567,7 +631,7 @@
             share_user_id: item.share_user_id,
             tags: item.tags || [],
             budget_id: item.budget_id,
-        }
+        })
         nextTick(() => {
             if (txtDescription.value) txtDescription.value.focus()
         })
@@ -586,23 +650,9 @@
 
     async function createData() {
         isLoading.value = true
-        router.post(
-            '/budget-expense',
-            {
-                description: expense.value.description,
-                date: moment(expense.value.date).format('YYYY-MM-DD'),
-                value: expense.value.value,
-                portion: expense.value.portion,
-                portion_total: expense.value.portion_total,
-                paid: expense.value.paid ? true : false,
-                group: expense.value.group,
-                remarks: expense.value.remarks,
-                share_value: expense.value.share_value,
-                share_user_id: expense.value.share_user_id,
-                budget_id: expense.value.budget_id,
-                tags: expense.value.tags,
-            },
-            {
+        expenseForm
+            .transform(() => buildExpensePayload())
+            .post('/budget-expense', {
                 onSuccess: () => {
                     editDialog.value = false
                 },
@@ -610,28 +660,14 @@
                     isLoading.value = false
                 },
                 preserveScroll: true,
-            }
-        )
+            })
     }
 
     async function updateData() {
         isLoading.value = true
-        router.put(
-            '/budget-expense/' + expense.value.id,
-            {
-                description: expense.value.description,
-                value: expense.value.value,
-                portion: expense.value.portion,
-                portion_total: expense.value.portion_total,
-                date: moment(expense.value.date).format('YYYY-MM-DD'),
-                paid: expense.value.paid ? true : false,
-                group: expense.value.group,
-                remarks: expense.value.remarks,
-                share_value: expense.value.share_value,
-                share_user_id: expense.value.share_user_id,
-                tags: expense.value.tags,
-            },
-            {
+        expenseForm
+            .transform(() => buildExpensePayload())
+            .put('/budget-expense/' + expense.value.id, {
                 onSuccess: () => {
                     editDialog.value = false
                 },
@@ -639,8 +675,7 @@
                     isLoading.value = false
                 },
                 preserveScroll: true,
-            }
-        )
+            })
     }
 
     async function confirmRemove(item) {

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Budget\CloneBudgetRequest;
+use App\Http\Requests\Budget\StoreBudgetRequest;
+use App\Http\Requests\Budget\UpdateBudgetRequest;
 use App\Services\Interfaces\BudgetServiceInterface;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class BudgetController extends Controller
@@ -24,30 +26,26 @@ class BudgetController extends Controller
 
     /**
      * Create Budget with your relations
-     * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreBudgetRequest $request)
     {
-        $this->validate($request, [
-            'year' => ['required'],
-            'month' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->budgetService->createComplete(
             auth()->user()->id,
-            $request->year,
-            $request->month,
-            $request->start_week_1,
-            $request->end_week_1,
-            $request->start_week_2,
-            $request->end_week_2,
-            $request->start_week_3,
-            $request->end_week_3,
-            $request->start_week_4,
-            $request->end_week_4,
-            $request->automaticGenerateYear,
-            $request->includeFixExpenses,
-            $request->includeProvisions
+            $data['year'],
+            $data['month'],
+            $data['start_week_1'] ?? null,
+            $data['end_week_1'] ?? null,
+            $data['start_week_2'] ?? null,
+            $data['end_week_2'] ?? null,
+            $data['start_week_3'] ?? null,
+            $data['end_week_3'] ?? null,
+            $data['start_week_4'] ?? null,
+            $data['end_week_4'] ?? null,
+            $data['automaticGenerateYear'] ?? false,
+            $data['includeFixExpenses'] ?? false,
+            $data['includeProvisions'] ?? false
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -55,24 +53,20 @@ class BudgetController extends Controller
 
     /**
      * Clone a Budget with your relations
-     * @param Request $request
      * @param integer $id
      */
-    public function clone(Request $request, int $id)
+    public function clone(CloneBudgetRequest $request, int $id)
     {
-        $this->validate($request, [
-            'year' => ['required'],
-            'month' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->budgetService->clone(
             $id,
-            $request->year,
-            $request->month,
-            $request->includeProvisions,
-            $request->cloneBugdetExpenses,
-            $request->cloneBugdetIncomes,
-            $request->cloneBugdetGoals
+            $data['year'],
+            $data['month'],
+            $data['includeProvisions'] ?? false,
+            $data['cloneBugdetExpenses'] ?? false,
+            $data['cloneBugdetIncomes'] ?? false,
+            $data['cloneBugdetGoals'] ?? false
         );
 
         return redirect()->back()->with('success', 'default.sucess-update');
@@ -80,26 +74,23 @@ class BudgetController extends Controller
 
     /**
      * Update a Budget
-     * @param Request $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateBudgetRequest $request, int $id)
     {
-        $this->validate($request, [
-            // 'closed' => ['closed'],
-        ]);
+        $data = $request->validated();
 
         $this->budgetService->update(
             $id,
-            $request->start_week_1,
-            $request->end_week_1,
-            $request->start_week_2,
-            $request->end_week_2,
-            $request->start_week_3,
-            $request->end_week_3,
-            $request->start_week_4,
-            $request->end_week_4,
-            // $request->closed
+            $data['start_week_1'] ?? null,
+            $data['end_week_1'] ?? null,
+            $data['start_week_2'] ?? null,
+            $data['end_week_2'] ?? null,
+            $data['start_week_3'] ?? null,
+            $data['end_week_3'] ?? null,
+            $data['start_week_4'] ?? null,
+            $data['end_week_4'] ?? null,
+            $data['closed'] ?? false
         );
         return redirect()->back()->with('success', 'default.sucess-update');
     }

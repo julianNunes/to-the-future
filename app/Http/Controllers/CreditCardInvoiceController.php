@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreditCardInvoice\StoreCreditCardInvoiceRequest;
+use App\Http\Requests\CreditCardInvoice\UpdateCreditCardInvoiceRequest;
 use App\Services\Interfaces\CreditCardInvoiceServiceInterface;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class CreditCardInvoiceController extends Controller
@@ -30,23 +30,17 @@ class CreditCardInvoiceController extends Controller
      * @param Request $request
      * @return void
      */
-    public function store(Request $request)
+    public function store(StoreCreditCardInvoiceRequest $request)
     {
-        $this->validate($request, [
-            'due_date' => ['required'],
-            'closing_date' => ['required'],
-            'year' => ['required'],
-            'month' => ['required'],
-            'credit_card_id' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->creditCardInvoiceService->createAutomatic(
-            $request->due_date,
-            $request->closing_date,
-            $request->year,
-            $request->month,
-            $request->credit_card_id,
-            $request->automatic_generate
+            $data['due_date'],
+            $data['closing_date'],
+            $data['year'],
+            $data['month'],
+            $data['credit_card_id'],
+            $data['automatic_generate'] ?? false,
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -57,15 +51,13 @@ class CreditCardInvoiceController extends Controller
      * @param Request $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateCreditCardInvoiceRequest $request, int $id)
     {
-        $this->validate($request, [
-            'closed' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->creditCardInvoiceService->update(
             $id,
-            $request->closed,
+            $data['closed'],
         );
 
         return redirect()->back()->with('success', 'default.sucess-update');

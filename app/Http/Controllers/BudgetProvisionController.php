@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\BudgetProvisionService;
+use App\Http\Requests\BudgetProvision\StoreBudgetProvisionRequest;
+use App\Http\Requests\BudgetProvision\UpdateBudgetProvisionRequest;
 use App\Services\Interfaces\BudgetProvisionServiceInterface;
-use Illuminate\Http\Request;
 
 class BudgetProvisionController extends Controller
 {
@@ -16,24 +16,19 @@ class BudgetProvisionController extends Controller
      * Create a new Provision to Budget
      * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreBudgetProvisionRequest $request)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'value' => ['required'],
-            'group' => ['required'],
-            'budget_id' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->budgetProvisionService->create(
-            intval($request->budget_id),
-            $request->description,
-            floatval($request->value),
-            $request->group,
-            $request->remarks,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['budget_id'],
+            $data['description'],
+            $data['value'],
+            $data['group'],
+            $data['remarks'] ?? null,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-save');
@@ -44,24 +39,19 @@ class BudgetProvisionController extends Controller
      * @param Request $request
      * @param int $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateBudgetProvisionRequest $request, int $id)
     {
-        $this->validate($request, [
-            'description' => ['required'],
-            'value' => ['required'],
-            'group' => ['required'],
-        ]);
+        $data = $request->validated();
 
         $this->budgetProvisionService->update(
             $id,
-            $request->description,
-            floatval($request->value),
-            $request->group,
-            $request->remarks,
-            intval($request->budget_id),
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags)
+            $data['description'],
+            $data['value'],
+            $data['group'],
+            $data['remarks'] ?? null,
+            $data['share_value'] ?? null,
+            $data['share_user_id'] ?? null,
+            collect($data['tags'] ?? [])
         );
 
         return redirect()->back()->with('success', 'default.sucess-update');

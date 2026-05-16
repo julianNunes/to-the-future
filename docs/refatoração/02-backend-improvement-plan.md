@@ -561,6 +561,8 @@ app/Http/Requests/
 
 **Ação:** Remover linhas comentadas ou reativar caso sejam necessárias.
 
+**Status em 16/05/2026:** `BudgetController`, `BudgetExpenseController`, `BudgetIncomeController` e `BudgetProvisionController` já foram migrados para Form Requests dedicadas, com normalização explícita de payload, validação de pares `share_value/share_user_id` e correção do fluxo de update de `BudgetProvision`.
+
 ---
 
 ## 7. Fase 5 — DTOs e Redução de Parâmetros

@@ -82,7 +82,7 @@ A análise identificou **62 pontos de melhoria** em 8 categorias. Os problemas m
 ### Fase 3 — Modernização do Inertia.js v2
 
 - [x] 5.1 `this.$inertia.*` não aparece mais nos arquivos ativos; a navegação foi migrada para `router` e `form.post()`.
-- [ ] 5.2 `useForm()` avançou para `Tag/Index.vue`, `FixExpense/Index.vue`, `Provision/Index.vue`, `Financing/Index.vue`, `CreditCard/Index.vue` e `PrepaidCard/Index.vue`, mas os fluxos centrais de Budget, invoices e extracts ainda mantêm formulários híbridos.
+- [ ] 5.2 `useForm()` avançou para `Tag/Index.vue`, `FixExpense/Index.vue`, `Provision/Index.vue`, `Financing/Index.vue`, `CreditCard/Index.vue`, `PrepaidCard/Index.vue`, `Budget/Index.vue` e os subfluxos ativos de `BudgetExpense.vue`, `BudgetIncome.vue` e `BudgetProvision.vue`; o débito remanescente ficou concentrado em invoices e extracts.
 - [x] 5.3 O layout persistente via `defineOptions({ layout: AuthenticatedLayout })` já está aplicado nas páginas autenticadas.
 - [ ] 5.4 Ziggy e rotas nomeadas no frontend ainda não foram adotados.
 

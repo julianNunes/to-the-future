@@ -96,7 +96,9 @@ class BudgetShowData implements BudgetShowDataInterface
 
         $shareUsersData = $this->shareUserOptions->resolveForUser($budget->user_id);
         $shareUsers = $shareUsersData['options'];
-        $shareUser = $shareUsersData['records']->first();
+        $shareUser = $shareUsersData['records']->first(
+            fn ($item) => $item->shareUser !== null && $item->user !== null
+        );
 
         $budgetShare = null;
 
@@ -167,35 +169,35 @@ class BudgetShowData implements BudgetShowDataInterface
 
         $this->mountExpensesIncomes($budget, $budgetShare, $shareUser?->shareUser);
 
-        if ($shareUser && $budgetShare) {
+        if ($shareUser?->user && $budgetShare) {
             $this->mountExpensesIncomes($budgetShare, $budget, $shareUser->user);
         }
 
         $resume = $this->mountResume($budget, $budgetShare);
         $resume_share = null;
 
-        if ($shareUser && $budgetShare) {
+        if ($shareUser?->user && $budgetShare) {
             $resume_share = $this->mountResume($budgetShare, $budget);
         }
 
         $goals_charts = $this->mountGoalsChart($budget, $budgetShare);
         $goals_charts_share = null;
 
-        if ($shareUser && $budgetShare) {
+        if ($shareUser?->user && $budgetShare) {
             $goals_charts_share = $this->mountGoalsChart($budgetShare, $budget);
         }
 
         $expense_to_tags = $this->mountExpenseToTags($budget);
         $expense_to_tags_share = null;
 
-        if ($shareUser && $budgetShare) {
+        if ($shareUser?->user && $budgetShare) {
             $expense_to_tags_share = $this->mountExpenseToTags($budgetShare);
         }
 
         $expense_to_tag_options_charts = $this->mountExpenseTagOptions($budget, $budgetShare);
         $expense_to_tag_options_charts_share = null;
 
-        if ($shareUser && $budgetShare) {
+        if ($shareUser?->user && $budgetShare) {
             $expense_to_tag_options_charts_share = $this->mountExpenseTagOptions($budgetShare, $budget);
         }
 

@@ -43,7 +43,10 @@ class CreditCardRequestTest extends TestCase
             ])
             ->assertRedirect('/credit-card');
 
-        $card = CreditCard::query()->firstOrFail();
+        $card = CreditCard::query()
+            ->where('user_id', $user->id)
+            ->where('digits', '1234')
+            ->firstOrFail();
 
         $this->assertSame('Nubank', $card->name);
         $this->assertSame('1234', $card->digits);

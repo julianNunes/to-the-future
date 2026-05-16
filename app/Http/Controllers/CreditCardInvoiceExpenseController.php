@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreditCardInvoiceExpense\StoreCreditCardInvoiceExpenseRequest;
+use App\Http\Requests\CreditCardInvoiceExpense\StoreImportCreditCardInvoiceExpenseRequest;
+use App\Http\Requests\CreditCardInvoiceExpense\UpdateCreditCardInvoiceExpenseRequest;
 use App\Services\Interfaces\CreditCardInvoiceExpenseServiceInterface;
-use Illuminate\Http\Request;
 
 class CreditCardInvoiceExpenseController extends Controller
 {
@@ -12,53 +14,46 @@ class CreditCardInvoiceExpenseController extends Controller
 
     /**
      * Create new Expense to Invoice and your portions
-     * @param Request $request
      */
-    public function store(Request $request)
+    public function store(StoreCreditCardInvoiceExpenseRequest $request)
     {
-        $this->validate($request, [
-            'credit_card_id' => ['required'],
-            'invoice_id' => ['required'],
-            'description' => ['required'],
-            'date' => ['required'],
-            'value' => ['required'],
-        ]);
+        $payload = $request->validated();
 
-        if ($request->portion_total && intval($request->portion_total) >= 2) {
+        if (($payload['portion_total'] ?? null) && $payload['portion_total'] >= 2) {
             $this->creditCardInvoiceExpenseService->createWithPortions(
-                $request->credit_card_id,
-                $request->invoice_id,
-                $request->description,
-                $request->date,
-                floatval($request->value),
-                $request->group,
-                $request->portion ? intval($request->portion) : null,
-                $request->portion_total ? intval($request->portion_total) : null,
-                $request->remarks,
-                $request->share_value ? floatval($request->share_value) : null,
-                $request->share_user_id,
-                collect($request->tags),
-                collect($request->divisions)
+                $payload['credit_card_id'],
+                $payload['invoice_id'],
+                $payload['description'],
+                $payload['date'],
+                (float) $payload['value'],
+                $payload['group'],
+                $payload['portion'],
+                $payload['portion_total'],
+                $payload['remarks'] ?? null,
+                $payload['share_value'] ?? null,
+                $payload['share_user_id'] ?? null,
+                \collect($payload['tags'] ?? []),
+                \collect($payload['divisions'] ?? [])
             );
         } else {
             $this->creditCardInvoiceExpenseService->create(
-                $request->credit_card_id,
-                $request->invoice_id,
-                $request->description,
-                $request->date,
-                floatval($request->value),
-                $request->group,
-                $request->portion ? intval($request->portion) : null,
-                $request->portion_total ? intval($request->portion_total) : null,
-                $request->remarks,
-                $request->share_value ? floatval($request->share_value) : null,
-                $request->share_user_id,
-                collect($request->tags),
-                collect($request->divisions)
+                $payload['credit_card_id'],
+                $payload['invoice_id'],
+                $payload['description'],
+                $payload['date'],
+                (float) $payload['value'],
+                $payload['group'],
+                $payload['portion'] ?? null,
+                $payload['portion_total'] ?? null,
+                $payload['remarks'] ?? null,
+                $payload['share_value'] ?? null,
+                $payload['share_user_id'] ?? null,
+                \collect($payload['tags'] ?? []),
+                \collect($payload['divisions'] ?? [])
             );
         }
 
-        return redirect()->back()->with('success', 'default.sucess-save');
+        return \redirect()->back()->with('success', 'default.sucess-save');
     }
 
     /**
@@ -66,37 +61,30 @@ class CreditCardInvoiceExpenseController extends Controller
 
     /**
      * Update a Expense
-     * @param Request $request
      * @param integer $id
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateCreditCardInvoiceExpenseRequest $request, int $id)
     {
-        $this->validate($request, [
-            'credit_card_id' => ['required'],
-            'invoice_id' => ['required'],
-            'description' => ['required'],
-            'date' => ['required'],
-            'value' => ['required'],
-        ]);
+        $payload = $request->validated();
 
         $this->creditCardInvoiceExpenseService->update(
             $id,
-            $request->credit_card_id,
-            $request->invoice_id,
-            $request->description,
-            $request->date,
-            floatval($request->value),
-            $request->group,
-            $request->portion,
-            $request->portion_total,
-            $request->remarks,
-            $request->share_value ? floatval($request->share_value) : null,
-            $request->share_user_id,
-            collect($request->tags),
-            collect($request->divisions)
+            $payload['credit_card_id'],
+            $payload['invoice_id'],
+            $payload['description'],
+            $payload['date'],
+            (float) $payload['value'],
+            $payload['group'],
+            $payload['portion'] ?? null,
+            $payload['portion_total'] ?? null,
+            $payload['remarks'] ?? null,
+            $payload['share_value'] ?? null,
+            $payload['share_user_id'] ?? null,
+            \collect($payload['tags'] ?? []),
+            \collect($payload['divisions'] ?? [])
         );
 
-        return redirect()->back()->with('success', 'default.sucess-save');
+        return \redirect()->back()->with('success', 'default.sucess-save');
     }
 
     /**
@@ -106,7 +94,7 @@ class CreditCardInvoiceExpenseController extends Controller
     public function delete(int $id)
     {
         $this->creditCardInvoiceExpenseService->delete($id);
-        return redirect()->back()->with('success', 'default.sucess-delete');
+        return \redirect()->back()->with('success', 'default.sucess-delete');
     }
 
     /**
@@ -116,22 +104,18 @@ class CreditCardInvoiceExpenseController extends Controller
     public function deletePortions(int $id)
     {
         $this->creditCardInvoiceExpenseService->deletePortions($id);
-        return redirect()->back()->with('success', 'default.sucess-delete');
+        return \redirect()->back()->with('success', 'default.sucess-delete');
     }
 
     /**
      * Read data from Excel and save the Expenses
-     * @param Request $request
      */
-    public function storeImportExcel(Request $request)
+    public function storeImportExcel(StoreImportCreditCardInvoiceExpenseRequest $request)
     {
-        $this->validate($request, [
-            'data' => ['required'],
-            'invoice_id' => ['required'],
-        ]);
+        $payload = $request->validated();
 
-        $this->creditCardInvoiceExpenseService->storeImportExcel(intval($request->invoice_id), collect($request->data));
-        return redirect()->back()->with('success', 'default.sucess-save');
+        $this->creditCardInvoiceExpenseService->storeImportExcel($payload['invoice_id'], \collect($payload['data']));
+        return \redirect()->back()->with('success', 'default.sucess-save');
     }
 
     /**
@@ -142,6 +126,6 @@ class CreditCardInvoiceExpenseController extends Controller
     public function search(string $description)
     {
         $data = $this->creditCardInvoiceExpenseService->search($description);
-        return response()->json($data);
+        return \response()->json($data);
     }
 }

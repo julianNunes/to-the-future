@@ -121,6 +121,7 @@
                                 ref="txtDescription"
                                 v-model="income.description"
                                 :label="$t('default.description')"
+                                :error-messages="incomeForm.errors.description ? [incomeForm.errors.description] : []"
                                 :rules="rules.textFieldRules"
                                 required
                                 density="comfortable"
@@ -131,6 +132,7 @@
                                 ref="inputDate"
                                 v-model="income.date"
                                 :label="$t('default.date')"
+                                :error-messages="incomeForm.errors.date ? [incomeForm.errors.date] : []"
                                 prepend-icon=""
                                 prepend-inner-icon="$calendar"
                                 required
@@ -149,6 +151,7 @@
                             <vuetify-money
                                 v-model="income.value"
                                 :label="$t('default.value')"
+                                :error-messages="incomeForm.errors.value ? [incomeForm.errors.value] : []"
                                 density="comfortable"
                                 :rules="rules.currencyFieldRules"
                                 :options="{
@@ -195,10 +198,10 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="error" flat :loading="isLoading" @click="editDialog = false">
+                <v-btn color="error" flat :loading="isLoading || incomeForm.processing" @click="editDialog = false">
                     {{ $t('default.cancel') }}
                 </v-btn>
-                <v-btn color="primary" flat :loading="isLoading" type="submit" @click="save">
+                <v-btn color="primary" flat :loading="isLoading || incomeForm.processing" type="submit" @click="save">
                     {{ $t('default.save') }}
                 </v-btn>
             </v-card-actions>
@@ -209,15 +212,15 @@
 </template>
 
 <script setup>
-    import { ref, computed, nextTick } from 'vue'
-    import { router } from '@inertiajs/vue3'
-    import { useI18n } from 'vue-i18n'
-    import moment from 'moment'
     import { currencyField, formatDate, sumField } from '@/utils/utils.js'
+import { router, useForm } from '@inertiajs/vue3'
+import moment from 'moment'
+import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-    import { useValidationRules } from '@/composables/useFormConstants.js'
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
-    import { useTagSearch } from '@/composables/useTagSearch.js'
+import { useValidationRules } from '@/composables/useFormConstants.js'
+import { useTagSearch } from '@/composables/useTagSearch.js'
 
     defineOptions({ name: 'BudgetIncome' })
 
@@ -249,6 +252,19 @@
         budget_id: null,
         tags: [],
     })
+
+    function createIncomeFormData() {
+        return {
+            description: null,
+            date: null,
+            value: 0,
+            remarks: null,
+            budget_id: componentProps.budgetId,
+            tags: [],
+        }
+    }
+
+    const incomeForm = useForm(createIncomeFormData())
 
     // Refs for template
     const txtDescription = ref(null)
@@ -283,6 +299,32 @@
     const monthToDateInput = computed(() => moment(componentProps.yearMonth + '-01').month())
     const yearToDateInput = computed(() => moment(componentProps.yearMonth + '-01').year())
 
+    function resetIncomeState(data = createIncomeFormData()) {
+        income.value = data
+        incomeForm.clearErrors()
+    }
+
+    function normalizeIncomeDate(value) {
+        if (!value) {
+            return null
+        }
+
+        const normalized = moment(value)
+
+        return normalized.isValid() ? normalized.format('YYYY-MM-DD') : null
+    }
+
+    function buildIncomePayload() {
+        return {
+            description: income.value.description,
+            date: normalizeIncomeDate(income.value.date),
+            value: income.value.value,
+            remarks: income.value.remarks,
+            budget_id: income.value.budget_id,
+            tags: income.value.tags || [],
+        }
+    }
+
     async function searchTags(val) {
         loadingData.value = true
         doSearchTags(val, income.value.tags)
@@ -298,7 +340,7 @@
     function newItem() {
         titleModal.value = t('budget-income.new-item')
         editDialog.value = true
-        income.value = {
+        resetIncomeState({
             id: null,
             description: null,
             value: 0,
@@ -306,7 +348,7 @@
             remarks: null,
             tags: [],
             budget_id: componentProps.budgetId,
-        }
+        })
         nextTick(() => {
             if (txtDescription.value) txtDescription.value.focus()
         })
@@ -316,7 +358,7 @@
         titleModal.value = t('budget-income.edit-item')
         editDialog.value = true
 
-        income.value = {
+        resetIncomeState({
             id: item.id,
             description: item.description,
             value: Number(item.value),
@@ -324,7 +366,7 @@
             remarks: item.remarks,
             tags: item.tags,
             budget_id: item.budget_id,
-        }
+        })
         nextTick(() => {
             if (txtDescription.value) txtDescription.value.focus()
         })
@@ -343,17 +385,9 @@
 
     async function createData() {
         isLoading.value = true
-        router.post(
-            '/budget-income',
-            {
-                description: income.value.description,
-                date: moment(income.value.date).format('YYYY-MM-DD'),
-                value: income.value.value,
-                remarks: income.value.remarks,
-                budget_id: income.value.budget_id,
-                tags: income.value.tags,
-            },
-            {
+        incomeForm
+            .transform(() => buildIncomePayload())
+            .post('/budget-income', {
                 onSuccess: () => {
                     editDialog.value = false
                 },
@@ -361,22 +395,14 @@
                     isLoading.value = false
                 },
                 preserveScroll: true,
-            }
-        )
+            })
     }
 
     async function updateData() {
         isLoading.value = true
-        router.put(
-            '/budget-income/' + income.value.id,
-            {
-                description: income.value.description,
-                value: income.value.value,
-                date: moment(income.value.date).format('YYYY-MM-DD'),
-                remarks: income.value.remarks,
-                tags: income.value.tags,
-            },
-            {
+        incomeForm
+            .transform(() => buildIncomePayload())
+            .put('/budget-income/' + income.value.id, {
                 onSuccess: () => {
                     editDialog.value = false
                 },
@@ -384,8 +410,7 @@
                     isLoading.value = false
                 },
                 preserveScroll: true,
-            }
-        )
+            })
     }
 
     async function confirmRemove(item) {
