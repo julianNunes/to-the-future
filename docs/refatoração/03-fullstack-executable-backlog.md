@@ -251,6 +251,14 @@ Uma slice só pode ser marcada como concluída quando atender todos os critério
 - Validação mínima: `./scripts/npm.sh run lint`, `./scripts/npm.sh run test:unit`, `./scripts/artisan.sh test --testsuite=Unit --filter="BudgetServiceTest|BudgetExpenseServiceTest"`, `./scripts/artisan.sh test --testsuite=Feature --filter="testInvoiceExpenseDeletePortionsRemovesAllMatchingInstallments"`, `./scripts/npm.sh run build`, smoke E2E crítico.
 - Status em 16/05/2026: concluída com alias compatível para `dayjs`, adapter `@date-io/dayjs`, remoção das dependências de `moment`, `ConfirmDialog` com `alertdialog`/ARIA, hook `pre-commit` com `lint-staged` via wrapper do projeto e batch real de recálculo nos fluxos de deleção em lote mais críticos.
 
+#### SLICE-7.5 — Fechamento dos avisos finais de frontend
+- [x] Eliminar os últimos avisos pendentes de lint e build sem reabrir o escopo da Onda 7.
+- Frontend: remover `vue/no-template-shadow` nas views restantes e reduzir o acoplamento síncrono dos blocos pesados da `Budget/Show.vue`.
+- Build/DX: isolar o peso de gráficos em chunks dedicados e ajustar o baseline de warning do Vite ao novo particionamento.
+- Testes mínimos: `lint`, `build` e regressão unitária das views Inertia.
+- Validação mínima: `./scripts/npm.sh run lint`, `./scripts/npm.sh run build`, `./scripts/npm.sh run test:unit -- resources/js/Pages/**/__tests__/*.spec.js`.
+- Status em 17/05/2026: concluída com renomeação dos slots que sombreavam `props`, lazy loading dos componentes pesados da `Budget/Show.vue`, `BarChart` carregado sob demanda, particionamento dedicado para vendors de chart/Vuetify no Vite e build final sem warnings de chunk size.
+
 ---
 
 ## 7. Definição de Encerramento do Programa

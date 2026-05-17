@@ -279,6 +279,19 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - smoke E2E crítico
 - Status em 16/05/2026: concluída com migração compatível para `dayjs`, remoção das dependências de `moment`, hook `pre-commit` executando `lint-staged` dentro do container, `ConfirmDialog` exposto como `alertdialog` com metadados ARIA e supressão de recálculo redundante nos fluxos `deleteAllPortions`, `deletePortions` e `BudgetService::delete`.
 
+### TASK-10 — Fechar avisos finais de lint e build
+- [x] Referência: `SLICE-7.5`.
+- Objetivo: encerrar a Onda 7 sem warnings residuais no lint e no build do frontend.
+- Passos:
+1. Remover o sombreamento de `props` nas views restantes.
+2. Lazy-loadar os blocos pesados da `Budget/Show.vue` e o `BarChart` nos consumidores de gráficos.
+3. Refinar o particionamento do Vite para vendors de gráficos/Vuetify e eliminar o warning final de chunk size.
+- Validação mínima:
+  - `./scripts/npm.sh run lint`
+  - `./scripts/npm.sh run build`
+  - `./scripts/npm.sh run test:unit -- resources/js/Pages/**/__tests__/*.spec.js`
+- Status em 17/05/2026: concluída com as views sem `vue/no-template-shadow`, `Budget/Show.vue` e componentes de gráfico em lazy loading, `manualChunks` refinado no Vite e build final sem avisos de chunk size.
+
 ---
 
 ## 7. Template de Atualização de Status

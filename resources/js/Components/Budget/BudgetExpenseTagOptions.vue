@@ -173,14 +173,15 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue'
-    import { useI18n } from 'vue-i18n'
-    import BarChart from '@/Components/BarChart.vue'
     import ConfirmDialog from '@/Components/ConfirmDialog.vue'
-    import { currencyField } from '@/utils/utils.js'
-    import { useValidationRules, useGroupList } from '@/composables/useFormConstants.js'
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import { useGroupList, useValidationRules } from '@/composables/useFormConstants.js'
     import { useTagSearch } from '@/composables/useTagSearch.js'
+    import { currencyField } from '@/utils/utils.js'
+    import { computed, defineAsyncComponent, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
+
+    const BarChart = defineAsyncComponent(() => import('@/Components/BarChart.vue'))
 
     const componentProps = defineProps({
         budgetId: { type: Number },

@@ -43,5 +43,37 @@ export default defineConfig({
         minify: 'esbuild',
         target: 'es2015',
         sourcemap: false,
+        chunkSizeWarningLimit: 650,
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (!id.includes('node_modules')) {
+                        return undefined
+                    }
+
+                    if (id.includes('vuetify') || id.includes('@mdi') || id.includes('vuetify-money-3')) {
+                        return 'vuetify-vendor'
+                    }
+
+                    if (id.includes('vue3-apexcharts')) {
+                        return 'charts-wrapper'
+                    }
+
+                    if (id.includes('node_modules/apexcharts/')) {
+                        return 'charts-core'
+                    }
+
+                    if (id.includes('read-excel-file') || id.includes('write-excel-file')) {
+                        return 'excel-vendor'
+                    }
+
+                    if (id.includes('@inertiajs') || id.includes('vue') || id.includes('axios')) {
+                        return 'app-vendor'
+                    }
+
+                    return 'vendor'
+                },
+            },
+        },
     },
 })

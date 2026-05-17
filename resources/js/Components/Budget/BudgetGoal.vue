@@ -198,15 +198,16 @@
 </template>
 
 <script setup>
-    import { ref, computed, nextTick } from 'vue'
-    import { router } from '@inertiajs/vue3'
-    import { useI18n } from 'vue-i18n'
-    import BarChart from '@/Components/BarChart.vue'
     import { currencyField } from '@/utils/utils.js'
+    import { router } from '@inertiajs/vue3'
+    import { computed, defineAsyncComponent, nextTick, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
 
-    import { useValidationRules } from '@/composables/useFormConstants.js'
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
+    import { useValidationRules } from '@/composables/useFormConstants.js'
     import { useTagSearch } from '@/composables/useTagSearch.js'
+
+    const BarChart = defineAsyncComponent(() => import('@/Components/BarChart.vue'))
 
     defineOptions({ name: 'BudgetGoal' })
 

@@ -72,10 +72,11 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue'
-    import { useI18n } from 'vue-i18n'
-    import BarChart from '@/Components/BarChart.vue'
     import { currencyField } from '@/utils/utils.js'
+    import { computed, defineAsyncComponent, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
+
+    const BarChart = defineAsyncComponent(() => import('@/Components/BarChart.vue'))
 
     defineOptions({ name: 'BudgetExpenseTags' })
 

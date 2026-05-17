@@ -109,9 +109,9 @@
 
                         <template #[`item.action`]="{ item }">
                             <v-tooltip :text="$t('default.edit')" location="top">
-                                <template #activator="{ props }">
+                                <template #activator="{ props: tooltipProps }">
                                     <v-icon
-                                        v-bind="props"
+                                        v-bind="tooltipProps"
                                         color="warning"
                                         icon="mdi-pencil"
                                         size="small"
@@ -281,14 +281,14 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue'
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
+    import { useCrudOperations } from '@/composables/useCrudOperations.js'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
+    import { currencyField, formatDate, percentField, reverseFormatNumber, sumField } from '@/utils/utils.js'
     import { Head, router } from '@inertiajs/vue3'
     import moment from 'moment'
-    import { currencyField, formatDate, percentField, reverseFormatNumber, sumField } from '@/utils/utils.js'
+    import { computed, ref } from 'vue'
     import { useI18n } from 'vue-i18n'
-    import { useCrudOperations } from '@/composables/useCrudOperations.js'
 
     defineOptions({ name: 'FinancingShow', layout: AuthenticatedLayout })
 

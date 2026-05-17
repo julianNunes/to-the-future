@@ -78,16 +78,17 @@
                         <template #[`item.credit`]="{ item }">{{ currencyField(item.credit) }}</template>
                         <template #[`item.action`]="{ item }">
                             <v-tooltip :text="$t('default.show')" location="top">
-                                <template #activator="{ props }">
+                                <template #activator="{ props: tooltipProps }">
                                     <Link :href="hrefExtractShow(item)" class="v-breadcrumbs-item--link">
-                                        <v-icon v-bind="props" color="warning" icon="mdi-eye" size="small"> </v-icon>
+                                        <v-icon v-bind="tooltipProps" color="warning" icon="mdi-eye" size="small">
+                                        </v-icon>
                                     </Link>
                                 </template>
                             </v-tooltip>
                             <v-tooltip :text="$t('default.edit')" location="top">
-                                <template #activator="{ props }">
+                                <template #activator="{ props: tooltipProps }">
                                     <v-icon
-                                        v-bind="props"
+                                        v-bind="tooltipProps"
                                         class="ml-1"
                                         color="warning"
                                         icon="mdi-pencil"
@@ -98,9 +99,9 @@
                                 </template>
                             </v-tooltip>
                             <v-tooltip :text="$t('default.delete')" location="top">
-                                <template #activator="{ props }">
+                                <template #activator="{ props: tooltipProps }">
                                     <v-icon
-                                        v-bind="props"
+                                        v-bind="tooltipProps"
                                         class="ml-1"
                                         color="error"
                                         icon="mdi-delete"

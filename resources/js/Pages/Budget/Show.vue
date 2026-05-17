@@ -167,21 +167,24 @@
 
 <script setup>
     import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-    import BudgetExpense from '@/Components/Budget/BudgetExpense.vue'
-    import BudgetExpenseTagOptions from '@/Components/Budget/BudgetExpenseTagOptions.vue'
-    import BudgetExpenseTags from '@/Components/Budget/BudgetExpenseTags.vue'
-    import BudgetGoal from '@/Components/Budget/BudgetGoal.vue'
-    import BudgetIncome from '@/Components/Budget/BudgetIncome.vue'
-    import BudgetProvision from '@/Components/Budget/BudgetProvision.vue'
     import BudgetResume from '@/Components/Budget/BudgetResume.vue'
     import ConfirmDialog from '@/Components/ConfirmDialog.vue'
-    import InvoiceExpense from '@/Components/CreditCardInvoice/InvoiceExpense.vue'
-    import ExtractExpense from '@/Components/PrepaidCardExtract/ExtractExpense.vue'
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
     import { Head, router } from '@inertiajs/vue3'
     import moment from 'moment'
-    import { computed, ref } from 'vue'
+    import { computed, defineAsyncComponent, ref } from 'vue'
     import { useI18n } from 'vue-i18n'
+
+    const BudgetExpense = defineAsyncComponent(() => import('@/Components/Budget/BudgetExpense.vue'))
+    const BudgetExpenseTagOptions = defineAsyncComponent(
+        () => import('@/Components/Budget/BudgetExpenseTagOptions.vue')
+    )
+    const BudgetExpenseTags = defineAsyncComponent(() => import('@/Components/Budget/BudgetExpenseTags.vue'))
+    const BudgetGoal = defineAsyncComponent(() => import('@/Components/Budget/BudgetGoal.vue'))
+    const BudgetIncome = defineAsyncComponent(() => import('@/Components/Budget/BudgetIncome.vue'))
+    const BudgetProvision = defineAsyncComponent(() => import('@/Components/Budget/BudgetProvision.vue'))
+    const InvoiceExpense = defineAsyncComponent(() => import('@/Components/CreditCardInvoice/InvoiceExpense.vue'))
+    const ExtractExpense = defineAsyncComponent(() => import('@/Components/PrepaidCardExtract/ExtractExpense.vue'))
 
     defineOptions({ name: 'BudgetShow', layout: AuthenticatedLayout })
 
