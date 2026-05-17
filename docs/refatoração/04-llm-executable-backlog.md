@@ -261,7 +261,23 @@ Se você for um LLM executando trabalho neste repositório, sua missão é:
   - `./scripts/npm.sh run lint`
   - `./scripts/npm.sh run test:unit`
   - `./scripts/npm.sh run test:e2e`
-- Status em 16/05/2026: concluída como corte seguro de encerramento com batch de tags, lazy-loading guard com log, Vuetify tree-shaking, skip link/logout acessível, lint em 0 erros, build, unit/backend e E2E verdes. Pendências maiores (`moment`, Husky/lint-staged, recálculos/deleções em lote) ficam registradas como evolução posterior, não bloqueante.
+- Status em 16/05/2026: concluída como corte seguro de encerramento com batch de tags, lazy-loading guard com log, Vuetify tree-shaking, skip link/logout acessível, lint em 0 erros, build, unit/backend e E2E verdes. Os remanescentes explícitos desse corte foram fechados na `TASK-09`.
+
+### TASK-09 — Fechar remanescentes pós-corte seguro
+- [x] Referência: `SLICE-7.4`.
+- Objetivo: eliminar os pontos concretos que ainda estavam documentados como posteriores após a `TASK-08`.
+- Passos:
+1. Migrar o runtime de datas de `moment` para `dayjs` e alinhar o adapter do Vuetify.
+2. Configurar Husky + lint-staged com os wrappers do projeto e endurecer a acessibilidade do `ConfirmDialog`.
+3. Reduzir recálculos redundantes nos deletes em lote e no teardown de `Budget`.
+- Validação mínima:
+  - `./scripts/npm.sh run lint`
+  - `./scripts/npm.sh run test:unit`
+  - `./scripts/artisan.sh test --testsuite=Unit --filter="BudgetServiceTest|BudgetExpenseServiceTest"`
+  - `./scripts/artisan.sh test --testsuite=Feature --filter="testInvoiceExpenseDeletePortionsRemovesAllMatchingInstallments"`
+  - `./scripts/npm.sh run build`
+  - smoke E2E crítico
+- Status em 16/05/2026: concluída com migração compatível para `dayjs`, remoção das dependências de `moment`, hook `pre-commit` executando `lint-staged` dentro do container, `ConfirmDialog` exposto como `alertdialog` com metadados ARIA e supressão de recálculo redundante nos fluxos `deleteAllPortions`, `deletePortions` e `BudgetService::delete`.
 
 ---
 

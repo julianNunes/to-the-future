@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-    import { currencyField, sumField, sumGroup } from '@/utils/utils.js';
+    import { currencyField, sumField, sumGroup } from '@/utils/utils.js'
 
     defineOptions({ name: 'InvoiceExpenseDivisionTable' })
 

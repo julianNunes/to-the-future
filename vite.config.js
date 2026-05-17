@@ -25,6 +25,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'resources/js'),
+            moment: path.resolve(__dirname, 'resources/js/utils/date.js'),
         },
     },
     server: {

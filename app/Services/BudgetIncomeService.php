@@ -120,7 +120,7 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
      * Delete a new Income to Budget
      * @param int $id
      */
-    public function delete(int $id): bool
+    public function delete(int $id, bool $shouldRecalculate = true): bool
     {
         $income = $this->budgetIncomeRepository->show($id);
 
@@ -142,7 +142,9 @@ class BudgetIncomeService implements BudgetIncomeServiceInterface
         $this->budgetIncomeRepository->delete($id);
 
         // Atualiza Orçamento
-        $this->budgetCalculate->recalculate($income->budget_id);
+        if ($shouldRecalculate) {
+            $this->budgetCalculate->recalculate($income->budget_id);
+        }
 
         return true;
     }

@@ -57,7 +57,7 @@ interface BudgetProvisionServiceInterface
      * Delete a Provision to Budget
      * @param int $id
      */
-    public function delete(int $id): bool;
+    public function delete(int $id, bool $shouldRecalculate = true): bool;
 
     /**
      * Search by description. Used in the "v-auto-complete" component

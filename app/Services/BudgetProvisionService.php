@@ -133,7 +133,7 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
      * Delete a Provision to Budget
      * @param int $id
      */
-    public function delete(int $id): bool
+    public function delete(int $id, bool $shouldRecalculate = true): bool
     {
         $provision = $this->budgetProvisionRepository->show($id);
 
@@ -158,7 +158,9 @@ class BudgetProvisionService implements BudgetProvisionServiceInterface
         $this->budgetProvisionRepository->delete($id);
 
         // Atualiza Orçamento
-        $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
+        if ($shouldRecalculate) {
+            $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
+        }
 
         return true;
     }

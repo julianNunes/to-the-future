@@ -1,5 +1,5 @@
-import path from 'path'
 import vue from '@vitejs/plugin-vue'
+import path from 'path'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
@@ -7,6 +7,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'resources/js'),
+            moment: path.resolve(__dirname, 'resources/js/utils/date.js'),
         },
     },
     test: {

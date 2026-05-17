@@ -112,7 +112,7 @@ interface CreditCardInvoiceExpenseServiceInterface
      * Delete a Expense
      * @param int $id
      */
-    public function delete(int $id): bool;
+    public function delete(int $id, bool $shouldRecalculate = true): bool;
 
     /**
      * Delete all Expense portions of a Invoice Credit Card

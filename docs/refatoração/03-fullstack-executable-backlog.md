@@ -232,7 +232,7 @@ Uma slice só pode ser marcada como concluída quando atender todos os critério
 - Frontend: tree-shaking do Vuetify, lazy load, eventual troca de `moment`, revisão de source maps e target.
 - Testes mínimos: suites existentes verdes + smoke E2E dos fluxos críticos após otimizações.
 - Validação mínima: `./scripts/artisan.sh test`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
-- Status em 16/05/2026: concluída como primeira passada segura com batch lookup em `TagRepository::saveTagsToModel()`, guard de lazy loading com log, tree-shaking real do Vuetify e validação por backend/unit/build/E2E. Otimizações maiores de recálculo/deleção e troca de `moment` permanecem como evolução posterior.
+- Status em 16/05/2026: concluída como primeira passada segura com batch lookup em `TagRepository::saveTagsToModel()`, guard de lazy loading com log, tree-shaking real do Vuetify e validação por backend/unit/build/E2E. Os remanescentes de troca de `moment` e batch de recálculo/deleção foram fechados na `SLICE-7.4`.
 
 #### SLICE-7.3 — DX, lint e acessibilidade
 - [x] Fechar a última camada de qualidade transversal.
@@ -240,7 +240,16 @@ Uma slice só pode ser marcada como concluída quando atender todos os critério
 - Backend: return types, imports mortos, naming final, docblocks e padronização.
 - Testes mínimos: component tests dos pontos acessíveis e validações finais das suites.
 - Validação mínima: `./scripts/npm.sh run lint`, `./scripts/artisan.sh test`, `./scripts/npm.sh run test:unit`, `./scripts/npm.sh run test:e2e`.
-- Status em 16/05/2026: concluída como fechamento executável com `npm run lint` em 0 erros, skip link no layout autenticado, logout navegável por teclado, labels no toggle de navegação e testes de layout/menu. Restam 4 avisos `vue/no-template-shadow` documentados e itens opcionais como Husky/lint-staged.
+- Status em 16/05/2026: concluída como fechamento executável com `npm run lint` em 0 erros, skip link no layout autenticado, logout navegável por teclado, labels no toggle de navegação e testes de layout/menu. O hardening restante de Husky/lint-staged e do `ConfirmDialog` foi fechado na `SLICE-7.4`; restam apenas 4 avisos `vue/no-template-shadow` documentados.
+
+#### SLICE-7.4 — Fechamento dos remanescentes do corte seguro
+- [x] Fechar os pontos concretos que ficaram explícitos como posteriores após a Onda 7.
+- Frontend: migrar o runtime de datas para `dayjs`, alinhar o adapter do Vuetify e remover dependências legadas de `moment`.
+- Backend: reduzir recálculos redundantes nos fluxos `deleteAllPortions`, `deletePortions` e no teardown de `Budget`.
+- DX/Acessibilidade: configurar Husky + lint-staged com os wrappers do projeto e tornar `ConfirmDialog` semanticamente acessível.
+- Testes mínimos: unit test do `ConfirmDialog`, unit tests backend focados nos deletes em lote e regressão feature de `deletePortions`.
+- Validação mínima: `./scripts/npm.sh run lint`, `./scripts/npm.sh run test:unit`, `./scripts/artisan.sh test --testsuite=Unit --filter="BudgetServiceTest|BudgetExpenseServiceTest"`, `./scripts/artisan.sh test --testsuite=Feature --filter="testInvoiceExpenseDeletePortionsRemovesAllMatchingInstallments"`, `./scripts/npm.sh run build`, smoke E2E crítico.
+- Status em 16/05/2026: concluída com alias compatível para `dayjs`, adapter `@date-io/dayjs`, remoção das dependências de `moment`, `ConfirmDialog` com `alertdialog`/ARIA, hook `pre-commit` com `lint-staged` via wrapper do projeto e batch real de recálculo nos fluxos de deleção em lote mais críticos.
 
 ---
 

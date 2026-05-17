@@ -134,7 +134,7 @@
 
 <script setup>
     import { currencyField, sumField } from '@/utils/utils.js'
-import moment from 'moment'
+    import moment from 'moment'
 
     defineOptions({ name: 'BudgetExpenseTable' })
 

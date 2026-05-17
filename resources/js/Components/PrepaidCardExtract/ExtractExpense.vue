@@ -225,22 +225,22 @@
 
 <script setup>
     import { currencyField, formatDate, reverseFormatNumber } from '@/utils/utils.js'
-import { router } from '@inertiajs/vue3'
-import moment from 'moment'
-import readXlsxFile from 'read-excel-file'
-import { computed, nextTick, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useToast } from 'vue-toastification'
+    import { router } from '@inertiajs/vue3'
+    import moment from 'moment'
+    import readXlsxFile from 'read-excel-file'
+    import { computed, nextTick, ref } from 'vue'
+    import { useI18n } from 'vue-i18n'
+    import { useToast } from 'vue-toastification'
 
     import ExtractExpenseActions from './ExtractExpenseActions.vue'
-import ExtractExpenseSummary from './ExtractExpenseSummary.vue'
-import ExtractExpenseTable from './ExtractExpenseTable.vue'
+    import ExtractExpenseSummary from './ExtractExpenseSummary.vue'
+    import ExtractExpenseTable from './ExtractExpenseTable.vue'
 
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
-import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
-import { useValidationRules } from '@/composables/useFormConstants.js'
-import { useShareCalculation } from '@/composables/useShareCalculation.js'
-import { useTagSearch } from '@/composables/useTagSearch.js'
+    import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
+    import { useValidationRules } from '@/composables/useFormConstants.js'
+    import { useShareCalculation } from '@/composables/useShareCalculation.js'
+    import { useTagSearch } from '@/composables/useTagSearch.js'
 
     const componentProps = defineProps({
         extract: { type: Object },

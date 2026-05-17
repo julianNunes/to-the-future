@@ -245,7 +245,7 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
      * @param integer $id
      * @return boolean
      */
-    public function delete(int $id): bool
+    public function delete(int $id, bool $shouldRecalculate = true): bool
     {
         $expense = $this->budgetExpenseRepository->show($id);
 
@@ -271,7 +271,9 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
         $this->budgetExpenseRepository->delete($expense->id);
 
         // Atualiza Orçamento
-        $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
+        if ($shouldRecalculate) {
+            $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
+        }
 
         return true;
     }
@@ -285,9 +287,11 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
     {
         $expenses = $this->budgetExpenseRepository->get(['group_portion' => $groupPortion]);
 
-        if ($expenses->count()) {
+        if (!$expenses->count()) {
             throw new Exception('budget-expense.not-found');
         }
+
+        $budgetsToRecalculate = [];
 
         foreach ($expenses as $expense) {
             $budget = $this->budgetRepository->show($expense->budget_id);
@@ -307,8 +311,17 @@ class BudgetExpenseService implements BudgetExpenseServiceInterface
             // Remove Despesa do Orçamento
             $this->budgetExpenseRepository->delete($expense->id);
 
-            // Atualiza Orçamento
-            $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
+            $budgetsToRecalculate[$budget_id . '|' . (int) ($share_user_id ? true : false)] = [
+                'budget_id' => $budget_id,
+                'has_share_user' => $share_user_id ? true : false,
+            ];
+        }
+
+        foreach ($budgetsToRecalculate as $recalculation) {
+            $this->budgetCalculate->recalculate(
+                $recalculation['budget_id'],
+                $recalculation['has_share_user']
+            );
         }
 
         return true;

@@ -453,23 +453,23 @@
 </template>
 <script setup>
     import { currencyField, formatDate, reverseFormatNumber } from '@/utils/utils.js'
-import { router } from '@inertiajs/vue3'
-import moment from 'moment'
-import readXlsxFile from 'read-excel-file'
-import { computed, nextTick, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useToast } from 'vue-toastification'
+    import { router } from '@inertiajs/vue3'
+    import moment from 'moment'
+    import readXlsxFile from 'read-excel-file'
+    import { computed, nextTick, ref, watch } from 'vue'
+    import { useI18n } from 'vue-i18n'
+    import { useToast } from 'vue-toastification'
 
     import InvoiceExpenseActions from './InvoiceExpenseActions.vue'
-import InvoiceExpenseDivisionTable from './InvoiceExpenseDivisionTable.vue'
-import InvoiceExpenseSummary from './InvoiceExpenseSummary.vue'
-import InvoiceExpenseTable from './InvoiceExpenseTable.vue'
+    import InvoiceExpenseDivisionTable from './InvoiceExpenseDivisionTable.vue'
+    import InvoiceExpenseSummary from './InvoiceExpenseSummary.vue'
+    import InvoiceExpenseTable from './InvoiceExpenseTable.vue'
 
     import { useCrudOperations } from '@/composables/useCrudOperations.js'
-import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
-import { useValidationRules } from '@/composables/useFormConstants.js'
-import { useShareCalculation } from '@/composables/useShareCalculation.js'
-import { useTagSearch } from '@/composables/useTagSearch.js'
+    import { useDescriptionSearch } from '@/composables/useDescriptionSearch.js'
+    import { useValidationRules } from '@/composables/useFormConstants.js'
+    import { useShareCalculation } from '@/composables/useShareCalculation.js'
+    import { useTagSearch } from '@/composables/useTagSearch.js'
 
     const componentProps = defineProps({
         invoice: { type: Object },

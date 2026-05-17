@@ -1,4 +1,5 @@
-import MomentAdapter from '@date-io/moment'
+import '@/utils/date'
+import DayjsAdapter from '@date-io/dayjs'
 import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
@@ -20,9 +21,9 @@ const vuetify = createVuetify({
         defaultTheme: 'light',
     },
     date: {
-        adapter: MomentAdapter,
+        adapter: DayjsAdapter,
         locale: {
-            pt: 'pt',
+            pt: 'pt-br',
         },
     },
 })

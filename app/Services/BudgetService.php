@@ -475,17 +475,17 @@ class BudgetService implements BudgetServiceInterface
 
         // Despesas
         foreach ($budget->expenses as $expense) {
-            $this->budgetExpenseService->delete($expense->id);
+            $this->budgetExpenseService->delete($expense->id, false);
         }
 
         // Receitas
         foreach ($budget->incomes as $income) {
-            $this->budgetIncomeService->delete($income->id);
+            $this->budgetIncomeService->delete($income->id, false);
         }
 
         // Provisions
         foreach ($budget->provisions as $provision) {
-            $this->budgetProvisionService->delete($provision->id);
+            $this->budgetProvisionService->delete($provision->id, false);
         }
 
         // Metas

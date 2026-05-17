@@ -11,4 +11,8 @@ if ! docker compose ps | grep -q "php.*Up"; then
 fi
 
 # Executar NPM no container
-docker compose exec php npm "$@"
+if [ -t 0 ] && [ -t 1 ]; then
+    docker compose exec php npm "$@"
+else
+    docker compose exec -T php npm "$@"
+fi

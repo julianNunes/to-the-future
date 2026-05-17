@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { captureDebugScreenshot, login } from './support/auth'
 
+function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 async function getActiveDialog(page) {
     const dialog = page.getByRole('dialog').last()
     await expect(dialog).toBeVisible()
@@ -13,16 +17,19 @@ async function pickComboboxOption(dialog, page, index, optionText, expectedValue
     const field = select.locator('.v-field')
 
     await field.click({ force: true })
-    const menuId = await combobox.getAttribute('aria-controls')
-    const option = page.locator(`#${menuId} .v-list-item`, { hasText: new RegExp(`^${optionText}$`) }).first()
-
-    await expect(page.locator(`#${menuId}`)).toBeVisible()
-    await option.click({ force: true })
+    await combobox.pressSequentially(optionText)
+    await combobox.press('ArrowDown')
+    await combobox.press('Enter')
 
     if (!(await field.textContent())?.includes(expectedValue)) {
+        const option = page
+            .locator('.v-overlay__content:visible .v-list-item', {
+                hasText: new RegExp(`^${escapeRegExp(optionText)}$`),
+            })
+            .first()
+
         await field.click({ force: true })
-        await combobox.pressSequentially(optionText)
-        await combobox.press('Enter')
+        await option.click({ force: true })
     }
 
     await expect(field).toContainText(expectedValue)

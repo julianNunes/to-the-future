@@ -6,7 +6,12 @@ use App\Helpers\Budget\Interfaces\BudgetCalculateInterface;
 use App\Helpers\Budget\Interfaces\BudgetRelationPeriodBinderInterface;
 use App\Helpers\Budget\Interfaces\BudgetShowDataInterface;
 use App\Models\Budget;
+use App\Models\BudgetExpense;
+use App\Models\BudgetGoal;
 use App\Models\BudgetIncome;
+use App\Models\BudgetProvision;
+use App\Models\CreditCardInvoice;
+use App\Models\PrepaidCardExtract;
 use App\Models\User;
 use App\Repositories\Interfaces\BudgetExpenseRepositoryInterface;
 use App\Repositories\Interfaces\BudgetGoalRepositoryInterface;
@@ -34,6 +39,121 @@ class BudgetServiceTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
     use RefreshDatabase;
+
+    public function testDeleteSkipsChildRecalculationsDuringBudgetTeardown(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $budgetExpenseService = Mockery::mock(BudgetExpenseServiceInterface::class);
+        $budgetProvisionService = Mockery::mock(BudgetProvisionServiceInterface::class);
+        $budgetIncomeService = Mockery::mock(BudgetIncomeServiceInterface::class);
+        $budgetGoalService = Mockery::mock(BudgetGoalServiceInterface::class);
+        $budgetShowData = Mockery::mock(BudgetShowDataInterface::class);
+        $budgetCalculate = Mockery::mock(BudgetCalculateInterface::class);
+        $budgetRelationPeriodBinder = Mockery::mock(BudgetRelationPeriodBinderInterface::class);
+        $fixExpenseRepository = Mockery::mock(FixExpenseRepositoryInterface::class);
+        $provisionRepository = Mockery::mock(ProvisionRepositoryInterface::class);
+        $budgetRepository = Mockery::mock(BudgetRepositoryInterface::class);
+        $creditCardInvoiceRepository = Mockery::mock(CreditCardInvoiceRepositoryInterface::class);
+        $prepaidCardExtractRepository = Mockery::mock(PrepaidCardExtractRepositoryInterface::class);
+        $financingInstallmentRepository = Mockery::mock(FinancingInstallmentRepositoryInterface::class);
+        $budgetExpenseRepository = Mockery::mock(BudgetExpenseRepositoryInterface::class);
+        $budgetProvisionRepository = Mockery::mock(BudgetProvisionRepositoryInterface::class);
+        $budgetIncomeRepository = Mockery::mock(BudgetIncomeRepositoryInterface::class);
+        $budgetGoalRepository = Mockery::mock(BudgetGoalRepositoryInterface::class);
+
+        $expense = new BudgetExpense();
+        $expense->id = 21;
+
+        $income = new BudgetIncome();
+        $income->id = 22;
+
+        $provision = new BudgetProvision();
+        $provision->id = 23;
+
+        $goal = new BudgetGoal();
+        $goal->id = 24;
+
+        $invoice = new CreditCardInvoice();
+        $invoice->id = 31;
+
+        $extract = new PrepaidCardExtract();
+        $extract->id = 41;
+
+        $budget = new Budget([
+            'user_id' => $user->id,
+            'year' => '2026',
+            'month' => '05',
+        ]);
+        $budget->id = 10;
+        $budget->setRelation('expenses', collect([$expense]));
+        $budget->setRelation('incomes', collect([$income]));
+        $budget->setRelation('provisions', collect([$provision]));
+        $budget->setRelation('goals', collect([$goal]));
+        $budget->setRelation('invoices', collect([$invoice]));
+        $budget->setRelation('extracts', collect([$extract]));
+
+        $budgetRepository->shouldReceive('show')
+            ->once()
+            ->with(10, ['expenses', 'incomes', 'provisions', 'goals', 'invoices', 'extracts'])
+            ->andReturn($budget);
+
+        $budgetExpenseService->shouldReceive('delete')
+            ->once()
+            ->with(21, false)
+            ->andReturn(true);
+
+        $budgetIncomeService->shouldReceive('delete')
+            ->once()
+            ->with(22, false)
+            ->andReturn(true);
+
+        $budgetProvisionService->shouldReceive('delete')
+            ->once()
+            ->with(23, false)
+            ->andReturn(true);
+
+        $budgetGoalService->shouldReceive('delete')
+            ->once()
+            ->with(24)
+            ->andReturn(true);
+
+        $creditCardInvoiceRepository->shouldReceive('store')
+            ->once()
+            ->with(['budget_id' => null], $invoice);
+
+        $prepaidCardExtractRepository->shouldReceive('store')
+            ->once()
+            ->with(['budget_id' => null], $extract);
+
+        $budgetRepository->shouldReceive('delete')
+            ->once()
+            ->with(10)
+            ->andReturn(true);
+
+        $service = new BudgetService(
+            $budgetExpenseService,
+            $budgetProvisionService,
+            $budgetIncomeService,
+            $budgetGoalService,
+            $budgetShowData,
+            $budgetCalculate,
+            $budgetRelationPeriodBinder,
+            $fixExpenseRepository,
+            $provisionRepository,
+            $budgetRepository,
+            $creditCardInvoiceRepository,
+            $prepaidCardExtractRepository,
+            $financingInstallmentRepository,
+            $budgetExpenseRepository,
+            $budgetProvisionRepository,
+            $budgetIncomeRepository,
+            $budgetGoalRepository,
+        );
+
+        $this->assertTrue($service->delete(10));
+    }
 
     public function testClonePassesNewBudgetIdAsFirstArgumentWhenCloningIncomes(): void
     {

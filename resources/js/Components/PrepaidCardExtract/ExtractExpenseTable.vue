@@ -119,7 +119,7 @@
 
 <script setup>
     import { currencyField, sumField, sumGroup } from '@/utils/utils.js'
-import moment from 'moment'
+    import moment from 'moment'
 
     defineOptions({ name: 'ExtractExpenseTable' })
 

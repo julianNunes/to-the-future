@@ -98,10 +98,10 @@ interface BudgetExpenseServiceInterface
      * @param int $id
      * @return boolean
      */
-    public function delete(int $id): bool;
+    public function delete(int $id, bool $shouldRecalculate = true): bool;
 
     /**
-     * Delete all Expenses with Portion from a Budget 
+     * Delete all Expenses with Portion from a Budget
      * @param string $groupPortion
      * @return boolean
      */

@@ -318,7 +318,7 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
     /**
      * Delete a Expense
      */
-    public function delete(int $id): bool
+    public function delete(int $id, bool $shouldRecalculate = true): bool
     {
         $credit_card_invoice_expense = $this->creditCardInvoiceExpenseRepository->show($id, [
             'invoice:id,budget_id,credit_card_id',
@@ -350,10 +350,12 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         $this->creditCardInvoiceExpenseRepository->delete($credit_card_invoice_expense->id);
 
         // Atualiza o saldo total da fatura
-        $this->recalculateTotalInvoice($invoice_id);
+        if ($shouldRecalculate) {
+            $this->recalculateTotalInvoice($invoice_id);
+        }
 
         // Atualiza Orçamento
-        if ($budget_id) {
+        if ($shouldRecalculate && $budget_id) {
             $this->budgetCalculate->recalculate($budget_id, $share_user_id ? true : false);
         }
 
@@ -384,14 +386,42 @@ class CreditCardInvoiceExpenseService implements CreditCardInvoiceExpenseService
         $description = $credit_card_invoice_expense->description;
 
         // Busca todas as despesas referente a parcela
-        $expenses = $this->creditCardInvoiceExpenseRepository->get(function (Builder $query) use ($credit_card_id, $portion_total, $description) {
-            $query->where('portion_total', $portion_total)
-                ->where('description', $description)
-                ->whereRelation('invoice', 'credit_card_id', '=', $credit_card_id);
-        });
+        $expenses = $this->creditCardInvoiceExpenseRepository->get(
+            function (Builder $query) use ($credit_card_id, $portion_total, $description) {
+                $query->where('portion_total', $portion_total)
+                    ->where('description', $description)
+                    ->whereRelation('invoice', 'credit_card_id', '=', $credit_card_id);
+            },
+            [],
+            [],
+            ['invoice:id,budget_id,credit_card_id']
+        );
+
+        $invoicesToRecalculate = [];
+        $budgetsToRecalculate = [];
 
         foreach ($expenses as $expense) {
-            $this->delete($expense->id);
+            $invoicesToRecalculate[$expense->invoice_id] = $expense->invoice_id;
+
+            if ($expense->invoice?->budget_id) {
+                $budgetsToRecalculate[$expense->invoice->budget_id . '|' . (int) ($expense->share_user_id ? true : false)] = [
+                    'budget_id' => $expense->invoice->budget_id,
+                    'has_share_user' => $expense->share_user_id ? true : false,
+                ];
+            }
+
+            $this->delete($expense->id, false);
+        }
+
+        foreach ($invoicesToRecalculate as $invoiceId) {
+            $this->recalculateTotalInvoice($invoiceId);
+        }
+
+        foreach ($budgetsToRecalculate as $recalculation) {
+            $this->budgetCalculate->recalculate(
+                $recalculation['budget_id'],
+                $recalculation['has_share_user']
+            );
         }
 
         return true;

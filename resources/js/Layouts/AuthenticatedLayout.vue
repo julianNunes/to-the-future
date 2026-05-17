@@ -1,11 +1,11 @@
 <script setup>
     import NavigationMenu from '@/Components/NavigationMenu.vue'
-import { usePage } from '@inertiajs/vue3'
-import md5 from 'crypto-js/md5'
-import { computed, onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useToast } from 'vue-toastification'
-import { useDisplay } from 'vuetify'
+    import { usePage } from '@inertiajs/vue3'
+    import md5 from 'crypto-js/md5'
+    import { computed, onMounted, ref, watch } from 'vue'
+    import { useI18n } from 'vue-i18n'
+    import { useToast } from 'vue-toastification'
+    import { useDisplay } from 'vuetify'
 
     const drawer = ref(false)
     const rail = ref(false)
